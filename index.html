@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Unleash Your Inner Beast: planul zi de zi, timere de luptă, calistenie, Wim Hof și tracking.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Beast">
+<title>Inner Beast</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preload" href="fonts/league-spartan-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'League Spartan';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/league-spartan-latin-wght-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'League Spartan';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/league-spartan-latin-ext-wght-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Montserrat';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/montserrat-latin-wght-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Montserrat';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/montserrat-latin-ext-wght-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+html,body{margin:0;background:#000;color:#fff}
+#splash{position:fixed;inset:0;z-index:100;background:#000;overflow:hidden;transition:opacity .45s ease;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#splash.sp-out{opacity:0;pointer-events:none}
+#sp-dust{position:absolute;inset:0;width:100%;height:100%}
+.sp-claws{position:absolute;width:min(92vmin,560px);right:-10vmin;top:max(4vh,env(safe-area-inset-top));filter:drop-shadow(0 0 14px rgba(199,254,81,.5))}
+.cl-reveal{stroke-dasharray:var(--l);stroke-dashoffset:var(--l)}
+.sp-go .cl-reveal{animation:sp-rip .3s cubic-bezier(.75,0,.25,1) forwards;animation-delay:calc(.35s + var(--d))}
+.sp-title{position:absolute;left:clamp(20px,6vw,48px);bottom:calc(19vh + env(safe-area-inset-bottom));margin:0;font:900 clamp(58px,19vw,128px)/.84 'League Spartan','Arial Black',sans-serif;letter-spacing:-.01em;color:#fff;text-transform:uppercase}
+.sp-title span{display:block;opacity:0;transform:translateY(.28em) scale(1.08);transform-origin:left bottom}
+.sp-go .sp-title span{animation:sp-slam .34s cubic-bezier(.2,.9,.3,1.25) forwards}
+.sp-go .sp-title span:nth-child(1){animation-delay:.82s}
+.sp-go .sp-title span:nth-child(2){animation-delay:.9s}
+.sp-go .sp-title span:nth-child(3){animation-delay:.98s}
+.sp-go .sp-title span:nth-child(4){animation-delay:1.06s}
+.sp-sub{position:absolute;left:clamp(20px,6vw,48px);right:clamp(20px,6vw,48px);bottom:calc(8vh + env(safe-area-inset-bottom));max-width:32ch;margin:0;font:600 15px/1.45 Montserrat,system-ui,sans-serif;color:#d4d4d4;opacity:0}
+.sp-go .sp-sub{animation:sp-fade .5s ease 1.5s forwards}
+.sp-go{animation:sp-shake .26s linear .7s 1}
+@keyframes sp-rip{to{stroke-dashoffset:0}}
+@keyframes sp-slam{to{opacity:1;transform:none}}
+@keyframes sp-fade{to{opacity:1}}
+@keyframes sp-shake{0%,100%{transform:none}20%{transform:translate(-5px,3px)}40%{transform:translate(4px,-3px)}60%{transform:translate(-3px,2px)}80%{transform:translate(2px,-1px)}}
+@media (prefers-reduced-motion:reduce){.sp-go,.sp-go .cl-reveal,.sp-go .sp-title span,.sp-go .sp-sub{animation:none}.cl-reveal{stroke-dashoffset:0}.sp-title span,.sp-sub{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="splash" aria-hidden="true">
+  <canvas id="sp-dust"></canvas>
+  <!--CLAWS-->
+  <h1 class="sp-title"><span>Unleash</span><span>your</span><span>inner</span><span>beast.</span></h1>
+  <p class="sp-sub">Tot ce-ți trebuie ca să ajungi în cea mai bună formă a vieții tale, mental și fizic.</p>
+</div>
+<div id="app"></div>
+<div id="ov"></div>
+<div id="sheet"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+(function () {
+  var sp = document.getElementById('splash');
+  if (!sp) return;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var c = document.getElementById('sp-dust'), x = c.getContext('2d');
+  var dpr = Math.min(2, window.devicePixelRatio || 1), W = 0, H = 0, P = [], raf = 0, t0 = performance.now(), done = false;
+  function size() { W = c.width = innerWidth * dpr; H = c.height = innerHeight * dpr; }
+  size();
+  addEventListener('resize', size);
+  for (var i = 0; i < 150; i++) P.push({ x: Math.random(), y: Math.random(), r: Math.random() < .86 ? .5 + Math.random() : 1.4 + Math.random() * 1.6, a: .12 + Math.random() * .6, v: .00002 + Math.random() * .0001 });
+  x.fillStyle = '#fff';
+  function draw(t) {
+    var k = Math.min(1, (t - t0) / 500);
+    x.clearRect(0, 0, W, H);
+    for (var i = 0; i < P.length; i++) {
+      var p = P[i];
+      if (!reduce) { p.y -= p.v * 16; if (p.y < 0) p.y += 1; }
+      x.globalAlpha = p.a * k;
+      x.beginPath(); x.arc(p.x * W, p.y * H, p.r * dpr, 0, 6.2832); x.fill();
+    }
+    raf = requestAnimationFrame(draw);
+  }
+  raf = requestAnimationFrame(draw);
+  function end() {
+    if (done) return;
+    done = true;
+    sp.classList.add('sp-out');
+    setTimeout(function () { cancelAnimationFrame(raf); removeEventListener('resize', size); sp.remove(); }, 460);
+  }
+  sp.addEventListener('click', end);
+  setTimeout(end, reduce ? 1300 : 2700);
+  sp.classList.add('sp-go');
+})();
+</script>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

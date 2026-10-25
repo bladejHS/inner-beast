@@ -109,7 +109,8 @@ class RoundsPlayer implements Player {
     let panel = '';
     if (p.kind === 'work' && this.call && this.caller) panel = this.callHtml('Acum');
     else if (p.kind === 'work' && this.cfg.legSwap) panel = `<div class="call-box"><h4>Formă</h4><p style="margin:0">${esc(LEG_CUES[ctx.S.set.legMode])}</p></div>`;
-    else if (p.kind === 'rest') panel = `<div class="call-box"><h4>Sfat de la Alex</h4><p style="margin:0;font-weight:600">${esc(this.tip)}</p></div>`;
+    else if (p.kind === 'rest' && this.tip) panel = `<div class="call-box"><h4>Sfat de la Alex</h4><p style="margin:0;font-weight:600">${esc(this.tip)}</p></div>`;
+    else if (p.kind === 'rest') panel = `<div class="call-box"><h4>Urmează</h4><p style="margin:0;font-weight:600">Runda ${(p.round ?? 0) + 1} din ${p.rounds}. Respiră adânc.</p></div>`;
     else if (p.kind === 'prep') panel = this.cfg.tip ? `<div class="call-box"><h4>Focus</h4><p style="margin:0;font-weight:600">${esc(this.cfg.tip)}</p></div>` : '';
     const body = `
       <p class="phase-lbl" id="ph">${esc(p.kind === 'work' ? (this.cfg.focus && FOCUS_LINE[this.cfg.focus]) || 'Lucru' : p.label)}</p>
@@ -208,7 +209,8 @@ class RoundsPlayer implements Player {
       sfx.bell(3);
       buzz([200, 100, 200]);
       hush();
-      this.tip = REST_TIPS[Math.floor(Math.random() * REST_TIPS.length)];
+      const boxing = this.cfg.focus && !['rope', 'legs'].includes(this.cfg.focus);
+      this.tip = boxing ? REST_TIPS[Math.floor(Math.random() * REST_TIPS.length)] : '';
     }
   }
 

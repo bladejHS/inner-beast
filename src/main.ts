@@ -1,4 +1,5 @@
 import './styles.css';
+import './premium.css';
 import { blockById, WEEK, type Block } from './data/plan.ts';
 import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
 import { dayKey, esc, uid, weekdayIdx } from './logic/util.ts';

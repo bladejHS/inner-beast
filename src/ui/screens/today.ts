@@ -6,17 +6,45 @@ import { dayProgress, habitDone, habitMilestone, habitStreak, weekDone } from '.
 import { dayKey, esc, prettyDay, RO_DAYS, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
-import { blockCard, top } from './shared.ts';
+import { clawSvg } from '../claws.ts';
+import { blockCard, blockMinutes, top } from './shared.ts';
+
+function miniRing(n: number, total: number, size = 64): string {
+  const r = 26;
+  const c = 2 * Math.PI * r;
+  const off = c * (1 - n / total);
+  return `<svg class="mring" width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="${r}" class="mr-t"/><circle cx="32" cy="32" r="${r}" class="mr-v" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg>`;
+}
+
+/** Monday–Sunday strip: how much of each day is done this week. */
+export function weekStrip(today: string, active: number): string {
+  const done = weekDone(ctx.S.log, weekStart(today));
+  const tIdx = weekdayIdx(today);
+  return `<nav class="wk" aria-label="Zilele săptămânii">${WEEK.map((d) => {
+    const n = dayProgress(d, done);
+    const st = n === d.blocks.length ? 'full' : n > 0 ? 'part' : '';
+    return `<button class="wk-d ${st} ${d.idx === active ? 'on' : ''} ${d.idx === tIdx ? 'now' : ''}" data-a="${d.idx === tIdx ? 'tab' : 'day'}" data-k="today" data-i="${d.idx}" aria-label="${esc(RO_DAYS[d.idx])}"><span>${RO_DAYS[d.idx].slice(0, 2)}</span><i></i></button>`;
+  }).join('')}</nav>`;
+}
 
 export function dayBody(day: Day, today: string, kicker: string): string {
   const done = weekDone(ctx.S.log, weekStart(today));
   const n = dayProgress(day, done);
-  const long = day.title.length > 16;
+  const total = day.blocks.length;
+  const mins = day.blocks.reduce((s, b) => s + blockMinutes(b), 0);
   return `
-    <p class="kicker">${esc(kicker)}</p>
-    <h1 class="stack ${long ? 'mid' : ''}">${esc(day.title)}</h1>
-    <div class="dayline"><div class="pips">${day.blocks.map((b) => `<i class="${done.has(b.id) ? 'on' : ''}"></i>`).join('')}</div><span class="small dim">${n === day.blocks.length ? 'Ziua e completă.' : `${n} din ${day.blocks.length} gata`}</span></div>
-    <ol class="blocks">${day.blocks.map((b, i) => blockCard(b, i + 1, today)).join('')}</ol>`;
+    <section class="hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      ${clawSvg('#C7FE51', 'hero-claw')}
+      <p class="hero-k">${esc(kicker)}</p>
+      <h1 class="hero-t">${esc(day.title)}</h1>
+      <div class="hero-row">
+        <div class="hero-meta"><span><b>${total}</b> blocuri</span><span><b>~${mins}</b> min</span></div>
+        <div class="hero-ring">${miniRing(n, total)}<b>${n}<small>/${total}</small></b></div>
+      </div>
+    </section>
+    ${weekStrip(today, day.idx)}
+    <ol class="bks">${day.blocks.map((b, i) => blockCard(b, i + 1, today)).join('')}</ol>`;
 }
 
 export function habitCard(compact = false): string {
@@ -66,7 +94,7 @@ function whyCard(): string {
 }
 
 function dailyCard(): string {
-  return `<section class="card"><div class="row"><div class="row-l"><h3>Mobilitate zilnică</h3><p class="small dim" style="margin:0">10 minute, opțional. Alex face mobilitate în fiecare zi ca să rămână rapid.</p></div><button class="go lime" data-a="tool" data-k="daily">Start${ic('play')}</button></div></section>`;
+  return `<section class="card"><div class="row"><div class="row-l"><h3>Mobilitate zilnică</h3><p class="small dim" style="margin:0">10 minute, opțional. Alex face mobilitate în fiecare zi ca să rămână rapid.</p></div><button class="bk-go" data-a="tool" data-k="daily" aria-label="Start mobilitate zilnică">${ic('play')}</button></div></section>`;
 }
 
 function introCard(): string {

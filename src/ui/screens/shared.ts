@@ -79,6 +79,31 @@ export function toggleMark(b: Block): void {
   });
 }
 
+const ICON_BY_ID: Record<string, string> = {
+  'mon-shadow': 'shadow', 'thu-shadow': 'shadow', 'tue-easy': 'shadow', 'fri-easy': 'shadow',
+  'mon-bag': 'bag', 'thu-bag': 'bag', 'thu-rope': 'rope', 'sun-legs': 'wall', 'mon-bw': 'bolt',
+  'tue-cal': 'fight', 'fri-cal': 'fight', 'sun-lunges': 'fight', 'tue-stretch': 'stretch', 'fri-stretch': 'stretch',
+  'sat-mob': 'stretch', 'wed-walk': 'walk', 'wed-shower': 'drop', 'wed-med': 'wind', 'sat-med': 'wind',
+  'sat-breath': 'mind', 'sun-jog': 'run',
+};
+
+export function blockIcon(b: Block): string {
+  return ICON_BY_ID[b.id] ?? 'timer';
+}
+
+/** Rough minutes a block takes, for the day's total. */
+export function blockMinutes(b: Block): number {
+  if (b.kind === 'rounds') {
+    const r = b.rounds ?? 1;
+    return Math.round((r * (b.work ?? 0) + (r - 1) * restFor(b.rest)) / 60);
+  }
+  if (b.kind === 'shower') return ctx.S.set.showerRounds * 2 + (ctx.S.set.showerEndCold ? 1 : 0);
+  if (b.kind === 'walk') return 75;
+  if (b.kind === 'wimhof' && !b.min) return 12;
+  if (b.kind === 'workout' && b.workout === 'legs') return 15;
+  return b.min ?? 10;
+}
+
 export function blockCard(b: Block, n: number, today: string): string {
   const entries = blockEntries(b, today);
   const done = entries.length > 0;
@@ -86,18 +111,21 @@ export function blockCard(b: Block, n: number, today: string): string {
   let extra = '';
   if (b.kind === 'walk') {
     const st = ctx.S.steps[today] ?? 0;
-    extra = `<div class="steps-in"><label class="sr" for="steps-in">Pași azi</label><input id="steps-in" type="number" inputmode="numeric" min="0" max="100000" data-a="steps" value="${st || ''}" placeholder="Pași azi"><span style="font-weight:700">din 10.000</span></div>`;
+    extra = `<div class="steps-in"><label class="sr" for="steps-in">Pași azi</label><input id="steps-in" type="number" inputmode="numeric" min="0" max="100000" data-a="steps" value="${st || ''}" placeholder="Pași azi"><span>din 10.000</span></div>`;
   }
   const when = done ? doneWhen(entries[0].date, today) : '';
-  return `<li class="blk ${done ? 'done' : ''}">
-    <button class="blk-n" data-a="mark" data-b="${b.id}" aria-label="${done ? 'Anulează bifa' : 'Bifează fără timer'}">${done ? ic('check') : n}</button>
-    <div>
-      <h3>${esc(name)}</h3>
-      <p class="dose">${esc(b.dose)}</p>
-      <p class="tip">${esc(b.tip)}</p>
-      ${extra}
-      <div class="acts"><button class="go ${done ? 'again' : ''}" data-a="start" data-b="${b.id}">${done ? 'Din nou' : 'Start'}${ic('play')}</button>${when ? `<span class="meta">${esc(when)}</span>` : ''}</div>
+  return `<li class="bk ${done ? 'done' : ''}">
+    <div class="bk-top">
+      <button class="bk-ic" data-a="mark" data-b="${b.id}" aria-label="${done ? 'Anulează bifa' : 'Bifează fără timer'}">${done ? ic('check') : ic(blockIcon(b))}</button>
+      <div class="bk-main">
+        <span class="bk-n">${String(n).padStart(2, '0')}${when ? ` <em>${esc(when)}</em>` : ''}</span>
+        <h3>${esc(name)}</h3>
+        <p class="bk-dose">${esc(b.dose)}</p>
+      </div>
+      <button class="bk-go" data-a="start" data-b="${b.id}" aria-label="${done ? 'Din nou' : 'Start'}: ${esc(name)}">${ic('play')}</button>
     </div>
+    <p class="bk-tip">${esc(b.tip)}</p>
+    ${extra}
   </li>`;
 }
 

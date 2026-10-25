@@ -21,14 +21,26 @@ function dust(n, seed, size) {
 function iconSvg(size, scale = 0.8, rounded = false) {
   const off = (size * (1 - scale)) / 2;
   const k = (size * scale) / 100;
-  const claws = CLAWS.map((c) => `<path d="${c.fill}" fill="${LIME}"/>`).join('');
+  const claws = CLAWS.map((c) => `<path d="${c.fill}"/>`).join('');
   const r = rounded ? size * 0.22 : 0;
+  const u = size / 512;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-<defs><radialGradient id="g" cx="50%" cy="46%" r="60%"><stop offset="0" stop-color="#1c2408"/><stop offset="0.55" stop-color="#050505"/><stop offset="1" stop-color="#000"/></radialGradient>
-<filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${(size / 160).toFixed(1)}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<rect width="${size}" height="${size}" rx="${r}" fill="url(#g)"/>
-${dust(70, 7, size)}
-<g filter="url(#glow)" transform="translate(${off.toFixed(2)} ${off.toFixed(2)}) scale(${k.toFixed(4)})">${claws}</g>
+<defs>
+  <radialGradient id="bg" cx="62%" cy="34%" r="80%"><stop offset="0" stop-color="#22330a"/><stop offset=".38" stop-color="#0b1105"/><stop offset=".75" stop-color="#030402"/><stop offset="1" stop-color="#000"/></radialGradient>
+  <radialGradient id="halo" cx="58%" cy="44%" r="42%"><stop offset="0" stop-color="#C7FE51" stop-opacity=".14"/><stop offset="1" stop-color="#C7FE51" stop-opacity="0"/></radialGradient>
+  <linearGradient id="cl" x1="0" y1="0" x2=".55" y2="1"><stop offset="0" stop-color="#F4FFD0"/><stop offset=".3" stop-color="#D6FF6E"/><stop offset=".62" stop-color="#C7FE51"/><stop offset="1" stop-color="#6FA514"/></linearGradient>
+  <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="${(7 * u).toFixed(1)}" result="b"/><feColorMatrix in="b" values="0 0 0 0 .78  0 0 0 0 1  0 0 0 0 .32  0 0 0 .55 0"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="shade" x="-10%" y="-10%" width="120%" height="120%"><feOffset dy="${(3 * u).toFixed(1)}"/><feGaussianBlur stdDeviation="${(2.5 * u).toFixed(1)}"/><feComposite in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 .1  0 0 0 0 0  0 0 0 .55 0"/></filter>
+</defs>
+<rect width="${size}" height="${size}" rx="${r}" fill="url(#bg)"/>
+${dust(60, 7, size)}
+<circle cx="${size * 0.56}" cy="${size * 0.47}" r="${size * 0.42}" fill="url(#halo)"/>
+<g transform="translate(${off.toFixed(2)} ${off.toFixed(2)}) scale(${k.toFixed(4)})">
+  <g filter="url(#glow)" fill="url(#cl)">${claws}</g>
+  <g filter="url(#shade)" fill="#000">${claws}</g>
+</g>
+<rect width="${size}" height="${size}" rx="${r}" fill="url(#rim)" opacity=".3"/>
 </svg>`;
 }
 

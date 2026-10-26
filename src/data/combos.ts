@@ -130,6 +130,11 @@ export const COMBOS: Combo[] = [
     vid: '7229638724781477146', src: 'Combination for today',
   },
   {
+    id: 'four-punch', name: 'Jab – Cross – Hook – Bodyshot', seq: ['Jab', 'Cross', 'Hook', 'Bodyshot'], call: 'Jab, cross, hook, body', cat: 'combo',
+    note: 'Combinația lui Alex la sacul greu: trei lovituri la cap, apoi cobori din genunchi pentru lovitura la corp.',
+    vid: '7211995471269678342', src: 'Boxing combo',
+  },
+  {
     id: 'favorite', name: 'Jab – Hook – Body – Right Hook', seq: ['Jab', 'Hook', 'Body', 'Right Hook'], call: 'Jab, hook, body, right hook', cat: 'combo',
     note: 'Una dintre combinațiile preferate ale lui Alex: jab, croșeu la cap, cobori la corp și închei cu croșeul de dreapta.',
     vid: '7223053215246421254', src: 'One of my favorite combos',
@@ -241,7 +246,7 @@ export const ROPE_MOVES = [
 const FOCUS: Record<string, string[]> = {
   jab: ['jab', 'double-jab', 'one-two', 'jab-out', 'body-body-head', 'ghost-step', 'pull-counter', 'guard-reset', 'jab-cross-hook', 'beginner-defense', 'simple-body'],
   move: ['body-head', 'liver', 'body-body-head', 'off-ropes', 'ghost-step', 'one-two', 'step-overhand', 'hooks-liver', 'close-range', 'liver-move', 'check-hook'],
-  combo: ['liver', 'tyson-huh', 'tyson-slip', 'body-head', 'body-body-head', 'pull-counter', 'angle-finish', 'duck-counter', 'step-overhand', 'jab-upper-roll', 'tyson-uppercuts', 'tyson-body-head', 'liver-setup', 'feint-liver', 'check-hook', 'tyson-switch', 'combo-of-day', 'hook-setup', 'favorite'],
+  combo: ['liver', 'tyson-huh', 'tyson-slip', 'body-head', 'body-body-head', 'pull-counter', 'angle-finish', 'duck-counter', 'step-overhand', 'jab-upper-roll', 'tyson-uppercuts', 'tyson-body-head', 'liver-setup', 'feint-liver', 'check-hook', 'tyson-switch', 'combo-of-day', 'hook-setup', 'favorite', 'four-punch'],
   power: ['tyson-killer', 'angle-finish', 'off-ropes', 'liver', 'body-head', 'body-body-head', 'gazelle', 'hooks-liver', 'peekaboo-killer', 'close-range', 'liver-cross', 'liver-move', 'ko-combo', 'tap-uppercut'],
   slow: ['jab', 'one-two', 'liver', 'alphabet', 'tyson-huh', 'peekaboo', 'guard-reset'],
   distance: ['jab', 'double-jab', 'jab-out', 'pull-counter', 'ghost-step', 'one-two', 'step-overhand'],

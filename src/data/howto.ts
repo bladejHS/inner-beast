@@ -383,6 +383,7 @@ export const HOW: Record<string, How> = {
       'Cotul rămâne aproape de corp; lovitura vine din picioare și șold.',
       'Revii imediat în gardă.',
     ],
+    mistake: 'Să-l armezi larg, drept în picioare, cu mâna coborâtă: Alex arată că așa se vede de departe. Pleacă scurt, din gardă, după ce cobori din genunchi.',
   },
   Overhand: {
     steps: [

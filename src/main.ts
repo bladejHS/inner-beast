@@ -14,7 +14,7 @@ import { chapterHtml, mindHtml } from './ui/screens/mind.ts';
 import { planHtml } from './ui/screens/plan.ts';
 import { historyHtml, progressHtml } from './ui/screens/progress.ts';
 import { settingsHtml } from './ui/screens/settings.ts';
-import { saveSteps, startBlock, toggleMark } from './ui/screens/shared.ts';
+import { isDark, saveSteps, setTheme, startBlock, toggleMark } from './ui/screens/shared.ts';
 import { dayViewHtml, todayHtml } from './ui/screens/today.ts';
 
 initAudio(() => ctx.S.set);
@@ -225,6 +225,9 @@ function act(a: string, el: HTMLElement): void {
       return;
     case 'settings':
       return pushView({ t: 'settings' });
+    case 'theme':
+      setTheme(!isDark());
+      return render();
     case 'history':
       return pushView({ t: 'history' });
     case 'qt':
@@ -337,6 +340,10 @@ function onChange(el: HTMLElement): void {
     return;
   }
   if (a === 'import') return importData(el as HTMLInputElement);
+  if (a === 'set-theme') {
+    setTheme((el as HTMLInputElement).checked);
+    return render();
+  }
   if (a === 'steps') {
     saveSteps(parseInt((el as HTMLInputElement).value, 10) || 0);
     return render();

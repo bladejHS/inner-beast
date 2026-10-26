@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f3f1ec">
+<meta name="color-scheme" content="light dark">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Unleash Your Inner Beast: planul zi de zi, timere de luptă, calistenie, Wim Hof și tracking.">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,35 +17,46 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" href="fonts/league-spartan-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="art/wolf.webp" as="image" type="image/webp">
+<script>
+// Theme before the first paint: the saved choice, otherwise the phone's setting.
+(function () {
+  var t = null;
+  try { t = localStorage.getItem('beast:theme'); } catch (e) {}
+  if (t !== 'dark' && t !== 'light') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.dataset.theme = t;
+  if (t === 'dark') document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0f0f0f');
+})();
+</script>
 <style>
 @font-face{font-family:'League Spartan';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/league-spartan-latin-wght-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'League Spartan';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/league-spartan-latin-ext-wght-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:'Montserrat';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/montserrat-latin-wght-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Montserrat';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/montserrat-latin-ext-wght-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-html,body{margin:0;background:#f3f1ec;color:#0d0d0d}
+html{--sp-bg:#f3f1ec;--sp-fg:#0d0d0d}html[data-theme=dark]{--sp-bg:#0f0f0f;--sp-fg:#efece6}
+html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 /* Opening: a drop of ink falls, bleeds into the wolf, three claws tear through it, the words are stamped. */
-#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#f3f1ec;color:#0d0d0d;transition:clip-path .6s cubic-bezier(.7,0,.2,1);clip-path:inset(0 0 0 0)}
+#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:var(--sp-bg);color:var(--sp-fg);transition:clip-path .6s cubic-bezier(.7,0,.2,1);clip-path:inset(0 0 0 0)}
 #splash.sp-out{clip-path:inset(0 0 100% 0);pointer-events:none}
 .sp-stage{position:absolute;inset:0}
 #sp-ink{position:absolute;inset:0;width:100%;height:100%}
-.sp-claws{position:absolute;color:#f3f1ec;pointer-events:none}
+.sp-claws{position:absolute;color:var(--sp-bg);pointer-events:none}
 .cl-reveal{stroke-dasharray:var(--l);stroke-dashoffset:var(--l)}
 .sp-go .cl-reveal{animation:sp-rip .2s cubic-bezier(.8,0,.2,1) forwards;animation-delay:calc(1.3s + var(--d))}
 .sp-go .sp-stage{animation:sp-hit .34s linear 1.4s 1}
-.sp-title{position:absolute;left:clamp(20px,6vw,48px);right:clamp(20px,6vw,48px);bottom:calc(19vh + env(safe-area-inset-bottom));margin:0;font:900 clamp(54px,17vw,118px)/.84 'League Spartan','Arial Black',sans-serif;letter-spacing:-.02em;text-transform:uppercase;filter:url(#ink)}
+.sp-title{position:absolute;left:clamp(20px,6vw,48px);right:clamp(20px,6vw,48px);bottom:calc(19vh + env(safe-area-inset-bottom));margin:0;font:900 clamp(54px,17vw,118px)/.84 'League Spartan','Arial Black',sans-serif;letter-spacing:-.02em;text-transform:uppercase}
 .sp-title span{display:block;opacity:0;transform:scale(1.5) rotate(-3deg);transform-origin:0 60%}
 .sp-go .sp-title span{animation:sp-stamp .32s cubic-bezier(.3,1.6,.5,1) forwards}
 .sp-go .sp-title span:nth-child(1){animation-delay:1.65s}
 .sp-go .sp-title span:nth-child(2){animation-delay:1.8s}
 .sp-go .sp-title span:nth-child(3){animation-delay:1.95s}
 .sp-brush{position:absolute;left:clamp(14px,5vw,42px);bottom:calc(13.5vh + env(safe-area-inset-bottom));width:min(78vw,430px);height:34px;overflow:visible}
-.sp-brush path{fill:none;stroke:#0d0d0d;stroke-width:13;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;filter:url(#brush)}
+.sp-brush path{fill:none;stroke:var(--sp-fg);stroke-width:13;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;filter:url(#brush)}
 .sp-go .sp-brush path{animation:sp-draw .45s cubic-bezier(.6,0,.2,1) 2.25s forwards}
-.sp-brand{position:absolute;left:clamp(22px,6vw,48px);bottom:calc(14.6vh + env(safe-area-inset-bottom));margin:0;font:900 12px/1 'League Spartan',sans-serif;letter-spacing:.55em;color:#f3f1ec;opacity:0;text-transform:uppercase}
+.sp-brand{position:absolute;left:clamp(22px,6vw,48px);bottom:calc(14.6vh + env(safe-area-inset-bottom));margin:0;font:900 12px/1 'League Spartan',sans-serif;letter-spacing:.55em;color:var(--sp-bg);opacity:0;text-transform:uppercase}
 .sp-go .sp-brand{animation:sp-fade .3s ease 2.6s forwards}
-.sp-sub{position:absolute;left:clamp(22px,6vw,48px);right:clamp(22px,6vw,48px);bottom:calc(5vh + env(safe-area-inset-bottom));max-width:34ch;margin:0;font:600 13px/1.45 Montserrat,system-ui,sans-serif;color:#55524c;opacity:0}
-.sp-go .sp-sub{animation:sp-fade .6s ease 2.7s forwards}
+.sp-sub{position:absolute;left:clamp(22px,6vw,48px);right:clamp(22px,6vw,48px);bottom:calc(5vh + env(safe-area-inset-bottom));max-width:34ch;margin:0;font:600 13px/1.45 Montserrat,system-ui,sans-serif;color:var(--sp-fg);opacity:0}
+.sp-go .sp-sub{animation:sp-fade-sub .6s ease 2.7s forwards}
+@keyframes sp-fade-sub{to{opacity:.7}}
 @keyframes sp-rip{to{stroke-dashoffset:0}}
 @keyframes sp-hit{0%,100%{transform:none}15%{transform:translate(-7px,4px) scale(1.012)}35%{transform:translate(6px,-4px)}55%{transform:translate(-4px,2px)}75%{transform:translate(2px,-1px)}}
 @keyframes sp-stamp{0%{opacity:0;transform:scale(1.5) rotate(-3deg)}60%{opacity:1}100%{opacity:1;transform:none}}
@@ -55,7 +67,6 @@ html,body{margin:0;background:#f3f1ec;color:#0d0d0d}
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G"/></filter>
   <filter id="brush" x="-5%" y="-60%" width="110%" height="220%"><feTurbulence type="fractalNoise" baseFrequency=".035 .9" numOctaves="3" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/></filter>
 </svg>
 <div id="splash" aria-hidden="true">
@@ -79,6 +90,7 @@ html,body{margin:0;background:#f3f1ec;color:#0d0d0d}
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var c = document.getElementById('sp-ink'), x = c.getContext('2d');
   var claws = sp.querySelector('.sp-claws');
+  var ink = getComputedStyle(sp).color || '#000';
   var wolf = new Image();
   var dpr = Math.min(2, window.devicePixelRatio || 1), W = 0, H = 0, box = null, raf = 0, t0 = 0, done = false;
   // fixed pseudo-random numbers, so the bleed has the same shape every time
@@ -102,7 +114,7 @@ html,body{margin:0;background:#f3f1ec;color:#0d0d0d}
     var ox = (box.x + box.w * .42) * dpr, oy = (box.y + box.h * .42) * dpr, R = Math.hypot(box.w, box.h) * dpr;
     x.setTransform(1, 0, 0, 1, 0, 0);
     x.clearRect(0, 0, W, H);
-    x.fillStyle = '#000';
+    x.fillStyle = ink;
     if (t < .32) {
       // the falling drop
       var k = t / .32, dy = (1 - k * k) * oy;
@@ -119,8 +131,11 @@ html,body{margin:0;background:#f3f1ec;color:#0d0d0d}
         j ? x.lineTo(ox + Math.cos(th) * rr, oy + Math.sin(th) * rr) : x.moveTo(ox + Math.cos(th) * rr, oy + Math.sin(th) * rr);
       }
       x.closePath(); x.clip();
-      if (wolf.complete && wolf.naturalWidth) x.drawImage(wolf, box.x * dpr, box.y * dpr, box.w * dpr, box.h * dpr);
-      else { x.beginPath(); x.arc(ox, oy, r * .3, 0, 6.2832); x.fill(); }
+      if (wolf.complete && wolf.naturalWidth) {
+        x.drawImage(wolf, box.x * dpr, box.y * dpr, box.w * dpr, box.h * dpr);
+        // the drawing is black ink: repaint it in the theme's ink colour
+        x.globalCompositeOperation = 'source-atop'; x.fillRect(0, 0, W, H); x.globalCompositeOperation = 'source-over';
+      } else { x.beginPath(); x.arc(ox, oy, r * .3, 0, 6.2832); x.fill(); }
       x.restore();
       // spatter thrown out by the impact
       var sk = ease(Math.min(1, (t - .32) / .5));

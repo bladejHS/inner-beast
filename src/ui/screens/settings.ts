@@ -4,7 +4,7 @@ import { esc } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { ic } from '../icons.ts';
-import { top } from './shared.ts';
+import { isDark, top } from './shared.ts';
 
 const sw = (k: string, on: boolean, label: string): string =>
   `<label class="switch"><input type="checkbox" data-a="set-bool" data-k="${k}" ${on ? 'checked' : ''} aria-label="${esc(label)}"><span></span></label>`;
@@ -20,6 +20,8 @@ export function settingsHtml(): string {
   const mm = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
   return `${top(true)}
     <h1 class="stack mid">Setări</h1>
+    <h2 class="sec">Aspect</h2>
+    ${row('Mod întunecat', 'Tuș alb pe negru. Îl comuți și din luna/soarele de sus.', `<label class="switch"><input type="checkbox" data-a="set-theme" ${isDark() ? 'checked' : ''} aria-label="Mod întunecat"><span></span></label>`)}
     <h2 class="sec">Sunet și ecran</h2>
     ${row('Sunete', 'Gong, bipuri, semnale', sw('sound', s.sound, 'Sunete'))}
     ${row('Voce', 'Combinațiile strigate în engleză, indicațiile în română', sw('voice', s.voice, 'Voce'))}

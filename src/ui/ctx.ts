@@ -4,7 +4,7 @@ import { loadState, saveState, type Entry, type State } from '../logic/store.ts'
 import { esc } from '../logic/util.ts';
 import { keepAwake, hush } from './audio.ts';
 
-export type Tab = 'today' | 'plan' | 'fight' | 'mind' | 'progress';
+export type Tab = 'today' | 'plan' | 'fight' | 'alex' | 'mind' | 'progress';
 export type View =
   | { t: 'day'; idx: number }
   | { t: 'chapter'; id: string }

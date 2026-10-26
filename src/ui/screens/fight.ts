@@ -1,12 +1,13 @@
 // "Lupte": round timers, Alex Hanma's combinations and his fight advice.
 
-import { ALEX_FIGHT, ALEX_WORKOUTS, srcUrl, type TipCard } from '../../data/alex.ts';
+import { srcUrl, type TipCard } from '../../data/alex.ts';
 import { CAT_NAMES, COMBOS, tiktokUrl, type ComboCat } from '../../data/combos.ts';
 import { WEEK, blockName, type Block } from '../../data/plan.ts';
 import { dayKey, esc, weekdayIdx } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { howHtml } from '../how.ts';
+import { weekCard } from './alex.ts';
 import { ic } from '../icons.ts';
 import { openRounds } from '../players/rounds.ts';
 import { restFor, top } from './shared.ts';
@@ -34,6 +35,7 @@ const QUICK: Quick[] = [
 /** A quick timer uses today's plan block when today has one of the same kind, so it gets checked off too. */
 export function startQuick(k: string): void {
   if (k === 'free') return openRounds({ name: 'Runde libere', rounds: 3, work: 180, rest: ctx.S.set.rest3 });
+  if (k === 'week') return openRounds({ name: 'Combinațiile săptămânii', rounds: 3, work: 180, rest: ctx.S.set.rest3, focus: 'week' });
   const q = QUICK.find((x) => x.k === k);
   if (!q) return;
   const today = WEEK[weekdayIdx(dayKey())];
@@ -77,6 +79,7 @@ export function fightHtml(): string {
     .join('');
   return `${top()}
     <div class="fight-art"><div class="title-art"><h1>Lupte</h1>${art('fighter')}</div>${art('boxer')}</div>
+    ${weekCard(false)}
     <h2 class="sec">Timere</h2>
     <div class="timer-list">${QUICK.map(quickRow).join('')}
       <button class="timer-row" data-a="tool" data-k="peekaboo"><div><b>Peekaboo Workout</b><span>7 exerciții, câte 2 serii, de la Alex</span></div>${ic('shadow')}</button>
@@ -88,8 +91,5 @@ export function fightHtml(): string {
     <h2 class="sec">Combinații de la Alex<small>Citite cadru cu cadru din video-urile lui de pe TikTok. Le auzi și în timpul rundelor de shadow boxing și sac.</small></h2>
     <div class="chips" role="group" aria-label="Filtru" style="margin-bottom:14px">${cats.map((c) => `<button class="chip" aria-pressed="${cat === c}" data-a="ccat" data-k="${c}">${c === 'all' ? 'Toate' : esc(CAT_NAMES[c])}</button>`).join('')}</div>
     ${combos}
-    <h2 class="sec">Antrenamentele lui Alex<small>Sesiuni întregi din video-urile lui, cu numerele scrise pe ecran. Alege una când vrei ceva în plus față de plan.</small></h2>
-    ${ALEX_WORKOUTS.map((t) => tipCard(t)).join('')}
-    <h2 class="sec">Sfaturi de la Alex</h2>
-    ${ALEX_FIGHT.map((t) => tipCard(t, t.id === 'mistakes')).join('')}`;
+    <div class="card" style="margin-top:28px"><h3>Mai mult de la Alex</h3><p class="dim" style="margin:0 0 12px">Combinațiile săptămânii, rutinele, antrenamentele, tehnica și mentalitatea lui sunt în tabul Alex.</p><button class="btn ghost sm" data-a="tab" data-k="alex">Deschide Alex</button></div>`;
 }

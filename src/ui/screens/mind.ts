@@ -1,6 +1,5 @@
 // "Minte": recovery tools, your why, the 28-day routine, the victory journal, the book and Alex's mindset.
 
-import { ALEX_MIND } from '../../data/alex.ts';
 import { BOOK, FORMULA, HABIT_STEPS, PRINCIPLES, type Chapter, type Para } from '../../data/book.ts';
 import { holdStats } from '../../logic/wimhof.ts';
 import { habitStreak } from '../../logic/progress.ts';
@@ -8,7 +7,6 @@ import { dayKey, esc, mmss, shortDay } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { ic } from '../icons.ts';
-import { tipCard } from './fight.ts';
 import { habitCard } from './today.ts';
 import { top } from './shared.ts';
 
@@ -18,9 +16,6 @@ const TOOLS = [
   { k: 'shower', icon: 'drop', name: 'Shower', sub: '1 min rece, 1 min cald' },
   { k: 'mobility', icon: 'stretch', name: 'Mobility', sub: '30 min, picioare, șolduri, umeri' },
   { k: 'daily', icon: 'bolt', name: 'Daily Mobility', sub: '10 min, rutina lui Alex' },
-  { k: 'dagestan', icon: 'stretch', name: 'Dagestan', sub: '9 min, șolduri și sfoară, de la Alex' },
-  { k: 'splits', icon: 'stretch', name: 'Split Routine', sub: '17 min, sfoara laterală ca Alex' },
-  { k: 'abs', icon: 'bolt', name: 'Abs', sub: '5 min fără pauză, de la Alex' },
   { k: 'stretch-push', icon: 'timer', name: 'Stretching', sub: '15 min, încălzirea umerilor' },
 ];
 
@@ -75,8 +70,7 @@ export function mindHtml(): string {
     ${winsBlock()}
     <h2 class="sec">Cartea<small>Unleash Your Inner Beast, tot în afară de nutriție</small></h2>
     <ul class="toc">${BOOK.map((c) => `<li class="${/^\d$/.test(c.num) ? 'sub' : ''}"><button data-a="chapter" data-id="${c.id}"><span class="n">${esc(c.num)}</span><span class="t">${esc(c.title)}</span></button></li>`).join('')}</ul>
-    <h2 class="sec">De la Alex<small>Din video-urile lui despre mentalitate</small></h2>
-    ${ALEX_MIND.map((t) => tipCard(t)).join('')}
+    <div class="card" style="margin-top:28px"><h3>Mentalitatea lui Alex</h3><p class="dim" style="margin:0 0 12px">Toate mesajele lui din video-uri sunt în tabul Alex.</p><button class="btn ghost sm" data-a="tab" data-k="alex">Deschide Alex</button></div>
     <div class="sign">${art('trust')}</div>`;
 }
 

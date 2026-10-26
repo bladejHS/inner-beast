@@ -2,7 +2,7 @@
 // Session and exercise names stay in English, as in the e-book; tips are in Romanian.
 
 export type BlockKind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'shower' | 'wimhof' | 'breath';
-export type ComboFocus = 'jab' | 'move' | 'combo' | 'power' | 'slow' | 'distance' | 'rope' | 'legs';
+export type ComboFocus = 'jab' | 'move' | 'combo' | 'power' | 'slow' | 'distance' | 'rope' | 'legs' | 'week';
 export type RestKey = 'r3' | 'r1' | 'none';
 
 export interface Block {

@@ -10,6 +10,7 @@ import { openRoutine } from './ui/players/routine.ts';
 import { openShower } from './ui/players/shower.ts';
 import { openWimHof } from './ui/players/wimhof.ts';
 import { fightHtml, setComboCat, startQuick } from './ui/screens/fight.ts';
+import { alexHtml, toggleLearned } from './ui/screens/alex.ts';
 import { chapterHtml, mindHtml } from './ui/screens/mind.ts';
 import { planHtml } from './ui/screens/plan.ts';
 import { historyHtml, progressHtml } from './ui/screens/progress.ts';
@@ -23,6 +24,7 @@ const TABS: Array<[Tab, string, string]> = [
   ['today', 'Azi', 'today'],
   ['plan', 'Plan', 'plan'],
   ['fight', 'Lupte', 'fight'],
+  ['alex', 'Alex', 'mask'],
   ['mind', 'Minte', 'mind'],
   ['progress', 'Progres', 'progress'],
 ];
@@ -43,6 +45,8 @@ function screenHtml(): string {
       return planHtml();
     case 'fight':
       return fightHtml();
+    case 'alex':
+      return alexHtml();
     case 'mind':
       return mindHtml();
     case 'progress':
@@ -233,6 +237,9 @@ function act(a: string, el: HTMLElement): void {
     case 'qt':
       unlock();
       return startQuick(el.dataset.k || '');
+    case 'learned':
+      toggleLearned(el.dataset.id || '');
+      return render();
     case 'ccat':
       setComboCat(el.dataset.k || 'all');
       return render();

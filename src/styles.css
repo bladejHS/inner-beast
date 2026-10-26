@@ -620,3 +620,19 @@ input:focus, textarea:focus { outline: none; border-color: var(--ink); }
 .pl.ph-work .mv .fig, .pl.ph-dark .mv .fig { background: transparent; color: var(--paper); }
 .hist li.has-fig { grid-template-columns: 64px 1fr auto; }
 .hist li.has-fig .fig { width: 64px; background: var(--card); border: 1px solid var(--line); }
+
+/* tab bar with six tabs */
+.tabs { grid-template-columns: repeat(6, 1fr); padding: 0 2px env(safe-area-inset-bottom); }
+.tabs button { font-size: 9.5px; letter-spacing: 0; }
+
+/* combinations of the week */
+.wc-item { display: grid; grid-template-columns: 34px 1fr; gap: 10px; padding: 12px 0; border-top: 1px solid var(--line); }
+.wc-item:first-of-type { margin-top: 10px; }
+.wc-n { width: 34px; height: 34px; display: grid; place-items: center; background: var(--ink); color: var(--paper); font: 900 18px/1 var(--display); }
+.wc-item.ok .wc-n { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
+.wc-main h3 { font: 900 18px/1.1 var(--display); text-transform: uppercase; margin-bottom: 8px; }
+.wc-main p { font-size: 14px; color: var(--ink-2); }
+.wc-main .chip { margin-top: 2px; gap: 6px; }
+.wc-main .chip svg { width: 16px; height: 16px; }
+.alex-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.alex-art { width: 74px; margin-bottom: 14px; }

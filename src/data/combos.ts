@@ -1,6 +1,8 @@
 // Combinations and drills taken from Alex Hanma's TikTok (@alexhanma___), read frame by frame from his videos.
 // Punch and drill names stay in English (as he labels them); notes are Romanian.
 
+import { daysBetween, dayKey, weekStart } from '../logic/util.ts';
+
 export type ComboCat = 'basics' | 'combo' | 'power' | 'defense' | 'counter' | 'footwork';
 
 export interface Combo {
@@ -252,9 +254,40 @@ const FOCUS: Record<string, string[]> = {
   distance: ['jab', 'double-jab', 'jab-out', 'pull-counter', 'ghost-step', 'one-two', 'step-overhand'],
 };
 
+/** The order in which the combinations are learned, two per week: basics first, the long ones last. */
+const LEARN = [
+  'one-two', 'jab-cross-hook', 'double-jab', 'jab-out', 'simple-body', 'body-head', 'beginner-defense', 'guard-reset',
+  'body-body-head', 'liver', 'jab-upper-roll', 'four-punch', 'pull-counter', 'step-overhand', 'check-hook', 'hook-setup',
+  'favorite', 'combo-of-day', 'tyson-huh', 'tyson-slip', 'peekaboo', 'alphabet', 'tyson-uppercuts', 'tyson-body-head',
+  'tyson-switch', 'peekaboo-killer', 'liver-setup', 'feint-liver', 'liver-cross', 'liver-move', 'ko-combo', 'tap-uppercut',
+  'duck-counter', 'off-ropes', 'angle-finish', 'close-range', 'hooks-liver', 'gazelle', 'tyson-killer', 'ghost-step',
+];
+const FIRST_WEEK = '2026-10-26';
+
+export function learnOrder(): Combo[] {
+  const listed = LEARN.map((id) => COMBOS.find((c) => c.id === id)).filter((c): c is Combo => !!c);
+  return [...listed, ...COMBOS.filter((c) => !LEARN.includes(c.id) && c.id !== 'jab')];
+}
+
+/** Week number in the learning plan (0 = the week the app got this feature). */
+export function learnWeek(today = dayKey()): number {
+  return Math.max(0, Math.floor(daysBetween(FIRST_WEEK, weekStart(today)) / 7));
+}
+
+/** The two combinations to learn in a given week; they cycle once the list is done. */
+export function weekCombos(week = learnWeek()): Combo[] {
+  const all = learnOrder();
+  const i = (week * 2) % all.length;
+  return [all[i], all[(i + 1) % all.length]];
+}
+
 export function focusCombos(focus: string | undefined): Combo[] {
+  const week = weekCombos();
+  if (focus === 'week') return week;
   const ids = FOCUS[focus ?? ''] ?? [];
-  return ids.map((id) => COMBOS.find((c) => c.id === id)).filter((c): c is Combo => !!c);
+  const list = ids.map((id) => COMBOS.find((c) => c.id === id)).filter((c): c is Combo => !!c);
+  // in every boxing round the combinations of the week are called too, so they stick
+  return list.length ? [...week, ...week, ...list.filter((c) => !week.includes(c))] : list;
 }
 
 export function tiktokUrl(vid: string): string {
@@ -262,6 +295,7 @@ export function tiktokUrl(vid: string): string {
 }
 
 export const FOCUS_LINE: Record<string, string> = {
+  week: 'Combinațiile săptămânii',
   jab: 'Jab și joc de picioare',
   move: 'Mișcare și pumni',
   combo: 'Combinații',

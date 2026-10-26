@@ -61,6 +61,16 @@ export const WORKOUTS: Workout[] = [
         cue: 'Mâinile formează un romb sub piept, coatele rămân lângă corp.',
       },
       {
+        id: 'trxpush', name: 'TRX Push-ups', vars: ['TRX Push-ups (incline)', 'TRX Push-ups', 'TRX Push-ups (feet in straps)', 'TRX Atomic Push-ups'], start: 0,
+        type: 'reps', sets: 3, lo: 8, hi: 12, rest: 75, muscles: 'piept, umeri, core',
+        cue: 'Mânerele instabile cer stabilitate din umeri și core. Coborî controlat, coatele la 45°, corpul drept.',
+      },
+      {
+        id: 'trxtri', name: 'TRX Triceps Extensions', vars: ['TRX Triceps Extensions (upright)', 'TRX Triceps Extensions', 'TRX Triceps Extensions (low)'], start: 0,
+        type: 'reps', sets: 3, lo: 10, hi: 15, rest: 60, muscles: 'triceps', opt: true,
+        cue: 'Brațele întinse în față, îndoi doar coatele și aduci mâinile spre frunte, apoi împingi înapoi.',
+      },
+      {
         id: 'hollow', name: 'Hollow Body Hold', vars: ['Tuck Hollow Hold', 'Hollow Body Hold', 'Hollow Body Rocks'], start: 0,
         type: 'time', sets: 3, lo: 20, hi: 45, rest: 45, muscles: 'abdomen',
         cue: 'Zona lombară lipită de sol, abdomenul strâns, respiri scurt.',
@@ -96,10 +106,16 @@ export const WORKOUTS: Workout[] = [
         alex: 'Ramat 4 × 10–12, ca în ziua lui de spate.',
       },
       {
-        id: 'ytw', name: 'Y-T-W Raises', vars: ['Prone Y-T-W Raises', 'Band Y-T-W Raises', 'TRX Y-T-W Raises'], start: 0,
+        id: 'ytw', name: 'Y-T-W Raises', vars: ['Band Y-T-W Raises', 'TRX Y-T-W Raises'], start: 1,
         type: 'ytw', sets: 4, rest: 60, muscles: 'umeri posteriori',
         cue: 'O serie înseamnă 5 repetări cu brațele în Y, 5 în T și 5 în W, fără pauză.',
         alex: 'Face 4 × 5-5-5 la TRX: umerii din spate trebuie întăriți ca să nu ajungi cu „umeri de boxer”, aduși în față.',
+      },
+      {
+        id: 'trxrow', name: 'TRX Rows', vars: ['TRX Rows (upright)', 'TRX Rows', 'TRX Rows (feet elevated)', 'TRX Single-arm Rows'], start: 1,
+        type: 'reps', sets: 3, lo: 10, hi: 15, rest: 60, muscles: 'spate, biceps, umeri posteriori',
+        cue: 'Corpul drept ca o scândură, tragi pieptul la mânere și strângi omoplații. Unghiul corpului dă greutatea.',
+        alex: 'TRX-ul e unealta lui Alex pentru spate și umăr posterior.',
       },
       {
         id: 'curls', name: 'Hammer Curls', vars: ['Bodyweight Biceps Curls', 'Band Hammer Curls', 'Dumbbell Hammer Curls'], start: 0,
@@ -108,9 +124,9 @@ export const WORKOUTS: Workout[] = [
         alex: 'Face hammer curls și biceps curls, 4 × 10–12 fiecare.',
       },
       {
-        id: 'face', name: 'Face Pulls', vars: ['Reverse Snow Angels', 'Band Pull-Aparts', 'Band Face Pulls'], start: 0,
+        id: 'face', name: 'Face Pulls', vars: ['Band Pull-Aparts', 'Band Face Pulls', 'TRX Face Pulls', 'TRX Rear Delt Flys'], start: 2,
         type: 'reps', sets: 3, lo: 12, hi: 15, rest: 60, muscles: 'umeri posteriori',
-        cue: 'Coatele sus, tragi spre față și strângi spatele umerilor.',
+        cue: 'Coatele sus, tragi spre față și strângi spatele umerilor. La TRX: cu cât picioarele sunt mai în față, cu atât e mai greu.',
         alex: 'Își încheie ziua de spate cu umărul posterior, 4 × 10–12.',
       },
       {

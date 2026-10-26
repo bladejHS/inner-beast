@@ -613,10 +613,12 @@ input:focus, textarea:focus { outline: none; border-color: var(--ink); }
 
 /* mobility illustrations */
 .fig { display: block; width: 100%; height: auto; color: var(--ink); }
-.mv { display: grid; grid-template-columns: 1fr 46%; gap: 10px; align-items: center; margin: 4px 0 6px; }
+.mv { position: relative; margin: 4px 0 6px; }
+.mv-z { margin: 6px 0 0; font-size: 13px; text-align: center; }
 .mv .fig { background: var(--card); border: 1.5px solid var(--line-2); }
-.mv .ring { width: 100%; margin: 0; }
-.mv .mid-time { font-size: clamp(40px, 12vw, 64px); }
+.mv .ring { position: absolute; top: 8px; right: 8px; width: 104px; margin: 0; background: var(--card); border-radius: 50%; }
+.mv .mid-time { font-size: 30px; }
+.mv .fig { max-height: 46vh; }
 .pl.ph-work .mv .fig, .pl.ph-dark .mv .fig { background: transparent; color: var(--paper); }
 .hist li.has-fig { grid-template-columns: 64px 1fr auto; }
 .hist li.has-fig .fig { width: 64px; background: var(--card); border: 1px solid var(--line); }
@@ -644,3 +646,67 @@ input:focus, textarea:focus { outline: none; border-color: var(--ink); }
 .calls span { font-size: 13px; opacity: .75; }
 .bk-calls { margin: 8px 0 0; font-size: 13px; line-height: 1.4; }
 .bk.done .bk-calls { color: var(--mute-inv); }
+
+/* ===================== motion ===================== */
+@keyframes up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes ink-in { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
+@keyframes stamp { 0% { transform: scale(2.2) rotate(-12deg); opacity: 0; } 55% { transform: scale(.9) rotate(2deg); opacity: 1; } 100% { transform: none; } }
+@keyframes flashdone { 0% { box-shadow: 0 0 0 0 var(--ink); } 100% { box-shadow: 0 0 0 14px transparent; } }
+@keyframes pop { 0% { transform: scale(.94); opacity: .4; } 100% { transform: none; opacity: 1; } }
+@keyframes rise { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tear { from { clip-path: inset(0 0 100% 0); transform: translate(8px, -8px) rotate(-6deg); } to { clip-path: inset(0 0 0 0); transform: rotate(-6deg); } }
+@keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+@keyframes ring-in { from { stroke-dashoffset: 163.4; } }
+@keyframes bar-in { from { transform: scaleX(0); } }
+@keyframes tick { 0% { transform: scale(1.08); } 100% { transform: none; } }
+
+/* screen entrance: sections slide up one after another */
+#app.enter > * { animation: up .5s cubic-bezier(.2, .8, .2, 1) both; }
+#app.enter > *:nth-child(2) { animation-delay: .04s; }
+#app.enter > *:nth-child(3) { animation-delay: .08s; }
+#app.enter > *:nth-child(4) { animation-delay: .12s; }
+#app.enter > *:nth-child(5) { animation-delay: .16s; }
+#app.enter > *:nth-child(6) { animation-delay: .2s; }
+#app.enter > *:nth-child(n+7) { animation-delay: .24s; }
+#app.enter > .tabs { animation: none; }
+#app.enter .bks > li, #app.enter .dcs > li { animation: up .5s cubic-bezier(.2, .8, .2, 1) both; }
+#app.enter .bks > li:nth-child(2), #app.enter .dcs > li:nth-child(2) { animation-delay: .1s; }
+#app.enter .bks > li:nth-child(3), #app.enter .dcs > li:nth-child(3) { animation-delay: .18s; }
+#app.enter .dcs > li:nth-child(n+4) { animation-delay: .24s; }
+#app.enter .hero-t, #app.enter .stack { animation: ink-in .7s cubic-bezier(.6, 0, .2, 1) both .05s; }
+#app.enter .hero-art, #app.enter .title-art .art, #app.enter .mind-eyes, #app.enter .alex-art { animation: fade .9s ease both .15s; }
+#app.enter .hero-claws { animation: tear .45s cubic-bezier(.8, 0, .2, 1) both .45s; }
+#app.enter .mr-v { animation: ring-in 1s cubic-bezier(.2, .8, .2, 1) both .3s; }
+#app.enter .wk-bar i, #app.enter .bar i, #app.enter .dc-bar i.on { transform-origin: left; animation: bar-in .8s cubic-bezier(.2, .8, .2, 1) both .3s; }
+
+/* the wolf in the header breathes slowly */
+.brand .art { animation: breathe 4s ease-in-out infinite; transform-origin: 50% 70%; }
+
+/* touch feedback */
+.btn, .chip, .tile, .timer-row, .dc, .bk-go, .bk-ic, .wk-d, .pl-ctrl button, .stepper button { transition: transform .12s, background-color .15s, color .15s; }
+.btn:active, .chip:active, .tile:active, .timer-row:active, .dc:active, .wk-d:active, .pl-ctrl button:active { transform: scale(.97); }
+.tabs button svg { transition: transform .2s; }
+.tabs button[aria-current='page'] svg { animation: pop .3s ease; transform: translateY(-1px); }
+.tabs button[aria-current='page']::before { animation: bar-in .3s ease both; }
+
+/* a block that was just done gets stamped */
+.bk.just { animation: flashdone .7s ease-out; }
+.bk.just .bk-ic { animation: stamp .55s cubic-bezier(.3, 1.5, .5, 1) both; }
+.wc-item.ok .wc-n { animation: stamp .45s cubic-bezier(.3, 1.5, .5, 1); }
+
+/* sheet and players */
+.sh { animation: rise .3s cubic-bezier(.2, .8, .2, 1); }
+.sh-bg { animation: fade .25s ease; }
+#ov.ov-in .pl { animation: rise .38s cubic-bezier(.2, .8, .2, 1); }
+.pl .call-box { animation: pop .35s ease; }
+.pl.ph-work .big-time, .pl.ph-last .big-time, .pl.ph-rest .big-time { animation: tick .4s ease; }
+.pl-h { animation: up .4s ease both; }
+.rest-ov { animation: fade .25s ease; }
+.how[open] .how-body { animation: up .3s ease both; }
+.done-claws { width: min(46vw, 190px); margin: 0 auto 4px; animation: tear .5s cubic-bezier(.8, 0, .2, 1) both .1s; }
+.done-h { animation: stamp .5s cubic-bezier(.3, 1.5, .5, 1) both .45s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .brand .art, #app.enter *, .bk.just, .bk.just .bk-ic { animation: none !important; }
+}

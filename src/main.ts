@@ -73,9 +73,22 @@ function render(): void {
 }
 ctx.render = render;
 
+/** Cards slide in when a new screen opens (not on every re-render). */
+function enter(): void {
+  const app = document.getElementById('app');
+  if (!app) return;
+  app.classList.remove('enter');
+  void app.offsetWidth;
+  app.classList.add('enter');
+  window.clearTimeout(enterTimer);
+  enterTimer = window.setTimeout(() => app.classList.remove('enter'), 900);
+}
+let enterTimer = 0;
+
 function go(fn: () => void, top = true): void {
   fn();
   render();
+  enter();
   if (top) window.scrollTo(0, 0);
 }
 
@@ -89,6 +102,7 @@ function pushView(v: View): void {
 function popView(): void {
   views.pop();
   render();
+  enter();
   window.scrollTo(0, views.length ? 0 : scrollMem[ctx.tab] ?? 0);
 }
 
@@ -196,6 +210,7 @@ function act(a: string, el: HTMLElement): void {
       views.length = 0;
       ctx.tab = k;
       render();
+      if (!same) enter();
       const to = el.dataset.to;
       if (to) document.getElementById(to)?.scrollIntoView({ block: 'start' });
       else window.scrollTo(0, same ? 0 : scrollMem[k] ?? 0);
@@ -447,6 +462,7 @@ window.addEventListener('popstate', () => {
 });
 
 render();
+enter();
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   window.addEventListener('load', () => {

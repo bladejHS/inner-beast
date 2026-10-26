@@ -54,8 +54,8 @@ export const POSES: Record<string, Fig> = {
   },
   'Shoulder Rolls': {
     k: [
-      { ...STAND, a: both(4, 0) },
-      { ...STAND, p: [50, 45], a: both(-10, -6) },
+      { ...STAND, a: both(14, 4) },
+      { ...STAND, p: [50, 44.5], a: both(-14, -8) },
     ],
   },
   'Shoulder Dislocates': {
@@ -118,9 +118,9 @@ export const POSES: Record<string, Fig> = {
   'Neck Mobility': {
     front: true,
     k: [
-      { ...FRONT_STAND, h: 145 },
+      { ...FRONT_STAND, h: 135 },
       { ...FRONT_STAND, h: 180 },
-      { ...FRONT_STAND, h: 215 },
+      { ...FRONT_STAND, h: 225 },
     ],
   },
   'Neck Stretch': {
@@ -395,4 +395,74 @@ export const POSES: Record<string, Fig> = {
       { p: [50, 70], t: 180, tl: 0.7, a: mirror(4, 0), l: mirror(78, 78) },
     ],
   },
+};
+
+export type Zone = 'hips' | 'groin' | 'hamstrings' | 'quads' | 'calves' | 'back' | 'chest' | 'shoulders' | 'arms' | 'neck' | 'wrists' | 'body';
+
+export const ZONE_NAMES: Record<Zone, string> = {
+  hips: 'șolduri',
+  groin: 'interiorul coapselor',
+  hamstrings: 'spatele coapsei',
+  quads: 'fața coapsei și flexorii șoldului',
+  calves: 'gambă',
+  back: 'spate',
+  chest: 'piept',
+  shoulders: 'umeri',
+  arms: 'triceps',
+  neck: 'gât',
+  wrists: 'încheieturi',
+  body: 'tot corpul',
+};
+
+/** Where the move should be felt; the illustration marks it with a pulsing spot. */
+export const ZONES: Record<string, Zone> = {
+  'Jumping Jacks': 'body',
+  'Arm Circles': 'shoulders',
+  'Shoulder Rolls': 'shoulders',
+  'Shoulder Dislocates': 'shoulders',
+  'Scapular Push-ups': 'shoulders',
+  'Scapular Pulls': 'shoulders',
+  'Cross-body Shoulder Stretch': 'shoulders',
+  'Doorway Chest Stretch': 'chest',
+  'Lat Stretch': 'back',
+  'Overhead Triceps Stretch': 'arms',
+  'Wrist Circles': 'wrists',
+  'Neck Mobility': 'neck',
+  'Neck Stretch': 'neck',
+  'Cat-Cow': 'back',
+  'Thoracic Rotations': 'back',
+  "World's Greatest Stretch": 'hips',
+  'Hip Flexor Stretch': 'quads',
+  'Hamstring Stretch': 'hamstrings',
+  'Deep Squat Hold': 'hips',
+  'Leg Swings (front-back)': 'hips',
+  'Leg Swings': 'hips',
+  'Leg Swings (side)': 'groin',
+  'Hip Circles': 'hips',
+  '90/90 Hip Switches': 'hips',
+  'Pigeon Stretch': 'hips',
+  'Couch Stretch': 'quads',
+  'Lizard Stretch': 'hips',
+  'Frog Stretch': 'groin',
+  'Cossack Squats': 'groin',
+  'Side-to-Side Shifts': 'groin',
+  'Dagestan Hip Shifts': 'groin',
+  'Straddle Sink': 'groin',
+  'Seated Hamstring Stretch': 'hamstrings',
+  'Butterfly Stretch': 'groin',
+  'Calf Stretch': 'calves',
+  'Thread the Needle': 'back',
+  'Open Book Stretch': 'back',
+  "Child's Pose": 'back',
+  'Cobra Stretch': 'back',
+  'Sleeper Stretch': 'shoulders',
+  'Torso Twists': 'back',
+  'Wrist & Ankle Circles': 'wrists',
+  'Loose Shadow Boxing': 'shoulders',
+  'Straddle Dive': 'groin',
+  'Middle Split Reach': 'groin',
+  'Straddle Side Bend': 'hamstrings',
+  'Wide Stance Hold': 'groin',
+  'Middle Split Lean': 'groin',
+  'Split Push-up Hold': 'groin',
 };

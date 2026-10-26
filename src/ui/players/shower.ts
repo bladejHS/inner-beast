@@ -47,7 +47,7 @@ class ShowerPlayer implements Player {
     if (this.st === 'done') {
       el.innerHTML = chrome(
         'Cold & Warm Showers',
-        `<h1 class="pl-h">Gata.</h1><p class="lead">${mmss(doneSec(this.phases, this.clock.t, 'cold'))} la rece.</p><p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p><button class="btn" data-a="p:close">Închide</button>`,
+        `${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1><p class="lead">${mmss(doneSec(this.phases, this.clock.t, 'cold'))} la rece.</p><p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p><button class="btn" data-a="p:close">Închide</button>`,
         { center: true },
       );
       return;

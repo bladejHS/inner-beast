@@ -71,7 +71,7 @@ class WimHofPlayer implements Player {
       const hs = holdStats(ctx.S.log);
       el.innerHTML = chrome(
         'Wim Hof',
-        `<h1 class="pl-h">Gata.</h1>
+        `${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1>
         <p class="lead">Retenții: ${this.holds.map(mmss).join(', ') || '–'}</p>
         ${hs.best ? `<p class="dim">Recordul tău: ${mmss(hs.best)}.</p>` : ''}
         <p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p>

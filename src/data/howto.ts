@@ -99,12 +99,12 @@ export const HOW: Record<string, How> = {
   },
   ytw: {
     steps: [
-      'Te întinzi pe burtă (sau te apleci în față cu spatele drept), fruntea aproape de sol.',
-      'Y: brațele întinse în diagonală deasupra capului, degetele mari în sus. Ridici, ții o secundă, cobori. 5 repetări.',
-      'T: brațele întinse lateral. Ridici strângând omoplații. 5 repetări.',
-      'W: coatele îndoite pe lângă corp. Tragi coatele înapoi și în jos. 5 repetări.',
+      'La TRX: ții mânerele cu brațele întinse în față și te lași pe spate, corpul drept ca o scândură. Cu banda: o prinzi în față, la nivelul pieptului.',
+      'Y: te tragi sus deschizând brațele întinse în diagonală, deasupra capului. Ții o secundă, revii. 5 repetări.',
+      'T: te tragi sus deschizând brațele lateral, strângând omoplații. 5 repetări.',
+      'W: tragi coatele înapoi și în jos, pe lângă corp, palmele spre exterior. 5 repetări.',
     ],
-    mistake: 'Să ridici din spatele de jos. Mișcarea vine doar din umeri și omoplați, cu greutate mică.',
+    mistake: 'Să îndoi coatele și să tragi din biceps. Brațele rămân întinse; mișcarea vine din umeri și omoplați. Începe cu corpul aproape vertical.',
   },
   curls: {
     steps: [
@@ -121,6 +121,31 @@ export const HOW: Record<string, How> = {
       'Strângi spatele umerilor și omoplații o secundă, apoi revii controlat.',
     ],
     mistake: 'Să tragi cu umerii ridicați spre urechi. Umerii rămân jos.',
+  },
+  trxrow: {
+    steps: [
+      'Ții mânerele TRX, picioarele în față, și te lași pe spate cu brațele întinse. Corpul drept, fesierii strânși.',
+      'Tragi pieptul spre mâini, coatele pe lângă corp, și strângi omoplații.',
+      'Cobori controlat până la brațe întinse.',
+      'Mai greu: picioarele mai în față (corpul mai orizontal). Mai ușor: un pas înapoi.',
+    ],
+    mistake: 'Șoldurile care cad și umerii ridicați spre urechi.',
+  },
+  trxpush: {
+    steps: [
+      'Mânerele TRX la nivelul genunchilor sau mai jos, te sprijini în ele cu brațele întinse, corpul înclinat în față.',
+      'Cobori controlat până când mâinile ajung lângă piept, coatele la aproximativ 45°.',
+      'Împingi înapoi, fără să lași mânerele să se depărteze.',
+      'Cu cât stai mai aplecat, cu atât e mai greu.',
+    ],
+    mistake: 'Mânerele care fug în lateral: ține-le strâns pe aceeași linie cu umerii.',
+  },
+  trxtri: {
+    steps: [
+      'Ții mânerele cu brațele întinse în față, la înălțimea umerilor, și te apleci în față.',
+      'Îndoi doar coatele și cobori fruntea spre mâini.',
+      'Împingi din triceps până la brațe întinse. Corpul rămâne drept.',
+    ],
   },
   core: {
     steps: [
@@ -439,13 +464,21 @@ export const VAR_NOTES: Record<string, string> = {
   'Inverted Rows (high bar)': 'Bara mai sus, corpul mai vertical: mai ușor.',
   'Feet-elevated Inverted Rows': 'Picioarele pe un scaun, corpul orizontal: mai greu.',
   'Archer Rows': 'Tragi spre o mână, celălalt braț rămâne întins lateral.',
-  'Prone Y-T-W Raises': 'Pe burtă pe sol, fără greutăți.',
   'Band Y-T-W Raises': 'În picioare, cu banda prinsă în față, la nivelul pieptului.',
   'TRX Y-T-W Raises': 'Ca Alex: ții mânerele TRX, te lași pe spate cu corpul drept și te tragi sus din brațele întinse în Y, T și W.',
   'Bodyweight Biceps Curls': 'Sub o bară joasă, cu palmele spre tine: tragi doar din coate, corpul rămâne drept.',
   'Band Hammer Curls': 'Calci pe bandă și tragi cu palmele una spre alta.',
   'Dumbbell Hammer Curls': 'Ganterele cu palmele una spre alta, 4 × 10–12 ca la Alex.',
-  'Reverse Snow Angels': 'Pe burtă, brațele pe lângă corp: le duci lateral până deasupra capului fără să atingă solul, ca un înger în zăpadă.',
+  'TRX Face Pulls': 'Ții mânerele, te lași pe spate și tragi mâinile spre frunte cu coatele sus, ca la face pulls cu banda.',
+  'TRX Rear Delt Flys': 'Brațele aproape întinse, le deschizi lateral (ca un T) și strângi spatele umerilor.',
+  'TRX Rows (upright)': 'Corpul aproape vertical: varianta ușoară.',
+  'TRX Rows (feet elevated)': 'Picioarele pe un scaun, corpul orizontal: cel mai greu.',
+  'TRX Single-arm Rows': 'Un singur mâner, celălalt braț liber; nu lăsa trunchiul să se rotească.',
+  'TRX Push-ups (incline)': 'Mânerele mai sus, corpul mai vertical: varianta ușoară.',
+  'TRX Push-ups (feet in straps)': 'Mâinile pe sol, picioarele în chingi: flotare cu picioarele suspendate.',
+  'TRX Atomic Push-ups': 'Picioarele în chingi: o flotare, apoi aduci genunchii la piept.',
+  'TRX Triceps Extensions (upright)': 'Corpul aproape vertical: varianta ușoară.',
+  'TRX Triceps Extensions (low)': 'Corpul mai aplecat: varianta grea.',
   'Band Pull-Aparts': 'Ții banda întinsă în față, la nivelul umerilor, și o desfaci până la piept strângând omoplații.',
   'Band Face Pulls': 'Banda prinsă la înălțimea feței: tragi spre față cu coatele sus.',
   'Lying Leg Raises': 'Pe spate, mâinile sub fese, ridici picioarele întinse până la vertical și cobori fără să atingi solul.',

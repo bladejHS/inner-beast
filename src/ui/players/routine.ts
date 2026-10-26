@@ -7,8 +7,9 @@ import { esc, mmss } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, mountPlayer, ovEl, type Player } from '../ctx.ts';
 import { ring } from '../charts.ts';
-import { figureFor } from '../figures.ts';
+import { figureFor, zoneLabel } from '../figures.ts';
 import { howHtml } from '../how.ts';
+import { art } from '../art.ts';
 import { chrome, ctrlBtn, setText } from './common.ts';
 
 class RoutinePlayer implements Player {
@@ -38,7 +39,7 @@ class RoutinePlayer implements Player {
         `<h1 class="pl-h">${esc(r.name)}</h1>
         <p class="pl-sub">${Math.round(routineSeconds(r) / 60)} minute, ${r.moves.length} exerciții</p>
         <p class="dim">${esc(r.intro)}</p>
-        <ul class="hist" style="margin:8px 0 18px">${r.moves.map((m) => `<li class="${figureFor(m.name) ? 'has-fig' : ''}">${figureFor(m.name)}<div><b>${esc(m.name)}</b><span>${mmss(m.sec)}${m.sides ? ', pe ambele părți' : ''}${m.alex ? ', de la Alex' : ''}</span></div></li>`).join('')}</ul>
+        <ul class="hist" style="margin:8px 0 18px">${r.moves.map((m) => `<li class="${figureFor(m.name) ? 'has-fig' : ''}">${figureFor(m.name, false)}<div><b>${esc(m.name)}</b><span>${mmss(m.sec)}${m.sides ? ', pe ambele părți' : ''}${m.alex ? ', de la Alex' : ''}</span></div></li>`).join('')}</ul>
         <button class="btn" data-a="p:start">Start</button>`,
       );
       return;
@@ -46,7 +47,7 @@ class RoutinePlayer implements Player {
     if (this.st === 'done') {
       el.innerHTML = chrome(
         r.name,
-        `<h1 class="pl-h">Gata.</h1><p class="lead">${esc(r.name)}: ${mmss(Math.min(this.clock.t, routineSeconds(r) + 5))}.</p><p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p><button class="btn" data-a="p:close">Închide</button>`,
+        `${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1><p class="lead">${esc(r.name)}: ${mmss(Math.min(this.clock.t, routineSeconds(r) + 5))}.</p><p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p><button class="btn" data-a="p:close">Închide</button>`,
         { center: true },
       );
       return;
@@ -68,7 +69,8 @@ class RoutinePlayer implements Player {
       ${(() => {
         const r0 = ring(1 - L.left / p.sec, `<div><div class="mid-time" id="t">${mmss(Math.ceil(L.left))}</div></div>`, 6);
         const fig = figureFor((m ?? r.moves[0]).name);
-        return fig ? `<div class="mv">${fig}${r0}</div>` : r0;
+        const z = zoneLabel((m ?? r.moves[0]).name);
+        return fig ? `<div class="mv"><div class="mv-fig">${fig}${z ? `<p class="mv-z">Simți în: <b>${esc(z)}</b></p>` : ''}</div>${r0}</div>` : r0;
       })()}
       <p class="cue">${esc(m ? m.cue : r.moves[0].cue)}</p>
       ${howHtml((m ?? r.moves[0]).name, undefined, { open: true })}

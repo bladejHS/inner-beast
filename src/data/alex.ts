@@ -92,7 +92,7 @@ export const ALEX_FIGHT: TipCard[] = [
     points: [
       'Luptătorii ajung des cu umerii aduși în față, „umeri de boxer”.',
       'Alex antrenează mereu umărul posterior: TRX 4 × 5-5-5 și umăr posterior 4 × 10–12.',
-      'În aplicație le găsești în ziua de pull: Y-T-W Raises și Face Pulls.',
+      'În aplicație le găsești în ziua de pull: Y-T-W Raises și Face Pulls la TRX, plus TRX Rows.',
     ],
   },
   {

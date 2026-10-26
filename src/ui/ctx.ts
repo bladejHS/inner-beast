@@ -38,7 +38,14 @@ export function save(): void {
   saveFailed = !ok;
 }
 
+/** Block completed a moment ago: its card plays the "done" stamp once. */
+export const fresh = { block: '', until: 0 };
+
 export function addEntry(e: Entry): void {
+  if (e.block) {
+    fresh.block = e.block;
+    fresh.until = Date.now() + 4000;
+  }
   ctx.S.log.push(e);
   ctx.S.log.sort((a, b) => a.ts - b.ts);
   save();
@@ -106,6 +113,11 @@ export function ask(title: string, text: string, yes: string, onYes: () => void,
 
 // ---------- full-screen players ----------
 export function mountPlayer(p: Player): void {
+  const ov = document.getElementById('ov');
+  if (ov && !ctx.player) {
+    ov.classList.add('ov-in');
+    window.setTimeout(() => ov.classList.remove('ov-in'), 500);
+  }
   if (ctx.player) ctx.player.destroy();
   ctx.player = p;
   void keepAwake(true);

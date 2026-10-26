@@ -5,7 +5,7 @@ import { blockName, type Block, type RestKey } from '../../data/plan.ts';
 import { makeEntry, type Kind } from '../../logic/store.ts';
 import { dayKey, esc, inWeek, num, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { art } from '../art.ts';
-import { addEntry, ask, ctx, save, toast } from '../ctx.ts';
+import { addEntry, ask, ctx, fresh, save, toast } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { openAmrap } from '../players/amrap.ts';
 import { openBreath } from '../players/breath.ts';
@@ -140,7 +140,9 @@ export function blockCard(b: Block, n: number, today: string): string {
     extra += `<p class="bk-calls"><b>Combinații:</b> ${esc(cs.slice(0, 4).map((c) => c.name).join(' · '))}${cs.length > 4 ? ` și încă ${cs.length - 4}` : ''}</p>`;
   }
   const when = done ? doneWhen(entries[0].date, today) : '';
-  return `<li class="bk ${done ? 'done' : ''}">
+  const just = done && fresh.block === b.id && Date.now() < fresh.until;
+  if (just) fresh.block = '';
+  return `<li class="bk ${done ? 'done' : ''} ${just ? 'just' : ''}">
     <div class="bk-top">
       <button class="bk-ic" data-a="mark" data-b="${b.id}" aria-label="${done ? 'Anulează bifa' : 'Bifează fără timer'}">${done ? ic('check') : ic(blockIcon(b))}</button>
       <div class="bk-main">

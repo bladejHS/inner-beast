@@ -8,6 +8,7 @@ import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, closeSheet, ctx, mountPlayer, openSheet, ovEl, save, toast, type Player } from '../ctx.ts';
 import { ring } from '../charts.ts';
 import { howHtml } from '../how.ts';
+import { art } from '../art.ts';
 import { chrome, ctrlBtn, setText } from './common.ts';
 
 export interface RunCfg {
@@ -148,7 +149,7 @@ class RunPlayer implements Player {
     const est = Math.round(this.track.m / STRIDE_M);
     el.innerHTML = chrome(
       this.name,
-      `<h1 class="pl-h">Gata.</h1>
+      `${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1>
       <div class="run-stats">
         <div><b>${mmss(t)}</b><span>timp</span></div>
         <div><b>${km(this.track.m)}</b><span>km</span></div>

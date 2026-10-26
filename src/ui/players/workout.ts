@@ -9,6 +9,7 @@ import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, type Player } from '../ctx.ts';
 import { howHtml } from '../how.ts';
 import { ic } from '../icons.ts';
+import { art } from '../art.ts';
 import { chrome, setText } from './common.ts';
 
 interface EmomState {
@@ -224,7 +225,7 @@ class WorkoutPlayer implements Player {
       .join('');
     return chrome(
       this.w.name,
-      `<h1 class="pl-h">Gata.</h1>
+      `${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1>
       <p class="lead">${mmss((Date.now() - this.t0) / 1000)} de antrenament. ${this.saved ? 'Salvat în progres.' : ''}</p>
       <ul class="hist">${lines || '<li><span>Nicio serie bifată.</span></li>'}</ul>
       <div style="height:16px"></div>

@@ -46,7 +46,7 @@ class BreathPlayer implements Player {
     if (this.st === 'done') {
       el.innerHTML = chrome(
         'Breathing Exercises',
-        `<h1 class="pl-h">Gata.</h1><p class="lead">${this.cycles()} cicluri 4-7-8, ${mmss(this.clock.t)}.</p><p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p><button class="btn" data-a="p:close">Închide</button>`,
+        `${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1><p class="lead">${this.cycles()} cicluri 4-7-8, ${mmss(this.clock.t)}.</p><p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p><button class="btn" data-a="p:close">Închide</button>`,
         { center: true },
       );
       return;

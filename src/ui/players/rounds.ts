@@ -21,6 +21,7 @@ import { esc, mmss } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock, hush } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
 import { howHtml } from '../how.ts';
+import { art } from '../art.ts';
 import { chrome, ctrlBtn, field, setText, stepper, switchCtl } from './common.ts';
 
 export interface RoundsCfg {
@@ -162,7 +163,7 @@ class RoundsPlayer implements Player {
   doneHtml(): string {
     const r = this.roundsDone();
     const body = `
-      <h1 class="pl-h">Gata.</h1>
+      ${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1>
       <p class="lead">${esc(this.cfg.name)}: ${r} din ${this.cfg.rounds} ${this.cfg.rounds === 1 ? 'rundă' : 'runde'}, ${mmss(doneSec(this.phases, this.clock.t, 'work'))} de lucru.</p>
       <p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p>
       <button class="btn" data-a="p:close">Închide</button>`;

@@ -7,6 +7,7 @@ import { esc, mmss } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, mountPlayer, ovEl, type Player } from '../ctx.ts';
 import { ring } from '../charts.ts';
+import { figureFor } from '../figures.ts';
 import { howHtml } from '../how.ts';
 import { chrome, ctrlBtn, setText } from './common.ts';
 
@@ -37,7 +38,7 @@ class RoutinePlayer implements Player {
         `<h1 class="pl-h">${esc(r.name)}</h1>
         <p class="pl-sub">${Math.round(routineSeconds(r) / 60)} minute, ${r.moves.length} exerciții</p>
         <p class="dim">${esc(r.intro)}</p>
-        <ul class="hist" style="margin:8px 0 18px">${r.moves.map((m) => `<li><div><b>${esc(m.name)}</b><span>${mmss(m.sec)}${m.sides ? ', pe ambele părți' : ''}${m.alex ? ', de la Alex' : ''}</span></div></li>`).join('')}</ul>
+        <ul class="hist" style="margin:8px 0 18px">${r.moves.map((m) => `<li class="${figureFor(m.name) ? 'has-fig' : ''}">${figureFor(m.name)}<div><b>${esc(m.name)}</b><span>${mmss(m.sec)}${m.sides ? ', pe ambele părți' : ''}${m.alex ? ', de la Alex' : ''}</span></div></li>`).join('')}</ul>
         <button class="btn" data-a="p:start">Start</button>`,
       );
       return;
@@ -64,7 +65,11 @@ class RoutinePlayer implements Player {
       <p class="small dim" style="margin:0">${p.move !== undefined ? `${p.move + 1} din ${r.moves.length}` : 'Pregătește-te'}</p>
       <h1 class="pl-h">${esc(m ? m.name : r.moves[0].name)}</h1>
       ${side ? `<p class="round-lbl" id="sd">${side}</p>` : ''}
-      ${ring(1 - L.left / p.sec, `<div><div class="mid-time" id="t">${mmss(Math.ceil(L.left))}</div></div>`, 6)}
+      ${(() => {
+        const r0 = ring(1 - L.left / p.sec, `<div><div class="mid-time" id="t">${mmss(Math.ceil(L.left))}</div></div>`, 6);
+        const fig = figureFor((m ?? r.moves[0]).name);
+        return fig ? `<div class="mv">${fig}${r0}</div>` : r0;
+      })()}
       <p class="cue">${esc(m ? m.cue : r.moves[0].cue)}</p>
       ${howHtml((m ?? r.moves[0]).name, undefined, { open: true })}
       ${m?.alex ? '<p class="alex"><b>Alex</b> face asta în rutina lui de mobilitate.</p>' : ''}

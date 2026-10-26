@@ -610,3 +610,13 @@ input:focus, textarea:focus { outline: none; border-color: var(--ink); }
 .fight-art .title-art { margin: 10px 0 0; }
 .card.white .btn { background: var(--paper); color: var(--ink); }
 .card.white .dim { color: var(--mute-inv); }
+
+/* mobility illustrations */
+.fig { display: block; width: 100%; height: auto; color: var(--ink); }
+.mv { display: grid; grid-template-columns: 1fr 46%; gap: 10px; align-items: center; margin: 4px 0 6px; }
+.mv .fig { background: var(--card); border: 1.5px solid var(--line-2); }
+.mv .ring { width: 100%; margin: 0; }
+.mv .mid-time { font-size: clamp(40px, 12vw, 64px); }
+.pl.ph-work .mv .fig, .pl.ph-dark .mv .fig { background: transparent; color: var(--paper); }
+.hist li.has-fig { grid-template-columns: 64px 1fr auto; }
+.hist li.has-fig .fig { width: 64px; background: var(--card); border: 1px solid var(--line); }

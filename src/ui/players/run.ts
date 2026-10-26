@@ -7,6 +7,7 @@ import { dayKey, esc, km, mmss, num, paceStr } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, closeSheet, ctx, mountPlayer, openSheet, ovEl, save, toast, type Player } from '../ctx.ts';
 import { ring } from '../charts.ts';
+import { howHtml } from '../how.ts';
 import { chrome, ctrlBtn, setText } from './common.ts';
 
 export interface RunCfg {
@@ -110,6 +111,7 @@ class RunPlayer implements Player {
         `<h1 class="pl-h">${this.name}</h1>
         <p class="pl-sub">${c.mode === 'run' ? `${Math.round((c.target ?? 1200) / 60)} de minute` : '10.000 de pași, prin natură'}</p>
         <p class="dim">${c.mode === 'run' ? 'Începe încet, respiră calm, crește viteza încet și constant.' : 'Mergi prin natură. Pașii îi iei din telefon sau îi estimez din distanță.'}</p>
+        ${howHtml(c.mode === 'run' ? 'Jogging' : 'Walk (10K Steps)', undefined, { open: true })}
         <p>${this.gpsHtml()}</p>
         <p class="small dim">Ecranul rămâne aprins cât timp alergi. Dacă îl blochezi, unele telefoane opresc GPS-ul din browser.</p>
         <button class="btn" data-a="p:start" style="margin-top:12px">Start</button>

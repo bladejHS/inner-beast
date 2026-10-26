@@ -5,6 +5,8 @@ import { CAT_NAMES, COMBOS, tiktokUrl, type ComboCat } from '../../data/combos.t
 import { WEEK, blockName, type Block } from '../../data/plan.ts';
 import { dayKey, esc, weekdayIdx } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
+import { art } from '../art.ts';
+import { howHtml } from '../how.ts';
 import { ic } from '../icons.ts';
 import { openRounds } from '../players/rounds.ts';
 import { restFor, top } from './shared.ts';
@@ -67,18 +69,20 @@ export function fightHtml(): string {
     .map(
       (c) => `<article class="combo">
       <h3>${esc(c.name)}</h3>
-      <div class="seq">${c.seq.map((s) => `<span class="${/^(Switch|Slip|Roll|Bob|Lean|Small step|Push off|Step out|Ghost)/.test(s) ? 'move' : ''}">${esc(s)}</span>`).join('')}</div>
+      <div class="seq">${c.seq.map((s) => `<span class="${/^(Switch|Slip|Roll|Bob|Weave|Lean|Small step|Push off|Step out|Step to|Ghost|Duck|Level|Back to)/.test(s) ? 'move' : ''}">${esc(s)}</span>`).join('')}</div>
       <p>${esc(c.note)}</p>
       ${c.vid ? `<a class="src" href="${tiktokUrl(c.vid)}" target="_blank" rel="noopener">${ic('ext')}${esc(c.src ?? 'TikTok')}</a>` : '<span class="src">Baza pe care insistă Alex</span>'}
     </article>`,
     )
     .join('');
   return `${top()}
-    <h1 class="stack">Lupte</h1>
+    <div class="fight-art"><div class="title-art"><h1>Lupte</h1>${art('fighter')}</div>${art('boxer')}</div>
     <h2 class="sec">Timere</h2>
     <div class="timer-list">${QUICK.map(quickRow).join('')}
       <button class="timer-row" data-a="qt" data-k="free"><div><b>Runde libere</b><span>Setezi tu rundele, lucrul și pauza</span></div>${ic('timer')}</button>
     </div>
+    <h2 class="sec">Loviturile de bază<small>Cum se face fiecare lovitură și mișcare din combinații</small></h2>
+    ${['Jab', 'Cross', 'Hook', 'Uppercut', 'Overhand', 'Slip & Roll', 'Footwork'].map((k) => howHtml(k, undefined, { title: k })).join('')}
     <h2 class="sec">Combinații de la Alex<small>Citite cadru cu cadru din video-urile lui de pe TikTok. Le auzi și în timpul rundelor de shadow boxing și sac.</small></h2>
     <div class="chips" role="group" aria-label="Filtru" style="margin-bottom:14px">${cats.map((c) => `<button class="chip" aria-pressed="${cat === c}" data-a="ccat" data-k="${c}">${c === 'all' ? 'Toate' : esc(CAT_NAMES[c])}</button>`).join('')}</div>
     ${combos}

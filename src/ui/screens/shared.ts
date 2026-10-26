@@ -3,7 +3,7 @@
 import { blockName, type Block, type RestKey } from '../../data/plan.ts';
 import { makeEntry, type Kind } from '../../logic/store.ts';
 import { dayKey, esc, inWeek, num, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
-import { clawSvg } from '../claws.ts';
+import { art } from '../art.ts';
 import { addEntry, ask, ctx, save, toast } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { openAmrap } from '../players/amrap.ts';
@@ -19,7 +19,7 @@ export function top(back = false): string {
   return `<header class="top">${
     back
       ? `<button class="icon-btn" data-a="back" aria-label="Înapoi">${ic('back')}</button>`
-      : `<div class="brand">${clawSvg('#C7FE51')}<span>Inner Beast</span></div>`
+      : `<div class="brand">${art('wolf')}<span>Inner Beast</span></div>`
   }<button class="icon-btn" data-a="settings" aria-label="Setări">${ic('gear')}</button></header>`;
 }
 

@@ -6,6 +6,7 @@ import { holdStats } from '../../logic/wimhof.ts';
 import { habitStreak } from '../../logic/progress.ts';
 import { dayKey, esc, mmss, shortDay } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
+import { art } from '../art.ts';
 import { ic } from '../icons.ts';
 import { tipCard } from './fight.ts';
 import { habitCard } from './today.ts';
@@ -17,6 +18,7 @@ const TOOLS = [
   { k: 'shower', icon: 'drop', name: 'Shower', sub: '1 min rece, 1 min cald' },
   { k: 'mobility', icon: 'stretch', name: 'Mobility', sub: '30 min, picioare, șolduri, umeri' },
   { k: 'daily', icon: 'bolt', name: 'Daily Mobility', sub: '10 min, rutina lui Alex' },
+  { k: 'dagestan', icon: 'stretch', name: 'Dagestan', sub: '9 min, șolduri și sfoară, de la Alex' },
   { k: 'stretch-push', icon: 'timer', name: 'Stretching', sub: '15 min, încălzirea umerilor' },
 ];
 
@@ -24,7 +26,7 @@ function whyBlock(): string {
   const w = ctx.S.why;
   const q = (k: 'victim' | 'winner' | 'drive', label: string, ph: string) =>
     `<label class="small" for="why-${k}" style="font-weight:700;display:block;margin:12px 0 6px">${esc(label)}</label><textarea id="why-${k}" data-a="why" data-k="${k}" placeholder="${esc(ph)}">${esc(w[k])}</textarea>`;
-  return `<section id="why">
+  return `<section id="why">${art('why', 'why-art')}
     ${q('victim', 'De ce nu vrei să fii o victimă?', 'Scrie sincer, doar tu vezi asta.')}
     ${q('winner', 'De ce tocmai tu ar trebui să fii un câștigător?', '')}
     ${q('drive', 'Cum va arăta viața ta când atingi tot ce ți-ai propus? Ce vor spune cei care te-au tras în jos?', 'Motorul tău suprem, pentru când corpul spune că nu mai poate.')}
@@ -60,6 +62,7 @@ export function mindHtml(): string {
   const hs = holdStats(ctx.S.log);
   return `${top()}
     <h1 class="stack">Minte</h1>
+    ${art('eyes', 'mind-eyes')}
     <h2 class="sec">Unelte</h2>
     <div class="tiles">${TOOLS.map((t) => `<button class="tile" data-a="tool" data-k="${t.k}">${ic(t.icon)}<b>${esc(t.name)}</b><span>${esc(t.k === 'wimhof' && hs.best ? `Record: ${mmss(hs.best)}` : t.sub)}</span></button>`).join('')}</div>
     <h2 class="sec">De ce-ul tău<small>„Găsește-ți de ce-ul și îți vei găsi succesul.”</small></h2>
@@ -71,7 +74,8 @@ export function mindHtml(): string {
     <h2 class="sec">Cartea<small>Unleash Your Inner Beast, tot în afară de nutriție</small></h2>
     <ul class="toc">${BOOK.map((c) => `<li class="${/^\d$/.test(c.num) ? 'sub' : ''}"><button data-a="chapter" data-id="${c.id}"><span class="n">${esc(c.num)}</span><span class="t">${esc(c.title)}</span></button></li>`).join('')}</ul>
     <h2 class="sec">De la Alex<small>Din video-urile lui despre mentalitate</small></h2>
-    ${ALEX_MIND.map((t) => tipCard(t)).join('')}`;
+    ${ALEX_MIND.map((t) => tipCard(t)).join('')}
+    <div class="sign">${art('trust')}</div>`;
 }
 
 // ---------- reader ----------
@@ -111,8 +115,8 @@ function chapterTool(c: Chapter): string {
       return formulaSvg();
     case 'warrior': {
       const v = ctx.S.warrior[dayKey()];
-      if (v === 'v') return `<div class="card" style="border-color:var(--red)"><h3>20 de flotări. Acum.</h3><p>Apoi răspunde din nou.</p><button class="btn" data-a="warrior" data-v="">Am făcut 20</button></div>`;
-      if (v === 'w') return `<div class="card lime"><h3>Războinic.</h3><p class="dim">Poartă-te ca atare azi.</p></div>`;
+      if (v === 'v') return `<div class="card white">${art('masks', 'card-art')}<h3>20 de flotări. Acum.</h3><p>Apoi răspunde din nou.</p><button class="btn" data-a="warrior" data-v="">Am făcut 20</button></div>`;
+      if (v === 'w') return `<div class="card lime">${art('wolf', 'card-art')}<h3>Războinic.</h3><p class="dim">Poartă-te ca atare azi.</p></div>`;
       return `<div class="btn-row"><button class="btn ghost" data-a="warrior" data-v="v">Victimă</button><button class="btn" data-a="warrior" data-v="w">Războinic</button></div>`;
     }
     case 'habit':

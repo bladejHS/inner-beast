@@ -7,6 +7,7 @@ import { makeEntry, type SetLog } from '../../logic/store.ts';
 import { esc, mmss, shortDay } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, type Player } from '../ctx.ts';
+import { howHtml } from '../how.ts';
 import { ic } from '../icons.ts';
 import { chrome, setText } from './common.ts';
 
@@ -135,6 +136,7 @@ class WorkoutPlayer implements Player {
       <p class="target">${esc(targetLine(ex))}</p>
       ${advHtml}
       <p class="cue">${esc(ex.cue)}</p>
+      ${howHtml(ex.id, ex.vars[x.lvl])}
       ${ex.alex ? `<p class="alex"><b>Alex:</b> ${esc(ex.alex)}</p>` : ''}
       ${lastLine}
       ${main}`;
@@ -181,7 +183,7 @@ class WorkoutPlayer implements Player {
         <p class="round-lbl">Minutul <span id="em">${m + 1}</span> din ${e.min}</p>
         <div class="mid-time" id="et">${mmss(Math.ceil(left))}</div>
         <p class="pl-sub" style="margin-bottom:12px">${e.reps} × ${esc(x.ex.vars[x.lvl])}, apoi pauză până la minutul următor</p>
-        <button class="tap-big" data-a="p:emark" style="${marked ? 'background:#fff' : ''}">${marked ? 'Făcut ✓' : 'Făcut'}</button>
+        <button class="tap-big" data-a="p:emark" style="${marked ? 'background:transparent;color:inherit;box-shadow:inset 0 0 0 3px currentColor' : ''}">${marked ? 'Făcut ✓' : 'Făcut'}</button>
         <p class="small dim" style="margin-top:10px">Minute făcute: ${e.marks.filter(Boolean).length}. <button class="link" data-a="p:estop">Oprește EMOM-ul</button></p>`;
     }
     const n = e.marks.filter(Boolean).length;

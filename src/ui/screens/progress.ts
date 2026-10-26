@@ -7,6 +7,7 @@ import type { Entry } from '../../logic/store.ts';
 import { addDays, dayKey, esc, km, mmss, num, paceStr, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { bars, spark } from '../charts.ts';
 import { ctx } from '../ctx.ts';
+import { art } from '../art.ts';
 import { ic } from '../icons.ts';
 import { top } from './shared.ts';
 
@@ -96,7 +97,7 @@ export function progressHtml(): string {
   const recent = [...S.log].reverse().slice(0, 12);
 
   return `${top()}
-    <h1 class="stack">Progres</h1>
+    <div class="title-art"><h1>Progres</h1>${art('strength')}</div>
     <h2 class="sec">Săptămâna asta<small>${full} din 7 zile complete</small></h2>
     <div class="week7">${week}</div>
     <div class="stats" style="margin-top:14px">
@@ -126,7 +127,7 @@ export function progressHtml(): string {
     ${bars(last7.map((d, i) => ({ v: stepsVals[i], label: RO_DAYS[weekdayIdx(d)].slice(0, 2) })), 10000)}
 
     <h2 class="sec">Istoric</h2>
-    ${recent.length ? `<ul class="hist">${recent.map((e) => entryLine(e)).join('')}</ul><button class="btn ghost sm" data-a="history" style="margin-top:12px">Tot istoricul</button>` : '<p class="dim">Tot ce faci apare aici.</p>'}`;
+    ${recent.length ? `<ul class="hist">${recent.map((e) => entryLine(e)).join('')}</ul><button class="btn ghost sm" data-a="history" style="margin-top:12px">Tot istoricul</button>` : `<div class="empty">${art('peek')}<p>Tot ce faci apare aici.</p></div>`}`;
 }
 
 export function historyHtml(): string {
@@ -137,5 +138,5 @@ export function historyHtml(): string {
     groups.set(e.date, g);
   }
   const html = [...groups.entries()].map(([d, es]) => `<h2 class="sec" style="font-size:19px;margin:24px 0 6px">${esc(prettyDay(d))}</h2><ul class="hist">${es.map((e) => entryLine(e, true)).join('')}</ul>`).join('');
-  return `${top(true)}<h1 class="stack mid">Istoric</h1>${html || '<p class="dim">Gol deocamdată.</p>'}`;
+  return `${top(true)}<h1 class="stack mid">Istoric</h1>${html || `<div class="empty">${art('peek')}<p>Gol deocamdată.</p></div>`}`;
 }

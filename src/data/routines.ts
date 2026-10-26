@@ -10,7 +10,7 @@ export interface Move {
 }
 
 export interface Routine {
-  id: 'stretch-push' | 'stretch-pull' | 'mobility' | 'daily';
+  id: 'stretch-push' | 'stretch-pull' | 'mobility' | 'daily' | 'dagestan';
   name: string;
   intro: string;
   moves: Move[];
@@ -100,6 +100,20 @@ export const ROUTINES: Routine[] = [
       { name: 'Wrist & Ankle Circles', sec: 60, cue: 'Încheieturile și gleznele, în ambele sensuri.' },
       { name: 'Neck Mobility', sec: 30, cue: 'Lent, fără rotiri forțate.' },
       { name: 'Loose Shadow Boxing', sec: 60, alex: true, cue: 'Pumni relaxați, brațul întins complet. De la lejer la tare.' },
+    ],
+  },
+  {
+    id: 'dagestan',
+    name: 'Dagestan Mobility',
+    intro: 'Rutina de mobilitate pentru șolduri și adductori pe care Alex o lucrează după clipul „Dagestan Mobility Routine”. Recunoaște singur că mai are de lucrat la ea: mergi doar până unde poți, fără durere.',
+    moves: [
+      { name: 'Dagestan Hip Shifts', sec: 90, alex: true, cue: 'Picioarele larg, mâinile pe sol: muți greutatea dintr-o parte în alta, piciorul opus rămâne întins.' },
+      { name: 'Straddle Dive', sec: 60, alex: true, cue: 'Din șoldurile sus, pieptul trece printre mâini și bazinul coboară spre sol.' },
+      { name: 'Straddle Sink', sec: 90, alex: true, cue: 'Picioarele foarte depărtate, cobori șoldurile la fiecare expirație.' },
+      { name: 'Middle Split Reach', sec: 90, alex: true, cue: 'În sfoară laterală, întinzi pe rând câte o mână cât mai departe înainte.' },
+      { name: 'Straddle Side Bend', sec: 90, sides: true, alex: true, cue: 'Din sfoară, cobori trunchiul peste un picior, apoi peste celălalt.' },
+      { name: 'Frog Stretch', sec: 60, cue: 'În patru labe, genunchii larg: împingi șoldurile în spate.' },
+      { name: 'Butterfly Stretch', sec: 60, cue: 'Tălpile lipite, genunchii cad spre sol.' },
     ],
   },
 ];

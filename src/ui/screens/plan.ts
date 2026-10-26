@@ -5,6 +5,7 @@ import { WEEK, blockLine } from '../../data/plan.ts';
 import { dayComplete, dayProgress, weekDone } from '../../logic/progress.ts';
 import { addDays, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
+import { art } from '../art.ts';
 import { ic } from '../icons.ts';
 import { blockIcon, blockMinutes, top } from './shared.ts';
 
@@ -41,7 +42,7 @@ export function planHtml(): string {
   }).join('');
   return `${top()}
     <section class="hero hero-plan">
-      <div class="hero-glow" aria-hidden="true"></div>
+      ${art('atlas', 'hero-art atlas')}
       <p class="hero-k">Săptămâna ${weekRange(mon)}</p>
       <h1 class="hero-t">Planul</h1>
       <div class="hero-row">

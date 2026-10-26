@@ -6,6 +6,7 @@ import { makeEntry } from '../../logic/store.ts';
 import { esc, mmss, shortDay } from '../../logic/util.ts';
 import { buzz, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, type Player } from '../ctx.ts';
+import { howHtml } from '../how.ts';
 import { chrome, ctrlBtn, setText, stepper } from './common.ts';
 
 const PREP = 5;
@@ -55,6 +56,7 @@ class AmrapPlayer implements Player {
         <p class="dim">O rundă înseamnă toate trei exercițiile, în ordine. Numeri rundele, apoi repetările din runda neterminată.</p>
         <div class="chips" style="margin:14px 0 4px">${BW_SCHEMES.map((s, i) => `<button class="chip" aria-pressed="${i === this.scheme}" data-a="p:scheme" data-i="${i}">${esc(s.name)} ${s.reps.join('-')}</button>`).join('')}</div>
         ${moves(true)}
+        ${BW_MOVES.map((m) => howHtml(m, undefined, { title: `Cum se face: ${m}` })).join('')}
         ${l ? `<p class="prev">Data trecută (${shortDay(l.date)}): ${l.rounds} runde + ${l.extra} repetări${l.scheme !== this.scheme ? ', altă variantă' : ''}. Progresia e obligatorie: bate-l.</p>` : ''}
         <button class="btn" data-a="p:start" style="margin-top:14px">Start</button>`,
       );

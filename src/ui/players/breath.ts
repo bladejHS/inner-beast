@@ -5,6 +5,7 @@ import { makeEntry } from '../../logic/store.ts';
 import { esc, mmss } from '../../logic/util.ts';
 import { say, sfx, unlock, buzz } from '../audio.ts';
 import { addEntry, ctx, mountPlayer, ovEl, save, type Player } from '../ctx.ts';
+import { art } from '../art.ts';
 import { chrome, ctrlBtn, setText } from './common.ts';
 
 class BreathPlayer implements Player {
@@ -29,7 +30,7 @@ class BreathPlayer implements Player {
     if (this.st === 'ready') {
       el.innerHTML = chrome(
         'Breathing Exercises',
-        `<h1 class="pl-h">4-7-8</h1>
+        `${art('heart', 'pl-art')}<h1 class="pl-h">4-7-8</h1>
         <p class="pl-sub">Metoda de respirație din carte</p>
         <ol class="ticks">
           <li>Inspiri pe nas, lent, 4 secunde.</li>

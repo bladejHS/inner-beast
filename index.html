@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#f3f1ec">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Unleash Your Inner Beast: planul zi de zi, timere de luptă, calistenie, Wim Hof și tracking.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Beast">
 <title>Inner Beast</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -16,59 +16,55 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" href="fonts/league-spartan-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="art/wolf.webp" as="image" type="image/webp">
 <style>
 @font-face{font-family:'League Spartan';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/league-spartan-latin-wght-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'League Spartan';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/league-spartan-latin-ext-wght-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:'Montserrat';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/montserrat-latin-wght-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Montserrat';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/montserrat-latin-ext-wght-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-html,body{margin:0;background:#000;color:#fff}
-#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:radial-gradient(90% 60% at 70% 30%,#1a2a07 0%,#060904 45%,#000 75%);transition:opacity .55s ease,filter .55s ease,transform .55s ease}
-#splash.sp-out{opacity:0;filter:blur(6px);transform:scale(1.04);pointer-events:none}
-.sp-stage{position:absolute;inset:0;transform:scale(1.08)}
-.sp-go .sp-stage{animation:sp-push 3.4s cubic-bezier(.2,.7,.2,1) forwards}
-#sp-dust{position:absolute;inset:0;width:100%;height:100%}
-.sp-vig{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 40%,transparent 50%,rgba(0,0,0,.85) 100%);pointer-events:none}
-.sp-claws{position:absolute;width:min(96vmin,580px);right:-12vmin;top:max(3vh,env(safe-area-inset-top));filter:drop-shadow(0 0 18px rgba(199,254,81,.55)) drop-shadow(0 0 60px rgba(199,254,81,.25))}
+html,body{margin:0;background:#f3f1ec;color:#0d0d0d}
+/* Opening: a drop of ink falls, bleeds into the wolf, three claws tear through it, the words are stamped. */
+#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#f3f1ec;color:#0d0d0d;transition:clip-path .6s cubic-bezier(.7,0,.2,1);clip-path:inset(0 0 0 0)}
+#splash.sp-out{clip-path:inset(0 0 100% 0);pointer-events:none}
+.sp-stage{position:absolute;inset:0}
+#sp-ink{position:absolute;inset:0;width:100%;height:100%}
+.sp-claws{position:absolute;color:#f3f1ec;pointer-events:none}
 .cl-reveal{stroke-dasharray:var(--l);stroke-dashoffset:var(--l)}
-.sp-go .cl-reveal{animation:sp-rip .26s cubic-bezier(.8,0,.2,1) forwards;animation-delay:calc(.45s + var(--d))}
-.sp-flash{position:absolute;inset:0;background:radial-gradient(60% 40% at 70% 32%,rgba(214,255,120,.55),transparent 70%);opacity:0;pointer-events:none;mix-blend-mode:screen}
-.sp-go .sp-flash{animation:sp-flash .7s ease-out .72s forwards}
-.sp-title{position:absolute;left:clamp(22px,6vw,48px);bottom:calc(21vh + env(safe-area-inset-bottom));margin:0;font:900 clamp(58px,19vw,128px)/.86 'League Spartan','Arial Black',sans-serif;letter-spacing:-.015em;text-transform:uppercase}
-.sp-title span{display:block;clip-path:inset(100% 0 0 0);transform:translateY(.35em);color:transparent;background:linear-gradient(100deg,#9ea394 0%,#fff 35%,#fff 48%,#e9ffb8 52%,#fff 56%,#c9cdc1 100%);background-size:250% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text}
-.sp-go .sp-title span{animation:sp-wipe .6s cubic-bezier(.2,.8,.2,1) forwards,sp-sheen 1.6s ease-in-out forwards}
-.sp-go .sp-title span:nth-child(1){animation-delay:.95s,1.5s}
-.sp-go .sp-title span:nth-child(2){animation-delay:1.05s,1.58s}
-.sp-go .sp-title span:nth-child(3){animation-delay:1.15s,1.66s}
-.sp-go .sp-title span:nth-child(4){animation-delay:1.25s,1.74s}
-.sp-line{position:absolute;left:clamp(22px,6vw,48px);bottom:calc(16.5vh + env(safe-area-inset-bottom));height:2px;width:0;background:linear-gradient(90deg,#C7FE51,rgba(199,254,81,0));box-shadow:0 0 12px rgba(199,254,81,.7)}
-.sp-go .sp-line{animation:sp-line .9s cubic-bezier(.2,.8,.2,1) 1.7s forwards}
-.sp-brand{position:absolute;left:clamp(22px,6vw,48px);bottom:calc(11vh + env(safe-area-inset-bottom));margin:0;font:700 12px/1 Montserrat,system-ui,sans-serif;letter-spacing:.6em;color:#C7FE51;opacity:0;text-transform:uppercase}
-.sp-go .sp-brand{animation:sp-track 1.1s cubic-bezier(.2,.8,.2,1) 1.9s forwards}
-.sp-sub{position:absolute;left:clamp(22px,6vw,48px);right:clamp(22px,6vw,48px);bottom:calc(5vh + env(safe-area-inset-bottom));max-width:34ch;margin:0;font:500 13px/1.45 Montserrat,system-ui,sans-serif;color:#a9ada3;opacity:0}
-.sp-go .sp-sub{animation:sp-fade .6s ease 2.2s forwards}
-.sp-go{animation:sp-shake .3s linear .76s 1}
-@keyframes sp-push{to{transform:scale(1)}}
+.sp-go .cl-reveal{animation:sp-rip .2s cubic-bezier(.8,0,.2,1) forwards;animation-delay:calc(1.3s + var(--d))}
+.sp-go .sp-stage{animation:sp-hit .34s linear 1.4s 1}
+.sp-title{position:absolute;left:clamp(20px,6vw,48px);right:clamp(20px,6vw,48px);bottom:calc(19vh + env(safe-area-inset-bottom));margin:0;font:900 clamp(54px,17vw,118px)/.84 'League Spartan','Arial Black',sans-serif;letter-spacing:-.02em;text-transform:uppercase;filter:url(#ink)}
+.sp-title span{display:block;opacity:0;transform:scale(1.5) rotate(-3deg);transform-origin:0 60%}
+.sp-go .sp-title span{animation:sp-stamp .32s cubic-bezier(.3,1.6,.5,1) forwards}
+.sp-go .sp-title span:nth-child(1){animation-delay:1.65s}
+.sp-go .sp-title span:nth-child(2){animation-delay:1.8s}
+.sp-go .sp-title span:nth-child(3){animation-delay:1.95s}
+.sp-brush{position:absolute;left:clamp(14px,5vw,42px);bottom:calc(13.5vh + env(safe-area-inset-bottom));width:min(78vw,430px);height:34px;overflow:visible}
+.sp-brush path{fill:none;stroke:#0d0d0d;stroke-width:13;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;filter:url(#brush)}
+.sp-go .sp-brush path{animation:sp-draw .45s cubic-bezier(.6,0,.2,1) 2.25s forwards}
+.sp-brand{position:absolute;left:clamp(22px,6vw,48px);bottom:calc(14.6vh + env(safe-area-inset-bottom));margin:0;font:900 12px/1 'League Spartan',sans-serif;letter-spacing:.55em;color:#f3f1ec;opacity:0;text-transform:uppercase}
+.sp-go .sp-brand{animation:sp-fade .3s ease 2.6s forwards}
+.sp-sub{position:absolute;left:clamp(22px,6vw,48px);right:clamp(22px,6vw,48px);bottom:calc(5vh + env(safe-area-inset-bottom));max-width:34ch;margin:0;font:600 13px/1.45 Montserrat,system-ui,sans-serif;color:#55524c;opacity:0}
+.sp-go .sp-sub{animation:sp-fade .6s ease 2.7s forwards}
 @keyframes sp-rip{to{stroke-dashoffset:0}}
-@keyframes sp-flash{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
-@keyframes sp-wipe{to{clip-path:inset(-10% 0 -10% 0);transform:none}}
-@keyframes sp-sheen{to{background-position:0 0}}
-@keyframes sp-line{to{width:min(62vw,360px)}}
-@keyframes sp-track{from{opacity:0;letter-spacing:1.2em}to{opacity:1;letter-spacing:.6em}}
+@keyframes sp-hit{0%,100%{transform:none}15%{transform:translate(-7px,4px) scale(1.012)}35%{transform:translate(6px,-4px)}55%{transform:translate(-4px,2px)}75%{transform:translate(2px,-1px)}}
+@keyframes sp-stamp{0%{opacity:0;transform:scale(1.5) rotate(-3deg)}60%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes sp-draw{to{stroke-dashoffset:0}}
 @keyframes sp-fade{to{opacity:1}}
-@keyframes sp-shake{0%,100%{transform:none}20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-3px,2px)}80%{transform:translate(2px,-1px)}}
-@media (prefers-reduced-motion:reduce){.sp-go,.sp-go *{animation:none!important}.cl-reveal{stroke-dashoffset:0}.sp-title span{clip-path:none;transform:none}.sp-line{width:min(62vw,360px)}.sp-brand,.sp-sub{opacity:1}.sp-stage{transform:none}}
+@media (prefers-reduced-motion:reduce){.sp-go *{animation:none!important}.cl-reveal{stroke-dashoffset:0}.sp-title span{opacity:1;transform:none}.sp-brush path{stroke-dashoffset:0}.sp-brand,.sp-sub{opacity:1}}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="brush" x="-5%" y="-60%" width="110%" height="220%"><feTurbulence type="fractalNoise" baseFrequency=".035 .9" numOctaves="3" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/></filter>
+</svg>
 <div id="splash" aria-hidden="true">
   <div class="sp-stage">
-    <canvas id="sp-dust"></canvas>
+    <canvas id="sp-ink"></canvas>
     <!--CLAWS-->
-    <div class="sp-flash"></div>
   </div>
-  <div class="sp-vig"></div>
-  <h1 class="sp-title"><span>Unleash</span><span>your</span><span>inner</span><span>beast</span></h1>
-  <div class="sp-line"></div>
+  <h1 class="sp-title"><span>Unleash</span><span>your inner</span><span>beast</span></h1>
+  <svg class="sp-brush" viewBox="0 0 430 34" preserveAspectRatio="none"><path d="M8 20 C 90 12, 170 26, 250 16 S 380 12, 422 18"/></svg>
   <p class="sp-brand">Inner Beast</p>
   <p class="sp-sub">Tot ce-ți trebuie ca să ajungi în cea mai bună formă a vieții tale, mental și fizic.</p>
 </div>
@@ -81,35 +77,79 @@ html,body{margin:0;background:#000;color:#fff}
   var sp = document.getElementById('splash');
   if (!sp) return;
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var c = document.getElementById('sp-dust'), x = c.getContext('2d');
-  var dpr = Math.min(2, window.devicePixelRatio || 1), W = 0, H = 0, P = [], raf = 0, t0 = performance.now(), done = false;
-  function size() { W = c.width = innerWidth * dpr; H = c.height = innerHeight * dpr; }
+  var c = document.getElementById('sp-ink'), x = c.getContext('2d');
+  var claws = sp.querySelector('.sp-claws');
+  var wolf = new Image();
+  var dpr = Math.min(2, window.devicePixelRatio || 1), W = 0, H = 0, box = null, raf = 0, t0 = 0, done = false;
+  // fixed pseudo-random numbers, so the bleed has the same shape every time
+  var seed = 11;
+  function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  var waves = [], drops = [];
+  for (var i = 0; i < 7; i++) waves.push({ f: 2 + Math.floor(rnd() * 9), p: rnd() * 6.28, a: .05 + rnd() * .09 });
+  for (i = 0; i < 46; i++) { var a = rnd() * 6.28, sp1 = .25 + rnd() * .9; drops.push({ a: a, d: sp1, r: .003 + Math.pow(rnd(), 3) * .02, s: rnd() }); }
+  function size() {
+    W = c.width = Math.round(innerWidth * dpr); H = c.height = Math.round(innerHeight * dpr);
+    var w = Math.min(innerWidth * .9, innerHeight * .52 * 392 / 482, 460);
+    var h = w * 482 / 392;
+    box = { x: (innerWidth - w) / 2 + w * .06, y: Math.max(innerHeight * .05, 24), w: w, h: h };
+    if (claws) { claws.style.left = (box.x + w * .1) + 'px'; claws.style.top = (box.y + h * .12) + 'px'; claws.style.width = (w * .8) + 'px'; }
+  }
   size();
   addEventListener('resize', size);
-  for (var i = 0; i < 170; i++) { var z = Math.random(); P.push({ x: Math.random(), y: Math.random(), z: z, r: .4 + z * z * 2.6, a: .1 + z * .6, v: .00001 + z * .00012, g: Math.random() < .12 }); }
-  x.fillStyle = '#fff';
-  function draw(t) {
-    var k = Math.min(1, (t - t0) / 500);
+  function ease(t) { return 1 - Math.pow(1 - t, 3); }
+  function draw(now) {
+    var t = (now - t0) / 1000;
+    var ox = (box.x + box.w * .42) * dpr, oy = (box.y + box.h * .42) * dpr, R = Math.hypot(box.w, box.h) * dpr;
+    x.setTransform(1, 0, 0, 1, 0, 0);
     x.clearRect(0, 0, W, H);
-    for (var i = 0; i < P.length; i++) {
-      var p = P[i];
-      if (!reduce) { p.y -= p.v * 16; if (p.y < 0) p.y += 1; }
-      x.globalAlpha = p.a * k;
-      x.fillStyle = p.g ? '#C7FE51' : '#fff';
-      x.beginPath(); x.arc(p.x * W, p.y * H, p.r * dpr * (p.g ? 1.6 : 1), 0, 6.2832); x.fill();
+    x.fillStyle = '#000';
+    if (t < .32) {
+      // the falling drop
+      var k = t / .32, dy = (1 - k * k) * oy;
+      x.beginPath(); x.ellipse(ox, oy - dy, 7 * dpr, (7 + 16 * k) * dpr, 0, 0, 6.2832); x.fill();
+    } else {
+      var g = ease(Math.min(1, (t - .32) / 1.0)), r = g * R * .78;
+      // the bleed: a noisy blob that grows from where the drop landed, the wolf only shows inside it
+      x.save();
+      x.beginPath();
+      for (var j = 0; j <= 96; j++) {
+        var th = j / 96 * 6.2832, m = 1;
+        for (var q = 0; q < waves.length; q++) m += waves[q].a * Math.sin(waves[q].f * th + waves[q].p + t * 1.5);
+        var rr = r * m;
+        j ? x.lineTo(ox + Math.cos(th) * rr, oy + Math.sin(th) * rr) : x.moveTo(ox + Math.cos(th) * rr, oy + Math.sin(th) * rr);
+      }
+      x.closePath(); x.clip();
+      if (wolf.complete && wolf.naturalWidth) x.drawImage(wolf, box.x * dpr, box.y * dpr, box.w * dpr, box.h * dpr);
+      else { x.beginPath(); x.arc(ox, oy, r * .3, 0, 6.2832); x.fill(); }
+      x.restore();
+      // spatter thrown out by the impact
+      var sk = ease(Math.min(1, (t - .32) / .5));
+      for (var d = 0; d < drops.length; d++) {
+        var p = drops[d], dist = p.d * sk * R * .55;
+        x.beginPath(); x.arc(ox + Math.cos(p.a) * dist, oy + Math.sin(p.a) * dist * .8, p.r * R * (.6 + .4 * sk), 0, 6.2832); x.fill();
+      }
     }
-    raf = requestAnimationFrame(draw);
+    if (t < 1.6 || !wolf.complete) raf = requestAnimationFrame(draw);
   }
-  raf = requestAnimationFrame(draw);
   function end() {
     if (done) return;
     done = true;
     sp.classList.add('sp-out');
-    setTimeout(function () { cancelAnimationFrame(raf); removeEventListener('resize', size); sp.remove(); }, 460);
+    setTimeout(function () { cancelAnimationFrame(raf); removeEventListener('resize', size); sp.remove(); }, 650);
+  }
+  function go() {
+    if (t0) return;
+    t0 =performance.now() - (reduce ? 5000 : 0);
+    raf = requestAnimationFrame(draw);
+    sp.classList.add('sp-go');
+    setTimeout(end, reduce ? 1400 : 3900);
   }
   sp.addEventListener('click', end);
-  setTimeout(end, reduce ? 1300 : 3500);
-  sp.classList.add('sp-go');
+  wolf.onload = go;
+  wolf.onerror = go;
+  wolf.src = 'art/wolf.webp';
+  // never hold the app hostage to a slow image
+  setTimeout(go, 900);
 })();
 </script>
 <script type="module" src="/src/main.ts"></script>

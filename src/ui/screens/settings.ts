@@ -2,6 +2,7 @@
 
 import { esc } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
+import { art } from '../art.ts';
 import { ic } from '../icons.ts';
 import { top } from './shared.ts';
 
@@ -41,5 +42,6 @@ export function settingsHtml(): string {
       <li>Combinațiile, rutina de spate, mobilitatea și sfaturile: canalul lui Alex Hanma, <a href="https://www.tiktok.com/@alexhanma___" target="_blank" rel="noopener">TikTok @alexhanma___</a> și <a href="https://www.instagram.com/alexhanma_/" target="_blank" rel="noopener">Instagram @alexhanma_</a>.</li>
       <li>Meditația: metoda de respirație Wim Hof. Respirația 4-7-8: metoda din carte.</li>
     </ul>
-    <p class="small dim">Inner Beast 1.0</p>`;
+    <div class="sign">${art('norisk')}</div>
+    <p class="small dim" style="text-align:center">Inner Beast 2.0</p>`;
 }

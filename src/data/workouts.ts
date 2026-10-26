@@ -35,7 +35,7 @@ export const WORKOUTS: Workout[] = [
     name: 'Push Training',
     ex: [
       {
-        id: 'explosive', name: 'Explosive Push-ups', vars: ['Incline Explosive Push-ups', 'Explosive Push-ups', 'Clap Push-ups'], start: 0,
+        id: 'explosive', name: 'Explosive Push-ups', vars: ['Incline Explosive Push-ups', 'Explosive Push-ups', 'Clap Push-ups', 'Superman Push-ups'], start: 0,
         type: 'reps', sets: 4, lo: 3, hi: 6, rest: 90, muscles: 'piept, triceps, putere',
         cue: 'Cobori controlat, împingi cât de exploziv poți. Puține repetări, fiecare la viteză maximă.',
         alex: 'Antrenează mușchii și pentru viteză, nu doar pentru forță. Le faci primele, cât ești proaspăt.',

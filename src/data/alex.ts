@@ -53,6 +53,27 @@ export const ALEX_FIGHT: TipCard[] = [
       'Devino mai puternic, nu doar mai greu: squats, pull-ups și exerciții compuse.',
       'Antrenează și viteza: sărituri, sprinturi, aruncări explozive cu mingea medicinală, mobilitate.',
       'Contează forța raportată la greutatea ta. Alex e mai rapid la 88 kg decât era la 75 kg, pentru că folosește picioarele și core-ul.',
+      'Antrenează nu doar câtă forță produci, ci și cât de repede o produci.',
+    ],
+  },
+  {
+    id: 'pillars', title: 'Pilonii progresului', src: '7693645369535679776', srcTitle: 'Ist das natty?',
+    points: [
+      'Somn, antrenament dur și multă regenerare. Regenerarea e la fel de importantă ca antrenamentul.',
+      'Antrenează-te intens și nu repeta la nesfârșit același antrenament, cu aceleași greșeli.',
+      'Variază intensitatea și introdu din când în când o săptămână cu volum mai mare.',
+      'Ține stresul sub control și rămâi constant. Un antrenor bun îți ajustează programul.',
+      'Genetica nu e o scuză: dacă respecți bazele, rezultatele vin.',
+    ],
+  },
+  {
+    id: 'riley', title: 'Antrenamentul „Simon Riley”', src: '7319897665938951457', srcTitle: 'Hardcore Combat workout',
+    points: [
+      '10 runde × 3 minute de shadow boxing, garda sus, ritm ridicat.',
+      '40 de Superman Push-ups: împingi atât de tare încât mâinile și picioarele se desprind de sol.',
+      '150 de Clap Push-ups, împărțite în câte serii ai nevoie.',
+      'Aterizezi moale, cu coatele ușor îndoite, ca să-ți protejezi încheieturile.',
+      'Variantele explozive le găsești în ziua de push, la Explosive Push-ups.',
     ],
   },
   {
@@ -79,6 +100,16 @@ export const ALEX_FIGHT: TipCard[] = [
       'Garda sus, în poziție de luptă: cine stă în gardă e pregătit, cine stă cu mâinile jos nu.',
       'Dacă ești atacat: întâi blochezi, apoi răspunzi.',
       'Ringul și strada sunt lucruri complet diferite, spune Alex.',
+    ],
+  },
+  {
+    id: 'street2', title: 'Autoapărare: pleacă, blochează, gardă', src: '7686905759724014881', srcTitle: 'Street self defense',
+    points: [
+      'Dacă poți pleca dintr-o situație periculoasă, pleacă. Nu te apropia și nu-l provoca.',
+      'Blocaj: ridici brațul cu palma pe cap, antebrațul îți acoperă lateralul capului, cotul rămâne îndreptat înainte.',
+      'Din blocaj, fără să cobori brațul, intri cu cotul. E interzis în box: exersează-l doar controlat, pe sac sau manechin.',
+      'Nu te baza pe lovituri la corp pe stradă: dacă nu-l opresc, te copleșește. Fără gardă nu ai cu ce să te aperi.',
+      'După fiecare atac revii imediat în poziția de luptă, cu garda sus.',
     ],
   },
 ];
@@ -129,6 +160,46 @@ export const ALEX_MIND: TipCard[] = [
     points: ['Nu te antrena doar ca să arăți bine.', 'Pentru Alex, curajul e în sparring cu profesioniști.'],
   },
   {
+    id: 'nobody', title: 'Nimănui nu-i pasă. Muncește mai mult', src: '7687707357983296801', srcTitle: 'Nobody cares. Work harder.',
+    points: [
+      'Obosit, trist, singur, fără bani, speriat, demotivat: nu sunt scuze.',
+      'Continuă să te antrenezi și să muncești, mai ales în zilele astea.',
+    ],
+  },
+  {
+    id: 'slow', title: 'Încet, dar fără oprire', src: '7693240332053466400', srcTitle: 'It does not matter how slowly you go',
+    points: ['Nu contează cât de încet avansezi, atâta timp cât nu te oprești.', 'Consecvența bate viteza.'],
+  },
+  {
+    id: 'fearless', title: 'Devino fără frică', src: '7688768918667676961', srcTitle: 'Angstfrei werden in 1:30 Minuten',
+    points: [
+      'Trebuie să duci lupta cu tine însuți. Nimeni nu o duce în locul tău.',
+      'Ia decizii independent de ceilalți. E normal să-ți faci timp pentru antrenament.',
+      'Dacă faci doar ce vor alții, nu ce simți, ajungi să te frângi.',
+      'Pe cei care nu te susțin lasă-i deoparte și mergi până la capăt.',
+    ],
+  },
+  {
+    id: 'balance', title: 'Corp, minte și suflet', src: '7695137765058432288', srcTitle: 'Emotionale Intelligenz',
+    points: [
+      'Forța mentală și emocională vine doar din munca pe tine, cu corpul, mintea și sufletul în echilibru.',
+      'Dacă tu dai totul și celălalt doar critică și trage în jos, dezechilibrul e al lui, nu al tău.',
+      'Nu-i lăsa pe oamenii negativi să te doboare.',
+    ],
+  },
+  {
+    id: 'joy', title: 'Fă ce te împlinește', src: '7698057905131638049', srcTitle: 'Warum?',
+    points: [
+      'Nu trebuie să te justifici: unii își repară mașinile, alții fac balet, el boxează.',
+      'Fă mai mult din ce te împlinește. Ce nu te împlinește, lasă-l.',
+      'Mișcarea îți face bine, și fizic, și mental.',
+    ],
+  },
+  {
+    id: 'pain', title: 'Durerea e doar o senzație', src: '7663128666758548769', srcTitle: 'Pain is just a feeling',
+    points: ['Abilitățile impresionante, ca sfoara laterală a lui Alex, cer timp și răbdare.', 'Mergi constant, puțin câte puțin. Rutina Dagestan o găsești la Unelte.'],
+  },
+  {
     id: 'practice', title: 'Practica bate teoria', src: '7660845220430384417', srcTitle: 'Rücken Training',
     points: ['Urmează oameni și antrenori care fac, nu doar care vorbesc.'],
   },
@@ -146,6 +217,10 @@ export const REST_TIPS = [
   'Lovește pe toată distanța.',
   'Croșee scurte, rotația vine din șold.',
   'Expiri scurt la fiecare lovitură.',
+  'Jabul pe toată distanța, umărul urcă la bărbie.',
+  'Cobori din genunchi, nu din spate.',
+  'După combinație ieși din linie sau schimbă unghiul.',
+  'Întâi corpul, apoi capul.',
 ];
 
 export function srcUrl(src: string | undefined): string | null {

@@ -1,5 +1,4 @@
 import './styles.css';
-import './premium.css';
 import { blockById, WEEK, type Block } from './data/plan.ts';
 import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
 import { dayKey, esc, uid, weekdayIdx } from './logic/util.ts';
@@ -107,7 +106,8 @@ function openTool(k: string): void {
     case 'stretch-pull':
       return openRoutine(k, todayBlock((b) => b.routine === k)?.id);
     case 'daily':
-      return openRoutine('daily');
+    case 'dagestan':
+      return openRoutine(k);
   }
 }
 

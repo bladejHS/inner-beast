@@ -7,6 +7,7 @@ import { dayKey, esc, prettyDay, RO_DAYS, weekStart, weekdayIdx, daysBetween } f
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { clawSvg } from '../claws.ts';
+import { art } from '../art.ts';
 import { blockCard, blockMinutes, top } from './shared.ts';
 
 function miniRing(n: number, total: number, size = 64): string {
@@ -34,8 +35,8 @@ export function dayBody(day: Day, today: string, kicker: string): string {
   const mins = day.blocks.reduce((s, b) => s + blockMinutes(b), 0);
   return `
     <section class="hero">
-      <div class="hero-glow" aria-hidden="true"></div>
-      ${clawSvg('#C7FE51', 'hero-claw')}
+      ${art('wolf', 'hero-art')}
+      ${clawSvg('currentColor', 'hero-claws')}
       <p class="hero-k">${esc(kicker)}</p>
       <h1 class="hero-t">${esc(day.title)}</h1>
       <div class="hero-row">
@@ -65,10 +66,10 @@ export function habitCard(compact = false): string {
          <div class="chips">${[-10, 10, 25, 50].map((d) => `<button class="chip" data-a="hab" data-n="${d}">${d > 0 ? '+' : '−'}${Math.abs(d)}</button>`).join('')}</div>`
       : `<button class="btn ${ok ? 'ghost' : ''}" data-a="hab-check">${ok ? 'Făcut azi' : 'Bifează azi'}</button>`;
   return `<section class="card ${ok ? 'lime' : ''}" aria-label="Rutina zilei">
-    <div class="row"><div class="row-l"><h3>${esc(h.name)}</h3><p class="small dim" style="margin:0">Rutina zilei, ziua ${dayN} din 28${streak ? `, serie de ${streak} ${streak === 1 ? 'zi' : 'zile'}` : ''}</p></div>${ok ? `<span style="color:var(--lime)">${ic('check')}</span>` : ''}</div>
+    <div class="row"><div class="row-l"><h3>${esc(h.name)}</h3><p class="small dim" style="margin:0">Rutina zilei, ziua ${dayN} din 28${streak ? `, serie de ${streak} ${streak === 1 ? 'zi' : 'zile'}` : ''}</p></div>${ok ? `<span>${ic('check')}</span>` : ''}</div>
     ${body}
     ${msText && ok ? `<p class="small" style="margin:10px 0 0"><b class="hl">${ms} zile.</b> ${esc(msText)}</p>` : ''}
-    ${late ? '<p class="small" style="margin:10px 0 0;color:var(--yellow)">Nu te culca până nu e gata.</p>' : ''}
+    ${late ? '<p class="small" style="margin:10px 0 0;font-weight:800">Nu te culca până nu e gata.</p>' : ''}
     ${compact ? '' : ''}
   </section>`;
 }
@@ -79,7 +80,7 @@ export function sleepCard(): string {
   const shown = v === undefined ? 'Notează' : `${String(v).replace('.', ',')} h`;
   return `<section class="card" aria-label="Somn">
     <div class="row"><div class="row-l"><h3>Somn</h3><p class="small dim" style="margin:0">Azi-noapte. Niciodată sub 7 ore.</p></div>
-    <div class="stepper"><button data-a="sleep" data-d="-1" aria-label="Mai puțin">−</button><output style="${v === undefined ? 'font:600 14px/1 var(--body);color:var(--dim)' : v < 7 ? 'color:var(--red)' : ''}">${shown}</output><button data-a="sleep" data-d="1" aria-label="Mai mult">+</button></div></div>
+    <div class="stepper"><button data-a="sleep" data-d="-1" aria-label="Mai puțin">−</button><output style="${v === undefined ? 'font:600 14px/1 var(--body);color:var(--dim)' : v < 7 ? 'text-decoration:underline wavy;text-underline-offset:4px' : ''}">${shown}</output><button data-a="sleep" data-d="1" aria-label="Mai mult">+</button></div></div>
   </section>`;
 }
 
@@ -87,10 +88,10 @@ function whyCard(): string {
   const w = ctx.S.why;
   const lines = [w.winner, w.victim, w.drive].filter((s) => s.trim());
   if (!lines.length) {
-    return `<section class="card"><h3>De ce-ul tău</h3><p class="dim">„Găsește-ți de ce-ul și îți vei găsi succesul.” Scrie de ce faci asta; îl vezi aici în fiecare zi.</p><button class="btn ghost sm" data-a="tab" data-k="mind" data-to="why">Scrie-l</button></section>`;
+    return `<section class="card">${art('why', 'card-art')}<h3>De ce-ul tău</h3><p class="dim">„Găsește-ți de ce-ul și îți vei găsi succesul.” Scrie de ce faci asta; îl vezi aici în fiecare zi.</p><button class="btn ghost sm" data-a="tab" data-k="mind" data-to="why">Scrie-l</button></section>`;
   }
   const pick = lines[daysBetween('2026-01-01', dayKey()) % lines.length] ?? lines[0];
-  return `<section class="card"><h3>De ce-ul tău</h3><p class="why-quote">${esc(pick)}</p></section>`;
+  return `<section class="card">${art('why', 'card-art')}<h3>De ce-ul tău</h3><p class="why-quote">${esc(pick)}</p></section>`;
 }
 
 function dailyCard(): string {

@@ -6,6 +6,7 @@ import { makeEntry } from '../../logic/store.ts';
 import { esc, mmss } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, type Player } from '../ctx.ts';
+import { art } from '../art.ts';
 import { chrome, field, setText, stepper } from './common.ts';
 
 type St = 'ready' | 'breathe' | 'hold' | 'recover' | 'exhale' | 'med' | 'done';
@@ -43,7 +44,7 @@ class WimHofPlayer implements Player {
       const hs = holdStats(ctx.S.log);
       el.innerHTML = chrome(
         'Wim Hof',
-        `<h1 class="pl-h">Meditation</h1>
+        `${art('angel', 'pl-art')}<h1 class="pl-h">Meditation</h1>
         <p class="pl-sub">Respirația Wim Hof, apoi liniște</p>
         <ol class="ticks" style="counter-reset:none">
           <li>${s.whBreaths} de respirații adânci: inspiri complet, pe nas sau pe gură, și lași aerul să iasă fără efort.</li>

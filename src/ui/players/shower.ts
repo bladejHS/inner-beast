@@ -5,6 +5,8 @@ import { makeEntry } from '../../logic/store.ts';
 import { esc, mmss } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ctx, mountPlayer, ovEl, save, type Player } from '../ctx.ts';
+import { art } from '../art.ts';
+import { howHtml } from '../how.ts';
 import { chrome, ctrlBtn, field, setText, stepper, switchCtl } from './common.ts';
 
 class ShowerPlayer implements Player {
@@ -29,9 +31,10 @@ class ShowerPlayer implements Player {
       const total = s.showerRounds * 2 + (s.showerEndCold ? 1 : 0);
       el.innerHTML = chrome(
         'Cold & Warm Showers',
-        `<h1 class="pl-h">Cold & Warm Showers</h1>
+        `${art('sharks', 'pl-art')}<h1 class="pl-h">Cold & Warm Showers</h1>
         <p class="pl-sub">1 minut rece, 1 minut cald</p>
         <p class="dim">Pune telefonul unde îl vezi și îl auzi. La fiecare schimbare primești un semnal. Când vine apa rece, respiră lent, pe nas.</p>
+        ${howHtml('Cold & Warm Showers', undefined, { open: true })}
         <div class="setup">
           ${field('Runde (rece + cald)', stepper('p:rounds', String(s.showerRounds), 'Runde'))}
           ${field('Termină pe rece', switchCtl('p:endcold', s.showerEndCold, 'Termină pe rece'), 'Încă un minut rece la final')}

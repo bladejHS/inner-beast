@@ -7,6 +7,7 @@ import { esc, mmss } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, mountPlayer, ovEl, type Player } from '../ctx.ts';
 import { ring } from '../charts.ts';
+import { howHtml } from '../how.ts';
 import { chrome, ctrlBtn, setText } from './common.ts';
 
 class RoutinePlayer implements Player {
@@ -62,9 +63,10 @@ class RoutinePlayer implements Player {
       `<div class="bar" style="margin-top:0"><i id="pb" style="width:${pct.toFixed(1)}%"></i></div>
       <p class="small dim" style="margin:0">${p.move !== undefined ? `${p.move + 1} din ${r.moves.length}` : 'Pregătește-te'}</p>
       <h1 class="pl-h">${esc(m ? m.name : r.moves[0].name)}</h1>
-      ${side ? `<p class="round-lbl" id="sd" style="color:var(--lime)">${side}</p>` : ''}
+      ${side ? `<p class="round-lbl" id="sd">${side}</p>` : ''}
       ${ring(1 - L.left / p.sec, `<div><div class="mid-time" id="t">${mmss(Math.ceil(L.left))}</div></div>`, 6)}
       <p class="cue">${esc(m ? m.cue : r.moves[0].cue)}</p>
+      ${howHtml((m ?? r.moves[0]).name, undefined, { open: true })}
       ${m?.alex ? '<p class="alex"><b>Alex</b> face asta în rutina lui de mobilitate.</p>' : ''}
       ${next && p.move !== undefined ? `<p class="prev">Urmează: ${esc(next.name)}</p>` : ''}`,
       { cls: p.kind === 'prep' ? 'ph-prep' : '', ctrl: ctrlBtn('p:prev', 'prev', 'Înapoi') + ctrlBtn('p:pause', paused ? 'play' : 'pause', paused ? 'Continuă' : 'Pauză', true) + ctrlBtn('p:skip', 'next', 'Următorul') },

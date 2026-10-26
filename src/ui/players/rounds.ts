@@ -9,6 +9,7 @@ import { makeEntry } from '../../logic/store.ts';
 import { esc, mmss } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock, hush } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
+import { howHtml } from '../how.ts';
 import { chrome, ctrlBtn, field, setText, stepper, switchCtl } from './common.ts';
 
 export interface RoundsCfg {
@@ -89,6 +90,7 @@ class RoundsPlayer implements Player {
       ${c.focus && FOCUS_LINE[c.focus] ? `<p class="pl-sub">${esc(FOCUS_LINE[c.focus])}</p>` : ''}
       ${c.tip ? `<p class="dim">${esc(c.tip)}</p>` : ''}
       ${c.legSwap ? `<p class="dim">${esc(LEG_CUES[ctx.S.set.legMode])}</p>` : ''}
+      ${howHtml(c.legSwap ? (ctx.S.set.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit') : c.name, undefined, { open: true })}
       <div class="setup">
         ${legs}
         ${field('Runde', stepper('p:rounds', String(c.rounds), 'Runde'))}

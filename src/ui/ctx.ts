@@ -3,6 +3,10 @@
 import { loadState, saveState, type Entry, type State } from '../logic/store.ts';
 import { esc } from '../logic/util.ts';
 import { keepAwake, hush } from './audio.ts';
+import { celebrate } from './fx.ts';
+import { WEEK } from '../data/plan.ts';
+import { dayComplete, weekDone } from '../logic/progress.ts';
+import { dayKey, weekStart, weekdayIdx } from '../logic/util.ts';
 
 export type Tab = 'today' | 'plan' | 'fight' | 'alex' | 'mind' | 'progress';
 export type View =
@@ -46,9 +50,16 @@ export function addEntry(e: Entry): void {
     fresh.block = e.block;
     fresh.until = Date.now() + 4000;
   }
+  const day = e.block ? WEEK.find((d) => d.blocks.some((b) => b.id === e.block)) : undefined;
+  const mon = weekStart(dayKey());
+  const before = day ? dayComplete(day, weekDone(ctx.S.log, mon)) : true;
   ctx.S.log.push(e);
   ctx.S.log.sort((a, b) => a.ts - b.ts);
   save();
+  if (day && !before && dayComplete(day, weekDone(ctx.S.log, mon))) {
+    const today = day.idx === weekdayIdx(dayKey());
+    window.setTimeout(() => celebrate(esc(day.title), today ? 'Ziua de azi e bifată' : 'Încă o zi bifată'), 600);
+  }
 }
 
 let toastTimer = 0;

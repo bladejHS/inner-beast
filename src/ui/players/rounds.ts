@@ -20,6 +20,7 @@ import { makeEntry } from '../../logic/store.ts';
 import { esc, mmss } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock, hush } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
+import { slam } from '../fx.ts';
 import { howHtml } from '../how.ts';
 import { art } from '../art.ts';
 import { chrome, ctrlBtn, field, setText, stepper, switchCtl } from './common.ts';
@@ -228,6 +229,8 @@ class RoundsPlayer implements Player {
 
   onPhase(p: Phase): void {
     if (p.kind === 'work') {
+      if (p.round && p.rounds && p.rounds > 1) slam(p.round === p.rounds ? 'Ultima rundă' : `Runda ${p.round}`, `din ${p.rounds}`);
+      else slam('Start');
       sfx.bell(1);
       buzz(350);
       if (this.caller) {

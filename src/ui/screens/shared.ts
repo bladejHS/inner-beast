@@ -1,5 +1,6 @@
 // Pieces shared by the screens: header, program block cards, starting and checking off a block.
 
+import { focusCombos } from '../../data/combos.ts';
 import { blockName, type Block, type RestKey } from '../../data/plan.ts';
 import { makeEntry, type Kind } from '../../logic/store.ts';
 import { dayKey, esc, inWeek, num, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
@@ -133,6 +134,10 @@ export function blockCard(b: Block, n: number, today: string): string {
   if (b.kind === 'walk') {
     const st = ctx.S.steps[today] ?? 0;
     extra = `<div class="steps-in"><label class="sr" for="steps-in">Pași azi</label><input id="steps-in" type="number" inputmode="numeric" min="0" max="100000" data-a="steps" value="${st || ''}" placeholder="Pași azi"><span>din 10.000</span></div>`;
+  }
+  if (b.kind === 'rounds' && b.focus && b.focus !== 'legs' && b.focus !== 'rope') {
+    const cs = focusCombos(b.focus);
+    extra += `<p class="bk-calls"><b>Combinații:</b> ${esc(cs.slice(0, 4).map((c) => c.name).join(' · '))}${cs.length > 4 ? ` și încă ${cs.length - 4}` : ''}</p>`;
   }
   const when = done ? doneWhen(entries[0].date, today) : '';
   return `<li class="bk ${done ? 'done' : ''}">

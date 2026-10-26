@@ -3,6 +3,17 @@
 
 import type { ComboFocus } from '../../data/plan.ts';
 import { focusCombos, ROPE_MOVES, FOCUS_LINE, type Combo } from '../../data/combos.ts';
+
+/** The e-book's focus line for each block, as printed on the plan page. */
+const BOOK_FOCUS: Record<string, string> = {
+  jab: '„Focus on jabs & footwork”',
+  move: '„Movement & punches”',
+  slow: '„Slow and clean moves”',
+  combo: '„Focus on combinations”',
+  power: '„Angle changes & power”',
+  distance: '„Distance work”',
+  rope: '„Focus on light footwork”',
+};
 import { REST_TIPS } from '../../data/alex.ts';
 import { Clock, doneSec, locate, phaseStart, roundsSeq, type Phase } from '../../logic/seq.ts';
 import { makeEntry } from '../../logic/store.ts';
@@ -65,6 +76,20 @@ class RoundsPlayer implements Player {
     return focusCombos(f).map((c: Combo) => ({ name: c.name, seq: c.seq, say: c.call, note: c.note }));
   }
 
+  callsHtml(): string {
+    const f = this.cfg.focus;
+    if (!f || f === 'legs' || !this.calls.length) return '';
+    const book = BOOK_FOCUS[f];
+    const list = this.calls
+      .map((c) => `<li><b>${esc(c.name)}</b>${c.seq.length ? `<span>${esc(c.seq.join(' → '))}</span>` : ''}</li>`)
+      .join('');
+    return `<details class="how" ${f === 'rope' ? '' : 'open'}><summary>${f === 'rope' ? 'Mișcările' : 'Combinațiile'} (${this.calls.length})</summary><div class="how-body">
+      ${book ? `<p class="small" style="margin:0 0 8px"><b>Din carte:</b> ${esc(book)}</p>` : ''}
+      <ul class="calls">${list}</ul>
+      <p class="small dim" style="margin:6px 0 0">Ți le strig pe rând în timpul rundelor. Le găsești explicate în Lupte.</p>
+    </div></details>`;
+  }
+
   get every(): number {
     const base = ctx.S.set.callEvery || 15;
     return this.cfg.focus === 'slow' ? base * 2 : this.cfg.focus === 'power' ? base + 5 : base;
@@ -91,6 +116,7 @@ class RoundsPlayer implements Player {
       ${c.tip ? `<p class="dim">${esc(c.tip)}</p>` : ''}
       ${c.legSwap ? `<p class="dim">${esc(LEG_CUES[ctx.S.set.legMode])}</p>` : ''}
       ${howHtml(c.legSwap ? (ctx.S.set.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit') : c.name, undefined, { open: true })}
+      ${this.callsHtml()}
       <div class="setup">
         ${legs}
         ${field('Runde', stepper('p:rounds', String(c.rounds), 'Runde'))}

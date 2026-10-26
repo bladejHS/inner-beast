@@ -54,7 +54,7 @@ export function weekCard(full: boolean): string {
     )
     .join('');
   return `<section class="card wc" aria-label="Combinațiile săptămânii">
-    <div class="row"><div class="row-l"><h3>Combinațiile săptămânii</h3><p class="small dim" style="margin:0">Săptămâna ${learnWeek() + 1}. Le auzi și în rundele de shadow boxing și sac.</p></div></div>
+    <div class="row"><div class="row-l"><h3>Combinațiile săptămânii</h3><p class="small dim" style="margin:0">Săptămâna ${learnWeek() + 1}. Le auzi și joi, în shadow boxing-ul pe combinații.</p></div></div>
     ${items}
     <button class="btn sm" style="width:100%;margin-top:12px" data-a="qt" data-k="week">${ic('play')} Exersează-le: 3 × 3 min</button>
   </section>`;

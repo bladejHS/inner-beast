@@ -57,6 +57,18 @@ export const COMBOS: Combo[] = [
     vid: '7224921223979896090', src: 'Simple boxing combination',
   },
   {
+    id: 'jab-step-in', name: 'Step In – Jab – Step Out', seq: ['Step in', 'Jab', 'Step out'], call: 'Step in, jab, step out', cat: 'footwork',
+    note: 'Intri cu un pas mic, lovești jabul exact când piciorul din față aterizează, ieși imediat. Distanța dintre tălpi rămâne aceeași.',
+  },
+  {
+    id: 'jab-circle', name: 'Jab – Circle Left / Right', seq: ['Jab', 'Circle left', 'Jab', 'Circle right'], call: 'Jab, circle left. Jab, circle right', cat: 'footwork',
+    note: 'După fiecare jab te muți în cerc în jurul țintei. Spre stânga pleacă piciorul stâng primul, spre dreapta cel drept. Nu încrucișa picioarele.',
+  },
+  {
+    id: 'double-jab-back', name: 'Double Jab – Step Back – Jab', seq: ['Jab', 'Jab', 'Step back', 'Jab'], call: 'Double jab, step back, jab', cat: 'footwork',
+    note: 'Două jaburi intrând, un pas înapoi când el vine după tine, și încă un jab din retragere. Ține-l mereu la capătul jabului.',
+  },
+  {
     id: 'body-body-head', name: 'Body, Body, Head', seq: ['Jab (body)', 'Jab (body)', 'Overhand Right (head)'], call: 'Jab body, jab body, overhand', cat: 'combo',
     note: 'Două jaburi la corp îl fac să coboare garda, apoi overhand-ul vine peste. E capcana din KO-ul de amatori arătat de Alex.',
     vid: '7677280053775895841', src: 'BODY BODY HEAD WORKS ALL THE TIME',
@@ -275,13 +287,16 @@ export const ROPE_MOVES = [
 ];
 
 /** Which combos the caller uses in each block. */
+// Which combinations the caller uses in each block, following the e-book's focus for that block (plan page 16):
+// Monday shadow "jabs & footwork", Monday bag "movement & punches", Tuesday easy shadow "slow and clean moves",
+// Thursday shadow "combinations", Thursday bag "angle changes & power", Friday easy shadow "distance work".
 const FOCUS: Record<string, string[]> = {
-  jab: ['jab', 'double-jab', 'one-two', 'jab-out', 'body-body-head', 'ghost-step', 'pull-counter', 'guard-reset', 'jab-cross-hook', 'beginner-defense', 'simple-body'],
-  move: ['body-head', 'liver', 'body-body-head', 'off-ropes', 'ghost-step', 'one-two', 'step-overhand', 'hooks-liver', 'close-range', 'liver-move', 'check-hook'],
-  combo: ['liver', 'tyson-huh', 'tyson-slip', 'body-head', 'body-body-head', 'pull-counter', 'angle-finish', 'duck-counter', 'step-overhand', 'jab-upper-roll', 'tyson-uppercuts', 'tyson-body-head', 'liver-setup', 'feint-liver', 'check-hook', 'tyson-switch', 'combo-of-day', 'hook-setup', 'favorite', 'four-punch', 'fake-jab-cross', 'body-uppers', 'double-onetwo', 'cross-hook-upper'],
-  power: ['tyson-killer', 'angle-finish', 'off-ropes', 'liver', 'body-head', 'body-body-head', 'gazelle', 'hooks-liver', 'peekaboo-killer', 'close-range', 'liver-cross', 'liver-move', 'ko-combo', 'tap-uppercut', 'shift-upper-hook', 'body-hooks-finish'],
-  slow: ['jab', 'one-two', 'liver', 'alphabet', 'tyson-huh', 'peekaboo', 'guard-reset'],
-  distance: ['jab', 'double-jab', 'jab-out', 'pull-counter', 'ghost-step', 'one-two', 'step-overhand'],
+  jab: ['jab', 'double-jab', 'one-two', 'jab-out', 'jab-step-in', 'jab-circle', 'double-jab-back', 'ghost-step', 'beginner-defense', 'pull-counter'],
+  move: ['jab-out', 'off-ropes', 'close-range', 'liver-move', 'step-overhand', 'check-hook', 'combo-of-day', 'fake-jab-cross', 'body-head', 'body-body-head'],
+  slow: ['jab', 'one-two', 'jab-cross-hook', 'simple-body', 'guard-reset', 'jab-upper-roll', 'liver', 'peekaboo', 'alphabet'],
+  combo: ['liver', 'double-onetwo', 'four-punch', 'cross-hook-upper', 'body-uppers', 'jab-upper-roll', 'favorite', 'tyson-huh', 'tyson-slip', 'tyson-uppercuts', 'tyson-body-head', 'liver-setup', 'feint-liver', 'body-head', 'body-body-head'],
+  power: ['angle-finish', 'tyson-killer', 'peekaboo-killer', 'shift-upper-hook', 'tyson-switch', 'combo-of-day', 'check-hook', 'gazelle', 'ko-combo', 'body-hooks-finish', 'liver-cross', 'tap-uppercut', 'hooks-liver'],
+  distance: ['jab', 'double-jab', 'jab-out', 'double-jab-back', 'pull-counter', 'ghost-step', 'one-two', 'fake-jab-cross', 'step-overhand', 'hook-setup'],
 };
 
 /** The order in which the combinations are learned, two per week: basics first, the long ones last. */
@@ -316,8 +331,8 @@ export function focusCombos(focus: string | undefined): Combo[] {
   if (focus === 'week') return week;
   const ids = FOCUS[focus ?? ''] ?? [];
   const list = ids.map((id) => COMBOS.find((c) => c.id === id)).filter((c): c is Combo => !!c);
-  // in every boxing round the combinations of the week are called too, so they stick
-  return list.length ? [...week, ...week, ...list.filter((c) => !week.includes(c))] : list;
+  // "focus on combinations": the combinations of the week are called there too, so they stick
+  return focus === 'combo' ? [...week, ...list.filter((c) => !week.includes(c))] : list;
 }
 
 export function tiktokUrl(vid: string): string {

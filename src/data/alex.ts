@@ -259,7 +259,7 @@ export const ALEX_WORKOUTS: TipCard[] = [
   },
   {
     id: 'w-challenges', title: 'Provocările lui Alex la flotări', src: '7238310144264785178', srcTitle: 'Give me 800 push ups',
-    points: ['800 de flotări „la micul dejun”: 350, apoi 200, apoi 150, apoi ultimele 100.', 'După 12 runde de box, 400 de flotări în serii de câte 50.', 'Provocarea pe niveluri: 11 variante de flotări, de la cele ușoare până la flotări în stând pe mâini. Vezi la ce nivel ești.', 'Nu sunt pentru început: crește treptat.'],
+    points: ['„Give me 75 / 87 push-ups”: provocarea pe care o trimiți și unui prieten, ca să-l faci mai puternic.', '800 de flotări „la micul dejun”: 350, apoi 200, apoi 150, apoi ultimele 100.', 'După 12 runde de box, 400 de flotări în serii de câte 50.', 'Provocarea pe niveluri: 11 variante de flotări, de la cele ușoare până la flotări în stând pe mâini. Vezi la ce nivel ești.', 'Nu sunt pentru început: crește treptat.'],
   },
   {
     id: 'w-outdoor', title: 'Box afară', src: '7348839246762921248', srcTitle: 'Box Training für draußen',
@@ -483,6 +483,20 @@ export const ALEX_MIND: TipCard[] = [
       'Nu devii un om bun când ești bogat, ci când îți găsești drumul spre Dumnezeu și spre tine.',
       'Un om bun e loial, disciplinat și își protejează familia.',
       'Nu te lăuda că ești cel mai bun: undeva sunt oameni care tac și sunt mai buni.',
+    ],
+  },
+  {
+    id: 'quotes', title: 'Din postările lui Alex', src: '7298765124268002592', srcTitle: 'Postările cu imagini',
+    points: [
+      'Există o versiune viitoare a ta care e mândră că n-ai renunțat.',
+      'Trebuie să omori trecutul. Altfel, trecutul te omoară pe tine.',
+      'Momentul în care renunți e momentul în care îl lași pe altul să câștige.',
+      'Sper să câștigi bătăliile despre care nu vorbești.',
+      'Unii cred că devin mai buni doar uitându-se la video-uri motivaționale.',
+      'Cel mai mare regret al lui: s-a pierdut pe sine încercând să facă fericit pe altcineva.',
+      'E în regulă să sari peste sală, dacă vrei să fii mediocru.',
+      'Disciplină sau scuze: rutină, antrenament, putere mentală, fără scuze.',
+      'Tatăl tău e singurul om care se bucură când ești mai bun decât el.',
     ],
   },
   {

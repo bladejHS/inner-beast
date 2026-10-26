@@ -30,7 +30,7 @@ export function toggleLearned(id: string): void {
   }
 }
 
-const MOVE = /^(Switch|Slip|Roll|Bob|Weave|Lean|Small step|Push off|Step|Ghost|Duck|Level|Back to|Close the|Move|Pivot|Feint|Hop|Tap)/;
+const MOVE = /^(Switch|Slip|Roll|Bob|Weave|Lean|Small step|Push off|Step|Ghost|Duck|Level|Back to|Close the|Move|Pivot|Feint|Hop|Tap|Shift|Fake)/;
 
 export function seqHtml(c: Combo): string {
   return `<div class="seq">${c.seq.map((s) => `<span class="${MOVE.test(s) ? 'move' : ''}">${esc(s)}</span>`).join('')}</div>`;

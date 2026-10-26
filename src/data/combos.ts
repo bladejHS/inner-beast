@@ -147,6 +147,36 @@ export const COMBOS: Combo[] = [
     vid: '7225625296991440155', src: 'Knockout uppercut',
   },
   {
+    id: 'fake-jab-cross', name: 'Fake Jab, Step In, Cross', seq: ['Fake jab', 'Step forward', 'Cross'], call: 'Fake jab, step, cross', cat: 'combo',
+    note: 'Fentezi jabul, iar cât reacționează el faci pasul înainte și închei cu cross-ul. Alex: pasul se face curat, nu sărit.',
+    vid: '7549274300688239894', src: 'Dangerous combination',
+  },
+  {
+    id: 'shift-upper-hook', name: 'Jab, Shift, Uppercut – Hook × 2, Cross', seq: ['Jab', 'Shift', 'Uppercut', 'Hook', 'Uppercut', 'Hook', 'Cross'], call: 'Jab. Shift. Uppercut, hook, uppercut, hook, cross', cat: 'power',
+    note: 'La mănuși, cu partenerul: jab, schimbi garda (shift), apoi două perechi uppercut–croșeu și închei cu cross.',
+    vid: '7285796202854075681', src: 'This combination hurts',
+  },
+  {
+    id: 'body-hooks-finish', name: '1-2, Hooks, Body Hooks, Head Hooks', seq: ['Jab', 'Cross', 'Lead Hook', 'Right Hook', 'Hook (body)', 'Hook (body)', 'Hook (head)', 'Hook (head)'], call: 'Jab, cross, hook, hook. Body hooks. Finish with hooks to the head', cat: 'power',
+    note: 'Un 1-2, două croșee, cobori cu croșee la corp și închei cu croșee la cap. Alex o arată de mai multe ori la sac.',
+    vid: '7288785089415171361', src: 'This combination hurts',
+  },
+  {
+    id: 'body-uppers', name: 'Jab – Jab, Body Hook – Uppercut × 2', seq: ['Jab', 'Jab', 'Left Hook (body)', 'Left Uppercut', 'Right Hook (body)', 'Right Uppercut'], call: 'Jab, jab, left body hook, left uppercut, right body hook, right uppercut', cat: 'combo',
+    note: 'Două jaburi, apoi pe fiecare parte un croșeu la corp urmat de uppercut cu aceeași mână.',
+    vid: '7517693577250573590', src: 'Learn this deadly combination',
+  },
+  {
+    id: 'double-onetwo', name: '2 × Jab – Cross, Hook Head – Hook Body', seq: ['Jab', 'Cross', 'Jab', 'Cross', 'Lead Hook (head)', 'Lead Hook (body)'], call: 'Jab, cross, jab, cross, hook head, hook body', cat: 'combo',
+    note: 'Dublezi 1-2-ul ca să-l ții în gardă, apoi croșeul de stânga la cap și același braț coboară la corp.',
+    vid: '7231261639784336667', src: 'Strong combination',
+  },
+  {
+    id: 'cross-hook-upper', name: 'Cross – Left Hook – Uppercut – Left Hook', seq: ['Cross', 'Left Hook', 'Uppercut', 'Left Hook'], call: 'Cross, left hook, uppercut, left hook', cat: 'combo',
+    note: 'Alex arată întâi greșit (lovituri din brațe, fără rotație) și apoi corect: fiecare pereche vine din rotația șoldului.',
+    vid: '7239815908552690970', src: 'This combination hurts',
+  },
+  {
     id: 'tyson-killer', name: 'Mike Tyson Killer Combo',
     seq: ['Body', 'Body', 'Body', 'Right Hook (head)', 'Switch to the side', 'Left Uppercut', 'Right Cross', 'Switch to the other side', 'Right Hook (body)', 'Right Hook (head)'],
     call: 'Body, body, body, right hook head. Switch. Left uppercut, right cross. Switch. Right hook body, right hook head', cat: 'power',
@@ -248,8 +278,8 @@ export const ROPE_MOVES = [
 const FOCUS: Record<string, string[]> = {
   jab: ['jab', 'double-jab', 'one-two', 'jab-out', 'body-body-head', 'ghost-step', 'pull-counter', 'guard-reset', 'jab-cross-hook', 'beginner-defense', 'simple-body'],
   move: ['body-head', 'liver', 'body-body-head', 'off-ropes', 'ghost-step', 'one-two', 'step-overhand', 'hooks-liver', 'close-range', 'liver-move', 'check-hook'],
-  combo: ['liver', 'tyson-huh', 'tyson-slip', 'body-head', 'body-body-head', 'pull-counter', 'angle-finish', 'duck-counter', 'step-overhand', 'jab-upper-roll', 'tyson-uppercuts', 'tyson-body-head', 'liver-setup', 'feint-liver', 'check-hook', 'tyson-switch', 'combo-of-day', 'hook-setup', 'favorite', 'four-punch'],
-  power: ['tyson-killer', 'angle-finish', 'off-ropes', 'liver', 'body-head', 'body-body-head', 'gazelle', 'hooks-liver', 'peekaboo-killer', 'close-range', 'liver-cross', 'liver-move', 'ko-combo', 'tap-uppercut'],
+  combo: ['liver', 'tyson-huh', 'tyson-slip', 'body-head', 'body-body-head', 'pull-counter', 'angle-finish', 'duck-counter', 'step-overhand', 'jab-upper-roll', 'tyson-uppercuts', 'tyson-body-head', 'liver-setup', 'feint-liver', 'check-hook', 'tyson-switch', 'combo-of-day', 'hook-setup', 'favorite', 'four-punch', 'fake-jab-cross', 'body-uppers', 'double-onetwo', 'cross-hook-upper'],
+  power: ['tyson-killer', 'angle-finish', 'off-ropes', 'liver', 'body-head', 'body-body-head', 'gazelle', 'hooks-liver', 'peekaboo-killer', 'close-range', 'liver-cross', 'liver-move', 'ko-combo', 'tap-uppercut', 'shift-upper-hook', 'body-hooks-finish'],
   slow: ['jab', 'one-two', 'liver', 'alphabet', 'tyson-huh', 'peekaboo', 'guard-reset'],
   distance: ['jab', 'double-jab', 'jab-out', 'pull-counter', 'ghost-step', 'one-two', 'step-overhand'],
 };
@@ -257,10 +287,10 @@ const FOCUS: Record<string, string[]> = {
 /** The order in which the combinations are learned, two per week: basics first, the long ones last. */
 const LEARN = [
   'one-two', 'jab-cross-hook', 'double-jab', 'jab-out', 'simple-body', 'body-head', 'beginner-defense', 'guard-reset',
-  'body-body-head', 'liver', 'jab-upper-roll', 'four-punch', 'pull-counter', 'step-overhand', 'check-hook', 'hook-setup',
+  'body-body-head', 'liver', 'double-onetwo', 'fake-jab-cross', 'jab-upper-roll', 'four-punch', 'cross-hook-upper', 'body-uppers', 'pull-counter', 'step-overhand', 'check-hook', 'hook-setup',
   'favorite', 'combo-of-day', 'tyson-huh', 'tyson-slip', 'peekaboo', 'alphabet', 'tyson-uppercuts', 'tyson-body-head',
   'tyson-switch', 'peekaboo-killer', 'liver-setup', 'feint-liver', 'liver-cross', 'liver-move', 'ko-combo', 'tap-uppercut',
-  'duck-counter', 'off-ropes', 'angle-finish', 'close-range', 'hooks-liver', 'gazelle', 'tyson-killer', 'ghost-step',
+  'duck-counter', 'off-ropes', 'angle-finish', 'close-range', 'body-hooks-finish', 'shift-upper-hook', 'hooks-liver', 'gazelle', 'tyson-killer', 'ghost-step',
 ];
 const FIRST_WEEK = '2026-10-26';
 

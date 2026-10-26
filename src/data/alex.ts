@@ -31,6 +31,8 @@ export const ALEX_FIGHT: TipCard[] = [
       'Forță fără elan: o lovitură scurtă și seacă ajunge.',
       'Lovești tare și din mișcare: cu pas înapoi, lateral sau schimbând unghiul.',
       'Croșeul are forță și de aproape, din rotație.',
+      'Lumea face o pauză după ce o atingi, chiar și la contact ușor. Sacul și mănușile sună greu.',
+      'Lovești tare și din poziții incomode: echilibrul, timingul și rotația duc forța oriunde.',
       'Timing: pumnul ajunge când adversarul nu se așteaptă.',
     ],
   },
@@ -100,6 +102,32 @@ export const ALEX_FIGHT: TipCard[] = [
       'Garda sus, în poziție de luptă: cine stă în gardă e pregătit, cine stă cu mâinile jos nu.',
       'Dacă ești atacat: întâi blochezi, apoi răspunzi.',
       'Ringul și strada sunt lucruri complet diferite, spune Alex.',
+    ],
+  },
+  {
+    id: 'guard-high', title: 'Garda sus, mereu', src: '7651603862721170720', srcTitle: 'Kampfsport Schwurbel',
+    points: [
+      'Cu mâinile jos îți lași ficatul și capul descoperite. Un adversar bun fentează jos și lovește sus, sau invers.',
+      'Ține garda sus: de acolo blochezi tot, ieși, faci roll sau intri.',
+      'Cine are mâinile sus are mai mult control și lovește mai repede.',
+    ],
+  },
+  {
+    id: 'controlled', title: 'Lovituri controlate', src: '7688788415181032736', srcTitle: 'Dangerous punches',
+    points: [
+      'Nu arunca lovituri sălbatice, necontrolate: te lasă descoperit.',
+      'Lovește controlat, „bărbie la bărbie”, și gândește-te la apărare la fiecare pumn.',
+    ],
+  },
+  {
+    id: 'details', title: 'Detalii care contează', src: '7555572452215033110', srcTitle: 'How to throw jab + cross effectively',
+    points: [
+      'La jab scoți capul de pe linia de mijloc. Încarci puțin piciorul, uppercut-ul pleacă scurt, apoi înapoi în gardă.',
+      'Croșeul de stânga se încarcă: greutatea trece pe partea din față înainte să-l arunci, nu doar din braț.',
+      'Stilul Tyson: poziție joasă, genunchii îndoiți tot timpul.',
+      'Semn că cineva nu știe box: face shadow boxing cu mâinile deschise.',
+      'Cea mai periculoasă lovitură, după Alex: overhand-ul.',
+      'Exercițiu de reacție cu un partener: când te atinge, răspunzi imediat cu lovituri. Întâi lent, apoi tot mai repede.',
     ],
   },
   {
@@ -186,6 +214,7 @@ export const ALEX_FIGHT: TipCard[] = [
       'Din blocaj, fără să cobori brațul, intri cu cotul. E interzis în box: exersează-l doar controlat, pe sac sau manechin.',
       'Nu te baza pe lovituri la corp pe stradă: dacă nu-l opresc, te copleșește. Fără gardă nu ai cu ce să te aperi.',
       'După fiecare atac revii imediat în poziția de luptă, cu garda sus.',
+      'Punctele cele mai sensibile, pe care ți le aperi: bărbia și maxilarul, gâtul, ficatul.',
     ],
   },
 ];
@@ -211,6 +240,26 @@ export const ALEX_WORKOUTS: TipCard[] = [
   {
     id: 'w-hardcore', title: 'Hardcore Boxing Homeworkout', src: '7261665042796481818', srcTitle: 'Hardcore Boxing Homeworkout',
     points: ['Doar lovituri drepte: 30 s × 4.', 'Croșee la corp: 30 s × 5.', '30 de burpees.', '20 de Jumping Push-ups.', '5 Superman Push-ups.', '3 runde × 3 minute de box.', 'Pauză 15 secunde între serii (în altă variantă, 30 de secunde).'],
+  },
+  {
+    id: 'w-explosive', title: 'Metode pentru pumni explozivi', src: '7559669199602306326', srcTitle: 'Training methods for hard punches',
+    points: ['Shadow boxing 3 × 3 minute, cu combinații explozive.', 'Rotații cu un baston (sau o coadă de mătură) pe umeri: 2 × 2 minute.', 'Același baston, câte 1 minut pe fiecare parte.', 'Priză și antebrațe cu kettlebell-ul: 12 × 4.'],
+  },
+  {
+    id: 'w-strength-home', title: 'Forță acasă pentru pumni grei', src: '7289557453757320480', srcTitle: 'Homeworkout for boxing',
+    points: ['Flotări până la epuizare.', 'Wide Push-ups 10 × 4.', 'Diamond Push-ups 5 × 4.', 'Shadow boxing 4 × 3 minute, „lasă-l să curgă”.', 'Finisher 20 × 2.'],
+  },
+  {
+    id: 'w-calories', title: 'Ardere rapidă', src: '7319534539477486881', srcTitle: 'Try this workout to burn calories',
+    points: ['Sărituri din genuflexiune: 5 × 10.', 'Stând pe mâini: 3 × 10 secunde (la perete, dacă ai nevoie).', 'Shadow boxing 8 × 30 de secunde, cât de rapid poți.'],
+  },
+  {
+    id: 'w-camp', title: 'O zi de cantonament', src: '7302590385921002785', srcTitle: 'Trainings Vlog in Spain',
+    points: ['6 runde de sparring tehnic.', '3 runde la mănuși (pads).', '8 runde la sacul greu.'],
+  },
+  {
+    id: 'w-challenges', title: 'Provocările lui Alex la flotări', src: '7238310144264785178', srcTitle: 'Give me 800 push ups',
+    points: ['800 de flotări „la micul dejun”: 350, apoi 200, apoi 150, apoi ultimele 100.', 'După 12 runde de box, 400 de flotări în serii de câte 50.', 'Provocarea pe niveluri: 11 variante de flotări, de la cele ușoare până la flotări în stând pe mâini. Vezi la ce nivel ești.', 'Nu sunt pentru început: crește treptat.'],
   },
   {
     id: 'w-outdoor', title: 'Box afară', src: '7348839246762921248', srcTitle: 'Box Training für draußen',
@@ -359,6 +408,81 @@ export const ALEX_MIND: TipCard[] = [
       'Antrenamentul e pentru starea mentală. Sportul e ceva ce nu poți păcăli.',
       'Alex a fost și el slab mental și frânt.',
       'E mult mai bine să fii un atlet dur decât frânt și bolnav.',
+    ],
+  },
+  {
+    id: 'choose', title: 'Îți alegi viața în fiecare zi', src: '7651698723688418592', srcTitle: 'Du entscheidest dich für dein Leben',
+    points: [
+      'În fiecare zi decizi ce faci, ce gândești, cum acționezi și cum reacționezi.',
+      'Cei mai mulți trăiesc în rolul de victimă a vieții.',
+      'Nu e grav că nu ești încă destul de bun. Grav e să stai pe loc.',
+      'Sarcina ta: să fii mai bun decât ieri, într-o transformare continuă.',
+    ],
+  },
+  {
+    id: 'constant', title: 'Constant, după ce trece euforia', src: '7635619617402064161', srcTitle: 'Handle konstant',
+    points: [
+      'Începi ceva nou cu euforie și energie. La primele probleme, cei mai mulți renunță și o iau de la capăt cu altceva.',
+      'În loc de asta: acționează constant, gândește conștient, crește din identitatea ta.',
+      'Greșelile și eșecurile sunt normale. Fac parte din drum.',
+    ],
+  },
+  {
+    id: 'emotions', title: 'Emoțiile unui bărbat', src: '7651938763303587105', srcTitle: 'Wichtigste Message heute',
+    points: [
+      'Mulți bărbați n-au învățat să pună limite și să-și arate emoțiile fără să fie luați în râs.',
+      'Emoțiile sunt importante: învață să le reglezi, nu să le ascunzi.',
+      'Dacă trebuie să plângi, plângi. Dacă ești furios, procesează și întreabă-te de ce.',
+    ],
+  },
+  {
+    id: 'affirm', title: '3 afirmații pentru boxeri', src: '7348481672771325217', srcTitle: '3 Affirmationen für Boxer',
+    points: ['Sunt disciplinat.', 'Îmi am emoțiile și sentimentele sub control.', 'Am încredere în abilitățile mele.'],
+  },
+  {
+    id: 'act', title: 'Poartă-te ca cel mai bun', src: '7392634621835496737', srcTitle: 'Um der Beste zu sein',
+    points: [
+      'Ca să fii cel mai bun trebuie să crezi că ești. Dacă nu ești încă, poartă-te ca și cum ai fi.',
+      'Adoptă atitudinea, personalitatea și felul de a gândi al câștigătorilor.',
+      'Cu timpul, comportamentul devine obicei și calitățile devin ale tale.',
+    ],
+  },
+  {
+    id: 'doit', title: 'Vorbitul nu ajută. Fă-o', src: '7556294020800974102', srcTitle: 'Masked mentality',
+    points: [
+      'Vorbitul, mai ales cel negativ, nu te duce nicăieri. Contează să faci, indiferent cum te simți.',
+      'Alex se simte des slab, dar o face ca și cum i-ar plăcea. După, se simte bine.',
+      'Când nu face nimic, mentalitatea îi scade și se simte deprimat. Ne luptăm în fiecare zi.',
+    ],
+  },
+  {
+    id: 'fail', title: 'Frica de eșec', src: '7223081043476122885', srcTitle: 'You are close my friend',
+    points: [
+      'E o situație în care câștigi oricum: fie reușești, fie câștigi experiență.',
+      'Nimeni n-a pornit din vârful muntelui. Nici bicicleta n-ai știut-o din prima.',
+    ],
+  },
+  {
+    id: 'no-excuses', title: '„Nu am timp” nu există', src: '7372266705063628064', srcTitle: 'Keine Zeit gibts nicht',
+    points: [
+      'Nu există „n-am timp”, „n-am motivație” sau „sunt prea bătrân pentru sfoară”.',
+      'Schimbă-ți gândurile spre pozitiv și zâmbește durerii.',
+      'Antrenează-te oriunde: o oră de antrenament concentrat contează mai mult decât locul.',
+    ],
+  },
+  {
+    id: 'peers', title: 'Competiție prietenoasă', src: '7375517148669676833', srcTitle: 'Friendly Competition',
+    points: [
+      'Antrenează-te cu cineva de nivelul tău, cu care să te întreci prietenește.',
+      'Dacă ai în jur oameni care fac, energia lor trece și la tine.',
+    ],
+  },
+  {
+    id: 'goodman', title: 'Ce înseamnă un om bun', src: '7571532659021581590', srcTitle: 'Find your way',
+    points: [
+      'Nu devii un om bun când ești bogat, ci când îți găsești drumul spre Dumnezeu și spre tine.',
+      'Un om bun e loial, disciplinat și își protejează familia.',
+      'Nu te lăuda că ești cel mai bun: undeva sunt oameni care tac și sunt mai buni.',
     ],
   },
   {

@@ -71,7 +71,7 @@ export function fightHtml(): string {
     .map(
       (c) => `<article class="combo">
       <h3>${esc(c.name)}</h3>
-      <div class="seq">${c.seq.map((s) => `<span class="${/^(Switch|Slip|Roll|Bob|Weave|Lean|Small step|Push off|Step out|Step to|Ghost|Duck|Level|Back to|Close the|Move|Pivot|Feint|Step|Switch step|Hop|Tap)/.test(s) ? 'move' : ''}">${esc(s)}</span>`).join('')}</div>
+      <div class="seq">${c.seq.map((s) => `<span class="${/^(Switch|Slip|Roll|Bob|Weave|Lean|Small step|Push off|Step out|Step to|Ghost|Duck|Level|Back to|Close the|Move|Pivot|Feint|Step|Switch step|Hop|Tap|Shift|Fake)/.test(s) ? 'move' : ''}">${esc(s)}</span>`).join('')}</div>
       <p>${esc(c.note)}</p>
       ${c.vid ? `<a class="src" href="${tiktokUrl(c.vid)}" target="_blank" rel="noopener">${ic('ext')}${esc(c.src ?? 'TikTok')}</a>` : '<span class="src">Baza pe care insistă Alex</span>'}
     </article>`,

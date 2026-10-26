@@ -19,6 +19,8 @@ const TOOLS = [
   { k: 'mobility', icon: 'stretch', name: 'Mobility', sub: '30 min, picioare, șolduri, umeri' },
   { k: 'daily', icon: 'bolt', name: 'Daily Mobility', sub: '10 min, rutina lui Alex' },
   { k: 'dagestan', icon: 'stretch', name: 'Dagestan', sub: '9 min, șolduri și sfoară, de la Alex' },
+  { k: 'splits', icon: 'stretch', name: 'Split Routine', sub: '17 min, sfoara laterală ca Alex' },
+  { k: 'abs', icon: 'bolt', name: 'Abs', sub: '5 min fără pauză, de la Alex' },
   { k: 'stretch-push', icon: 'timer', name: 'Stretching', sub: '15 min, încălzirea umerilor' },
 ];
 

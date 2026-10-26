@@ -107,6 +107,10 @@ function openTool(k: string): void {
       return openRoutine(k, todayBlock((b) => b.routine === k)?.id);
     case 'daily':
     case 'dagestan':
+    case 'peekaboo':
+    case 'abs':
+    case 'splits':
+    case 'homebox':
       return openRoutine(k);
   }
 }

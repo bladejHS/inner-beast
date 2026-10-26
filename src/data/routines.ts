@@ -10,7 +10,7 @@ export interface Move {
 }
 
 export interface Routine {
-  id: 'stretch-push' | 'stretch-pull' | 'mobility' | 'daily' | 'dagestan';
+  id: 'stretch-push' | 'stretch-pull' | 'mobility' | 'daily' | 'dagestan' | 'peekaboo' | 'abs' | 'splits' | 'homebox';
   name: string;
   intro: string;
   moves: Move[];
@@ -114,6 +114,77 @@ export const ROUTINES: Routine[] = [
       { name: 'Straddle Side Bend', sec: 90, sides: true, alex: true, cue: 'Din sfoară, cobori trunchiul peste un picior, apoi peste celălalt.' },
       { name: 'Frog Stretch', sec: 60, cue: 'În patru labe, genunchii larg: împingi șoldurile în spate.' },
       { name: 'Butterfly Stretch', sec: 60, cue: 'Tălpile lipite, genunchii cad spre sol.' },
+    ],
+  },
+  {
+    id: 'peekaboo',
+    name: 'Peekaboo Workout',
+    intro: 'Cele 7 exerciții de peek-a-boo arătate de Alex, cu timpii scriși pe ecran: 2 serii din fiecare. Garda lipită de față tot timpul, mișcarea vine din genunchi. La Twist 180 Alex nu dă timpul; aici are 30 de secunde.',
+    moves: [
+      { name: 'Zig-Zag Slips', sec: 20, alex: true, cue: 'Seria 1: eschive stânga-dreapta în timp ce avansezi în zigzag.' },
+      { name: 'Zig-Zag Slips', sec: 20, alex: true, cue: 'Seria 2.' },
+      { name: 'Weaves', sec: 20, alex: true, cue: 'Seria 1: treci cu capul pe sub o lovitură imaginară, în U, dintr-o parte în alta.' },
+      { name: 'Weaves', sec: 20, alex: true, cue: 'Seria 2.' },
+      { name: 'Slip-Roll Uppercut', sec: 30, alex: true, cue: 'Seria 1: slip, roll pe sub, apoi uppercut din partea în care ai ieșit.' },
+      { name: 'Slip-Roll Uppercut', sec: 30, alex: true, cue: 'Seria 2.' },
+      { name: 'Weave + Hook', sec: 20, alex: true, cue: 'Seria 1: weave, iar când urci, croșeu din partea respectivă.' },
+      { name: 'Weave + Hook', sec: 20, alex: true, cue: 'Seria 2.' },
+      { name: 'Slip In Slip Out', sec: 30, alex: true, cue: 'Seria 1: intri cu un slip, ieși cu un slip, garda strânsă.' },
+      { name: 'Slip In Slip Out', sec: 30, alex: true, cue: 'Seria 2.' },
+      { name: 'Leg Switch', sec: 20, alex: true, cue: 'Seria 1: schimbi garda dintr-un salt mic, stânga-dreapta.' },
+      { name: 'Leg Switch', sec: 20, alex: true, cue: 'Seria 2.' },
+      { name: 'Twist 180 + Punching', sec: 30, alex: true, cue: 'Pivotezi la 180° și lovești imediat din noua direcție.' },
+    ],
+  },
+  {
+    id: 'abs',
+    name: 'Abs Workout',
+    intro: 'Abdomenul lui Alex, „fără pauză”: exercițiile și timpii sunt cei de pe ecran. Pentru cele cu minge îți ajunge o minge medicinală, o gantere sau o sticlă plină.',
+    moves: [
+      { name: 'Seated Leg Raises', sec: 30, alex: true, cue: 'Așezat, sprijinit în mâini, ridici și cobori picioarele întinse.' },
+      { name: 'Touch Your Foot', sec: 30, alex: true, cue: 'Din V, atingi pe rând cu mâna piciorul opus.' },
+      { name: 'Ball Twists', sec: 30, alex: true, cue: 'Cu mingea la piept, picioarele sus, rotești trunchiul stânga-dreapta.' },
+      { name: 'Ball Sit-up Press', sec: 30, alex: true, cue: 'Urci din abdomen și împingi mingea deasupra capului.' },
+      { name: 'Leg Raises with Ball', sec: 30, alex: true, cue: 'Mingea între tălpi, ridici și cobori picioarele.' },
+      { name: 'Legs Over Ball', sec: 30, alex: true, cue: 'Așezat, sprijinit în mâini: treci picioarele pe deasupra mingii, dintr-o parte în alta.' },
+      { name: 'Plank', sec: 60, alex: true, cue: 'Pe antebrațe, corpul drept, abdomenul strâns.' },
+      { name: 'High Plank', sec: 30, alex: true, cue: 'Pe palme, brațele întinse, corpul drept.' },
+      { name: 'Seated Weight Hold', sec: 60, alex: true, cue: 'Ultimul: așezat, picioarele sus, ții greutatea la piept și o împingi peste cap.' },
+    ],
+  },
+  {
+    id: 'splits',
+    name: 'Split Routine',
+    intro: 'Cum lucrează Alex sfoara laterală: încălzire, apoi 5 runde de 2 minute în sfoară și 1 minut ținut în aer. Dacă e prea mult, fă 1 minut și 30 de secunde: adaptează nivelul. Fără mișcări bruște.',
+    moves: [
+      { name: 'Wide Stance Hold', sec: 60, alex: true, cue: 'Picioarele foarte depărtate, coborât, spatele drept: ții, ca să te încălzești.' },
+      { name: 'Side-to-Side Shifts', sec: 60, alex: true, cue: 'Din poziția largă, te muți dreapta-stânga, tot mai relaxat.' },
+      { name: 'Middle Split Lean', sec: 120, alex: true, cue: 'Runda 1 din 5: în sfoară, cât de jos poți, pieptul înainte. Respiri.' },
+      { name: 'Split Push-up Hold', sec: 60, alex: true, cue: 'Mâinile pe sol, împingi și ții corpul în aer, tot în sfoară.' },
+      { name: 'Middle Split Lean', sec: 120, alex: true, cue: 'Runda 2 din 5: în sfoară, cât de jos poți, pieptul înainte. Respiri.' },
+      { name: 'Split Push-up Hold', sec: 60, alex: true, cue: 'Mâinile pe sol, împingi și ții corpul în aer, tot în sfoară.' },
+      { name: 'Middle Split Lean', sec: 120, alex: true, cue: 'Runda 3 din 5: în sfoară, cât de jos poți, pieptul înainte. Respiri.' },
+      { name: 'Split Push-up Hold', sec: 60, alex: true, cue: 'Mâinile pe sol, împingi și ții corpul în aer, tot în sfoară.' },
+      { name: 'Middle Split Lean', sec: 120, alex: true, cue: 'Runda 4 din 5: în sfoară, cât de jos poți, pieptul înainte. Respiri.' },
+      { name: 'Split Push-up Hold', sec: 60, alex: true, cue: 'Mâinile pe sol, împingi și ții corpul în aer, tot în sfoară.' },
+      { name: 'Middle Split Lean', sec: 120, alex: true, cue: 'Runda 5 din 5: în sfoară, cât de jos poți, pieptul înainte. Respiri.' },
+      { name: 'Split Push-up Hold', sec: 60, alex: true, cue: 'Mâinile pe sol, împingi și ții corpul în aer, tot în sfoară.' },
+    ],
+  },
+  {
+    id: 'homebox',
+    name: 'Home Boxing Rounds',
+    intro: 'Box acasă, fără echipament, cum îl arată Alex: o rundă de 3 minute are 1 minut de jaburi cu eschive, 1 minut de pași, 1 minut de lovituri drepte. El face 3–6 runde; aici sunt 3.',
+    moves: [
+      { name: 'Jabs with Slips & Pulls', sec: 60, alex: true, cue: 'Runda 1: jab, slip sau pull, jab.' },
+      { name: 'Two Steps Forward, Two Back', sec: 60, alex: true, cue: 'Doi pași înainte, doi înapoi, în gardă.' },
+      { name: 'Four Straight Punches', sec: 60, alex: true, cue: 'Câte patru lovituri drepte, apoi gardă.' },
+      { name: 'Jabs with Slips & Pulls', sec: 60, alex: true, cue: 'Runda 2: jab, slip sau pull, jab.' },
+      { name: 'Two Steps Forward, Two Back', sec: 60, alex: true, cue: 'Doi pași înainte, doi înapoi, în gardă.' },
+      { name: 'Four Straight Punches', sec: 60, alex: true, cue: 'Câte patru lovituri drepte, apoi gardă.' },
+      { name: 'Jabs with Slips & Pulls', sec: 60, alex: true, cue: 'Runda 3: jab, slip sau pull, jab.' },
+      { name: 'Two Steps Forward, Two Back', sec: 60, alex: true, cue: 'Doi pași înainte, doi înapoi, în gardă.' },
+      { name: 'Four Straight Punches', sec: 60, alex: true, cue: 'Câte patru lovituri drepte, apoi gardă.' },
     ],
   },
 ];

@@ -35,6 +35,26 @@ export const COMBOS: Combo[] = [
     note: 'Lovești și ieși imediat din linie. Garda rămâne sus după fiecare pumn.',
   },
   {
+    id: 'jab-cross-hook', name: 'Jab – Cross – Lead Hook', seq: ['Jab', 'Cross', 'Lead Hook'], call: 'Jab, cross, hook', cat: 'basics',
+    note: 'Alex o arată greșit și corect: greșit e cu capul în față și mâna din spate plecată de la bărbie. Corect: garda strânsă, mâna care nu lovește lipită de față, croșeul scurt.',
+    vid: '7552631237718838550', src: 'JAB-CROSS-LEADHOOK',
+  },
+  {
+    id: 'jab-upper-roll', name: 'Jab – Uppercut – Roll – Cross', seq: ['Jab', 'Uppercut', 'Roll under', 'Cross', 'Back to guard'], call: 'Jab, uppercut, roll, cross', cat: 'combo',
+    note: 'Combinația de bază a lui Alex, „keep it simple”: jab, uppercut, treci pe sub lovitura lui cu un roll, cross, apoi înapoi în poziția de luptă.',
+    vid: '7328020214057078048', src: 'Basic combination',
+  },
+  {
+    id: 'beginner-defense', name: 'Jab – Cross, Slip, Duck, Step', seq: ['Jab', 'Cross', 'Slip', 'Slip', 'Duck', 'Step', 'Step'], call: 'Jab, cross. Slip, slip. Duck. Step, step', cat: 'defense',
+    note: '„Învață asta ca începător”: un 1-2, două eschive laterale, o aplecare din genunchi, doi pași. Alex o face întâi în ritm, apoi lent. Lucreaz-o lent până iese curat.',
+    vid: '7605733380629499159', src: 'Lerne DAS als Anfänger',
+  },
+  {
+    id: 'simple-body', name: 'Jab – Cross Body – Lead Hook Head', seq: ['Jab', 'Cross (body)', 'Lead Hook (head)'], call: 'Jab, cross body, hook head', cat: 'basics',
+    note: '„Simple boxing combination”. Greșit, după Alex: drept în picioare, cu garda jos. Corect: genunchii îndoiți, garda strânsă, cobori pentru cross la corp și urci cu croșeul la cap.',
+    vid: '7224921223979896090', src: 'Simple boxing combination',
+  },
+  {
     id: 'body-body-head', name: 'Body, Body, Head', seq: ['Jab (body)', 'Jab (body)', 'Overhand Right (head)'], call: 'Jab body, jab body, overhand', cat: 'combo',
     note: 'Două jaburi la corp îl fac să coboare garda, apoi overhand-ul vine peste. E capcana din KO-ul de amatori arătat de Alex.',
     vid: '7677280053775895841', src: 'BODY BODY HEAD WORKS ALL THE TIME',
@@ -58,6 +78,66 @@ export const COMBOS: Combo[] = [
     id: 'tyson-slip', name: 'Tyson: Slip – Slip – Roll – Roll – Hook – Uppercut', seq: ['Slip', 'Slip', 'Roll', 'Roll', 'Hook', 'Uppercut'], call: 'Slip, slip, roll, roll, hook, uppercut', cat: 'combo',
     note: 'Întâi te aperi, apoi răspunzi. Roll-ul te duce direct în poziția de croșeu.',
     vid: '7663910698841345312', src: 'Mike Tyson combinations',
+  },
+  {
+    id: 'tyson-uppercuts', name: 'Tyson: 4 Uppercuts – Hook – Cross', seq: ['Uppercut', 'Uppercut', 'Uppercut', 'Uppercut', 'Lead Hook', 'Cross'], call: 'Four uppercuts, hook, cross', cat: 'combo',
+    note: 'Din garda peek-a-boo, patru uppercut-uri scurte alternate, apoi croșeu de stânga și cross. Așa o lucrează Alex la mănuși, cu un partener.',
+    vid: '7285276631298624800', src: 'Mike Tyson combo',
+  },
+  {
+    id: 'tyson-body-head', name: 'Tyson: Right Hook Body → Uppercut', seq: ['Level change', 'Right Hook (body)', 'Right Uppercut (head)'], call: 'Right hook body, right uppercut', cat: 'combo',
+    note: 'Combinația-semnătură a lui Tyson, refăcută de Alex: cobori din genunchi (îi marchează cu roșu), croșeu de dreapta la corp, apoi aceeași mână urcă în uppercut la cap. Loviturile nu sunt scrise pe ecran; le-am citit din cadre.',
+    vid: '7622988396671159585', src: 'Mike Tyson body + head',
+  },
+  {
+    id: 'peekaboo-killer', name: 'Peek-a-boo Killer Combo', seq: ['Bodyshot', 'Bodyshot', 'Left Hook (head)', 'Right Hook (head)', 'Move to the side', 'Left Uppercut', 'Right Cross'], call: 'Body, body, left hook head, right hook head. Move. Left uppercut, right cross', cat: 'power',
+    note: 'Două lovituri la corp, două croșee la cap, ieși în lateral și închei cu uppercut de stânga și cross de dreapta.',
+    vid: '7660508755091606817', src: 'Peakabo killer combo',
+  },
+  {
+    id: 'close-range', name: 'Close the Range, Step Out', seq: ['Jab', 'Cross', 'Lead Hook', 'Right Hook', 'Close the range', 'Body', 'Back to the head', 'Step out of the range', 'Cross'], call: 'Jab, cross, hook, hook. Close the range. Body, head. Step out, cross', cat: 'power',
+    note: 'Combinația de la sac a lui Alex: 1-2, două croșee, intri aproape, ataci corpul, revii la cap, ieși din distanță și închei cu un cross.',
+    vid: '7640532414586031392', src: 'Street fight combo',
+  },
+  {
+    id: 'liver-cross', name: 'Liver Shot: Cross – Hook – Hook', seq: ['Cross', 'Hook (head)', 'Hook (body)'], call: 'Cross, hook head, hook body', cat: 'power',
+    note: 'A doua dintre cele 3 variante de liver shot: cross, croșeu la cap, apoi același braț coboară la ficat.',
+    vid: '7627958008730914081', src: '3 Livershot combos',
+  },
+  {
+    id: 'liver-move', name: 'Liver Shot: Jab – Hook – Hook, Move', seq: ['Jab', 'Hook (head)', 'Hook (body)', 'Move to the side'], call: 'Jab, hook head, hook body, move', cat: 'power',
+    note: 'A treia variantă: jab, croșeu la cap, croșeu la ficat și ieși în lateral. În clip mai apare și controlul capului, interzis în box și scos de aici.',
+    vid: '7627958008730914081', src: '3 Livershot combos',
+  },
+  {
+    id: 'liver-setup', name: 'Head First, Then the Liver', seq: ['Jab (head)', 'Hook (head)', 'Step over', 'Lead Hook (liver)'], call: 'Jab, hook head, step, liver', cat: 'combo',
+    note: 'Un adversar bun își apără mijlocul. Întâi ataci capul ca să ridice garda, te poziționezi, încarci și abia atunci croșeul scurt și exploziv sub coaste. Dacă nu e liber, ieși și o iei de la capăt.',
+    vid: '7494379943447547158', src: 'Der perfekte Leberhaken',
+  },
+  {
+    id: 'ko-combo', name: 'Jab – Jab – Loaded Right Hook – Lead Hook', seq: ['Jab', 'Jab', 'Loaded Right Hook', 'Lead Hook'], call: 'Jab, jab, right hook, lead hook', cat: 'power',
+    note: '„Knockout combination”: două jaburi, un croșeu de dreapta încărcat din șold, apoi croșeul de stânga.',
+    vid: '7234248748321525018', src: 'Knockout combination',
+  },
+  {
+    id: 'tyson-switch', name: 'Tyson: Uppercut – Hook, Switch Step', seq: ['Right Uppercut', 'Left Hook', 'Switch step', 'Left Uppercut', 'Right Hook'], call: 'Right uppercut, left hook. Switch. Left uppercut, right hook', cat: 'combo',
+    note: 'Uppercut de dreapta și croșeu de stânga, schimbi garda dintr-un pas, apoi oglinda: uppercut de stânga și croșeu de dreapta. Repeți în ritm.',
+    vid: '7237522682407832858', src: 'Mike Tyson combination',
+  },
+  {
+    id: 'combo-of-day', name: 'Jab – Cross, Move, Uppercut – Cross, Move, Uppercut – Hook', seq: ['Jab', 'Cross', 'Move to the side', 'Uppercut', 'Cross', 'Move to the other side', 'Uppercut', 'Right Hook'], call: 'Jab, cross. Move. Uppercut, cross. Move. Uppercut, right hook', cat: 'combo',
+    note: 'Combinația zilei de la Alex: după fiecare pereche de lovituri schimbi partea, ca să nu rămâi în fața lui.',
+    vid: '7229638724781477146', src: 'Combination for today',
+  },
+  {
+    id: 'favorite', name: 'Jab – Hook – Body – Right Hook', seq: ['Jab', 'Hook', 'Body', 'Right Hook'], call: 'Jab, hook, body, right hook', cat: 'combo',
+    note: 'Una dintre combinațiile preferate ale lui Alex: jab, croșeu la cap, cobori la corp și închei cu croșeul de dreapta.',
+    vid: '7223053215246421254', src: 'One of my favorite combos',
+  },
+  {
+    id: 'tap-uppercut', name: 'Tap → Uppercut', seq: ['Tap (jab)', 'Uppercut'], call: 'Tap, uppercut', cat: 'power',
+    note: 'Cum exersează Alex uppercut-ul de KO la sacul pară: un tap scurt cu mâna din față, iar când sacul (sau adversarul) vine spre tine, uppercut. Apoi le amesteci cu alte lovituri.',
+    vid: '7225625296991440155', src: 'Knockout uppercut',
   },
   {
     id: 'tyson-killer', name: 'Mike Tyson Killer Combo',
@@ -95,6 +175,21 @@ export const COMBOS: Combo[] = [
     id: 'off-ropes', name: 'Off the Ropes', seq: ['Push off', 'Right Hook', 'Left Hook'], call: 'Push off, right hook, left hook', cat: 'power',
     note: 'Când atingi peretele sau corzile, te împingi înapoi și ieși cu două croșee. Nu rămâi lipit acolo.',
     vid: '7695784903249562912', src: 'This was really fast',
+  },
+  {
+    id: 'feint-liver', name: 'Feint – Liver – Head (2-punch KO)', seq: ['Feint (lean to the side)', 'Lead Hook (liver)', 'Lead Hook (head)'], call: 'Feint, liver, head', cat: 'counter',
+    note: 'Înclini trunchiul într-o parte ca să-l păcălești, lovești cu stânga la ficat, iar când își coboară mâinile urmează imediat al doilea croșeu, la cap.',
+    vid: '7322852075858070816', src: 'KO mit 2 Schlägen',
+  },
+  {
+    id: 'hook-setup', name: 'Jab – Jab → Hook Around the Parry', seq: ['Jab', 'Jab', 'Hop', 'Lead Hook'], call: 'Jab, jab, hook', cat: 'counter',
+    note: 'Alex: arunci jaburi și te uiți la reacție. Când adversarul începe să pareze jabul, fentezi jabul și vii cu croșeul pe după mâna lui.',
+    vid: '7229063556732341531', src: 'Lead hook KO set up',
+  },
+  {
+    id: 'check-hook', name: 'Check Hook', seq: ['Lead Hook', 'Pivot out'], call: 'Check hook', cat: 'counter',
+    note: 'Contra pentru cine intră peste tine: croșeu de stânga în timp ce pivotezi pe piciorul din față și ieși din linia lui. Îl contrezi și ajungi să-l ataci din alt unghi.',
+    vid: '7598303462463393046', src: 'Check hook sauber ausführen',
   },
   {
     id: 'pull-counter', name: 'Pull Counter', seq: ['Lean back', 'Small step back', 'Right Cross'], call: 'Pull back, cross', cat: 'counter',
@@ -144,10 +239,10 @@ export const ROPE_MOVES = [
 
 /** Which combos the caller uses in each block. */
 const FOCUS: Record<string, string[]> = {
-  jab: ['jab', 'double-jab', 'one-two', 'jab-out', 'body-body-head', 'ghost-step', 'pull-counter', 'guard-reset'],
-  move: ['body-head', 'liver', 'body-body-head', 'off-ropes', 'ghost-step', 'one-two', 'step-overhand', 'hooks-liver'],
-  combo: ['liver', 'tyson-huh', 'tyson-slip', 'body-head', 'body-body-head', 'pull-counter', 'angle-finish', 'duck-counter', 'step-overhand'],
-  power: ['tyson-killer', 'angle-finish', 'off-ropes', 'liver', 'body-head', 'body-body-head', 'gazelle', 'hooks-liver'],
+  jab: ['jab', 'double-jab', 'one-two', 'jab-out', 'body-body-head', 'ghost-step', 'pull-counter', 'guard-reset', 'jab-cross-hook', 'beginner-defense', 'simple-body'],
+  move: ['body-head', 'liver', 'body-body-head', 'off-ropes', 'ghost-step', 'one-two', 'step-overhand', 'hooks-liver', 'close-range', 'liver-move', 'check-hook'],
+  combo: ['liver', 'tyson-huh', 'tyson-slip', 'body-head', 'body-body-head', 'pull-counter', 'angle-finish', 'duck-counter', 'step-overhand', 'jab-upper-roll', 'tyson-uppercuts', 'tyson-body-head', 'liver-setup', 'feint-liver', 'check-hook', 'tyson-switch', 'combo-of-day', 'hook-setup', 'favorite'],
+  power: ['tyson-killer', 'angle-finish', 'off-ropes', 'liver', 'body-head', 'body-body-head', 'gazelle', 'hooks-liver', 'peekaboo-killer', 'close-range', 'liver-cross', 'liver-move', 'ko-combo', 'tap-uppercut'],
   slow: ['jab', 'one-two', 'liver', 'alphabet', 'tyson-huh', 'peekaboo', 'guard-reset'],
   distance: ['jab', 'double-jab', 'jab-out', 'pull-counter', 'ghost-step', 'one-two', 'step-overhand'],
 };

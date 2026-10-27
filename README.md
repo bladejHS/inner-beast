@@ -17,6 +17,7 @@ npm install
 npm test        # logica: plan, timere, GPS, progresie
 npm run build   # tsc + vite + service worker
 npm run icons   # regenerează iconițele din geometria ghearelor
+npm run photos  # fundalul de start, titlul și pozele zilelor, din PNG-urile de pe Desktop
 ```
 
 Publicată pe GitHub Pages la fiecare push pe `main`.

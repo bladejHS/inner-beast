@@ -61,16 +61,6 @@ export const WORKOUTS: Workout[] = [
         cue: 'Mâinile formează un romb sub piept, coatele rămân lângă corp.',
       },
       {
-        id: 'trxpush', name: 'TRX Push-ups', vars: ['TRX Push-ups (incline)', 'TRX Push-ups', 'TRX Push-ups (feet in straps)', 'TRX Atomic Push-ups'], start: 0,
-        type: 'reps', sets: 3, lo: 8, hi: 12, rest: 75, muscles: 'piept, umeri, core',
-        cue: 'Mânerele instabile cer stabilitate din umeri și core. Coborî controlat, coatele la 45°, corpul drept.',
-      },
-      {
-        id: 'trxtri', name: 'TRX Triceps Extensions', vars: ['TRX Triceps Extensions (upright)', 'TRX Triceps Extensions', 'TRX Triceps Extensions (low)'], start: 0,
-        type: 'reps', sets: 3, lo: 10, hi: 15, rest: 60, muscles: 'triceps', opt: true,
-        cue: 'Brațele întinse în față, îndoi doar coatele și aduci mâinile spre frunte, apoi împingi înapoi.',
-      },
-      {
         id: 'hollow', name: 'Hollow Body Hold', vars: ['Tuck Hollow Hold', 'Hollow Body Hold', 'Hollow Body Rocks'], start: 0,
         type: 'time', sets: 3, lo: 20, hi: 45, rest: 45, muscles: 'abdomen',
         cue: 'Zona lombară lipită de sol, abdomenul strâns, respiri scurt.',

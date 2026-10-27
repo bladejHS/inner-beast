@@ -131,22 +131,6 @@ export const HOW: Record<string, How> = {
     ],
     mistake: 'Șoldurile care cad și umerii ridicați spre urechi.',
   },
-  trxpush: {
-    steps: [
-      'Mânerele TRX la nivelul genunchilor sau mai jos, te sprijini în ele cu brațele întinse, corpul înclinat în față.',
-      'Cobori controlat până când mâinile ajung lângă piept, coatele la aproximativ 45°.',
-      'Împingi înapoi, fără să lași mânerele să se depărteze.',
-      'Cu cât stai mai aplecat, cu atât e mai greu.',
-    ],
-    mistake: 'Mânerele care fug în lateral: ține-le strâns pe aceeași linie cu umerii.',
-  },
-  trxtri: {
-    steps: [
-      'Ții mânerele cu brațele întinse în față, la înălțimea umerilor, și te apleci în față.',
-      'Îndoi doar coatele și cobori fruntea spre mâini.',
-      'Împingi din triceps până la brațe întinse. Corpul rămâne drept.',
-    ],
-  },
   core: {
     steps: [
       'Atârni de bară cu brațele întinse și umerii activi, corpul nemișcat.',
@@ -474,11 +458,6 @@ export const VAR_NOTES: Record<string, string> = {
   'TRX Rows (upright)': 'Corpul aproape vertical: varianta ușoară.',
   'TRX Rows (feet elevated)': 'Picioarele pe un scaun, corpul orizontal: cel mai greu.',
   'TRX Single-arm Rows': 'Un singur mâner, celălalt braț liber; nu lăsa trunchiul să se rotească.',
-  'TRX Push-ups (incline)': 'Mânerele mai sus, corpul mai vertical: varianta ușoară.',
-  'TRX Push-ups (feet in straps)': 'Mâinile pe sol, picioarele în chingi: flotare cu picioarele suspendate.',
-  'TRX Atomic Push-ups': 'Picioarele în chingi: o flotare, apoi aduci genunchii la piept.',
-  'TRX Triceps Extensions (upright)': 'Corpul aproape vertical: varianta ușoară.',
-  'TRX Triceps Extensions (low)': 'Corpul mai aplecat: varianta grea.',
   'Band Pull-Aparts': 'Ții banda întinsă în față, la nivelul umerilor, și o desfaci până la piept strângând omoplații.',
   'Band Face Pulls': 'Banda prinsă la înălțimea feței: tragi spre față cu coatele sus.',
   'Lying Leg Raises': 'Pe spate, mâinile sub fese, ridici picioarele întinse până la vertical și cobori fără să atingi solul.',

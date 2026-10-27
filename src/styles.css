@@ -49,7 +49,7 @@
 :root[data-theme='dark'] body::before { filter: invert(1); opacity: .35; }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; background: var(--paper); }
+html { -webkit-text-size-adjust: 100%; background: var(--paper); touch-action: pan-x pan-y; }
 body {
   margin: 0;
   background: var(--paper);
@@ -189,6 +189,9 @@ h1, h2, h3, h4 { margin: 0; font-weight: 800; }
 .stepper { display: flex; align-items: stretch; border: 1.5px solid var(--ink); width: max-content; background: var(--card); }
 .stepper button { width: 46px; min-height: 46px; background: none; border: 0; font: 800 22px/1 var(--display); color: var(--ink); }
 .stepper button:active { background: var(--paper-2); }
+.stepper input { width: 64px; min-width: 0; padding: 0 6px; border: 0; border-left: 1.5px solid var(--ink); border-right: 1.5px solid var(--ink); background: none; text-align: center; font: 800 20px/1 var(--display); font-variant-numeric: tabular-nums; -moz-appearance: textfield; appearance: textfield; }
+.stepper input::-webkit-inner-spin-button, .stepper input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.stepper input:focus { background: var(--paper-2); }
 .stepper output { min-width: 64px; display: grid; place-items: center; font: 800 20px/1 var(--display); font-variant-numeric: tabular-nums; border-left: 1.5px solid var(--ink); border-right: 1.5px solid var(--ink); padding: 0 6px; }
 .field { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .field:last-child { border-bottom: 0; }
@@ -295,6 +298,11 @@ input:focus, textarea:focus { outline: none; border-color: var(--ink); }
 
 /* ---------- plan ---------- */
 .dcs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.day-ph { display: block; width: 100%; height: auto; aspect-ratio: 830 / 230; object-fit: cover; background: #000; }
+.day-ph-top { margin: 4px 0 2px; animation: ph-in .7s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes ph-in { from { opacity: 0; transform: scale(1.04); filter: brightness(.3); } to { opacity: 1; transform: none; filter: none; } }
+@media (prefers-reduced-motion: reduce) { .day-ph-top { animation: none; } }
+.dc-ph { width: calc(100% + 32px); margin: -16px -16px 14px; }
 .dc { display: block; width: 100%; text-align: left; padding: 16px; color: var(--ink); background: var(--card); border: 1.5px solid var(--line-2); }
 .dc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .dc-day { font: 800 12px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
@@ -545,7 +553,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--ink); }
 .set { display: grid; grid-template-columns: 66px 1fr 58px; gap: 8px; align-items: center; }
 .set .sn { font: 900 15px/1 var(--display); text-transform: uppercase; color: var(--mute); white-space: nowrap; }
 .set .stepper { width: 100%; }
-.set .stepper output { flex: 1; }
+.set .stepper output, .set .stepper input { flex: 1; }
 .set .ok { height: 48px; border: 0; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--ink); display: grid; place-items: center; color: var(--ink); }
 .set .ok svg { width: 24px; height: 24px; }
 .set.done .ok { background: var(--ink); color: var(--paper); }

@@ -154,7 +154,7 @@ class WorkoutPlayer implements Player {
         const ctl =
           ex.type === 'ytw'
             ? `<span class="dim" style="font-weight:600">5 Y, 5 T, 5 W</span>`
-            : `<div class="stepper" role="group" aria-label="Seria ${k + 1}"><button data-a="p:v" data-k="${k}" data-d="-1" aria-label="Scade">−</button><output>${v}${isSec(ex) ? ' s' : ''}</output><button data-a="p:v" data-k="${k}" data-d="1" aria-label="Crește">+</button></div>`;
+            : `<div class="stepper" role="group" aria-label="Seria ${k + 1}"><button data-a="p:v" data-k="${k}" data-d="-1" aria-label="Scade">−</button>${isSec(ex) ? `<output>${v} s</output>` : `<input type="number" inputmode="numeric" pattern="[0-9]*" min="0" max="999" value="${v}" data-a="p:vin" data-k="${k}" aria-label="Repetări, seria ${k + 1}">`}<button data-a="p:v" data-k="${k}" data-d="1" aria-label="Crește">+</button></div>`;
         const okLabel = d ? 'Anulează seria' : isSec(ex) && !d ? 'Pornește cronometrul' : 'Bifează seria';
         return `<div class="set ${d ? 'done' : ''}"><span class="sn">Seria ${k + 1}</span>${ctl}<button class="ok" data-a="p:set" data-k="${k}" aria-label="${okLabel}">${ic(isSec(ex) && !d ? 'play' : 'check')}</button></div>`;
       })
@@ -323,6 +323,13 @@ class WorkoutPlayer implements Player {
         if (x.done[k]) x.done[k] = x.vals[k] > 0;
         return this.render();
       }
+      case 'p:vin': {
+        // Typed reps: commit on change without re-rendering, so a tap on ✓ right after typing still lands.
+        const inp = el as HTMLInputElement;
+        this.typeReps(k, inp.value);
+        inp.value = String(x.vals[k]);
+        return;
+      }
       case 'p:set':
         if (x.done[k]) {
           x.done[k] = false;
@@ -405,6 +412,20 @@ class WorkoutPlayer implements Player {
           x.emom.clock.pause();
         }
         return this.render();
+    }
+  }
+
+  input(el: HTMLElement): void {
+    if (el.dataset.a === 'p:vin') this.typeReps(Number(el.dataset.k), (el as HTMLInputElement).value);
+  }
+
+  typeReps(k: number, raw: string): void {
+    const x = this.x;
+    const n = parseInt(raw, 10);
+    x.vals[k] = Math.max(0, Math.min(999, Number.isFinite(n) ? n : 0));
+    if (x.done[k] && x.vals[k] <= 0) {
+      x.done[k] = false;
+      ovEl().querySelectorAll('.set')[k]?.classList.remove('done');
     }
   }
 

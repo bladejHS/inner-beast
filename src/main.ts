@@ -426,7 +426,20 @@ document.addEventListener('input', (ev) => {
   if (el?.dataset?.a) onInput(el);
 });
 
+// Typing reps: select the old number so the new one replaces it.
+document.addEventListener('focusin', (ev) => {
+  const t = ev.target;
+  if (t instanceof HTMLInputElement && t.type === 'number') t.select();
+});
+
+// No zoom: iOS ignores user-scalable=no, so pinch is blocked here too (double-tap: touch-action in CSS).
+for (const g of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(g, (ev) => ev.preventDefault());
+document.addEventListener('touchmove', (ev) => {
+  if (ev.touches.length > 1) ev.preventDefault();
+}, { passive: false });
+
 document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Enter' && ev.target instanceof HTMLInputElement && ev.target.type === 'number') ev.target.blur();
   if (ev.key === 'Enter' && (ev.target as HTMLElement)?.id === 'win-in') {
     act('win-add', ev.target as HTMLElement);
   }

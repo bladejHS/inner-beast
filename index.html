@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#f3f1ec">
 <meta name="color-scheme" content="light dark">
 <meta name="robots" content="noindex, nofollow">
@@ -16,6 +16,8 @@
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preload" href="splash/bg.webp" as="image" type="image/webp">
+<link rel="preload" href="splash/title.webp" as="image" type="image/webp">
 <link rel="preload" href="fonts/league-spartan-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script>
 // Theme before the first paint: the saved choice, otherwise the phone's setting.
@@ -34,48 +36,40 @@
 @font-face{font-family:'Montserrat';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/montserrat-latin-ext-wght-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 html{--sp-bg:#f3f1ec;--sp-fg:#0d0d0d}html[data-theme=dark]{--sp-bg:#0f0f0f;--sp-fg:#efece6}
 html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
-/* Opening: a drop of ink falls, bleeds into the wolf, three claws tear through it, the words are stamped. */
-#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:var(--sp-bg);color:var(--sp-fg);transition:clip-path .6s cubic-bezier(.7,0,.2,1);clip-path:inset(0 0 0 0)}
+/* Opening: the wolf over the wanderer comes out of the dark, the lettering is torn in, hits, and a light runs through it. */
+#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#000;color:#efece6;transition:clip-path .6s cubic-bezier(.7,0,.2,1),opacity .6s;clip-path:inset(0 0 0 0)}
 #splash.sp-out{clip-path:inset(0 0 100% 0);pointer-events:none}
 .sp-stage{position:absolute;inset:0}
-#sp-ink{position:absolute;inset:0;width:100%;height:100%}
-.sp-claws{position:absolute;color:var(--sp-bg);pointer-events:none}
-.cl-reveal{stroke-dasharray:var(--l);stroke-dashoffset:var(--l)}
-.sp-go .cl-reveal{animation:sp-rip .2s cubic-bezier(.8,0,.2,1) forwards;animation-delay:calc(1.3s + var(--d))}
-.sp-go .sp-stage{animation:sp-hit .34s linear 1.4s 1}
-.sp-title{position:absolute;left:clamp(20px,6vw,48px);right:clamp(20px,6vw,48px);bottom:calc(19vh + env(safe-area-inset-bottom));margin:0;font:900 clamp(54px,17vw,118px)/.84 'League Spartan','Arial Black',sans-serif;letter-spacing:-.02em;text-transform:uppercase}
-.sp-title span{display:block;opacity:0;transform:scale(1.5) rotate(-3deg);transform-origin:0 60%}
-.sp-go .sp-title span{animation:sp-stamp .32s cubic-bezier(.3,1.6,.5,1) forwards}
-.sp-go .sp-title span:nth-child(1){animation-delay:1.65s}
-.sp-go .sp-title span:nth-child(2){animation-delay:1.8s}
-.sp-go .sp-title span:nth-child(3){animation-delay:1.95s}
-.sp-brush{position:absolute;left:clamp(14px,5vw,42px);bottom:calc(13.5vh + env(safe-area-inset-bottom));width:min(78vw,430px);height:34px;overflow:visible}
-.sp-brush path{fill:none;stroke:var(--sp-fg);stroke-width:13;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;filter:url(#brush)}
-.sp-go .sp-brush path{animation:sp-draw .45s cubic-bezier(.6,0,.2,1) 2.25s forwards}
-.sp-brand{position:absolute;left:clamp(22px,6vw,48px);bottom:calc(14.6vh + env(safe-area-inset-bottom));margin:0;font:900 12px/1 'League Spartan',sans-serif;letter-spacing:.55em;color:var(--sp-bg);opacity:0;text-transform:uppercase}
-.sp-go .sp-brand{animation:sp-fade .3s ease 2.6s forwards}
-.sp-sub{position:absolute;left:clamp(22px,6vw,48px);right:clamp(22px,6vw,48px);bottom:calc(5vh + env(safe-area-inset-bottom));max-width:34ch;margin:0;font:600 13px/1.45 Montserrat,system-ui,sans-serif;color:var(--sp-fg);opacity:0}
+.sp-bg{position:absolute;inset:-3%;background:#000 url(splash/bg.webp) 50% 30%/cover no-repeat;opacity:0;transform:scale(1.18);filter:brightness(.4) contrast(1.15)}
+.sp-go .sp-bg{animation:sp-bg 4.6s cubic-bezier(.2,.7,.2,1) forwards}
+.sp-shade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.35),transparent 30%,transparent 50%,rgba(0,0,0,.85) 82%,#000)}
+.sp-go .sp-stage{animation:sp-hit .34s linear 1.55s 1}
+.sp-logo{position:absolute;left:50%;bottom:calc(17vh + env(safe-area-inset-bottom));width:min(94vw,560px);aspect-ratio:1100/367;margin:0;transform:translateX(-50%)}
+.sp-logo img{display:block;width:100%;height:100%;opacity:0;clip-path:inset(0 100% 0 0);transform:scale(1.25) rotate(-4deg);filter:blur(10px) drop-shadow(0 0 0 rgba(255,255,255,0))}
+.sp-go .sp-logo img{animation:sp-tear .55s cubic-bezier(.7,0,.25,1) 1s forwards,sp-glow 2.4s ease-in-out 2.6s infinite alternate}
+.sp-logo::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.95) 50%,transparent 62%) 0 0/300% 100% no-repeat;background-position:100% 0;-webkit-mask:url(splash/title.webp) center/100% 100% no-repeat;mask:url(splash/title.webp) center/100% 100% no-repeat;opacity:0;mix-blend-mode:screen}
+.sp-go .sp-logo::after{animation:sp-sheen .9s ease-in-out 1.9s forwards}
+.sp-brand{position:absolute;left:0;right:0;bottom:calc(13vh + env(safe-area-inset-bottom));margin:0;text-align:center;font:900 12px/1 'League Spartan',sans-serif;letter-spacing:.55em;color:#efece6;opacity:0;text-transform:uppercase}
+.sp-go .sp-brand{animation:sp-fade .4s ease 2.5s forwards}
+.sp-sub{position:absolute;left:clamp(22px,6vw,48px);right:clamp(22px,6vw,48px);bottom:calc(5vh + env(safe-area-inset-bottom));max-width:34ch;margin:0 auto;text-align:center;font:600 13px/1.45 Montserrat,system-ui,sans-serif;color:#efece6;opacity:0}
 .sp-go .sp-sub{animation:sp-fade-sub .6s ease 2.7s forwards}
-@keyframes sp-fade-sub{to{opacity:.7}}
-@keyframes sp-rip{to{stroke-dashoffset:0}}
+@keyframes sp-bg{0%{opacity:0;transform:scale(1.18);filter:brightness(.4) contrast(1.15)}35%{opacity:1}100%{opacity:1;transform:scale(1.02);filter:brightness(.95) contrast(1.05)}}
+@keyframes sp-tear{0%{opacity:0;clip-path:inset(0 100% 0 0);transform:scale(1.25) rotate(-4deg);filter:blur(10px)}55%{opacity:1;clip-path:inset(0 0 0 0);filter:blur(2px)}80%{transform:scale(.97) rotate(.5deg)}100%{opacity:1;clip-path:inset(0 0 0 0);transform:none;filter:blur(0) drop-shadow(0 0 0 rgba(255,255,255,0))}}
+@keyframes sp-glow{from{filter:drop-shadow(0 0 0 rgba(255,255,255,0))}to{filter:drop-shadow(0 0 14px rgba(255,255,255,.35))}}
+@keyframes sp-sheen{0%{opacity:1;background-position:100% 0}100%{opacity:1;background-position:0 0}}
+@keyframes sp-fade-sub{to{opacity:.75}}
 @keyframes sp-hit{0%,100%{transform:none}15%{transform:translate(-7px,4px) scale(1.012)}35%{transform:translate(6px,-4px)}55%{transform:translate(-4px,2px)}75%{transform:translate(2px,-1px)}}
-@keyframes sp-stamp{0%{opacity:0;transform:scale(1.5) rotate(-3deg)}60%{opacity:1}100%{opacity:1;transform:none}}
-@keyframes sp-draw{to{stroke-dashoffset:0}}
-@keyframes sp-fade{to{opacity:1}}
-@media (prefers-reduced-motion:reduce){.sp-go *{animation:none!important}.cl-reveal{stroke-dashoffset:0}.sp-title span{opacity:1;transform:none}.sp-brush path{stroke-dashoffset:0}.sp-brand,.sp-sub{opacity:1}}
+@keyframes sp-fade{to{opacity:.8}}
+@media (prefers-reduced-motion:reduce){.sp-go *,.sp-go .sp-logo::after{animation:none!important}.sp-bg{opacity:1;transform:none;filter:none}.sp-logo img{opacity:1;clip-path:none;transform:none;filter:none}.sp-brand,.sp-sub{opacity:.8}}
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <filter id="brush" x="-5%" y="-60%" width="110%" height="220%"><feTurbulence type="fractalNoise" baseFrequency=".035 .9" numOctaves="3" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/></filter>
-</svg>
 <div id="splash" aria-hidden="true">
   <div class="sp-stage">
-    <canvas id="sp-ink"></canvas>
-    <!--CLAWS-->
+    <div class="sp-bg"></div>
+    <div class="sp-shade"></div>
+    <h1 class="sp-logo"><img src="splash/title.webp" alt="Unleash your inner beast" width="1100" height="367" decoding="async"></h1>
   </div>
-  <h1 class="sp-title"><span>Unleash</span><span>your inner</span><span>beast</span></h1>
-  <svg class="sp-brush" viewBox="0 0 430 34" preserveAspectRatio="none"><path d="M8 20 C 90 12, 170 26, 250 16 S 380 12, 422 18"/></svg>
   <p class="sp-brand">Inner Beast</p>
   <p class="sp-sub">Tot ce-ți trebuie ca să ajungi în cea mai bună formă a vieții tale, mental și fizic.</p>
 </div>
@@ -88,83 +82,28 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
   var sp = document.getElementById('splash');
   if (!sp) return;
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var c = document.getElementById('sp-ink'), x = c.getContext('2d');
-  var claws = sp.querySelector('.sp-claws');
-  var ink = getComputedStyle(sp).color || '#000';
-  var wolf = new Image();
-  var dpr = Math.min(2, window.devicePixelRatio || 1), W = 0, H = 0, box = null, raf = 0, t0 = 0, done = false;
-  // fixed pseudo-random numbers, so the bleed has the same shape every time
-  var seed = 11;
-  function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
-  var waves = [], drops = [];
-  for (var i = 0; i < 7; i++) waves.push({ f: 2 + Math.floor(rnd() * 9), p: rnd() * 6.28, a: .05 + rnd() * .09 });
-  for (i = 0; i < 46; i++) { var a = rnd() * 6.28, sp1 = .25 + rnd() * .9; drops.push({ a: a, d: sp1, r: .003 + Math.pow(rnd(), 3) * .02, s: rnd() }); }
-  function size() {
-    W = c.width = Math.round(innerWidth * dpr); H = c.height = Math.round(innerHeight * dpr);
-    var w = Math.min(innerWidth * .9, innerHeight * .52 * 392 / 482, 460);
-    var h = w * 482 / 392;
-    box = { x: (innerWidth - w) / 2 + w * .06, y: Math.max(innerHeight * .05, 24), w: w, h: h };
-    if (claws) { claws.style.left = (box.x + w * .1) + 'px'; claws.style.top = (box.y + h * .12) + 'px'; claws.style.width = (w * .8) + 'px'; }
-  }
-  size();
-  addEventListener('resize', size);
-  function ease(t) { return 1 - Math.pow(1 - t, 3); }
-  function draw(now) {
-    var t = (now - t0) / 1000;
-    var ox = (box.x + box.w * .42) * dpr, oy = (box.y + box.h * .42) * dpr, R = Math.hypot(box.w, box.h) * dpr;
-    x.setTransform(1, 0, 0, 1, 0, 0);
-    x.clearRect(0, 0, W, H);
-    x.fillStyle = ink;
-    if (t < .32) {
-      // the falling drop
-      var k = t / .32, dy = (1 - k * k) * oy;
-      x.beginPath(); x.ellipse(ox, oy - dy, 7 * dpr, (7 + 16 * k) * dpr, 0, 0, 6.2832); x.fill();
-    } else {
-      var g = ease(Math.min(1, (t - .32) / 1.0)), r = g * R * .78;
-      // the bleed: a noisy blob that grows from where the drop landed, the wolf only shows inside it
-      x.save();
-      x.beginPath();
-      for (var j = 0; j <= 96; j++) {
-        var th = j / 96 * 6.2832, m = 1;
-        for (var q = 0; q < waves.length; q++) m += waves[q].a * Math.sin(waves[q].f * th + waves[q].p + t * 1.5);
-        var rr = r * m;
-        j ? x.lineTo(ox + Math.cos(th) * rr, oy + Math.sin(th) * rr) : x.moveTo(ox + Math.cos(th) * rr, oy + Math.sin(th) * rr);
-      }
-      x.closePath(); x.clip();
-      if (wolf.complete && wolf.naturalWidth) {
-        x.drawImage(wolf, box.x * dpr, box.y * dpr, box.w * dpr, box.h * dpr);
-        // the drawing is black ink: repaint it in the theme's ink colour
-        x.globalCompositeOperation = 'source-atop'; x.fillRect(0, 0, W, H); x.globalCompositeOperation = 'source-over';
-      } else { x.beginPath(); x.arc(ox, oy, r * .3, 0, 6.2832); x.fill(); }
-      x.restore();
-      // spatter thrown out by the impact
-      var sk = ease(Math.min(1, (t - .32) / .5));
-      for (var d = 0; d < drops.length; d++) {
-        var p = drops[d], dist = p.d * sk * R * .55;
-        x.beginPath(); x.arc(ox + Math.cos(p.a) * dist, oy + Math.sin(p.a) * dist * .8, p.r * R * (.6 + .4 * sk), 0, 6.2832); x.fill();
-      }
-    }
-    if (t < 1.6 || !wolf.complete) raf = requestAnimationFrame(draw);
-  }
+  var started = false, done = false, left = 2;
   function end() {
     if (done) return;
     done = true;
     sp.classList.add('sp-out');
-    setTimeout(function () { cancelAnimationFrame(raf); removeEventListener('resize', size); sp.remove(); }, 650);
+    setTimeout(function () { sp.remove(); }, 650);
   }
   function go() {
-    if (t0) return;
-    t0 =performance.now() - (reduce ? 5000 : 0);
-    raf = requestAnimationFrame(draw);
+    if (started) return;
+    started = true;
     sp.classList.add('sp-go');
-    setTimeout(end, reduce ? 1400 : 3900);
+    setTimeout(end, reduce ? 1400 : 4300);
   }
+  // start once the picture and the lettering are in, but never hold the app hostage to a slow image
+  function ready() { if (--left <= 0) go(); }
+  ['splash/bg.webp', 'splash/title.webp'].forEach(function (src) {
+    var im = new Image();
+    im.onload = im.onerror = ready;
+    im.src = src;
+  });
   sp.addEventListener('click', end);
-  wolf.onload = go;
-  wolf.onerror = go;
-  wolf.src = 'art/wolf.webp';
-  // never hold the app hostage to a slow image
-  setTimeout(go, 900);
+  setTimeout(go, 1200);
 })();
 </script>
 <script type="module" src="/src/main.ts"></script>

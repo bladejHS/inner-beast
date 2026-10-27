@@ -10,6 +10,7 @@
     "dev": "vite",
     "art": "node scripts/art.mjs",
     "icons": "node scripts/icons.mjs",
+    "photos": "node scripts/photos.mjs",
     "check": "tsc --noEmit",
     "build": "npm run check && vite build && node scripts/sw.mjs",
     "preview": "vite preview",

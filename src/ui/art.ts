@@ -21,6 +21,11 @@ const RATIO = {
 
 export type ArtName = keyof typeof RATIO;
 
+/** The day's banner (public/days, made by scripts/photos.mjs): a picture with the day's motto lettered in. */
+export function dayPhoto(idx: number, cls = '', lazy = false): string {
+  return `<img class="day-ph ${cls}" src="${import.meta.env.BASE_URL}days/${idx}.webp" width="830" height="230" alt="" decoding="async"${lazy ? ' loading="lazy"' : ''}>`;
+}
+
 export function art(name: ArtName, cls = ''): string {
   return `<i class="art ${cls}" style="--m:url(${import.meta.env.BASE_URL}art/${name}.webp);--ar:${RATIO[name].toFixed(4)}" aria-hidden="true"></i>`;
 }

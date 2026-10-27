@@ -20,11 +20,6 @@ export function isDark(): boolean {
   return document.documentElement.dataset.theme === 'dark';
 }
 
-function themeBtn(): string {
-  const d = isDark();
-  return `<button class="icon-btn" data-a="theme" aria-label="${d ? 'Mod luminos' : 'Mod întunecat'}" aria-pressed="${d}">${ic(d ? 'sun' : 'moon')}</button>`;
-}
-
 /** Light or dark, remembered on this device. */
 export function setTheme(dark: boolean): void {
   const t = dark ? 'dark' : 'light';
@@ -42,7 +37,7 @@ export function top(back = false): string {
     back
       ? `<button class="icon-btn" data-a="back" aria-label="Înapoi">${ic('back')}</button>`
       : `<div class="brand">${art('wolf')}<span>Inner Beast</span></div>`
-  }<div class="top-r">${themeBtn()}<button class="icon-btn" data-a="settings" aria-label="Setări">${ic('gear')}</button></div></header>`;
+  }<div class="top-r"><button class="icon-btn" data-a="settings" aria-label="Setări">${ic('gear')}</button></div></header>`;
 }
 
 export function restFor(k: RestKey | undefined): number {

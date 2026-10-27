@@ -38,3 +38,11 @@ for (const [i, [r, c]] of DAYS.entries()) {
     .toFile(`public/days/${i}.webp`);
 }
 console.log('splash + 7 day banners written');
+
+// The app's background: the lone wolf under the eclipse, blurred and darkened so text stays readable on it.
+await sharp(join(SRC, 'Lup singur sub luna eclipsată.png'))
+  .resize({ width: 540 })
+  .blur(7)
+  .modulate({ brightness: 0.85 })
+  .webp({ quality: 70 })
+  .toFile('public/splash/app-bg.webp');

@@ -49,10 +49,15 @@
 :root[data-theme='dark'] body::before { filter: invert(1); opacity: .35; }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; background: var(--paper); touch-action: pan-x pan-y; }
+html { -webkit-text-size-adjust: 100%; background: #000; touch-action: pan-x pan-y; }
+/* the lone wolf under the eclipse, blurred, fixed behind everything (made by scripts/photos.mjs) */
+html::before {
+  content: ''; position: fixed; inset: -20px; z-index: -2; pointer-events: none;
+  background: #000 url(/splash/app-bg.webp) 50% 30% / cover no-repeat;
+}
 body {
   margin: 0;
-  background: var(--paper);
+  background: transparent;
   color: var(--ink);
   font: 500 16px/1.5 var(--body);
   -webkit-tap-highlight-color: transparent;
@@ -94,7 +99,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 800; }
   display: flex; align-items: center; justify-content: space-between;
   margin: 0 calc(-1 * var(--gutter));
   padding: calc(8px + env(safe-area-inset-top)) var(--gutter) 6px;
-  background: linear-gradient(var(--paper) 62%, transparent);
+  background: linear-gradient(rgba(8, 8, 8, .8) 62%, transparent);
 }
 .brand { display: flex; align-items: center; gap: 9px; font: 900 15px/1 var(--display); text-transform: uppercase; letter-spacing: .16em; }
 .brand .art { width: 30px; }

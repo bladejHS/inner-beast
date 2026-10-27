@@ -7,7 +7,7 @@ import { dayKey, esc, prettyDay, RO_DAYS, weekStart, weekdayIdx, daysBetween } f
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { clawSvg } from '../claws.ts';
-import { art, dayPhoto } from '../art.ts';
+import { art } from '../art.ts';
 import { blockCard, blockMinutes, top } from './shared.ts';
 import { weekCard } from './alex.ts';
 
@@ -35,7 +35,6 @@ export function dayBody(day: Day, today: string, kicker: string): string {
   const total = day.blocks.length;
   const mins = day.blocks.reduce((s, b) => s + blockMinutes(b), 0);
   return `
-    ${dayPhoto(day.idx, 'day-ph-top')}
     <section class="hero">
       ${art('wolf', 'hero-art')}
       ${clawSvg('currentColor', 'hero-claws')}

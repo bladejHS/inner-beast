@@ -1,4 +1,4 @@
-// Nutrition data, moved over from zece-app (FALCO): the food table, the two meal plans, the goals and their rules.
+// Nutrition data, moved over from zece-app (FALCO): the food table and the goals.
 // Nutrition follows Layne Norton (Biolayne / Dr. Layne Norton on YouTube, Fat Loss Forever, The Complete Contest Prep Guide).
 
 import type { DayType } from '../logic/nutri/plan.ts';
@@ -11,15 +11,6 @@ export const GOALS: Record<Goal, { l: string; rate: number; pl: number }> = {
   recomp: { l: 'Recompoziție', rate: -0.0025, pl: 2.52 },
   bulk: { l: 'Lean bulk', rate: 0.00175, pl: 2.4 },
 };
-
-/** BMR equations: [key, name, based on]. */
-export const EQS: Array<[Eq, string, string]> = [
-  ['mifflin', 'Mifflin-St Jeor', 'greutate'],
-  ['harris', 'Harris-Benedict', 'greutate'],
-  ['cunningham', 'Cunningham', 'masă slabă'],
-  ['katch', 'Katch-McArdle', 'masă slabă'],
-];
-export type Eq = 'mifflin' | 'harris' | 'cunningham' | 'katch';
 
 /** Declared metabolism (some people burn less than the formulas say). */
 export const METAB: Array<[number, string]> = [
@@ -84,82 +75,5 @@ export const FOODS: FoodRow[] = [
   ['Lapte de soia neîndulcit', 33, 3.3, 0.6, 1.8, 'l', 250, 'o cană'], ['Smântână 12%', 133, 2.7, 4, 12, 'l', 30, 'o lingură mare'], ['Ou fiert', 155, 12.6, 1.1, 10.6, 'p', 50, 'un ou'],
 ];
 export const FCATS: Record<string, string> = { p: 'Carne, pește, ouă', l: 'Lactate', c: 'Carbohidrați', f: 'Fructe', v: 'Legume', g: 'Grăsimi și semințe', a: 'Altele', m: 'Alimentele mele' };
-
-// ---------- the meal plans ----------
-/** Meal-plan food: [name, kcal, protein, carbs, fat per 100 g or 100 ml, role, shop category, unit?, grams per unit?]
- *  Role: p protein, c carbs, f fat, v vegetables, x supplements (not scaled). */
-export type MealFood = [string, number, number, number, number, 'p' | 'c' | 'f' | 'v' | 'x', string, string?, number?];
-export const MFD: Record<string, MealFood> = {
-  ovaz: ['fulgi de ovăz', 379, 13.2, 67.7, 6.5, 'c', 'Carbohidrați'],
-  fruct: ['mix de fructe congelate', 50, 0.8, 12, 0.3, 'c', 'Fructe'],
-  whey: ['whey (pudră proteică)', 390, 78, 7, 5.5, 'p', 'Proteine'],
-  arahide: ['unt de arahide', 588, 25, 20, 50, 'f', 'Grăsimi'],
-  orez: ['orez (cântărit fiert)', 130, 2.7, 28.2, 0.3, 'c', 'Carbohidrați'],
-  pui: ['piept de pui (crud)', 120, 22.5, 0, 2.6, 'p', 'Proteine'],
-  ulei: ['ulei de măsline', 884, 0, 0, 100, 'f', 'Grăsimi', 'ml', 0.92],
-  legume: ['legume la alegere', 30, 2, 5, 0.3, 'v', 'Legume'],
-  crema: ['cremă de orez', 370, 6, 82, 1, 'c', 'Carbohidrați'],
-  rondea: ['rondele de orez', 387, 8.2, 81.5, 2.8, 'c', 'Carbohidrați', 'buc', 9],
-  miere: ['miere', 304, 0.3, 82, 0, 'c', 'Carbohidrați'],
-  creatina: ['creatină', 0, 0, 0, 0, 'x', 'Suplimente'],
-  eaa: ['EAA', 400, 95, 0, 0, 'x', 'Suplimente'],
-  dextrina: ['dextrină', 380, 0, 95, 0, 'c', 'Suplimente'],
-  corn: ['corn flakes', 378, 7, 84, 0.9, 'c', 'Carbohidrați'],
-  ananas: ['ananas', 50, 0.5, 13, 0.1, 'c', 'Fructe'],
-  albus: ['albuș de ou', 52, 10.9, 0.7, 0.2, 'p', 'Proteine', 'ml', 1.03],
-  ou: ['ou întreg', 143, 12.6, 0.7, 9.5, 'p', 'Proteine', 'buc', 55],
-  avocado: ['avocado', 160, 2, 8.5, 14.7, 'f', 'Grăsimi'],
-  toast: ['pâine toast', 265, 8, 49, 3.5, 'c', 'Carbohidrați', 'felie', 28],
-  cartof: ['cartofi (cântăriți fierți)', 87, 1.9, 20.1, 0.1, 'c', 'Carbohidrați'],
-  vita: ['vită slabă (crudă)', 137, 21, 0, 5.5, 'p', 'Proteine'],
-  mar: ['măr', 52, 0.3, 13.8, 0.2, 'c', 'Fructe'],
-  iaurt: ['iaurt 2%', 61, 4.2, 5.3, 2, 'p', 'Proteine'],
-  // swaps (Norton, flexible dieting: change the food, keep the macros)
-  curcan: ['piept de curcan (crud)', 114, 23.7, 0, 1.5, 'p', 'Proteine'],
-  ton: ['ton în apă (scurs)', 116, 26, 0, 1, 'p', 'Proteine'],
-  cod: ['cod / pește alb (crud)', 82, 18, 0, 0.7, 'p', 'Proteine'],
-  skyr: ['skyr', 63, 11, 4, 0.2, 'p', 'Proteine'],
-  vaci: ['brânză de vaci slabă', 90, 13, 3.4, 2, 'p', 'Proteine'],
-  paste: ['paste (cântărite fierte)', 158, 5.8, 30.9, 0.9, 'c', 'Carbohidrați'],
-  cartdulce: ['cartof dulce (cântărit fiert)', 90, 2, 20.7, 0.2, 'c', 'Carbohidrați'],
-  banana: ['banană', 89, 1.1, 22.8, 0.3, 'c', 'Fructe'],
-  migdale: ['migdale', 579, 21, 22, 50, 'f', 'Grăsimi'],
-  nuci: ['nuci', 654, 15, 14, 65, 'f', 'Grăsimi'],
-};
-/** Fixed amounts (not scaled with the target). */
-export const MFIX: Record<string, number> = { ou: 1, legume: 100, creatina: 5, eaa: 10 };
-/** Fibre per 100 g (Norton: at least 15 g per 1000 kcal). */
-export const MFIB: Record<string, number> = { ovaz: 10.6, fruct: 3, arahide: 6, orez: 0.4, legume: 2.5, crema: 1, rondea: 3.4, corn: 3, ananas: 1.4, avocado: 6.7, toast: 2.5, cartof: 1.8, mar: 2.4, paste: 1.8, cartdulce: 3, banana: 2.6, migdale: 12.5, nuci: 6.7 };
-
-/** A meal: [name, icon, note, share of the day's protein / carbs / fat, foods: [key, weight within its role] or [key] for fixed ones]. */
-export type PlanMeal = [string, string, string, [number, number, number], Array<[string, number?]>];
-export const MPLANS: Record<'t' | 'r', { name: string; meals: PlanMeal[] }> = {
-  t: {
-    name: 'Zi de antrenament',
-    meals: [
-      ['Masa 1', 'sun', 'dimineața', [1 / 4, 0.2, 0.35], [['ovaz', 0.75], ['fruct', 0.25], ['whey', 1], ['arahide', 1]]],
-      ['Masa 2', 'bowl', 'prânzul', [1 / 4, 0.2, 0.35], [['orez', 1], ['pui', 1], ['ulei', 1], ['legume']]],
-      ['Masa 3 · pre-workout', 'bolt', 'cu 60–90 de minute înainte de antrenament', [1 / 4, 0.27, 0.1], [['crema', 0.6], ['whey', 1], ['fruct', 0.15], ['rondea', 0.1], ['arahide', 1], ['miere', 0.15]]],
-      ['Intra-workout', 'drop', 'băutură în timpul antrenamentului, în apă (nu e masă; fără EAA: Norton — inutile când proteina zilei e atinsă)', [0, 0.08, 0], [['creatina'], ['dextrina', 1]]],
-      ['Masa 4 · post-workout', 'star', 'după antrenament, ca cină', [1 / 4, 0.25, 0.2], [['orez', 0.6], ['ananas', 0.4], ['pui', 0.6], ['albus', 0.4], ['ou'], ['ulei', 1], ['legume']]],
-    ],
-  },
-  r: {
-    name: 'Zi de odihnă',
-    meals: [
-      ['Masa 1', 'sun', 'dimineața', [1 / 4, 0.2, 0.35], [['albus', 1], ['ou'], ['avocado', 1], ['toast', 1]]],
-      ['Masa 2', 'bowl', 'prânzul', [1 / 4, 0.3, 0.25], [['orez', 1], ['pui', 1], ['ulei', 1], ['legume']]],
-      ['Masa 3', 'bowl', 'după-amiaza', [1 / 4, 0.3, 0.1], [['cartof', 1], ['vita', 1], ['legume']]],
-      ['Masa 4', 'moon', 'seara', [1 / 4, 0.2, 0.3], [['ovaz', 0.6], ['mar', 0.2], ['fruct', 0.2], ['whey', 0.7], ['iaurt', 0.3], ['arahide', 1]]],
-    ],
-  },
-};
-
-export const SHOP_ORDER = ['Proteine', 'Carbohidrați', 'Fructe', 'Legume', 'Grăsimi', 'Suplimente'];
-export const SHOP_RANGE: Array<[number, string]> = [
-  [1, 'Azi'],
-  [7, 'Săptămâna asta'],
-  [14, 'Săptămâna viitoare'],
-];
 
 export const TAC_SRC: Record<string, string> = { FLF: 'Norton · Fat Loss Forever', CPG: 'Norton · Contest Prep Guide', NY: 'Norton · YouTube', MW: 'Dr. Milo Wolf' };

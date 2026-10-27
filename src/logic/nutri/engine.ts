@@ -1,24 +1,23 @@
-// The nutrition engine, moved over from zece-app: metabolism, goal and phase (diet breaks), the day's targets
-// periodized on Inner Beast's week, the measured TDEE, the weekly correction from the scale, the meal plans with their
-// quantities, the shopping list and the weekly verdict. Everything reads the app state; nothing here touches the DOM.
+// The nutrition engine, Layne Norton's method only: a starting estimate of maintenance, then the real one from what
+// you log and what the scale does (measured TDEE and the weekly correction). The goal sets the weekly rate, protein
+// comes from lean mass, fats stay low, the rest is carbs, the same target every day. Diet breaks and the weekly verdict
+// follow Norton too. Everything reads the app state; nothing here touches the DOM.
 
 import { WEEK, type Block } from '../../data/plan.ts';
-import { GOALS, MFD, MFIB, MFIX, MPLANS, PLAN_DAY_TYPE, SHOP_ORDER, type Eq, type Goal } from '../../data/nutrition.ts';
+import { GOALS, PLAN_DAY_TYPE, type Goal } from '../../data/nutrition.ts';
 import type { MealLog, NAdj, NutProfile, State } from '../store.ts';
 import { addDays, clamp, daysBetween, weekStart, weekdayIdx } from '../util.ts';
 import { KCAL_FLOOR, type Sex } from './floor.ts';
-import { hydration, type HydrationPlan, type Intensity } from './hydration.ts';
-import { DAY_LABEL, periodize, weekCarbMean, type DayType, type NutritionPlan } from './plan.ts';
+import { DAY_LABEL, type DayType } from './plan.ts';
 
 const r2 = (v: number): number => Math.round(v * 100) / 100;
 const sexOf = (P: NutProfile): Sex => (P.sex === 'f' ? 'f' : 'm');
 
-// ---------- meals, water, weight ----------
+// ---------- meals, weight ----------
 export const mlogDay = (S: State, k: string): MealLog[] => S.mlog[k] ?? [];
 export function dayTotals(S: State, k: string): { k: number; p: number; c: number; g: number } {
   return mlogDay(S, k).reduce((a, m) => ({ k: a.k + (+m.k || 0), p: a.p + (+m.p || 0), c: a.c + (+m.c || 0), g: a.g + (+m.g || 0) }), { k: 0, p: 0, c: 0, g: 0 });
 }
-export const waterOf = (S: State, k: string): number => +(S.water[k] ?? 0) || 0;
 
 export function wList(S: State): Array<{ d: string; w: number }> {
   return Object.keys(S.weight).sort().map((d) => ({ d, w: S.weight[d] }));
@@ -53,16 +52,10 @@ export function bfOf(P: NutProfile, w: number): number {
   const bmi = w / Math.pow((+P.h || 180) / 100, 2);
   return clamp(Math.round(1.2 * bmi + 0.23 * (+P.age || 30) - (P.sex === 'f' ? 5.4 : 16.2)), 8, 50);
 }
-export function bmrAll(P: NutProfile, w: number): Record<Eq, number> & { ffm: number } {
+/** Starting estimate of resting metabolism (Mifflin-St Jeor); the real maintenance comes from the scale. */
+export function bmrOf(P: NutProfile, w: number): { bmr: number; ffm: number } {
   const f = P.sex === 'f';
-  const F = w * (1 - bfOf(P, w) / 100);
-  return {
-    ffm: F,
-    mifflin: Math.round(10 * w + 6.25 * P.h - 5 * P.age + (f ? -161 : 5)),
-    harris: Math.round(f ? 447.593 + 9.247 * w + 3.098 * P.h - 4.33 * P.age : 88.362 + 13.397 * w + 4.799 * P.h - 5.677 * P.age),
-    cunningham: Math.round(500 + 22 * F),
-    katch: Math.round(370 + 21.6 * F),
-  };
+  return { bmr: Math.round(10 * w + 6.25 * P.h - 5 * P.age + (f ? -161 : 5)), ffm: w * (1 - bfOf(P, w) / 100) };
 }
 
 // ---------- goal, protein, phase ----------
@@ -141,23 +134,14 @@ export interface NutDay {
   d: number;
   /** Training minutes (walks and breathing left out). */
   minutes: number;
-  intensity: Intensity;
 }
 export function nutriDay(k: string): NutDay {
   const d = weekdayIdx(k);
   const day = WEEK[d];
   const type = PLAN_DAY_TYPE[d];
   const minutes = day.blocks.filter((b) => b.kind !== 'walk').reduce((s, b) => s + (blockMet(b) >= 4 ? blockMin(b) : 0), 0);
-  return { type, label: DAY_LABEL[type], t: day.title, d, minutes, intensity: type === 'high' ? 'high' : type === 'rest' ? 'low' : 'moderate' };
+  return { type, label: DAY_LABEL[type], t: day.title, d, minutes };
 }
-/** Energy spent training on day k, kcal (net MET × 3.5 × kg / 200 per minute). */
-export function exKcalOf(k: string, kg: number): number {
-  const day = WEEK[weekdayIdx(k)];
-  const m = day.blocks.reduce((s, b) => s + blockMin(b) * blockMet(b), 0);
-  return Math.round(m * 0.0175 * kg);
-}
-export const WEEK_MEAN = weekCarbMean(PLAN_DAY_TYPE);
-
 // ---------- measured TDEE and the weekly correction from the scale ----------
 export interface Measured {
   ok: boolean;
@@ -205,7 +189,7 @@ export function nAdaptRun(S: State, today: string): boolean {
   let changed = false;
   if (!S.nlog[today]) {
     const tg = targets(S, today);
-    S.nlog[today] = { k: tg.base.kcal, t: tg.tdee };
+    S.nlog[today] = { k: tg.kcal, t: tg.tdee };
     for (const d of Object.keys(S.nlog)) if (d < addDays(today, -60)) delete S.nlog[d];
     changed = true;
   }
@@ -238,11 +222,7 @@ export interface Targets {
   p: number;
   c: number;
   f: number;
-  water: number;
-  hyd: HydrationPlan;
   day: NutDay;
-  per: NutritionPlan;
-  base: { kcal: number; p: number; c: number; f: number };
   bmr: number;
   bmrR: number;
   tdee: number;
@@ -252,11 +232,8 @@ export interface Targets {
   auto: number;
   manual: boolean;
   phase: Phase;
-  eq: Eq;
   def: number;
-  A: Record<Eq, number> & { ffm: number };
   autoDef: number;
-  exKcal: number;
   ffm: number;
   adj: number;
   metab: number;
@@ -268,13 +245,11 @@ export interface Targets {
   w: number;
 }
 
-/** The targets of day k: the base (TDEE, phase, deficit) periodized on the kind of training day. */
+/** The daily target (Norton): maintenance minus the goal's deficit, protein on lean mass, ~20-25% fat, the rest carbs. */
 export function targets(S: State, k: string, today = k): Targets {
   const P = S.nut;
   const w = curW(S, today);
-  const A = bmrAll(P, w);
-  const eq: Eq = P.eq && P.eq in A && P.eq !== 'ffm' ? (P.eq as Eq) : 'mifflin';
-  const bmr = A[eq];
+  const { bmr, ffm } = bmrOf(P, w);
   const sex = sexOf(P);
   const mf = metabF(P);
   const bmrR = Math.round(bmr * mf);
@@ -284,216 +259,31 @@ export function targets(S: State, k: string, today = k): Targets {
   const adj = useM ? 0 : nAdj(P).c;
   const tdee = useM ? ms.tdee! : Math.max(Math.round(bmrR * 1.1), est + adj);
   const ph = nPhase(S, today);
-  const dt = nutriDay(k);
-  const ffm = A.ffm;
-  const sc = clamp(tdee / est, 0.5, 1);
   const ad = autoDef(P, w);
   const def = ph.goal === 'cut' ? (ph.cut ? +(P.def ?? 0) || ad : 0) : ad;
   const goal = Math.max(Math.round((bmrR * 1.1) / 50) * 50, Math.round((tdee - def) / 50) * 50);
-  // Norton: calories come from the rate; the only limits are 1% of body weight a week and the app's absolute floor
+  // never faster than 1% of body weight a week, never under the app's absolute floor
   const wkFloor = def > 0 ? Math.ceil(Math.max(KCAL_FLOOR[sex], Math.round(tdee - (w * 0.01 * 7700) / 7)) / 50) * 50 : 0;
   const auto = Math.max(goal, wkFloor);
   const kcal = +(P.kcalT ?? 0) || auto;
   const rk = refKg(w, ffm);
   const p = +(P.protT ?? 0) || Math.round(protPL(P, ph.goal) * ffm);
-  // few fats (~20% of calories, at least 0.5 g/kg), the rest carbs
   let f = Math.max(Math.round((kcal * 0.2) / 9), Math.round(0.5 * rk));
   let c = Math.round((kcal - p * 4 - f * 9) / 4);
   if (c < 80) {
     f = Math.max(Math.round(0.5 * ffm), Math.round((kcal - p * 4 - 320) / 9));
     c = Math.max(0, Math.round((kcal - p * 4 - f * 9) / 4));
   }
-  const exKcal = Math.round(exKcalOf(k, w) * mf * sc);
-  const per = periodize({ base: { kcal, p, c, f }, dayType: dt.type, sex, weightKg: w, fatMinG: Math.round(0.5 * rk), tdee, cut: def > 0, weekMean: WEEK_MEAN, ffmKg: ffm, exerciseKcal: exKcal, weekly: true });
-  const hyd = hydration({ weightKg: w, minutes: dt.minutes, intensity: dt.intensity });
   return {
-    kcal: per.kcal, p: per.p, c: Math.max(0, per.c), f: per.f, water: +(P.waterT ?? 0) || hyd.totalMl, hyd, day: dt, per, base: { kcal, p, c, f },
-    bmr, bmrR, tdee, est, measured: useM, ms, auto, manual: !!P.kcalT, phase: ph, eq, def, A, autoDef: ad, exKcal, ffm: Math.round(ffm), adj, metab: mf,
-    wkFloor, raised: !P.kcalT && wkFloor > goal, bf: Math.round(bfOf(P, w)), goal: ph.goal, rateT: Math.round((-(P.kcalT ? 0 : def) * 7 / 7700) * 100) / 100, w,
+    kcal: Math.round(kcal / 5) * 5, p, c, f, day: nutriDay(k), bmr, bmrR, tdee, est, measured: useM, ms, auto, manual: !!P.kcalT, phase: ph, def, autoDef: ad,
+    ffm: Math.round(ffm), adj, metab: mf, wkFloor, raised: !P.kcalT && wkFloor > goal, bf: Math.round(bfOf(P, w)), goal: ph.goal, rateT: Math.round((-(P.kcalT ? 0 : def) * 7 / 7700) * 100) / 100, w,
   };
-}
-
-/** The week's average target (Mon–Sun): intense days get more, rest days less, the average stays the base. */
-export function weekTargets(S: State, today: string): { days: Array<{ k: string; kcal: number; type: DayType }>; avg: number } {
-  const m0 = weekStart(today);
-  const a = Array.from({ length: 7 }, (_, i) => {
-    const kk = addDays(m0, i);
-    const t = targets(S, kk, today);
-    return { k: kk, kcal: t.kcal, type: t.day.type };
-  });
-  return { days: a, avg: Math.round(a.reduce((s, x) => s + x.kcal, 0) / 7) };
 }
 
 /** How many of today's meals have enough protein: ~30 g, 3–5 times a day (Norton). */
 export function protMeals(S: State, k: string): { thr: number; n: number; tot: number } {
   const ml = mlogDay(S, k);
   return { thr: 30, n: ml.filter((m) => (+m.p || 0) >= 30 * 0.85).length, tot: ml.length };
-}
-
-// ---------- the meal plans ----------
-export const planKind = (k: string): 't' | 'r' => (nutriDay(k).type === 'rest' ? 'r' : 't');
-const mSwaps = (S: State): Record<string, string> => S.nut.mSwap ?? {};
-export function mfMealFoods(S: State, kind: 't' | 'r', mi: number): string[] {
-  const sw = mSwaps(S);
-  return MPLANS[kind].meals[mi][4].map(([f]) => sw[kind + mi + ':' + f] || f);
-}
-/** Foods that can replace `of` in that meal: same role; oats only together with whey. */
-export function mfSwapOpts(S: State, kind: 't' | 'r', mi: number, of: string): { now: string; locked?: string; list: string[] } {
-  const now = mSwaps(S)[kind + mi + ':' + of] || of;
-  const r = MFD[of][5];
-  const foods = mfMealFoods(S, kind, mi);
-  const whey = foods.includes('whey');
-  if (of === 'whey' && foods.includes('ovaz')) return { now, locked: 'Whey rămâne cât timp masa are ovăz (ovăzul doar cu whey).', list: [] };
-  const list = Object.keys(MFD).filter((f) => MFD[f][5] === r && MFIX[f] == null && f !== now && (f === of || !foods.includes(f)) && (f !== 'ovaz' || whey) && f !== 'dextrina');
-  return { now, list };
-}
-/** Real grams of a quantity (ml and pieces converted). */
-export const mfG = (f: string, q: number): number => {
-  const F = MFD[f];
-  return F[7] ? q * (F[8] || 1) : q;
-};
-const mfMac = (f: string, q: number): [number, number, number, number] => {
-  const F = MFD[f];
-  const g = mfG(f, q) / 100;
-  return [F[1] * g, F[2] * g, F[3] * g, F[4] * g];
-};
-const mfFib = (f: string, q: number): number => ((MFIB[f] || 0) * mfG(f, q)) / 100;
-/** Pieces and slices to whole (at least 1), egg white to 10 ml, the rest to 5 (at least 5). */
-const mfRound = (f: string, q: number): number => {
-  const u = MFD[f][7];
-  if (u === 'buc' || u === 'felie') return Math.max(1, Math.round(q));
-  if (u === 'ml' && f === 'albus') return Math.max(10, Math.round(q / 10) * 10);
-  return Math.max(5, Math.round(q / 5) * 5);
-};
-/** "250 ml", "3 buc", "1 felie", "80 g". */
-export const mfQty = (f: string, q: number): string => {
-  const u = MFD[f][7];
-  return u === 'buc' ? `${q} buc` : u === 'felie' ? `${q} ${q === 1 ? 'felie' : 'felii'}` : u === 'ml' ? `${q} ml` : `${q} g`;
-};
-
-export interface PlanItem {
-  f: string;
-  of: string;
-  sw: boolean;
-  q: number;
-  opt: boolean;
-}
-export interface PlanMealOut {
-  n: string;
-  icn: string;
-  note: string;
-  it: PlanItem[];
-  k: number;
-  p: number;
-  c: number;
-  g: number;
-  fb: number;
-}
-export interface DayPlan {
-  kind: 't' | 'r';
-  name: string;
-  meals: PlanMealOut[];
-  tot: { k: number; p: number; c: number; g: number; fb: number };
-}
-const MPC = new Map<string, DayPlan>();
-/** Day k's meal plan: each food gets its meal's share of its macro; then a few passes correct for the "hidden" macros
- *  (protein in oats, fat in eggs) so the day lands on target. */
-export function dayPlan(S: State, k: string, tg: Targets): DayPlan {
-  const kind = planKind(k);
-  const P = MPLANS[kind];
-  const SW = mSwaps(S);
-  const key = [kind, tg.kcal, tg.p, tg.c, tg.f, JSON.stringify(SW)].join('|');
-  const hit = MPC.get(key);
-  if (hit) return hit;
-  const MI = { p: 2, c: 3, f: 4 } as const;
-  const T = { p: tg.p, c: tg.c, f: tg.f };
-  type Row = { mi: number; f: string; of: string; r: 'p' | 'c' | 'f' | 'x'; q: number };
-  const rows: Row[] = [];
-  P.meals.forEach(([, , , sh, its0], mi) => {
-    const rs = { p: sh[0], c: sh[1], f: sh[2] };
-    const its = its0.map(([f, w]) => [SW[kind + mi + ':' + f] || f, w ?? 0, f] as const);
-    its.forEach(([f, w, of]) => {
-      const r = MFD[f][5];
-      if (MFIX[f] != null) {
-        rows.push({ mi, f, of, r: 'x', q: MFIX[f] });
-        return;
-      }
-      if (r === 'v' || r === 'x') return;
-      const sw = its.filter(([g]) => MFIX[g] == null && MFD[g][5] === r).reduce((a, [, v]) => a + v, 0);
-      const per = (MFD[f][MI[r]] / 100) * (MFD[f][7] ? MFD[f][8] || 1 : 1);
-      rows.push({ mi, f, of, r, q: per > 0 && sw > 0 ? (T[r] * rs[r] * w) / sw / per : 0 });
-    });
-  });
-  for (let it = 0; it < 4; it++) {
-    (['p', 'c', 'f'] as const).forEach((r) => {
-      const own = rows.filter((x) => x.r === r);
-      const oth = rows.filter((x) => x.r !== r);
-      const from = (a: Row[]): number => a.reduce((s, x) => s + mfMac(x.f, x.q)[MI[r] - 1], 0);
-      const o = from(own);
-      if (o > 0) {
-        const s = Math.max(0.2, (T[r] - from(oth)) / o);
-        own.forEach((x) => {
-          x.q *= s;
-        });
-      }
-    });
-  }
-  const meals = P.meals.map(([n, icn, note], mi) => {
-    const it = rows.filter((x) => x.mi === mi).map((x) => ({ f: x.f, of: x.of, sw: x.f !== x.of, q: x.r === 'x' ? x.q : mfRound(x.f, x.q), opt: x.f === 'legume' }));
-    const t = it.reduce((a, x) => {
-      const m = mfMac(x.f, x.q);
-      return { k: a.k + m[0], p: a.p + m[1], c: a.c + m[2], g: a.g + m[3] };
-    }, { k: 0, p: 0, c: 0, g: 0 });
-    const fb = it.reduce((a, x) => a + mfFib(x.f, x.q), 0);
-    return { n, icn, note, it, k: Math.round(t.k), p: Math.round(t.p), c: Math.round(t.c), g: Math.round(t.g), fb: Math.round(fb) };
-  });
-  const tot = meals.reduce((a, m) => ({ k: a.k + m.k, p: a.p + m.p, c: a.c + m.c, g: a.g + m.g, fb: a.fb + m.fb }), { k: 0, p: 0, c: 0, g: 0, fb: 0 });
-  const out = { kind, name: P.name, meals, tot };
-  if (MPC.size > 60) MPC.clear();
-  MPC.set(key, out);
-  return out;
-}
-
-// ---------- shopping list ----------
-export interface ShopItem {
-  f: string;
-  nm: string;
-  q: number;
-  g: number;
-  n: number;
-  on: boolean;
-}
-export function shopData(S: State, today: string, n: number): { n: number; ks: string[]; meals: number; tr: number; groups: Record<string, ShopItem[]>; order: string[]; all: number; got: number; left: number } {
-  const m0 = weekStart(today);
-  const from = n === 14 ? addDays(m0, 7) : today;
-  const to = n === 1 ? today : n === 14 ? addDays(m0, 13) : addDays(m0, 6);
-  const ks: string[] = [];
-  for (let k = from; k <= to; k = addDays(k, 1)) ks.push(k);
-  const agg: Record<string, number> = {};
-  const cnt: Record<string, number> = {};
-  let meals = 0;
-  let tr = 0;
-  ks.forEach((k) => {
-    const D = dayPlan(S, k, targets(S, k, today));
-    if (D.kind === 't') tr++;
-    D.meals.forEach((m) => {
-      meals++;
-      m.it.forEach((x) => {
-        agg[x.f] = (agg[x.f] || 0) + x.q;
-        cnt[x.f] = (cnt[x.f] || 0) + 1;
-      });
-    });
-  });
-  const groups: Record<string, ShopItem[]> = {};
-  Object.keys(agg).forEach((f) => {
-    const nm = MFD[f][0];
-    const c = MFD[f][6];
-    (groups[c] = groups[c] || []).push({ f, nm, q: agg[f], g: mfG(f, agg[f]), n: cnt[f], on: !!S.shop[nm] });
-  });
-  Object.values(groups).forEach((a) => a.sort((x, y) => Number(x.on) - Number(y.on) || y.g - x.g));
-  const order = SHOP_ORDER.filter((c) => groups[c]);
-  const items = order.flatMap((c) => groups[c]);
-  return { n, ks, meals, tr, groups, order, all: items.length, got: items.filter((x) => x.on).length, left: items.filter((x) => !x.on).reduce((a, x) => a + x.g, 0) };
 }
 
 // ---------- the weekly verdict ----------
@@ -567,7 +357,7 @@ export function tacWarn(S: State, tg: Targets): Array<[Verdict['c'], string]> {
 export function tacRules(S: State, tg: Targets, today: string): Array<[string, string, string, string]> {
   const P = S.nut;
   const g = tg.goal;
-  const W = weekTargets(S, today).avg;
+  const W = tg.kcal;
   const T = Math.abs(GOALS[g].rate * tg.w);
   const d = Math.abs(Math.round((GOALS[g].rate * tg.w * 7700) / 7 / 50) * 50);
   const pl = nf(protPL(P, g));

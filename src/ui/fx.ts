@@ -1,4 +1,4 @@
-// Show pieces: ink ripples on tap, cards revealed on scroll, numbers that count up, the hero drawing's parallax,
+// Show pieces: cards revealed on scroll, numbers that count up, the hero drawing's parallax,
 // the round slam with a gong ring, and the full-screen "day done" celebration.
 // Everything is skipped when the phone asks for reduced motion.
 
@@ -6,28 +6,6 @@ import { CLAWS } from './claws.ts';
 
 const reduced = (): boolean => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const BASE = import.meta.env.BASE_URL;
-
-/** An irregular ink blot spreading from where you tap a button. */
-export function initRipple(): void {
-  document.addEventListener(
-    'pointerdown',
-    (ev) => {
-      if (reduced()) return;
-      const el = (ev.target as HTMLElement).closest<HTMLElement>('.btn, .bk-go, .tile, .timer-row, .dc, .chip, .pl-ctrl button, .tap-big, .wk-d');
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      const s = Math.max(r.width, r.height) * 2.2;
-      const blot = document.createElement('i');
-      blot.className = 'blot';
-      blot.style.cssText = `width:${s}px;height:${s}px;left:${ev.clientX - r.left - s / 2}px;top:${ev.clientY - r.top - s / 2}px;--rot:${Math.round(Math.random() * 360)}deg`;
-      if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
-      el.style.overflow = 'hidden';
-      el.appendChild(blot);
-      window.setTimeout(() => blot.remove(), 650);
-    },
-    { passive: true },
-  );
-}
 
 let io: IntersectionObserver | null = null;
 

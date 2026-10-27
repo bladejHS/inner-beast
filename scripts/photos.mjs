@@ -39,10 +39,8 @@ for (const [i, [r, c]] of DAYS.entries()) {
 }
 console.log('splash + 7 day banners written');
 
-// The app's background: the lone wolf under the eclipse, blurred and darkened so text stays readable on it.
-await sharp(join(SRC, 'Lup singur sub luna eclipsată.png'))
-  .resize({ width: 540 })
-  .blur(7)
-  .modulate({ brightness: 0.85 })
-  .webp({ quality: 70 })
+// The app's background: the wolf in the dark red fog, kept sharp.
+await sharp('C:/Users/Andrei PC/Downloads/Lup în ceață roșie întunecată.png')
+  .resize({ width: 900 })
+  .webp({ quality: 76 })
   .toFile('public/splash/app-bg.webp');

@@ -142,7 +142,8 @@ export interface State {
   water: Record<string, number>;
   foods: FoodMine[];
   supp: { on: Record<string, boolean>; log: Record<string, string[]> };
-  shop: Record<string, boolean>;
+  /** The shopping list you write yourself. */
+  shop: Array<{ id: string; n: string; q: string; on: boolean }>;
   /** Daily base target and TDEE used, for the weekly scale correction. */
   nlog: Record<string, { k: number; t: number }>;
 }
@@ -194,7 +195,7 @@ export function freshState(today: string = dayKey()): State {
     water: {},
     foods: [],
     supp: { on: {}, log: {} },
-    shop: {},
+    shop: [],
     nlog: {},
   };
 }
@@ -227,7 +228,7 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     water: isObj(r.water) ? (r.water as Record<string, number>) : {},
     foods: Array.isArray(r.foods) ? r.foods.filter((x) => isObj(x) && typeof x.n === 'string') : [],
     supp: { on: {}, log: {}, ...(isObj(r.supp) ? r.supp : {}) },
-    shop: isObj(r.shop) ? (r.shop as Record<string, boolean>) : {},
+    shop: Array.isArray(r.shop) ? r.shop.filter((x) => isObj(x) && typeof x.n === 'string') : [],
     nlog: isObj(r.nlog) ? (r.nlog as Record<string, { k: number; t: number }>) : {},
   };
 }

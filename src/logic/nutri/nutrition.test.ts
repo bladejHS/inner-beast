@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { hydration, preWorkoutAlert } from './hydration.ts';
 import { mealFeedback, mealPrep } from './meals.ts';
 import { belowFloor, periodize, weekCarbMean, type DayType, type PeriodizeInput } from './plan.ts';
 import { tierOf } from './supplements.ts';
@@ -56,17 +55,6 @@ test('praguri sigure: 2000 kcal bărbați, 1600 femei, deficit cel mult 25%', ()
   const deep = periodize({ ...base, base: { kcal: 2100, p: 180, c: 150, f: 70 }, tdee: 3400 });
   assert.ok(deep.kcal >= 2550 - 5, String(deep.kcal));
   assert.equal(belowFloor(1500, 'f'), true); assert.equal(belowFloor(1700, 'f'), false);
-});
-
-test('hidratare: bază + pierderi, înainte/în timpul/după', () => {
-  const h = hydration({ weightKg: 80, minutes: 60, intensity: 'high' });
-  assert.equal(h.baseMl, 2800); assert.equal(h.lossMl, 1100); assert.equal(h.totalMl, 4200);
-  assert.equal(h.sodiumMg, 1000); assert.equal(h.sodiumPerHour, null);
-  assert.deepEqual(hydration({ weightKg: 80, minutes: 75, intensity: 'moderate' }).sodiumPerHour, [300, 600]);
-  assert.deepEqual(h.preMl, [400, 550]); assert.deepEqual(h.duringMlPerHour, [400, 800]); assert.equal(h.postMl, 1650);
-  assert.equal(hydration({ weightKg: 80, minutes: 0, intensity: 'low' }).totalMl, 2800);
-  assert.match(preWorkoutAlert(100, h) ?? '', /300 ml/);
-  assert.equal(preWorkoutAlert(600, h), null);
 });
 
 test('suplimente: niveluri și blocări', () => {

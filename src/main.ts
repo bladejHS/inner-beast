@@ -3,7 +3,7 @@ import { blockById, WEEK, type Block } from './data/plan.ts';
 import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
 import { dayKey, esc, uid, weekdayIdx } from './logic/util.ts';
 import { initAudio, unlock } from './ui/audio.ts';
-import { countUp, initParallax, initRipple, revealBelowFold } from './ui/fx.ts';
+import { countUp, initParallax, revealBelowFold } from './ui/fx.ts';
 import { closePlayer, closeSheet, ctx, openSheet, ask, save, sheetAct, toast, type Tab, type View } from './ui/ctx.ts';
 import { ic } from './ui/icons.ts';
 import { openBreath } from './ui/players/breath.ts';
@@ -22,7 +22,6 @@ import { isDark, saveSteps, setTheme, startBlock, toggleMark } from './ui/screen
 import { dayViewHtml, todayHtml } from './ui/screens/today.ts';
 
 initAudio(() => ctx.S.set);
-initRipple();
 initParallax();
 
 const TABS: Array<[Tab, string, string]> = [

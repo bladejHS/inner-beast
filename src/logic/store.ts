@@ -68,6 +68,10 @@ export interface State {
   sleep: Record<string, number>;
   steps: Record<string, number>;
   warrior: Record<string, 'w' | 'v'>;
+  /** Body weight in kg by day. */
+  weight: Record<string, number>;
+  /** Progress photos (the pictures themselves are in IndexedDB, see photodb.ts). */
+  photos: Array<{ id: string; date: string }>;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -107,6 +111,8 @@ export function freshState(today: string = dayKey()): State {
     sleep: {},
     steps: {},
     warrior: {},
+    weight: {},
+    photos: [],
   };
 }
 
@@ -130,6 +136,8 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     sleep: isObj(r.sleep) ? (r.sleep as Record<string, number>) : {},
     steps: isObj(r.steps) ? (r.steps as Record<string, number>) : {},
     warrior: isObj(r.warrior) ? (r.warrior as Record<string, 'w' | 'v'>) : {},
+    weight: isObj(r.weight) ? (r.weight as Record<string, number>) : {},
+    photos: Array.isArray(r.photos) ? r.photos.filter((x) => isObj(x) && typeof x.id === 'string' && typeof x.date === 'string') : [],
   };
 }
 

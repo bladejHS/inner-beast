@@ -10,6 +10,7 @@ import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { ic } from '../icons.ts';
 import { top } from './shared.ts';
+import { photosHtml, weightHtml } from './body.ts';
 
 function entryLine(e: Entry, del = false): string {
   const d = e.data as Record<string, unknown>;
@@ -108,6 +109,9 @@ export function progressHtml(): string {
       <div class="stat"><b>${Math.round(t.coldMin)}</b><span>minute la rece</span></div>
       <div class="stat"><b>${t.bestHold ? mmss(t.bestHold) : '–'}</b><span>retenție record</span></div>
     </div>
+
+    ${weightHtml()}
+    ${photosHtml()}
 
     <h2 class="sec">Calistenie<small>Totalul de repetări pe sesiune, la varianta curentă</small></h2>
     <div class="ex-line"><div><b>Pull-up EMOM</b><span>Următoarea țintă: ${S.emom.min} min × ${S.emom.reps}. Spre 30 × 10: ${emomPct}%.</span></div><div class="bar" style="margin:0"><i style="width:${Math.min(100, emomPct)}%"></i></div></div>

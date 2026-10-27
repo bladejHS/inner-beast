@@ -10,6 +10,7 @@ import { clawSvg } from '../claws.ts';
 import { art } from '../art.ts';
 import { blockCard, blockMinutes, top } from './shared.ts';
 import { weekCard } from './alex.ts';
+import { photoReminderCard } from './body.ts';
 
 function miniRing(n: number, total: number, size = 64): string {
   const r = 26;
@@ -120,6 +121,7 @@ export function todayHtml(): string {
     <h2 class="sec">De învățat</h2>
     ${weekCard(false)}
     <h2 class="sec">Zilnic</h2>
+    ${photoReminderCard()}
     ${habitCard()}
     ${sleepCard()}
     ${whyCard()}

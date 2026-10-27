@@ -43,6 +43,15 @@ const P: Record<string, string> = {
   star: '<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/>',
   download: '<path d="M12 4v11M7 10.5l5 5 5-5M4.5 19.5h15"/>',
   upload: '<path d="M12 15.5v-11M7 9.5l5-5 5 5M4.5 19.5h15"/>',
+  bowl: '<path d="M3.5 11h17a8.5 8.5 0 01-17 0z"/><path d="M8.5 20.5h7M9 7.5c0-1.5 1.5-1.5 1.5-3M13.5 7.5c0-1.5 1.5-1.5 1.5-3"/>',
+  camera: '<path d="M4 7.5h3.5l1.8-2.5h5.4l1.8 2.5H20v12H4z"/><circle cx="12" cy="13.2" r="3.6"/>',
+  mic: '<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0013 0M12 18v3"/>',
+  cart: '<path d="M3 4.5h2.5l2.2 10.5h10.8l2-7.5H6.5"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/>',
+  copy: '<rect x="8.5" y="8.5" width="11.5" height="11.5"/><path d="M15.5 8.5V4H4v11.5h4.5"/>',
+  refresh: '<path d="M19.5 12a7.5 7.5 0 11-2.2-5.3M19.5 4v4h-4"/>',
+  pill: '<rect x="3.6" y="8.6" width="16.8" height="6.8" rx="3.4" transform="rotate(-40 12 12)"/><path d="M9.5 9l5 5" transform="rotate(5 12 12)"/>',
+  info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.5v.5"/>',
+  alert: '<path d="M12 3.5l9 16H3z"/><path d="M12 10v4.5M12 17v.5"/>',
 };
 
 export function ic(name: string, label?: string): string {

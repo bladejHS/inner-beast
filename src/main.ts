@@ -17,6 +17,7 @@ import { planHtml } from './ui/screens/plan.ts';
 import { historyHtml, progressHtml } from './ui/screens/progress.ts';
 import { settingsHtml } from './ui/screens/settings.ts';
 import { bodyAct, bodyChange, bodyInput, hydratePhotos } from './ui/screens/body.ts';
+import { nuAct, nuChange, nuInput, nutriStartup, nutritionHtml } from './ui/screens/nutrition.ts';
 import { isDark, saveSteps, setTheme, startBlock, toggleMark } from './ui/screens/shared.ts';
 import { dayViewHtml, todayHtml } from './ui/screens/today.ts';
 
@@ -30,6 +31,7 @@ const TABS: Array<[Tab, string, string]> = [
   ['fight', 'Lupte', 'fight'],
   ['alex', 'Alex', 'mask'],
   ['mind', 'Minte', 'mind'],
+  ['nutri', 'Nutriție', 'bowl'],
   ['progress', 'Progres', 'progress'],
 ];
 
@@ -53,6 +55,8 @@ function screenHtml(): string {
       return alexHtml();
     case 'mind':
       return mindHtml();
+    case 'nutri':
+      return nutritionHtml();
     case 'progress':
       return progressHtml();
     default:
@@ -177,7 +181,8 @@ function habitSheet(fresh: boolean): void {
 }
 
 function exportData(): void {
-  const blob = new Blob([JSON.stringify(ctx.S, null, 1)], { type: 'application/json' });
+  // the AI key stays on this phone: never in a file that gets shared
+  const blob = new Blob([JSON.stringify({ ...ctx.S, nut: { ...ctx.S.nut, aiKey: undefined } }, null, 1)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `inner-beast-${dayKey()}.json`;
@@ -194,6 +199,7 @@ function importData(input: HTMLInputElement): void {
     .then((txt) => {
       const st = normalize(JSON.parse(txt));
       ask('Înlocuiești datele?', `Copia are ${st.log.length} înregistrări. Ce e acum pe telefon se înlocuiește.`, 'Înlocuiește', () => {
+        if (!st.nut.aiKey && ctx.S.nut.aiKey) st.nut.aiKey = ctx.S.nut.aiKey;
         ctx.S = st;
         save();
         render();
@@ -361,6 +367,7 @@ function act(a: string, el: HTMLElement): void {
 function onChange(el: HTMLElement): void {
   const a = el.dataset.a || '';
   if (a.startsWith('body:')) return bodyChange(a, el, render);
+  if (a.startsWith('nu:')) return nuChange(a, el, render);
   if (a.startsWith('p:')) return ctx.player?.act(a, el);
   const S = ctx.S;
   if (a === 'set-bool') {
@@ -383,6 +390,7 @@ function onChange(el: HTMLElement): void {
 function onInput(el: HTMLElement): void {
   const a = el.dataset.a || '';
   if (a.startsWith('body:')) return bodyInput(a, el);
+  if (a.startsWith('nu:')) return nuInput(a, el);
   if (a.startsWith('p:')) return ctx.player?.input?.(el);
   if (a === 'why') {
     const k = el.dataset.k as 'victim' | 'winner' | 'drive';
@@ -413,6 +421,7 @@ document.addEventListener('click', (ev) => {
     return;
   }
   if (a.startsWith('body:')) return bodyAct(a, el, render);
+  if (a.startsWith('nu:')) return nuAct(a, el, render);
   const hadPlayer = !!ctx.player;
   act(a, el);
   if (!hadPlayer && ctx.player) {
@@ -484,6 +493,7 @@ window.addEventListener('popstate', () => {
   if (views.length) popView();
 });
 
+nutriStartup();
 render();
 enter();
 

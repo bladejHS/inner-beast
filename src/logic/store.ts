@@ -56,6 +56,69 @@ export interface Settings {
   whSafety: boolean;
 }
 
+/** A logged meal: name, kcal, protein, carbs, fat (g); pl = which plan meal it was ("t2"). */
+export interface MealLog {
+  n: string;
+  k: number;
+  p: number;
+  c: number;
+  g: number;
+  pl?: string;
+}
+
+/** The weekly correction from the scale (see nutri/engine.ts). */
+export interface NAdj {
+  c: number;
+  d?: string;
+  r?: number;
+  pred?: number;
+  step?: number;
+  n?: number;
+  h?: number[];
+  w0?: number;
+  w1?: number;
+  eat?: number | null;
+}
+
+/** Nutrition profile and settings. Optional fields: unset = automatic. */
+export interface NutProfile {
+  /** Day the medical disclaimer was accepted. */
+  ok?: string;
+  sex: 'm' | 'f';
+  age: number;
+  h: number;
+  startW: number;
+  goalW: number;
+  act: number;
+  eq?: string;
+  metab?: number;
+  bf?: number;
+  def?: number;
+  kcalT?: number;
+  protT?: number;
+  waterT?: number;
+  goalMode?: 'cut' | 'recomp' | 'bulk';
+  dietBreak?: boolean;
+  dbStart?: string;
+  useMeasured?: boolean;
+  nAdj?: NAdj;
+  mSwap?: Record<string, string>;
+  /** Anthropic API key for the AI meal estimates; stays on this phone, left out of backups. */
+  aiKey?: string;
+  aiWk?: { d: string; text: string };
+}
+
+export interface FoodMine {
+  n: string;
+  brand?: string;
+  k: number;
+  p: number;
+  c: number;
+  g: number;
+  por?: number | null;
+  code?: string;
+}
+
 export interface State {
   v: 1;
   set: Settings;
@@ -72,7 +135,19 @@ export interface State {
   weight: Record<string, number>;
   /** Progress photos (the pictures themselves are in IndexedDB, see photodb.ts). */
   photos: Array<{ id: string; date: string }>;
+  /** Waist in cm by day (for the recomposition verdict). */
+  waist: Record<string, number>;
+  nut: NutProfile;
+  mlog: Record<string, MealLog[]>;
+  water: Record<string, number>;
+  foods: FoodMine[];
+  supp: { on: Record<string, boolean>; log: Record<string, string[]> };
+  shop: Record<string, boolean>;
+  /** Daily base target and TDEE used, for the weekly scale correction. */
+  nlog: Record<string, { k: number; t: number }>;
 }
+
+export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 180, startW: 80, goalW: 75, act: 1.55 };
 
 export const DEFAULT_SETTINGS: Settings = {
   sound: true,
@@ -113,6 +188,14 @@ export function freshState(today: string = dayKey()): State {
     warrior: {},
     weight: {},
     photos: [],
+    waist: {},
+    nut: { ...DEFAULT_NUT },
+    mlog: {},
+    water: {},
+    foods: [],
+    supp: { on: {}, log: {} },
+    shop: {},
+    nlog: {},
   };
 }
 
@@ -138,6 +221,14 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     warrior: isObj(r.warrior) ? (r.warrior as Record<string, 'w' | 'v'>) : {},
     weight: isObj(r.weight) ? (r.weight as Record<string, number>) : {},
     photos: Array.isArray(r.photos) ? r.photos.filter((x) => isObj(x) && typeof x.id === 'string' && typeof x.date === 'string') : [],
+    waist: isObj(r.waist) ? (r.waist as Record<string, number>) : {},
+    nut: { ...DEFAULT_NUT, ...(isObj(r.nut) ? r.nut : {}) } as NutProfile,
+    mlog: isObj(r.mlog) ? (r.mlog as Record<string, MealLog[]>) : {},
+    water: isObj(r.water) ? (r.water as Record<string, number>) : {},
+    foods: Array.isArray(r.foods) ? r.foods.filter((x) => isObj(x) && typeof x.n === 'string') : [],
+    supp: { on: {}, log: {}, ...(isObj(r.supp) ? r.supp : {}) },
+    shop: isObj(r.shop) ? (r.shop as Record<string, boolean>) : {},
+    nlog: isObj(r.nlog) ? (r.nlog as Record<string, { k: number; t: number }>) : {},
   };
 }
 

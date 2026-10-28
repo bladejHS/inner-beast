@@ -1,12 +1,10 @@
 // The splash picture, the title lettering and the day banners, from the PNGs on the Desktop: node scripts/photos.mjs [srcDir]
 // The banners come cut out of one 2 × 4 sheet (thin grey lines between the panels).
 import sharp from 'sharp';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const SRC = process.argv[2] || 'C:/Users/Andrei PC/Desktop';
-const BG = 'Lupul spectral și călătorul solitar.png';
-const TITLE = 'Dezlănțuie fiara interioară.png';
 const SHEET = 'Dezlănțuie fiara interioară (1).png';
 
 // Panel edges on the sheet, measured from the separator lines; 3 px kept off each edge.
@@ -26,8 +24,10 @@ const DAYS = [
 mkdirSync('public/splash', { recursive: true });
 mkdirSync('public/days', { recursive: true });
 
-await sharp(join(SRC, BG)).resize({ width: 900 }).webp({ quality: 74 }).toFile('public/splash/bg.webp');
-await sharp(join(SRC, TITLE)).resize({ width: 1100 }).webp({ quality: 86, alphaQuality: 90 }).toFile('public/splash/title.webp');
+// the app wallpaper (three crimson claws) and the splash emblem (the metal wolf)
+await sharp(join(SRC, 'Fundal întunecat cu zgârieturi roșii.png')).resize({ width: 1000 }).webp({ quality: 80 }).toFile('public/splash/bg-claws.webp');
+const EMBLEM = readdirSync(SRC).find((f) => f.startsWith('03cOMVLNqlRo6FOaFVCXo5UBf7wrFHUf'));
+if (EMBLEM) await sharp(join(SRC, EMBLEM)).resize({ width: 640 }).webp({ quality: 86 }).toFile('public/splash/emblem.webp');
 
 for (const [i, [r, c]] of DAYS.entries()) {
   const [x0, x1] = COLS[c];

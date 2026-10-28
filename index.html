@@ -16,8 +16,7 @@
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preload" href="splash/bg.webp" as="image" type="image/webp">
-<link rel="preload" href="splash/title.webp" as="image" type="image/webp">
+<link rel="preload" href="splash/emblem.webp" as="image" type="image/webp">
 <link rel="preload" href="fonts/league-spartan-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script>
 // Theme before the first paint: the saved choice, otherwise the phone's setting.
@@ -34,42 +33,68 @@
 @font-face{font-family:'Montserrat';font-style:normal;font-display:swap;font-weight:100 900;src:url(fonts/montserrat-latin-ext-wght-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 html{--sp-bg:#f3f1ec;--sp-fg:#0d0d0d}html[data-theme=dark]{--sp-bg:#090a0c;--sp-fg:#efece6}
 html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
-/* Opening: the wolf over the wanderer comes out of the dark, the lettering is torn in, hits, and a light runs through it. */
-#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#000;color:#efece6;transition:clip-path .6s cubic-bezier(.7,0,.2,1),opacity .6s;clip-path:inset(0 0 0 0)}
-#splash.sp-out{clip-path:inset(0 0 100% 0);pointer-events:none}
-.sp-stage{position:absolute;inset:0}
-.sp-bg{position:absolute;inset:-3%;background:#000 url(splash/bg.webp) 50% 30%/cover no-repeat;opacity:0;transform:scale(1.18);filter:brightness(.4) contrast(1.15)}
-.sp-go .sp-bg{animation:sp-bg 4.6s cubic-bezier(.2,.7,.2,1) forwards}
-.sp-shade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.35),transparent 30%,transparent 50%,rgba(0,0,0,.85) 82%,#000)}
-.sp-go .sp-stage{animation:sp-hit .34s linear 1.55s 1}
-.sp-logo{position:absolute;left:50%;bottom:calc(17vh + env(safe-area-inset-bottom));width:min(94vw,560px);aspect-ratio:1100/367;margin:0;transform:translateX(-50%)}
-.sp-logo img{display:block;width:100%;height:100%;opacity:0;clip-path:inset(0 100% 0 0);transform:scale(1.25) rotate(-4deg);filter:blur(10px) drop-shadow(0 0 0 rgba(255,255,255,0))}
-.sp-go .sp-logo img{animation:sp-tear .55s cubic-bezier(.7,0,.25,1) 1s forwards,sp-glow 2.4s ease-in-out 2.6s infinite alternate}
-.sp-logo::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.95) 50%,transparent 62%) 0 0/300% 100% no-repeat;background-position:100% 0;-webkit-mask:url(splash/title.webp) center/100% 100% no-repeat;mask:url(splash/title.webp) center/100% 100% no-repeat;opacity:0;mix-blend-mode:screen}
-.sp-go .sp-logo::after{animation:sp-sheen .9s ease-in-out 1.9s forwards}
-.sp-brand{position:absolute;left:0;right:0;bottom:calc(13vh + env(safe-area-inset-bottom));margin:0;text-align:center;font:900 12px/1 'League Spartan',sans-serif;letter-spacing:.55em;color:#efece6;opacity:0;text-transform:uppercase}
-.sp-go .sp-brand{animation:sp-fade .4s ease 2.5s forwards}
-.sp-sub{position:absolute;left:clamp(22px,6vw,48px);right:clamp(22px,6vw,48px);bottom:calc(5vh + env(safe-area-inset-bottom));max-width:34ch;margin:0 auto;text-align:center;font:600 13px/1.45 Montserrat,system-ui,sans-serif;color:#efece6;opacity:0}
-.sp-go .sp-sub{animation:sp-fade-sub .6s ease 2.7s forwards}
-@keyframes sp-bg{0%{opacity:0;transform:scale(1.18);filter:brightness(.4) contrast(1.15)}35%{opacity:1}100%{opacity:1;transform:scale(1.02);filter:brightness(.95) contrast(1.05)}}
-@keyframes sp-tear{0%{opacity:0;clip-path:inset(0 100% 0 0);transform:scale(1.25) rotate(-4deg);filter:blur(10px)}55%{opacity:1;clip-path:inset(0 0 0 0);filter:blur(2px)}80%{transform:scale(.97) rotate(.5deg)}100%{opacity:1;clip-path:inset(0 0 0 0);transform:none;filter:blur(0) drop-shadow(0 0 0 rgba(255,255,255,0))}}
-@keyframes sp-glow{from{filter:drop-shadow(0 0 0 rgba(255,255,255,0))}to{filter:drop-shadow(0 0 14px rgba(255,255,255,.35))}}
+/* Opening, ~2 s: darkness and a hairline crack, the metal wolf assembles and its eyes ignite, three claws strike behind it
+   with a shockwave, a silver light sweeps the face, INNER BEAST appears, the eyes pulse once and the screen hands over to the app. */
+#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#050505;color:#efede8;transition:opacity .35s ease;display:grid;place-items:center}
+#splash.sp-out{opacity:0;pointer-events:none}
+.sp-stage{position:relative;width:min(78vw,380px);aspect-ratio:1;margin-top:-12vh}
+.sp-crack{position:absolute;left:50%;top:50%;width:2px;height:46%;margin:-23% 0 0 -1px;background:linear-gradient(transparent,#c10f25 30%,#ff3b4a 50%,#c10f25 70%,transparent);box-shadow:0 0 12px #c10f25,0 0 30px #750010;transform:scaleY(0);opacity:0}
+.sp-go .sp-crack{animation:sp-crack .5s cubic-bezier(.6,0,.2,1) both}
+.sp-glow{position:absolute;inset:-30%;background:radial-gradient(closest-side,rgba(193,15,37,.55),rgba(117,0,16,.25) 45%,transparent 72%);opacity:0;transform:scale(.4)}
+.sp-go .sp-glow{animation:sp-glow 1.9s ease-out .22s both}
+.sp-claws{position:absolute;inset:-18%;opacity:.95}
+.sp-claws i{position:absolute;left:8%;width:84%;height:7px;border-radius:50%;background:linear-gradient(90deg,transparent,#750010 12%,#ff3b4a 50%,#750010 88%,transparent);box-shadow:0 0 14px #c10f25,0 0 34px rgba(193,15,37,.6);transform-origin:0 50%;transform:rotate(-38deg) scaleX(0)}
+.sp-claws i:nth-child(1){top:36%}.sp-claws i:nth-child(2){top:50%}.sp-claws i:nth-child(3){top:64%}
+.sp-go .sp-claws i{animation:sp-slash .22s cubic-bezier(.8,0,.2,1) forwards,sp-cool .5s ease 1.3s forwards}
+.sp-go .sp-claws i:nth-child(1){animation-delay:.66s,1.3s}.sp-go .sp-claws i:nth-child(2){animation-delay:.73s,1.36s}.sp-go .sp-claws i:nth-child(3){animation-delay:.8s,1.42s}
+.sp-wave{position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:2px solid rgba(255,59,74,.75);opacity:0}
+.sp-go .sp-wave{animation:sp-wave .7s ease-out .86s both}
+.sp-emb{position:absolute;inset:0;opacity:0;transform:scale(1.7);filter:blur(14px) brightness(0)}
+.sp-emb img{display:block;width:100%;height:100%;-webkit-mask:radial-gradient(closest-side,#000 70%,transparent 99%);mask:radial-gradient(closest-side,#000 70%,transparent 99%)}
+.sp-go .sp-emb{animation:sp-emb .42s cubic-bezier(.2,.9,.25,1) .25s forwards,sp-lock .26s linear .9s}
+.sp-sheen{position:absolute;inset:0;pointer-events:none;-webkit-mask:url(splash/emblem.webp) center/100% 100%;mask:url(splash/emblem.webp) center/100% 100%;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.75) 50%,transparent 60%) 0 0/300% 100% no-repeat;background-position:100% 0;mix-blend-mode:screen;opacity:0}
+.sp-go .sp-sheen{animation:sp-sheen .45s ease-in-out 1.1s}
+.sp-eye{position:absolute;top:47.5%;width:11%;aspect-ratio:1.6;margin:-3% 0 0 -5.5%;border-radius:50%;background:radial-gradient(closest-side,#fff 0,#ff4a55 35%,rgba(193,15,37,.6) 60%,transparent);opacity:0;mix-blend-mode:screen}
+.sp-eye.l{left:41.5%}.sp-eye.r{left:58.5%}
+.sp-go .sp-eye{animation:sp-eye .5s ease-out .58s both,sp-pulse .45s ease-in-out 1.6s}
+.sp-shake{position:absolute;inset:0}
+.sp-go .sp-shake{animation:sp-hit .22s linear .62s}
+.sp-title{position:absolute;left:0;right:0;top:calc(50% + min(39vw,190px) - 12vh + 26px);margin:0;text-align:center;font:900 clamp(34px,10.5vw,56px)/1 'League Spartan','Arial Black',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#efede8;opacity:0;transform:translateY(8px);text-shadow:0 0 22px rgba(193,15,37,.35)}
+.sp-title span{color:#c52d38}
+.sp-go .sp-title{animation:sp-title .35s cubic-bezier(.2,.8,.2,1) 1.15s forwards}
+.sp-line{position:absolute;left:50%;top:calc(50% + min(39vw,190px) - 12vh + 86px);width:min(56vw,260px);height:2px;margin-left:min(-28vw,-130px);background:linear-gradient(90deg,transparent,#c10f25,transparent);transform:scaleX(0);opacity:0}
+.sp-go .sp-line{animation:sp-line 1s ease 1.25s forwards}
+@keyframes sp-crack{0%{opacity:0;transform:scaleY(0)}40%{opacity:1}70%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1.2)}}
+@keyframes sp-glow{0%{opacity:0;transform:scale(.4)}25%{opacity:1;transform:scale(1)}70%{opacity:.55}100%{opacity:.25;transform:scale(.9)}}
+@keyframes sp-emb{0%{opacity:0;transform:scale(1.7);filter:blur(14px) brightness(0)}60%{opacity:1;filter:blur(3px) brightness(1.6)}100%{opacity:1;transform:scale(1);filter:none}}
+@keyframes sp-lock{0%,100%{transform:scale(1)}30%{transform:scale(.965)}60%{transform:scale(1.01)}}
+@keyframes sp-hit{0%,100%{transform:none}20%{transform:translate(-6px,3px)}45%{transform:translate(5px,-3px)}70%{transform:translate(-2px,1px)}}
+@keyframes sp-eye{0%{opacity:0;transform:scale(.3)}35%{opacity:1;transform:scale(1.9)}100%{opacity:.85;transform:scale(1)}}
+@keyframes sp-pulse{50%{opacity:1;transform:scale(1.5)}}
+@keyframes sp-slash{to{transform:rotate(-38deg) scaleX(1)}}
+@keyframes sp-cool{to{opacity:.18;filter:saturate(.6)}}
+@keyframes sp-wave{0%{opacity:.9;transform:scale(.4)}100%{opacity:0;transform:scale(11)}}
 @keyframes sp-sheen{0%{opacity:1;background-position:100% 0}100%{opacity:1;background-position:0 0}}
-@keyframes sp-fade-sub{to{opacity:.75}}
-@keyframes sp-hit{0%,100%{transform:none}15%{transform:translate(-7px,4px) scale(1.012)}35%{transform:translate(6px,-4px)}55%{transform:translate(-4px,2px)}75%{transform:translate(2px,-1px)}}
-@keyframes sp-fade{to{opacity:.8}}
-@media (prefers-reduced-motion:reduce){.sp-go *,.sp-go .sp-logo::after{animation:none!important}.sp-bg{opacity:1;transform:none;filter:none}.sp-logo img{opacity:1;clip-path:none;transform:none;filter:none}.sp-brand,.sp-sub{opacity:.8}}
+@keyframes sp-title{to{opacity:1;transform:none}}
+@keyframes sp-line{0%{opacity:0;transform:scaleX(0)}40%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(.02)}}
+@media (prefers-reduced-motion:reduce){.sp-go *{animation:none!important}.sp-emb,.sp-title{opacity:1;transform:none;filter:none}.sp-eye{opacity:.85}.sp-claws i{transform:rotate(-38deg) scaleX(1);opacity:.18}}
 </style>
 </head>
 <body>
 <div id="splash" aria-hidden="true">
   <div class="sp-stage">
-    <div class="sp-bg"></div>
-    <div class="sp-shade"></div>
-    <h1 class="sp-logo"><img src="splash/title.webp" alt="Unleash your inner beast" width="1100" height="367" decoding="async"></h1>
+    <div class="sp-glow"></div>
+    <div class="sp-claws"><i></i><i></i><i></i></div>
+    <div class="sp-wave"></div>
+    <div class="sp-crack"></div>
+    <div class="sp-shake">
+      <div class="sp-emb"><img src="splash/emblem.webp" alt="" width="640" height="640" decoding="async"></div>
+      <div class="sp-sheen"></div>
+      <i class="sp-eye l"></i><i class="sp-eye r"></i>
+    </div>
   </div>
-  <p class="sp-brand">Inner Beast</p>
-  <p class="sp-sub">Tot ce-ți trebuie ca să ajungi în cea mai bună formă a vieții tale, mental și fizic.</p>
+  <p class="sp-title">Inner <span>Beast</span></p>
+  <i class="sp-line"></i>
 </div>
 <div id="app"></div>
 <div id="ov"></div>
@@ -80,28 +105,25 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
   var sp = document.getElementById('splash');
   if (!sp) return;
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var started = false, done = false, left = 2;
+  var started = false, done = false;
   function end() {
     if (done) return;
     done = true;
     sp.classList.add('sp-out');
-    setTimeout(function () { sp.remove(); }, 650);
+    setTimeout(function () { sp.remove(); }, 400);
   }
   function go() {
     if (started) return;
     started = true;
     sp.classList.add('sp-go');
-    setTimeout(end, reduce ? 1400 : 4300);
+    setTimeout(end, reduce ? 900 : 2050);
   }
-  // start once the picture and the lettering are in, but never hold the app hostage to a slow image
-  function ready() { if (--left <= 0) go(); }
-  ['splash/bg.webp', 'splash/title.webp'].forEach(function (src) {
-    var im = new Image();
-    im.onload = im.onerror = ready;
-    im.src = src;
-  });
+  // start once the emblem is in, but never hold the app hostage to a slow image
+  var im = new Image();
+  im.onload = im.onerror = go;
+  im.src = 'splash/emblem.webp';
   sp.addEventListener('click', end);
-  setTimeout(go, 1200);
+  setTimeout(go, 700);
 })();
 </script>
 <script type="module" src="/src/main.ts"></script>

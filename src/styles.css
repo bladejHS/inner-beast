@@ -969,10 +969,9 @@ input:focus, textarea:focus { outline: none; border-color: var(--ink); }
   --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 10px 30px -18px rgba(0, 0, 0, .8);
 }
 
-/* background: the claws wallpaper (scripts/photos.mjs); the wolf picture stays only in the Today hero */
+/* background: carbon with a whisper of texture; the dramatic picture only in the Today hero */
 html { background: var(--paper); }
-/* the wallpaper: three crimson claws in near-black stone, center kept clean for the cards */
-html::before { background: #050505 url(/splash/bg-claws.webp) 50% 0 / cover no-repeat; inset: 0; }
+html::before { background: radial-gradient(120% 60% at 50% -10%, #15171b 0%, transparent 60%), var(--paper); inset: 0; }
 body::before { opacity: .22; }
 ::selection { background: var(--red); color: #fff; }
 :focus-visible { outline: 2px solid var(--red-2); outline-offset: 3px; border-radius: 6px; }

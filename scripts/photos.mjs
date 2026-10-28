@@ -24,8 +24,7 @@ const DAYS = [
 mkdirSync('public/splash', { recursive: true });
 mkdirSync('public/days', { recursive: true });
 
-// the app wallpaper (three crimson claws) and the splash emblem (the metal wolf)
-await sharp(join(SRC, 'Fundal întunecat cu zgârieturi roșii.png')).resize({ width: 1000 }).webp({ quality: 80 }).toFile('public/splash/bg-claws.webp');
+// the splash emblem (the metal wolf)
 const EMBLEM = readdirSync(SRC).find((f) => f.startsWith('03cOMVLNqlRo6FOaFVCXo5UBf7wrFHUf'));
 if (EMBLEM) await sharp(join(SRC, EMBLEM)).resize({ width: 640 }).webp({ quality: 86 }).toFile('public/splash/emblem.webp');
 

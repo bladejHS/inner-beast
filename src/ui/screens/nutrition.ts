@@ -1,8 +1,7 @@
 // "Nutriție": nutrition moved over from zece-app, Layne Norton's method only. Today (targets, supplements, logging by
-// AI photo / text / food table / by hand), the goal and its tactics, the shopping list you write, the TDEE and
-// the food table. Logic in src/logic/nutri, data in src/data/nutrition.ts.
+// AI photo / text / by hand), the goal and its tactics, the TDEE. Logic in src/logic/nutri, data in src/data/nutrition.ts.
 
-import { ACTIVITY, DISCLAIMER, FCATS, FOODS, GOALS, METAB, TAC_SRC, type Goal } from '../../data/nutrition.ts';
+import { ACTIVITY, DISCLAIMER, GOALS, METAB, TAC_SRC, type Goal } from '../../data/nutrition.ts';
 import { aiErrText, estimatePhoto, estimateText, photoB64, weekReview, type MealEstimate } from '../../logic/nutri/ai.ts';
 import {
   autoDef, curW, dayTotals, dietBreakPlan, fuelPlan, mlogDay, nAdaptRun, nAdj, protAgeF, protMeals, protPL, tacRules, tacStatus, tacWarn, targets, wWeeks, type Targets,
@@ -11,33 +10,19 @@ import { KCAL_FLOOR } from '../../logic/nutri/floor.ts';
 import { mealFeedback } from '../../logic/nutri/meals.ts';
 import { BLOCKED, SUPPLEMENTS, USELESS } from '../../logic/nutri/supplements.ts';
 import type { MealLog, NutProfile } from '../../logic/store.ts';
-import { addDays, clamp, dayKey, esc, RO_DAYS, shortDay, uid, weekStart, weekdayIdx } from '../../logic/util.ts';
+import { addDays, clamp, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { buzz } from '../audio.ts';
 import { bars } from '../charts.ts';
 import { ask, ctx, save, toast } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { top } from './shared.ts';
 
-type NTab = 'azi' | 'tac' | 'shop' | 'nec' | 'tools';
-const TABS: Array<[NTab, string]> = [['azi', 'Azi'], ['tac', 'Tactică'], ['shop', 'Listă'], ['nec', 'Necesar'], ['tools', 'Alimente']];
+type NTab = 'azi' | 'tac' | 'nec';
+const TABS: Array<[NTab, string]> = [['azi', 'Azi'], ['tac', 'Tactică'], ['nec', 'Necesar']];
 let NT: NTab = 'azi';
 const SC: { img: string | null; data: string | null; hint: string; busy: boolean; res: MealEstimate | null; err: string | null } = { img: null, data: null, hint: '', busy: false, res: null, err: null };
 const QI: { text: string; busy: boolean; res: MealEstimate | null; err: string | null; rec: { stop(): void } | null } = { text: '', busy: false, res: null, err: null, rec: null };
-const FD: { q: string; cat: string; sel: FoodSel | null; g: string; bc: string; busy: boolean; err: string | null } = { q: '', cat: '', sel: null, g: '', bc: '', busy: false, err: null };
 const AIW = { busy: false, err: '' };
-
-interface FoodSel {
-  n: string;
-  k: number;
-  p: number;
-  c: number;
-  g: number;
-  por: number | null;
-  pl: string;
-  mine?: boolean;
-  brand?: string;
-  src?: string;
-}
 
 const nf = (v: number, d = 1): string => (Math.round(v * 10 ** d) / 10 ** d).toFixed(d).replace('.', ',');
 const S = (): typeof ctx.S => ctx.S;
@@ -87,7 +72,7 @@ const numIn = (id: string, label: string, val: string | number, ph = '', step = 
 export function nutritionHtml(): string {
   const head = `${top()}<h1 class="stack mid">Nutriție</h1>`;
   if (!P().ok) return head + gateHtml();
-  const body = NT === 'tac' ? tacHtml() : NT === 'shop' ? shopHtml() : NT === 'nec' ? needHtml() : NT === 'tools' ? toolsHtml() : todayHtml();
+  const body = NT === 'tac' ? tacHtml() : NT === 'nec' ? needHtml() : todayHtml();
   return `${head}<nav class="nseg" aria-label="Nutriție">${TABS.map(([k, l]) => `<button class="chip" aria-pressed="${NT === k}" data-a="nu:tab" data-k="${k}">${l}</button>`).join('')}</nav>${body}`;
 }
 
@@ -142,7 +127,6 @@ function todayHtml(): string {
   ${suppCard()}
   ${quickCard()}
   ${scanCard()}
-  <button class="card nlink" data-a="nu:tab" data-k="tools"><span class="nlink-i">${ic('bowl')}</span><span class="row-l"><b>Caută un aliment</b><span class="small dim">${FOODS.length} alimente la gram, cod de bare${S().foods.length ? ` și ${S().foods.length} ale tale` : ''}</span></span>${ic('chev')}</button>
   <section class="card"><h3>Adaugă manual</h3>
     ${topF.length ? `<div class="chips" style="margin-bottom:10px">${topF.map((f) => `<button class="chip" data-a="nu:again" data-k="${esc(f.n)}">+ ${esc(f.n)}</button>`).join('')}</div>` : ''}
     <div class="nform"><label class="nfld full"><span>Ce ai mâncat</span><input id="mN" type="text" placeholder="ex: omletă cu 4 ouă"></label>
@@ -245,22 +229,6 @@ function tacHtml(): string {
       <p class="small dim">Ritmul, pragurile, pauzele de dietă și corecția din cântar le aplică singură aplicația.</p></section>`;
 }
 
-// ---------- Listă: the shopping list you write ----------
-function shopHtml(): string {
-  const L = S().shop;
-  const left = L.filter((x) => !x.on);
-  const got = L.filter((x) => x.on);
-  const row = (x: (typeof L)[number]): string => `<li class="sl-li"><button class="sl-r ${x.on ? 'on' : ''}" data-a="nu:stk" data-k="${x.id}" aria-pressed="${x.on}"><span class="tick ${x.on ? 'on' : ''}">${ic('check')}</span><span class="row-l"><b>${esc(x.n)}</b></span>${x.q ? `<b class="sl-q">${esc(x.q)}</b>` : ''}</button><button class="icon-btn" data-a="nu:sdel" data-k="${x.id}" aria-label="Șterge">${ic('trash')}</button></li>`;
-  return `<section class="card"><h3>${ic('cart')} Lista de cumpărături</h3>
-    <div class="nform"><label class="nfld full"><span>Aliment</span><input id="slN" type="text" placeholder="ex: piept de pui" autocomplete="off"></label>
-      <label class="nfld full"><span>Cantitate (opțional)</span><input id="slQ" type="text" placeholder="ex: 1 kg, 2 cutii"></label></div>
-    <button class="btn" style="margin-top:10px" data-a="nu:sadd">${ic('plus')} Adaugă în listă</button>
-    ${L.length ? `<p class="small dim" style="margin:12px 0 0">${left.length} de luat${got.length ? `, ${got.length} luate` : ''}</p>` : ''}</section>
-    ${left.length ? `<section class="card"><ul class="sl-ul">${left.map(row).join('')}</ul></section>` : L.length ? '' : '<p class="dim">Lista e goală. Scrie ce ai de cumpărat.</p>'}
-    ${got.length ? `<section class="card sl-cat done"><h3>Luate</h3><ul class="sl-ul">${got.map(row).join('')}</ul><button class="btn ghost sm" data-a="nu:sclear">${ic('trash')} Șterge ce ai luat</button></section>` : ''}
-    ${left.length ? `<button class="btn ghost" data-a="nu:scopy">${ic('copy')} Copiază lista</button>` : ''}`;
-}
-
 // ---------- Necesar ----------
 function needHtml(): string {
   const k = dayKey();
@@ -309,98 +277,9 @@ function needHtml(): string {
 }
 const mbarCount = (l: string, v: number, t: number): string => `<div class="mbar"><div class="row"><span>${l}</span><span class="dim">${v}/${t}</span></div><div class="bar"><i style="width:${(clamp(v / t, 0, 1) * 100).toFixed(0)}%"></i></div></div>`;
 
-// ---------- Alimente: the food table and barcodes ----------
-const fnorm = (s: string): string => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-type Row = [string, number, number, number, number, string, number, string, string];
-const foodAll = (): Row[] => [...S().foods.map((f): Row => [f.n, f.k, f.p, f.c, f.g, 'm', f.por || 100, f.por ? 'o porție' : '100 g', f.brand || '']), ...FOODS.map((f): Row => [...f, ''])];
-function foodListHtml(): string {
-  const q = fnorm(FD.q).trim();
-  const ws = q.split(/\s+/).filter(Boolean);
-  const L = foodAll().filter((f) => (!FD.cat || f[5] === FD.cat) && ws.every((w) => fnorm(`${f[0]} ${f[8]}`).includes(w))).slice(0, q || FD.cat ? 40 : 12);
-  if (!L.length) return `<p class="dim">Nimic găsit${FD.q ? ` pentru „${esc(FD.q)}”` : ''}. Încearcă alt cuvânt sau adaugă alimentul tău, de pe etichetă.</p>`;
-  return L.map((f) => `<button class="fd-r ${FD.sel?.n === f[0] ? 'on' : ''}" data-a="nu:fdpick" data-k="${esc(f[0])}"><span><b>${esc(f[0])}</b><span class="small dim">${f[8] ? `${esc(f[8])} · ` : ''}${Math.round(f[1])} kcal · P ${nf(f[2])} · C ${nf(f[3])} · G ${nf(f[4])} la 100 g</span></span>${ic('plus')}</button>`).join('');
-}
-function foodMacros(): string {
-  const f = FD.sel!;
-  const g = parseFloat(FD.g.replace(',', '.'));
-  const ok = g > 0 && g <= 3000;
-  const x = (v: number): number => (ok ? (v * g) / 100 : 0);
-  return `<div class="kpis k4">${kpi('kcal', ok ? String(Math.round(x(f.k))) : '—')}${kpi('Proteină', ok ? `${nf(x(f.p))} g` : '—')}${kpi('Carbo', ok ? `${nf(x(f.c))} g` : '—')}${kpi('Grăsimi', ok ? `${nf(x(f.g))} g` : '—')}</div>`;
-}
-function foodSelHtml(): string {
-  const f = FD.sel;
-  if (!f) return '';
-  const opts: Array<[number, string]> = [[100, '100 g']];
-  if (f.por && f.por !== 100) opts.push([f.por, f.pl || 'o porție']);
-  if (f.por) opts.push([f.por * 2, '2 porții']);
-  return `<div class="fd-sel"><div class="row"><div class="row-l"><b>${esc(f.n)}</b><p class="small dim" style="margin:0">${f.src === 'off' ? `Open Food Facts${f.brand ? ` · ${esc(f.brand)}` : ''}` : f.mine ? 'alimentul tău' : 'valori medii'} · la 100 g: ${Math.round(f.k)} kcal, P ${nf(f.p)} g</p></div><button class="icon-btn" data-a="nu:fdclear" aria-label="Alt aliment">${ic('close')}</button></div>
-    <div class="chips" style="margin:8px 0">${opts.map(([v, l]) => `<button class="chip" aria-pressed="${+FD.g === v}" data-a="nu:fdg" data-i="${v}">${esc(l)}${l.includes(' g') ? '' : ` · ${v} g`}</button>`).join('')}</div>
-    ${numIn('fdG', 'Cantitatea (grame)', FD.g, 'ex: 150', '1', 'nu:fdgin')}
-    <div id="fdOut">${foodMacros()}</div>
-    <button class="btn" style="margin-top:10px" data-a="nu:fdadd">${ic('check')} Adaugă în jurnalul de azi</button></div>`;
-}
-function toolsHtml(): string {
-  const bd = 'BarcodeDetector' in window;
-  return `<section class="card" id="food"><h3>${ic('bowl')} Calculator alimente</h3>
-      <label class="nfld full"><span>Caută</span><input id="fdQ" type="text" value="${esc(FD.q)}" placeholder="pui, orez, ovăz, iaurt…" autocomplete="off" data-a="nu:fdq"></label>
-      <div class="chips nscroll" style="margin:10px 0">${[['', 'Toate'] as [string, string]].concat(Object.entries(FCATS).filter(([c]) => c !== 'm' || S().foods.length)).map(([c, l]) => `<button class="chip" aria-pressed="${FD.cat === c}" data-a="nu:fdcat" data-k="${c}">${l}</button>`).join('')}</div>
-      <div id="fdSel">${foodSelHtml()}</div>
-      <div class="fd-list" id="fdList">${foodListHtml()}</div>
-      <h3 style="margin-top:16px;font-size:17px">Produs ambalat · cod de bare</h3>
-      <div class="nrow"><input id="fdBc" type="number" inputmode="numeric" value="${esc(FD.bc)}" placeholder="cifrele de sub codul de bare" aria-label="Cod de bare"><button class="btn sm" data-a="nu:fdbc" ${FD.busy ? 'disabled' : ''}>${FD.busy ? 'Caut…' : 'Caută'}</button></div>
-      ${bd ? `<label class="btn ghost sm" style="margin-top:8px">${ic('camera')} Fotografiază codul de bare<input type="file" accept="image/*" capture="environment" data-a="nu:bcimg" class="sr"></label>` : ''}
-      ${FD.err ? `<p class="nalert">${ic('alert')} ${esc(FD.err)}</p>` : ''}
-      <p class="small dim">Datele vin din Open Food Facts, o bază deschisă cu produse din magazine. Verifică eticheta: are prioritate.</p>
-      <details class="ndet"><summary>Adaugă un aliment al tău (de pe etichetă)</summary>
-        <div class="nform"><label class="nfld full"><span>Nume</span><input id="faN" type="text" placeholder="ex: Baton proteic X"></label>${numIn('faK', 'kcal / 100 g', '', '', '1', 'nu:x')}${numIn('faP', 'Proteină / 100 g', '', '', '0.1', 'nu:x')}${numIn('faC', 'Carbo / 100 g', '', '', '0.1', 'nu:x')}${numIn('faG', 'Grăsimi / 100 g', '', '', '0.1', 'nu:x')}${numIn('faPor', 'Porția (g, opțional)', '', 'ex: 60', '1', 'nu:x')}</div>
-        <button class="btn" style="margin-top:10px" data-a="nu:fdmine">${ic('check')} Salvează în alimentele mele</button></details>
-      <p class="small dim">Valori medii la 100 g, pentru alimente crude dacă nu scrie „fiert” sau „gătit”. Cântărește crud când poți: e cel mai precis.</p></section>
-`;
-}
 // ---------- actions ----------
 const val = (id: string): string => (document.getElementById(id) as HTMLInputElement | null)?.value ?? '';
 const fnum = (id: string): number => parseFloat(val(id).replace(',', '.'));
-
-function foodSel(f: FoodSel): void {
-  FD.sel = f;
-  FD.g = String(f.por && f.por !== 100 ? f.por : 100);
-  FD.err = null;
-}
-
-async function foodBarcode(raw: string, render: () => void): Promise<void> {
-  const code = String(raw || '').replace(/\D/g, '');
-  if (code.length < 8 || code.length > 14) {
-    FD.err = 'Codul de bare are 8–14 cifre.';
-    return render();
-  }
-  FD.bc = code;
-  FD.busy = true;
-  FD.err = null;
-  render();
-  try {
-    const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,product_name_ro,brands,nutriments,serving_quantity`);
-    if (!r.ok && r.status !== 404) throw new Error('http');
-    const d = (await r.json()) as { status?: number; product?: { product_name?: string; product_name_ro?: string; brands?: string; serving_quantity?: number; nutriments?: Record<string, number> } };
-    const p = d.product;
-    const nu = p?.nutriments ?? {};
-    let k = +nu['energy-kcal_100g'];
-    if (!(k > 0) && +nu.energy_100g > 0) k = nu.energy_100g / 4.184;
-    if (!p || d.status === 0) FD.err = 'Produsul nu e în Open Food Facts. Adaugă-l mai jos, de pe etichetă.';
-    else if (!(k >= 0) || nu.proteins_100g == null) FD.err = 'Produsul există, dar fără valori nutriționale complete. Adaugă-l de pe etichetă.';
-    else {
-      const sq = +(p.serving_quantity ?? 0);
-      const f = { n: String(p.product_name_ro || p.product_name || `Produs ${code}`).trim().slice(0, 70), brand: String(p.brands || '').split(',')[0].trim().slice(0, 40), k: Math.round(k), p: +(+nu.proteins_100g || 0).toFixed(1), c: +(+nu.carbohydrates_100g || 0).toFixed(1), g: +(+nu.fat_100g || 0).toFixed(1), por: sq > 0 && sq < 2000 ? Math.round(sq) : null, code };
-      S().foods = [f, ...S().foods.filter((x) => x.code !== code && x.n !== f.n)].slice(0, 60);
-      save();
-      FD.bc = '';
-      foodSel({ ...f, pl: 'o porție', src: 'off' });
-    }
-  } catch {
-    FD.err = 'Nu ajung la Open Food Facts. Verifică internetul și mai încearcă.';
-  }
-  FD.busy = false;
-  render();
-}
 
 async function runQuick(render: () => void): Promise<void> {
   const t = (val('qiT') || QI.text).trim();
@@ -591,35 +470,6 @@ export function nuAct(a: string, el: HTMLElement, render: () => void): void {
         render();
       }
       return;
-    case 'nu:sadd': {
-      const n = val('slN').trim();
-      if (!n) return toast('Scrie ce ai de cumpărat.');
-      st.shop.push({ id: uid(), n: n.slice(0, 60), q: val('slQ').trim().slice(0, 30), on: false });
-      save();
-      render();
-      (document.getElementById('slN') as HTMLInputElement | null)?.focus();
-      return;
-    }
-    case 'nu:stk': {
-      const x = st.shop.find((y) => y.id === key);
-      if (x) x.on = !x.on;
-      save();
-      buzz(8);
-      return render();
-    }
-    case 'nu:sdel':
-      st.shop = st.shop.filter((y) => y.id !== key);
-      save();
-      return render();
-    case 'nu:sclear':
-      st.shop = st.shop.filter((y) => !y.on);
-      save();
-      return render();
-    case 'nu:scopy': {
-      const t = `Lista de cumpărături\n\n${st.shop.filter((y) => !y.on).map((y) => `- ${y.n}${y.q ? `: ${y.q}` : ''}`).join('\n')}`;
-      navigator.clipboard.writeText(t).then(() => toast('Lista copiată.'), () => toast('Browserul nu permite copierea aici.'));
-      return;
-    }
     case 'nu:def': {
       p.def = clamp((+(p.def ?? 0) || autoDef(p, curW(st, k))) + I, 0, 1200);
       save();
@@ -657,53 +507,6 @@ export function nuAct(a: string, el: HTMLElement, render: () => void): void {
       delete p.aiKey;
       save();
       return render();
-    case 'nu:fdcat':
-      FD.cat = key;
-      return render();
-    case 'nu:fdpick': {
-      const f = foodAll().find((x) => x[0] === key);
-      if (!f) return;
-      foodSel({ n: f[0], k: f[1], p: f[2], c: f[3], g: f[4], por: f[5] === 'm' ? (f[6] !== 100 ? f[6] : null) : f[6], pl: f[7], mine: f[5] === 'm', brand: f[8] });
-      render();
-      requestAnimationFrame(() => document.getElementById('fdSel')?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
-      return;
-    }
-    case 'nu:fdclear':
-      FD.sel = null;
-      return render();
-    case 'nu:fdg':
-      FD.g = String(I);
-      return render();
-    case 'nu:fdadd': {
-      const f = FD.sel;
-      const g = parseFloat(FD.g.replace(',', '.'));
-      if (!f || !(g > 0 && g <= 3000)) return toast('Scrie cantitatea în grame.');
-      const m = { n: `${f.n} · ${Math.round(g)} g`.slice(0, 80), k: Math.round((f.k * g) / 100), p: Math.round((f.p * g) / 100), c: Math.round((f.c * g) / 100), g: Math.round((f.g * g) / 100) };
-      addMeal(m);
-      FD.sel = null;
-      FD.q = '';
-      toast(`Adăugat · ${m.k} kcal · ${m.p} g proteină`);
-      return render();
-    }
-    case 'nu:fdbc':
-      void foodBarcode(val('fdBc') || FD.bc, render);
-      return;
-    case 'nu:fdmine': {
-      const n = val('faN').trim();
-      const kc = fnum('faK');
-      const pr = fnum('faP');
-      if (!n) return toast('Scrie numele alimentului.');
-      if (!(kc >= 0 && kc <= 950)) return toast('kcal la 100 g: între 0 și 950.');
-      if (!(pr >= 0 && pr <= 100)) return toast('Proteina la 100 g: între 0 și 100.');
-      const por = fnum('faPor');
-      const f = { n: n.slice(0, 70), k: Math.round(kc), p: +pr.toFixed(1), c: +(fnum('faC') || 0).toFixed(1), g: +(fnum('faG') || 0).toFixed(1), por: por > 0 ? Math.round(por) : null };
-      st.foods = [f, ...st.foods.filter((x) => x.n !== f.n)].slice(0, 60);
-      save();
-      FD.cat = 'm';
-      foodSel({ ...f, pl: 'o porție', mine: true });
-      toast(`Aliment salvat: ${f.n}`);
-      return render();
-    }
   }
 }
 
@@ -750,11 +553,11 @@ export function nuChange(a: string, el: HTMLElement, render: () => void): void {
     save();
     return render();
   }
-  if (a === 'nu:scanfile' || a === 'nu:bcimg') {
+  if (a === 'nu:scanfile') {
     const f = inp.files?.[0];
     inp.value = '';
     if (!f) return;
-    if (a === 'nu:scanfile') {
+    {
       photoB64(f)
         .then((r) => {
           Object.assign(SC, { img: r.url, data: r.data, res: null, err: null, busy: false, hint: '' });
@@ -764,36 +567,16 @@ export function nuChange(a: string, el: HTMLElement, render: () => void): void {
         .catch(() => toast('Nu am putut citi poza.'));
       return;
     }
-    const BD = (window as unknown as { BarcodeDetector?: new (o: { formats: string[] }) => { detect(b: ImageBitmap): Promise<Array<{ rawValue: string }>> } }).BarcodeDetector;
-    if (!BD) return;
-    createImageBitmap(f)
-      .then((bmp) => new BD({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] }).detect(bmp))
-      .then((r) => {
-        if (r.length) void foodBarcode(r[0].rawValue, render);
-        else {
-          FD.err = 'Nu am găsit un cod de bare în poză. Apropie telefonul și asigură lumină bună, sau scrie cifrele.';
-          render();
-        }
-      })
-      .catch(() => {
-        FD.err = 'Nu am putut citi poza. Scrie cifrele de sub codul de bare.';
-        render();
-      });
     return;
   }
 }
 
-/** Live typing: the food search, grams, the calculators. No full re-render, so the keyboard stays open. */
+/** Live typing    return;
+  }
+}
+
+/** Live typing: the quick-estimate field keeps its text across re-renders. */
 export function nuInput(a: string, el: HTMLElement): void {
-  const v = (el as HTMLInputElement).value;
-  if (a === 'nu:fdq') {
-    FD.q = v;
-    const l = document.getElementById('fdList');
-    if (l) l.innerHTML = foodListHtml();
-  } else if (a === 'nu:fdgin') {
-    FD.g = v;
-    const o = document.getElementById('fdOut');
-    if (o && FD.sel) o.innerHTML = foodMacros();
-  } else if (a === 'nu:qit') QI.text = v;
+  if (a === 'nu:qit') QI.text = (el as HTMLInputElement).value;
 }
 

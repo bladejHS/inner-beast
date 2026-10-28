@@ -146,9 +146,11 @@ class RoundsPlayer implements Player {
       <p class="phase-lbl" id="ph">${esc(p.kind === 'work' ? (this.cfg.focus && FOCUS_LINE[this.cfg.focus]) || 'Lucru' : p.label)}</p>
       <div class="big-time" id="t">${mmss(Math.ceil(L.left))}</div>
       <p class="round-lbl" id="rd">${esc(roundTxt)}</p>
+      ${p.round && (p.rounds ?? 0) > 1 ? `<div class="rd-dots" aria-hidden="true">${Array.from({ length: p.rounds ?? 0 }, (_, i) => `<i class="${i + 1 < p.round! ? 'ok' : i + 1 === p.round ? (p.kind === 'work' ? 'on' : 'ok') : ''}"></i>`).join('')}</div>` : ''}
       ${panel}`;
     const paused = !this.clock.running;
     const ctrl =
+      ctrlBtn('p:reset', 'refresh', 'Resetează') +
       ctrlBtn('p:prev', 'prev', 'Înapoi') +
       ctrlBtn('p:pause', paused ? 'play' : 'pause', paused ? 'Continuă' : 'Pauză', true) +
       ctrlBtn('p:skip', 'next', 'Sari') +
@@ -319,6 +321,22 @@ class RoundsPlayer implements Player {
       case 'p:combo':
         this.nextCall();
         return this.render();
+      case 'p:reset': {
+        const was = this.clock.running;
+        this.clock.pause();
+        hush();
+        this.render();
+        ask('Resetezi?', 'Timerul pornește din nou de la început.', 'Resetează', () => {
+          this.clock.set(0);
+          this.lastI = -2;
+          this.clock.resume();
+          this.tick();
+        }, 'Renunță', false, () => {
+          if (was) this.clock.resume();
+          this.render();
+        });
+        return;
+      }
     }
   }
 

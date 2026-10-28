@@ -18,20 +18,21 @@ import { historyHtml, progressHtml } from './ui/screens/progress.ts';
 import { settingsHtml } from './ui/screens/settings.ts';
 import { bodyAct, bodyChange, bodyInput, hydratePhotos } from './ui/screens/body.ts';
 import { nuAct, nuChange, nuInput, nutriStartup, nutritionHtml } from './ui/screens/nutrition.ts';
+import { MORE_TABS, moreHtml } from './ui/screens/more.ts';
+import { icsExport } from './ui/ics.ts';
 import { isDark, saveSteps, setTheme, startBlock, toggleMark } from './ui/screens/shared.ts';
 import { dayViewHtml, todayHtml } from './ui/screens/today.ts';
 
 initAudio(() => ctx.S.set);
 initParallax();
 
+// five destinations; Nutriție, Minte and Alex live behind "Mai mult"
 const TABS: Array<[Tab, string, string]> = [
   ['today', 'Azi', 'today'],
   ['plan', 'Plan', 'plan'],
   ['fight', 'Lupte', 'fight'],
-  ['alex', 'Alex', 'mask'],
-  ['mind', 'Minte', 'mind'],
-  ['nutri', 'Nutriție', 'bowl'],
   ['progress', 'Progres', 'progress'],
+  ['more', 'Mai mult', 'more'],
 ];
 
 const views: View[] = [];
@@ -56,6 +57,8 @@ function screenHtml(): string {
       return mindHtml();
     case 'nutri':
       return nutritionHtml();
+    case 'more':
+      return moreHtml();
     case 'progress':
       return progressHtml();
     default:
@@ -64,7 +67,8 @@ function screenHtml(): string {
 }
 
 function navHtml(): string {
-  return `<nav class="tabs" aria-label="Secțiuni">${TABS.map(([k, label, icon]) => `<button data-a="tab" data-k="${k}" ${ctx.tab === k && !views.length ? 'aria-current="page"' : ''}>${ic(icon)}<span>${label}</span></button>`).join('')}</nav>`;
+  const cur = MORE_TABS.includes(ctx.tab) ? 'more' : ctx.tab;
+  return `<nav class="tabs" aria-label="Secțiuni">${TABS.map(([k, label, icon]) => `<button data-a="tab" data-k="${k}" ${cur === k && !views.length ? 'aria-current="page"' : ''}>${ic(icon)}<span>${label}</span></button>`).join('')}</nav>`;
 }
 
 function render(): void {
@@ -261,6 +265,12 @@ function act(a: string, el: HTMLElement): void {
       return render();
     case 'history':
       return pushView({ t: 'history' });
+    case 'ics': {
+      const t = (document.getElementById('icsT') as HTMLInputElement | null)?.value || '18:00';
+      const al = Number((document.getElementById('icsA') as HTMLSelectElement | null)?.value ?? 30);
+      void icsExport(t, al);
+      return;
+    }
     case 'qt':
       unlock();
       return startQuick(el.dataset.k || '');

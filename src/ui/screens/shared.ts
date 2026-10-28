@@ -29,7 +29,7 @@ export function setTheme(dark: boolean): void {
   } catch {
     /* ignore */
   }
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0f0f0f' : '#f3f1ec');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#090a0c' : '#f3f1ec');
 }
 
 export function top(back = false): string {

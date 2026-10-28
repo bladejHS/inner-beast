@@ -1,7 +1,7 @@
 // "Azi": today's session from the plan, the 28-day routine, sleep and your why.
 
 import { HABIT_STEPS } from '../../data/book.ts';
-import { WEEK, type Day } from '../../data/plan.ts';
+import { WEEK, blockName, type Day } from '../../data/plan.ts';
 import { dayProgress, habitDone, habitMilestone, habitStreak, weekDone } from '../../logic/progress.ts';
 import { dayKey, esc, prettyDay, RO_DAYS, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
@@ -36,6 +36,7 @@ export function dayBody(day: Day, today: string, kicker: string): string {
   const n = dayProgress(day, done);
   const total = day.blocks.length;
   const mins = day.blocks.reduce((s, b) => s + blockMinutes(b), 0);
+  const next = day.blocks.find((b) => !done.has(b.id));
   return `
     <section class="hero">
       ${art('wolf', 'hero-art')}
@@ -46,6 +47,7 @@ export function dayBody(day: Day, today: string, kicker: string): string {
         <div class="hero-meta"><span><b>${total}</b> blocuri</span><span><b>~${mins}</b> min</span></div>
         <div class="hero-ring">${miniRing(n, total)}<b>${n}<small>/${total}</small></b></div>
       </div>
+      ${next ? `<button class="btn hero-go" data-a="start" data-b="${next.id}">${ic('play')}Începe: ${esc(blockName(next, ctx.S.set.legMode))}</button>` : `<p class="hero-done">${ic('check')} Ziua e completă</p>`}
     </section>
     ${weekStrip(today, day.idx)}
     <ol class="bks">${day.blocks.map((b, i) => blockCard(b, i + 1, today)).join('')}</ol>`;

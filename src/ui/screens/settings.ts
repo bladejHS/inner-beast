@@ -20,7 +20,6 @@ export function settingsHtml(): string {
   const mm = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
   return `${top(true)}
     <h1 class="stack mid">Setări</h1>
-    <h2 class="sec">Aspect</h2>
     <h2 class="sec">Sunet și ecran</h2>
     ${row('Sunete', 'Gong, bipuri, semnale', sw('sound', s.sound, 'Sunete'))}
     ${row('Voce', 'Combinațiile strigate în engleză, indicațiile în română', sw('voice', s.voice, 'Voce'))}
@@ -31,6 +30,13 @@ export function settingsHtml(): string {
     ${row('Pauză la rundele de 3 minute', 'Cartea nu o precizează; standardul în box e 1 minut', step('rest3', mm(s.rest3), 'Pauză 3 minute'))}
     ${row('Pauză la intervalele de 1 minut', 'Wall Sit / Jumping Squats', step('rest1', mm(s.rest1), 'Pauză 1 minut'))}
     ${row('Duminică', 'Treci la Jumping Squats când ești pregătit', `<div class="chips"><button class="chip" aria-pressed="${s.legMode === 'wall'}" data-a="set-leg" data-v="wall">Wall Sit</button><button class="chip" aria-pressed="${s.legMode === 'jump'}" data-a="set-leg" data-v="jump">Jumping Squats</button></div>`)}
+    <h2 class="sec">Memento-uri în calendar<small>O aplicație web nu poate trimite notificări programate, mai ales pe iPhone. Pune următoarele 4 săptămâni din plan și zilele pozelor de progres în calendarul telefonului, cu alarmă.</small></h2>
+    <div class="ics">
+      <label class="nfld"><span>Ora antrenamentului</span><input id="icsT" type="time" value="18:00"></label>
+      <label class="nfld"><span>Alarmă înainte</span><select id="icsA">${[[0, 'Fără'], [15, '15 min'], [30, '30 min'], [60, '1 oră'], [120, '2 ore']].map(([v, l]) => `<option value="${v}" ${v === 30 ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+    </div>
+    <button class="btn" data-a="ics">${ic('download')}Adaugă în calendar (.ics)</button>
+    <p class="small dim" style="margin-top:8px">Pe iPhone deschide fișierul și apasă „Adaugă tot”. Dacă îl exporți din nou, evenimentele se actualizează, nu se dublează.</p>
     <h2 class="sec">Datele tale<small>Stau doar pe telefonul ăsta. Fă-ți din când în când o copie.</small></h2>
     <div style="display:grid;gap:10px">
       <button class="btn ghost sm" style="width:100%" data-a="export">${ic('download')}Descarcă o copie</button>

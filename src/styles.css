@@ -660,6 +660,9 @@ input:focus, textarea:focus { outline: none; border-color: var(--ink); }
 .calls span { font-size: 13px; opacity: .75; }
 .bk-calls { margin: 8px 0 0; font-size: 13px; line-height: 1.4; }
 .bk-alt { margin-top: 10px; }
+.fast-t { font: 800 44px/1 var(--display, inherit); letter-spacing: -.02em; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+.fast.on .bar i { background: var(--red); }
+.fast.eat .bar i { background: var(--ink); }
 .bk-alt .chip { min-height: 32px; padding: 0 12px; font-size: 13px; }
 .bk.done .bk-calls { color: var(--mute-inv); }
 

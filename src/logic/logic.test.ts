@@ -5,6 +5,7 @@ import { Clock, breath478Seq, doneSec, locate, phaseStart, roundsSeq, showerSeq,
 import { Track, haversine, routePath, simplify } from './geo.ts';
 import { activeStreak, advise, dayComplete, emomNext, habitMilestone, habitStreak, lastExercise, totals, weekDone } from './progress.ts';
 import { freshState, makeEntry, normalize } from './store.ts';
+import { fastStatus, hms } from './nutri/fast.ts';
 import { breathPos, holdStats } from './wimhof.ts';
 import { WEEK, blockName, blockLine, resolveBlock, type Picks } from '../data/plan.ts';
 import { ROW_CHALLENGES, rowChallenge, rowRests, rowTotal } from '../data/row.ts';
@@ -293,4 +294,22 @@ test('height: an unconfirmed nutrition profile takes the 200 cm default, a confi
   assert.equal(s.thuFeet, 'rope');
   assert.equal(s.thuMain, 'bag');
   assert.equal(s.rowCh, 'a');
+});
+
+test('fasting: 16/8 and 24 h timers', () => {
+  const H = 3600_000;
+  const t0 = Date.UTC(2026, 9, 29, 20);
+  const a = fastStatus({ mode: '168', start: t0 }, t0 + 10 * H);
+  assert.equal(a.done, false);
+  assert.equal(a.left, 6 * H);
+  const b = fastStatus({ mode: '168', start: t0 }, t0 + 17 * H);
+  assert.ok(b.done && !b.over);
+  assert.equal(b.windowLeft, 7 * H);
+  assert.ok(fastStatus({ mode: '168', start: t0 }, t0 + 24 * H).over);
+  const c = fastStatus({ mode: '24', start: t0 }, t0 + 23 * H);
+  assert.equal(c.done, false);
+  assert.equal(hms(c.left), '1:00:00');
+  assert.ok(fastStatus({ mode: '24', start: t0 }, t0 + 24 * H).done);
+  assert.equal(normalize({ fast: { mode: 'x', start: 1 } }).fast, null);
+  assert.deepEqual(normalize({ fast: { mode: '24', start: t0 } }).fast, { mode: '24', start: t0 });
 });

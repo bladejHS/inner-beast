@@ -11,7 +11,7 @@ import { art } from '../art.ts';
 import { blockCard, blockMinutes, top } from './shared.ts';
 import { weekCard } from './alex.ts';
 import { photoReminderCard } from './body.ts';
-import { nutriWidget } from './nutrition.ts';
+import { fastCard, nutriWidget } from './nutrition.ts';
 
 function miniRing(n: number, total: number, size = 64): string {
   const r = 26;
@@ -126,6 +126,7 @@ export function todayHtml(): string {
     <h2 class="sec">Zilnic</h2>
     ${photoReminderCard()}
     ${nutriWidget()}
+    ${fastCard()}
     ${habitCard()}
     ${sleepCard()}
     ${whyCard()}

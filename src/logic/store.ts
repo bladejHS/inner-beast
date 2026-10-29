@@ -2,6 +2,7 @@
 
 import { EMOM_START } from '../data/workouts.ts';
 import { dayKey, uid } from './util.ts';
+import type { Fast, FastLog } from './nutri/fast.ts';
 
 export type Kind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'wimhof' | 'breath' | 'shower' | 'row';
 
@@ -151,6 +152,9 @@ export interface State {
   shop: Array<{ id: string; n: string; q: string; on: boolean }>;
   /** Daily base target and TDEE used, for the weekly scale correction. */
   nlog: Record<string, { k: number; t: number }>;
+  /** The fast running now (16/8 or 24 h), and the finished ones. */
+  fast: Fast | null;
+  fasts: FastLog[];
 }
 
 export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 200, startW: 80, goalW: 75, act: 1.55 };
@@ -205,6 +209,8 @@ export function freshState(today: string = dayKey()): State {
     supp: { on: {}, log: {} },
     shop: [],
     nlog: {},
+    fast: null,
+    fasts: [],
   };
 }
 
@@ -239,6 +245,8 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     supp: { on: {}, log: {}, ...(isObj(r.supp) ? r.supp : {}) },
     shop: Array.isArray(r.shop) ? r.shop.filter((x) => isObj(x) && typeof x.n === 'string') : [],
     nlog: isObj(r.nlog) ? (r.nlog as Record<string, { k: number; t: number }>) : {},
+    fast: isObj(r.fast) && (r.fast.mode === '168' || r.fast.mode === '24') && typeof r.fast.start === 'number' ? (r.fast as Fast) : null,
+    fasts: Array.isArray(r.fasts) ? r.fasts.filter((x) => isObj(x) && typeof x.start === 'number' && typeof x.end === 'number') : [],
   };
 }
 

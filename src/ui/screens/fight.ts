@@ -40,8 +40,8 @@ export function startQuick(k: string): void {
   if (!q) return;
   const today = WEEK[weekdayIdx(dayKey())];
   const b = today.blocks.find(q.match);
-  if (b) return openRounds({ name: blockName(b, ctx.S.set.legMode), rounds: b.rounds ?? 1, work: b.work ?? 180, rest: restFor(b.rest), focus: b.focus, block: b.id, tip: b.tip, legSwap: b.legSwap });
-  openRounds({ name: q.k === 'legs' ? blockName({ legSwap: true } as Block, ctx.S.set.legMode) : q.name, rounds: q.def.rounds, work: q.def.work, rest: restFor(q.def.rest), focus: q.def.focus, legSwap: q.k === 'legs' });
+  if (b) return openRounds({ name: blockName(b, ctx.S.set), rounds: b.rounds ?? 1, work: b.work ?? 180, rest: restFor(b.rest), focus: b.focus, block: b.id, tip: b.tip, cues: b.cues, legSwap: b.legSwap });
+  openRounds({ name: q.k === 'legs' ? blockName({ legSwap: true } as Block, ctx.S.set) : q.name, rounds: q.def.rounds, work: q.def.work, rest: restFor(q.def.rest), focus: q.def.focus, legSwap: q.k === 'legs' });
 }
 
 function quickRow(q: Quick): string {

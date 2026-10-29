@@ -1,8 +1,8 @@
-// Round timer for Shadow Boxing, Heavy Bag, Jumping Rope and Wall Sit / Jumping Squats,
+// Round timer for Shadow Boxing, Heavy Bag, Jumping Rope / Agility Ladder and Wall Sit / Jumping Squats,
 // with Alex Hanma's combinations called out during the rounds.
 
 import type { ComboFocus } from '../../data/plan.ts';
-import { focusCombos, ROPE_MOVES, FOCUS_LINE, type Combo } from '../../data/combos.ts';
+import { focusCombos, LADDER_MOVES, ROPE_MOVES, FOCUS_LINE, type Combo } from '../../data/combos.ts';
 
 /** The e-book's focus line for each block, as printed on the plan page. */
 const BOOK_FOCUS: Record<string, string> = {
@@ -33,8 +33,12 @@ export interface RoundsCfg {
   focus?: ComboFocus;
   block?: string;
   tip?: string;
+  cues?: string[];
   legSwap?: boolean;
 }
+
+/** Footwork drills (rope, ladder) are called as moves, not combinations. */
+const isDrill = (f: ComboFocus | undefined): boolean => f === 'rope' || f === 'ladder';
 
 interface Call {
   name: string;
@@ -74,8 +78,8 @@ class RoundsPlayer implements Player {
 
   buildCalls(): Call[] {
     const f = this.cfg.focus;
-    if (f === 'rope') return ROPE_MOVES.map((m) => ({ name: m.name, seq: [], say: m.call, note: m.note }));
-    return focusCombos(f).map((c: Combo) => ({ name: c.name, seq: c.seq, say: c.call, note: c.note }));
+    if (isDrill(f)) return (f === 'ladder' ? LADDER_MOVES : ROPE_MOVES).map((m) => ({ name: m.name, seq: [], say: m.call, note: m.note }));
+    return focusCombos(f, ctx.S.nut.h).map((c: Combo) => ({ name: c.name, seq: c.seq, say: c.call, note: c.note }));
   }
 
   callsHtml(): string {
@@ -85,7 +89,7 @@ class RoundsPlayer implements Player {
     const list = this.calls
       .map((c) => `<li><b>${esc(c.name)}</b>${c.seq.length ? `<span>${esc(c.seq.join(' → '))}</span>` : ''}</li>`)
       .join('');
-    return `<details class="how" ${f === 'rope' ? '' : 'open'}><summary>${f === 'rope' ? 'Mișcările' : 'Combinațiile'} (${this.calls.length})</summary><div class="how-body">
+    return `<details class="how" ${isDrill(f) ? '' : 'open'}><summary>${isDrill(f) ? 'Mișcările' : 'Combinațiile'} (${this.calls.length})</summary><div class="how-body">
       ${book ? `<p class="small" style="margin:0 0 8px"><b>Din carte:</b> ${esc(book)}</p>` : ''}
       <ul class="calls">${list}</ul>
       <p class="small dim" style="margin:6px 0 0">Ți le strig pe rând în timpul rundelor. Le găsești explicate în Lupte.</p>
@@ -110,12 +114,13 @@ class RoundsPlayer implements Player {
       ? field('Exercițiu', `<div class="chips"><button class="chip" aria-pressed="${ctx.S.set.legMode === 'wall'}" data-a="p:leg" data-v="wall">Wall Sit</button><button class="chip" aria-pressed="${ctx.S.set.legMode === 'jump'}" data-a="p:leg" data-v="jump">Jumping Squats</button></div>`)
       : '';
     const callerRow = this.calls.length
-      ? field(c.focus === 'rope' ? 'Mișcări strigate' : 'Combinații strigate', switchCtl('p:caller', this.caller, 'Combinații strigate'), `La fiecare ${this.every} s, cu voce`)
+      ? field(isDrill(c.focus) ? 'Mișcări strigate' : 'Combinații strigate', switchCtl('p:caller', this.caller, 'Combinații strigate'), `La fiecare ${this.every} s, cu voce`)
       : '';
     const body = `
       <h1 class="pl-h">${esc(c.name)}</h1>
       ${c.focus && FOCUS_LINE[c.focus] ? `<p class="pl-sub">${esc(FOCUS_LINE[c.focus])}</p>` : ''}
       ${c.tip ? `<p class="dim">${esc(c.tip)}</p>` : ''}
+      ${c.cues?.length ? `<ul class="ticks small">${c.cues.map((q) => `<li>${esc(q)}</li>`).join('')}</ul>` : ''}
       ${c.legSwap ? `<p class="dim">${esc(LEG_CUES[ctx.S.set.legMode])}</p>` : ''}
       ${howHtml(c.legSwap ? (ctx.S.set.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit') : c.name, undefined, { open: true })}
       ${this.callsHtml()}
@@ -243,7 +248,7 @@ class RoundsPlayer implements Player {
       sfx.bell(3);
       buzz([200, 100, 200]);
       hush();
-      const boxing = this.cfg.focus && !['rope', 'legs'].includes(this.cfg.focus);
+      const boxing = this.cfg.focus && !isDrill(this.cfg.focus) && this.cfg.focus !== 'legs';
       this.tip = boxing ? REST_TIPS[Math.floor(Math.random() * REST_TIPS.length)] : '';
     }
   }

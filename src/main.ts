@@ -1,5 +1,6 @@
 import './styles.css';
 import { blockById, WEEK, type Block } from './data/plan.ts';
+import { rowChallenge } from './data/row.ts';
 import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
 import { dayKey, esc, uid, weekdayIdx } from './logic/util.ts';
 import { initAudio, unlock } from './ui/audio.ts';
@@ -356,6 +357,15 @@ function act(a: string, el: HTMLElement): void {
       return render();
     case 'set-leg':
       S.set.legMode = el.dataset.v === 'jump' ? 'jump' : 'wall';
+      save();
+      return render();
+    case 'alt':
+      if (el.dataset.b === 'thu-rope') S.set.thuFeet = el.dataset.v === 'ladder' ? 'ladder' : 'rope';
+      else S.set.thuMain = el.dataset.v === 'row' ? 'row' : 'bag';
+      save();
+      return render();
+    case 'row-ch':
+      S.set.rowCh = rowChallenge(el.dataset.v).id;
       save();
       return render();
     case 'export':

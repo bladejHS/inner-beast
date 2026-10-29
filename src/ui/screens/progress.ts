@@ -45,6 +45,9 @@ function entryLine(e: Entry, del = false): string {
     case 'routine':
       what = mmss(e.dur);
       break;
+    case 'row':
+      what = `${d.challenge}: ${num(Number(d.meters) || 0)} m${d.reps && Number(d.reps) > 1 ? `, ${d.intervals} din ${d.reps} intervale` : ''} în ${mmss(e.dur)}`;
+      break;
   }
   if (d.manual && e.kind !== 'run' && e.kind !== 'walk') what = 'bifat manual';
   return `<li><div><b>${esc(e.name)}</b><span>${shortDay(e.date)}${what ? `, ${esc(what)}` : ''}${e.block ? '' : ', în afara planului'}</span></div>${del ? `<button class="icon-btn" data-a="hist-del" data-id="${e.id}" aria-label="Șterge">${ic('trash')}</button>` : ''}</li>`;

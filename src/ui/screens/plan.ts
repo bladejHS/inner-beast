@@ -36,7 +36,7 @@ export function planHtml(): string {
           <span class="dc-min">~${mins} min</span>
         </div>
         <h3>${esc(d.title)}</h3>
-        <ul>${d.blocks.map((b) => `<li class="${done.has(b.id) ? 'ok' : ''}">${ic(done.has(b.id) ? 'check' : blockIcon(b))}<span>${esc(blockLine(b, ctx.S.set.legMode))}</span></li>`).join('')}</ul>
+        <ul>${d.blocks.map((b) => `<li class="${done.has(b.id) ? 'ok' : ''}">${ic(done.has(b.id) ? 'check' : blockIcon(b))}<span>${esc(blockLine(b, ctx.S.set))}</span></li>`).join('')}</ul>
         <div class="dc-bar">${d.blocks.map((b) => `<i class="${done.has(b.id) ? 'on' : ''}"></i>`).join('')}</div>
       </button>
     </li>`;

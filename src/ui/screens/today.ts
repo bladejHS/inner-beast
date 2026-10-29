@@ -47,7 +47,7 @@ export function dayBody(day: Day, today: string, kicker: string): string {
         <div class="hero-meta"><span><b>${total}</b> blocuri</span><span><b>~${mins}</b> min</span></div>
         <div class="hero-ring">${miniRing(n, total)}<b>${n}<small>/${total}</small></b></div>
       </div>
-      ${next ? `<button class="btn hero-go" data-a="start" data-b="${next.id}">${ic('play')}Începe: ${esc(blockName(next, ctx.S.set.legMode))}</button>` : `<p class="hero-done">${ic('check')} Ziua e completă</p>`}
+      ${next ? `<button class="btn hero-go" data-a="start" data-b="${next.id}">${ic('play')}Începe: ${esc(blockName(next, ctx.S.set))}</button>` : `<p class="hero-done">${ic('check')} Ziua e completă</p>`}
     </section>
     ${weekStrip(today, day.idx)}
     <ol class="bks">${day.blocks.map((b, i) => blockCard(b, i + 1, today)).join('')}</ol>`;

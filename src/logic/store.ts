@@ -3,7 +3,7 @@
 import { EMOM_START } from '../data/workouts.ts';
 import { dayKey, uid } from './util.ts';
 
-export type Kind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'wimhof' | 'breath' | 'shower';
+export type Kind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'wimhof' | 'breath' | 'shower' | 'row';
 
 export interface SetLog {
   id: string;
@@ -43,6 +43,11 @@ export interface Settings {
   wake: boolean;
   callEvery: number;
   legMode: 'wall' | 'jump';
+  /** Thursday's first slot: Jumping Rope or Agility Ladder. */
+  thuFeet: 'rope' | 'ladder';
+  /** Thursday's last slot: Heavy Bag or Machine Row, and the rowing challenge. */
+  thuMain: 'bag' | 'row';
+  rowCh: 'a' | 'b' | 'c' | 'd';
   rest3: number;
   rest1: number;
   whRounds: number;
@@ -148,7 +153,7 @@ export interface State {
   nlog: Record<string, { k: number; t: number }>;
 }
 
-export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 180, startW: 80, goalW: 75, act: 1.55 };
+export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 200, startW: 80, goalW: 75, act: 1.55 };
 
 export const DEFAULT_SETTINGS: Settings = {
   sound: true,
@@ -157,6 +162,9 @@ export const DEFAULT_SETTINGS: Settings = {
   wake: true,
   callEvery: 15,
   legMode: 'wall',
+  thuFeet: 'rope',
+  thuMain: 'bag',
+  rowCh: 'a',
   rest3: 60,
   rest1: 60,
   whRounds: 3,
@@ -223,7 +231,8 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     weight: isObj(r.weight) ? (r.weight as Record<string, number>) : {},
     photos: Array.isArray(r.photos) ? r.photos.filter((x) => isObj(x) && typeof x.id === 'string' && typeof x.date === 'string') : [],
     waist: isObj(r.waist) ? (r.waist as Record<string, number>) : {},
-    nut: { ...DEFAULT_NUT, ...(isObj(r.nut) ? r.nut : {}) } as NutProfile,
+    // Height drives the boxing combinations too; a profile never confirmed still holds the old default, so it takes the current one.
+    nut: { ...DEFAULT_NUT, ...(isObj(r.nut) ? r.nut : {}), ...(isObj(r.nut) && r.nut.ok ? {} : { h: DEFAULT_NUT.h }) } as NutProfile,
     mlog: isObj(r.mlog) ? (r.mlog as Record<string, MealLog[]>) : {},
     water: isObj(r.water) ? (r.water as Record<string, number>) : {},
     foods: Array.isArray(r.foods) ? r.foods.filter((x) => isObj(x) && typeof x.n === 'string') : [],

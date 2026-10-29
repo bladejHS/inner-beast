@@ -208,6 +208,24 @@ export const HOW: Record<string, How> = {
     ],
     mistake: 'Să sari prea sus și pe călcâie: obosești repede și te doare tibia.',
   },
+  'Agility Ladder': {
+    steps: [
+      'Scara întinsă pe o suprafață plană, care nu alunecă. Stai la capătul ei, pe vârfuri, în gardă.',
+      'Contacte scurte și rapide cu solul, fără să calci pe treptele scării.',
+      'Treci prin drill-urile strigate: One Foot In, Two Feet In, Lateral Shuffle, In-In-Out-Out, Icky Shuffle.',
+      'La capăt te întorci și reiei. Privirea înainte, ca în ring, nu la picioare.',
+    ],
+    mistake: 'Să grăbești până calci strâmb: întâi precizia, apoi viteza.',
+  },
+  'Machine Row': {
+    steps: [
+      'Picioarele prinse în chingi, monitorul aparatului resetat pe 0 m.',
+      'Ordinea: împingi din picioare, trunchiul se lasă puțin pe spate, abia la final brațele trag mânerul spre piept.',
+      'La revenire invers: brațele pleacă primele, trunchiul vine în față, apoi genunchii se îndoaie.',
+      'Spatele drept, umerii jos. Distanța o citești pe monitorul aparatului și o notezi aici.',
+    ],
+    mistake: 'Să tragi doar din brațe și să cocoșezi spatele: puterea vine din picioare.',
+  },
   'Wall Sit': {
     steps: [
       'Spatele lipit de perete, picioarele la un pas în fața peretelui, la lățimea șoldurilor.',

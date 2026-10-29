@@ -33,6 +33,8 @@ const P: Record<string, string> = {
   bolt: '<path d="M13.5 2.5L5 13.5h6l-1 8 8.5-11h-6z"/>',
   stretch: '<circle cx="12" cy="4.3" r="1.8"/><path d="M4 8.5l8 1.3 8-1.3M12 9.8v5.2l-4 6M12 15l4 6"/>',
   rope: '<path d="M5 3.5v6M19 3.5v6"/><path d="M5 9.5c0 8 3 11 7 11s7-3 7-11"/>',
+  ladder: '<path d="M8 3v18M16 3v18M8 7h8M8 12h8M8 17h8"/>',
+  row: '<circle cx="8" cy="7" r="1.8"/><path d="M3 19.5h18M8 9.5l2 5h5M10 11.5l5-1.5M17.5 10l2-1M5 19.5l3-5"/>',
   bag: '<path d="M12 2.5v3"/><rect x="7" y="5.5" width="10" height="15" rx="2"/><path d="M7 9.5h10M7 16.5h10"/>',
   wall: '<path d="M18.5 3v18"/><circle cx="14.5" cy="5.5" r="1.8"/><path d="M14.5 8v6h-6.5v6.5M14.5 14H18"/>',
   shadow: '<circle cx="9" cy="5" r="1.8"/><path d="M9 7.5v6l-3 7M9 13.5l3 7M9 9.5l4.5-1.5 5.5 1M9 10l-3.5 2.5"/>',

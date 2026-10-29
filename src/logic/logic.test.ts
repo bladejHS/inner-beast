@@ -6,10 +6,11 @@ import { Track, haversine, routePath, simplify } from './geo.ts';
 import { activeStreak, advise, dayComplete, emomNext, habitMilestone, habitStreak, lastExercise, totals, weekDone } from './progress.ts';
 import { freshState, makeEntry, normalize } from './store.ts';
 import { breathPos, holdStats } from './wimhof.ts';
-import { WEEK, blockName } from '../data/plan.ts';
+import { WEEK, blockName, blockLine, resolveBlock, type Picks } from '../data/plan.ts';
+import { ROW_CHALLENGES, rowChallenge, rowRests, rowTotal } from '../data/row.ts';
 import { WORKOUTS, exerciseById } from '../data/workouts.ts';
 import { ROUTINES, routineSeconds } from '../data/routines.ts';
-import { COMBOS, focusCombos } from '../data/combos.ts';
+import { COMBOS, INSIDE, focusCombos } from '../data/combos.ts';
 import { BOOK } from '../data/book.ts';
 
 test('dates: the program week starts on Monday', () => {
@@ -42,8 +43,9 @@ test('the plan matches the e-book', () => {
   assert.equal(r('tue-easy').work, 600);
   assert.equal(r('sun-legs').rounds, 10);
   assert.equal(r('sun-legs').work, 60);
-  assert.equal(blockName(r('sun-legs'), 'wall'), 'Wall Sit');
-  assert.equal(blockName(r('sun-legs'), 'jump'), 'Jumping Squats');
+  const P: Picks = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a' };
+  assert.equal(blockName(r('sun-legs'), P), 'Wall Sit');
+  assert.equal(blockName(r('sun-legs'), { ...P, legMode: 'jump' }), 'Jumping Squats');
   assert.equal(exerciseById('lunges')!.lo, 15);
   assert.equal(exerciseById('lunges')!.sets, 4);
   assert.ok(WEEK.every((d) => d.blocks.length === 3));
@@ -221,4 +223,74 @@ test('wim hof breath animation goes in then out', () => {
   const b = breathPos(3.0, 3.2);
   assert.ok(!b.inhale && b.fill < 0.5);
   assert.equal(breathPos(6.5, 3.2).n, 2);
+});
+
+test('day focus: each boxing block carries the requested focus', () => {
+  const r = (id: string) => WEEK.flatMap((d) => d.blocks).find((b) => b.id === id)!;
+  assert.equal(r('mon-shadow').focus, 'jab');
+  assert.equal(r('mon-bag').focus, 'move');
+  assert.equal(r('tue-easy').focus, 'slow');
+  assert.equal(r('thu-shadow').focus, 'combo');
+  assert.equal(r('thu-bag').focus, 'power');
+  assert.equal(r('fri-easy').focus, 'distance');
+  for (const id of ['mon-shadow', 'mon-bag', 'tue-easy', 'thu-shadow', 'thu-bag', 'fri-easy']) assert.ok((r(id).cues ?? []).length >= 3, id);
+});
+
+test('thursday: rope/ladder and bag/row are alternatives for the same slot', () => {
+  const thu = WEEK[3];
+  const P: Picks = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a' };
+  const [feet, , main] = thu.blocks;
+  assert.equal(resolveBlock(feet, P).name, 'Jumping Rope');
+  assert.equal(resolveBlock(feet, P).focus, 'rope');
+  const ladder = resolveBlock(feet, { ...P, thuFeet: 'ladder' });
+  assert.equal(ladder.name, 'Agility Ladder');
+  assert.equal(ladder.focus, 'ladder');
+  assert.equal(ladder.id, 'thu-rope');
+  assert.equal(resolveBlock(main, P).name, 'Heavy Bag Training');
+  assert.equal(resolveBlock(main, P).kind, 'rounds');
+  const row = resolveBlock(main, { ...P, thuMain: 'row', rowCh: 'd' });
+  assert.equal(row.kind, 'row');
+  assert.equal(row.id, 'thu-bag');
+  assert.equal(row.focus, undefined);
+  assert.match(blockLine(main, { ...P, thuMain: 'row', rowCh: 'd' }), /250 m × 8/);
+  assert.equal(thu.blocks.length, 3);
+  // other days don't change with the Thursday picks
+  for (const d of WEEK.filter((x) => x.idx !== 3)) for (const b of d.blocks) assert.equal(resolveBlock(b, { ...P, thuFeet: 'ladder', thuMain: 'row' }).name, resolveBlock(b, P).name);
+});
+
+test('machine row: four challenges, 250 m × 8 with 45 s between intervals only', () => {
+  assert.deepEqual(ROW_CHALLENGES.map((c) => [c.id, rowTotal(c), c.reps]), [['a', 1000, 1], ['b', 5000, 1], ['c', 10000, 1], ['d', 2000, 8]]);
+  const d = rowChallenge('d');
+  assert.equal(d.meters, 250);
+  assert.equal(d.rest, 45);
+  assert.equal(rowRests(d), 7);
+  assert.equal(rowRests(rowChallenge('a')), 0);
+  assert.equal(rowChallenge('x').id, 'a');
+});
+
+test('combinations: a 200 cm boxer gets jab-led, long-range sets', () => {
+  const ids = new Set(COMBOS.map((c) => c.id));
+  assert.equal(ids.size, COMBOS.length);
+  for (const f of ['jab', 'move', 'slow', 'combo', 'power', 'distance']) {
+    const tall = focusCombos(f, 200).filter((c) => !['week'].includes(c.id));
+    assert.ok(tall.length >= 8, f);
+    const inside = tall.filter((c) => INSIDE.has(c.id)).length;
+    assert.ok(inside <= 2, `${f}: ${inside} close-range combos`);
+    const jabLed = tall.filter((c) => /^(Jab|Step in|Fake jab)/.test(c.seq[0])).length;
+    assert.ok(jabLed / tall.length >= 0.6, `${f}: ${jabLed}/${tall.length} jab-led`);
+    // generic profile still works
+    assert.ok(focusCombos(f, 175).length >= 4, f);
+  }
+  // hooks are kept where distance allows them, not removed
+  assert.ok(focusCombos('power', 200).some((c) => c.seq.some((s) => /Hook/.test(s))));
+});
+
+test('height: an unconfirmed nutrition profile takes the 200 cm default, a confirmed one keeps its own', () => {
+  assert.equal(freshState('2026-10-29').nut.h, 200);
+  assert.equal(normalize({ nut: { h: 180 } }, '2026-10-29').nut.h, 200);
+  assert.equal(normalize({ nut: { h: 186, ok: '2026-10-01' } }, '2026-10-29').nut.h, 186);
+  const s = normalize({ set: { legMode: 'jump' } }, '2026-10-29').set;
+  assert.equal(s.thuFeet, 'rope');
+  assert.equal(s.thuMain, 'bag');
+  assert.equal(s.rowCh, 'a');
 });

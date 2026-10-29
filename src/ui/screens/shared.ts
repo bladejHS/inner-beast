@@ -1,7 +1,8 @@
 // Pieces shared by the screens: header, program block cards, starting and checking off a block.
 
 import { focusCombos } from '../../data/combos.ts';
-import { blockName, type Block, type RestKey } from '../../data/plan.ts';
+import { resolveBlock, type Block, type RestKey } from '../../data/plan.ts';
+import { ROW_CHALLENGES, rowChallenge } from '../../data/row.ts';
 import { makeEntry, type Kind } from '../../logic/store.ts';
 import { dayKey, esc, inWeek, num, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { art } from '../art.ts';
@@ -11,6 +12,7 @@ import { openAmrap } from '../players/amrap.ts';
 import { openBreath } from '../players/breath.ts';
 import { openRoutine } from '../players/routine.ts';
 import { openRounds } from '../players/rounds.ts';
+import { openRow } from '../players/row.ts';
 import { openRun } from '../players/run.ts';
 import { openShower } from '../players/shower.ts';
 import { openWimHof } from '../players/wimhof.ts';
@@ -46,10 +48,13 @@ export function restFor(k: RestKey | undefined): number {
   return 0;
 }
 
-export function startBlock(b: Block): void {
+export function startBlock(raw: Block): void {
+  const b = resolveBlock(raw, ctx.S.set);
   switch (b.kind) {
     case 'rounds':
-      return openRounds({ name: blockName(b, ctx.S.set.legMode), rounds: b.rounds ?? 1, work: b.work ?? 180, rest: restFor(b.rest), focus: b.focus, block: b.id, tip: b.tip, legSwap: b.legSwap });
+      return openRounds({ name: b.name, rounds: b.rounds ?? 1, work: b.work ?? 180, rest: restFor(b.rest), focus: b.focus, block: b.id, tip: b.tip, cues: b.cues, legSwap: b.legSwap });
+    case 'row':
+      return openRow(b.id);
     case 'amrap':
       return openAmrap(b.id, b.min ?? 10);
     case 'workout':
@@ -69,7 +74,7 @@ export function startBlock(b: Block): void {
   }
 }
 
-const KIND_OF: Record<string, Kind> = { rounds: 'rounds', amrap: 'amrap', workout: 'workout', routine: 'routine', run: 'run', walk: 'walk', shower: 'shower', wimhof: 'wimhof', breath: 'breath' };
+const KIND_OF: Record<string, Kind> = { row: 'row', rounds: 'rounds', amrap: 'amrap', workout: 'workout', routine: 'routine', run: 'run', walk: 'walk', shower: 'shower', wimhof: 'wimhof', breath: 'breath' };
 
 /** Entries of this block in the current week, newest first. */
 export function blockEntries(b: Block, today = dayKey()): typeof ctx.S.log {
@@ -78,8 +83,9 @@ export function blockEntries(b: Block, today = dayKey()): typeof ctx.S.log {
 }
 
 /** Tap on the block number: check off without the timer, or undo the check. */
-export function toggleMark(b: Block): void {
-  const name = blockName(b, ctx.S.set.legMode);
+export function toggleMark(raw: Block): void {
+  const b = resolveBlock(raw, ctx.S.set);
+  const name = b.name;
   const done = blockEntries(b);
   if (done.length) {
     ask('Anulezi bifa?', `„${name}” nu mai apare ca făcut săptămâna asta. Înregistrarea rămâne în istoric.`, 'Anulează bifa', () => {
@@ -104,12 +110,16 @@ const ICON_BY_ID: Record<string, string> = {
   'sat-breath': 'mind', 'sun-jog': 'run',
 };
 
-export function blockIcon(b: Block): string {
+export function blockIcon(raw: Block): string {
+  const b = resolveBlock(raw, ctx.S.set);
+  if (b.focus === 'ladder') return 'ladder';
+  if (b.kind === 'row') return 'row';
   return ICON_BY_ID[b.id] ?? 'timer';
 }
 
 /** Rough minutes a block takes, for the day's total. */
-export function blockMinutes(b: Block): number {
+export function blockMinutes(raw: Block): number {
+  const b = resolveBlock(raw, ctx.S.set);
   if (b.kind === 'rounds') {
     const r = b.rounds ?? 1;
     return Math.round((r * (b.work ?? 0) + (r - 1) * restFor(b.rest)) / 60);
@@ -121,17 +131,35 @@ export function blockMinutes(b: Block): number {
   return b.min ?? 10;
 }
 
-export function blockCard(b: Block, n: number, today: string): string {
+/** Thursday's two-way slots: which activity, and for the row, which challenge. */
+function altPicker(b: Block): string {
+  const s = ctx.S.set;
+  const opts: Array<[string, string, boolean]> =
+    b.alt === 'feet'
+      ? [['rope', 'Jumping Rope', s.thuFeet === 'rope'], ['ladder', 'Agility Ladder', s.thuFeet === 'ladder']]
+      : [['bag', 'Heavy Bag', s.thuMain === 'bag'], ['row', 'Machine Row', s.thuMain === 'row']];
+  const chips = (act: string, list: Array<[string, string, boolean]>, label: string) =>
+    `<div class="chips bk-alt" role="group" aria-label="${esc(label)}">${list.map(([v, l, on]) => `<button class="chip" aria-pressed="${on}" data-a="${act}" data-b="${b.id}" data-v="${v}">${esc(l)}</button>`).join('')}</div>`;
+  let html = chips('alt', opts, 'Alege activitatea');
+  if (b.alt === 'main' && s.thuMain === 'row') {
+    const cur = rowChallenge(s.rowCh);
+    html += chips('row-ch', ROW_CHALLENGES.map((c) => [c.id, `${c.id.toUpperCase()} · ${c.label}`, c.id === cur.id]), 'Alege provocarea');
+  }
+  return html;
+}
+
+export function blockCard(raw: Block, n: number, today: string): string {
+  const b = resolveBlock(raw, ctx.S.set);
   const entries = blockEntries(b, today);
   const done = entries.length > 0;
-  const name = blockName(b, ctx.S.set.legMode);
-  let extra = '';
+  const name = b.name;
+  let extra = b.alt ? altPicker(b) : '';
   if (b.kind === 'walk') {
     const st = ctx.S.steps[today] ?? 0;
     extra = `<div class="steps-in"><label class="sr" for="steps-in">Pași azi</label><input id="steps-in" type="number" inputmode="numeric" min="0" max="100000" data-a="steps" value="${st || ''}" placeholder="Pași azi"><span>din 10.000</span></div>`;
   }
-  if (b.kind === 'rounds' && b.focus && b.focus !== 'legs' && b.focus !== 'rope') {
-    const cs = focusCombos(b.focus);
+  if (b.kind === 'rounds' && b.focus && b.focus !== 'legs' && b.focus !== 'rope' && b.focus !== 'ladder') {
+    const cs = focusCombos(b.focus, ctx.S.nut.h);
     extra += `<p class="bk-calls"><b>Combinații:</b> ${esc(cs.slice(0, 4).map((c) => c.name).join(' · '))}${cs.length > 4 ? ` și încă ${cs.length - 4}` : ''}</p>`;
   }
   const when = done ? doneWhen(entries[0].date, today) : '';

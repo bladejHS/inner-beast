@@ -35,7 +35,7 @@ export function icsText(time: string, alarm: number, today = dayKey()): string {
     const mins = Math.max(15, day.blocks.reduce((s, b) => s + blockMinutes(b), 0));
     const en = new Date(st.getTime() + mins * 60000);
     // the UID stays the same for a day, so exporting again updates the events instead of doubling them
-    L.push('BEGIN:VEVENT', `UID:beast-${k}@inner-beast`, `DTSTAMP:${now}`, `DTSTART:${stamp(st)}`, `DTEND:${stamp(en)}`, fold(`SUMMARY:${icsEsc(`Inner Beast · ${day.title}`)}`), fold(`DESCRIPTION:${icsEsc(day.blocks.map((b) => `• ${blockLine(b, ctx.S.set.legMode)}`).join('\n'))}`));
+    L.push('BEGIN:VEVENT', `UID:beast-${k}@inner-beast`, `DTSTAMP:${now}`, `DTSTART:${stamp(st)}`, `DTEND:${stamp(en)}`, fold(`SUMMARY:${icsEsc(`Inner Beast · ${day.title}`)}`), fold(`DESCRIPTION:${icsEsc(day.blocks.map((b) => `• ${blockLine(b, ctx.S.set)}`).join('\n'))}`));
     if (alarm > 0) L.push(...alarmLines(`În ${alarm} de minute: ${day.title}`, `-PT${alarm}M`));
     L.push('END:VEVENT');
   }

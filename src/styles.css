@@ -659,6 +659,8 @@ input:focus, textarea:focus { outline: none; border-color: var(--ink); }
 .calls b { display: block; font: 900 14px/1.2 var(--display); text-transform: uppercase; }
 .calls span { font-size: 13px; opacity: .75; }
 .bk-calls { margin: 8px 0 0; font-size: 13px; line-height: 1.4; }
+.bk-alt { margin-top: 10px; }
+.bk-alt .chip { min-height: 32px; padding: 0 12px; font-size: 13px; }
 .bk.done .bk-calls { color: var(--mute-inv); }
 
 /* ===================== motion ===================== */

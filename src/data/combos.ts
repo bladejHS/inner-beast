@@ -265,6 +265,39 @@ export const COMBOS: Combo[] = [
     note: 'Desenezi literele cu capul, cu garda sus: S din slip-uri, U pe sub, ca un roll, W din două roll-uri, Z în zigzag. Video-ul cu cele mai multe vizualizări din lista lui de tehnici.',
     vid: '7670899488076221729', src: 'Learn some defences in boxing',
   },
+  // Long-range combinations for a tall boxer: they keep the reach advantage and leave on an angle.
+  {
+    id: 'one-two-angle', name: 'Jab – Cross – Step Out at an Angle', seq: ['Jab', 'Cross', 'Step out at an angle'], call: 'Jab, cross, step out', cat: 'footwork',
+    note: 'Două lovituri drepte de la distanță lungă, apoi un pas pe diagonală, în afara liniei lui. Nu rămâi în fața lui după cross.',
+  },
+  {
+    id: 'double-jab-cross-exit', name: 'Double Jab – Cross – Lateral Exit', seq: ['Jab', 'Jab', 'Cross', 'Step to the side'], call: 'Double jab, cross, step to the side', cat: 'footwork',
+    note: 'Primul jab măsoară distanța, al doilea o câștigă, crossul vine pe toată lungimea brațului. Ieși lateral înainte să răspundă.',
+  },
+  {
+    id: 'jab-feint-cross', name: 'Jab – Feint – Cross – Reposition', seq: ['Jab', 'Feint', 'Cross', 'Step back'], call: 'Jab, feint, cross, step back', cat: 'combo',
+    note: 'Jabul îl ține la distanță, fenta îl face să reacționeze, crossul intră în spațiul liber. Un pas înapoi și ești din nou la capătul jabului.',
+  },
+  {
+    id: 'one-two-hook-pivot', name: 'Jab – Cross – Lead Hook – Pivot Out', seq: ['Jab', 'Cross', 'Lead Hook', 'Pivot out'], call: 'Jab, cross, hook, pivot', cat: 'power',
+    note: 'Croșeul doar dacă crossul te-a adus în distanță. Pivotezi pe piciorul din față și ieși din linie cu garda sus.',
+  },
+  {
+    id: 'jab-reset-reenter', name: 'Jab – Step Back – Jab – Cross', seq: ['Jab', 'Step back', 'Jab', 'Cross'], call: 'Jab, step back. Jab, cross', cat: 'footwork',
+    note: 'Lovești, ieși din distanță când vine spre tine, apoi reintri cu un 1-2 drept. Controlezi tu momentul schimbului.',
+  },
+  {
+    id: 'jab-body-cross', name: 'Jab Body – Cross Head – Step Out', seq: ['Jab (body)', 'Cross (head)', 'Step out'], call: 'Jab body, cross head, step out', cat: 'combo',
+    note: 'Cobori din genunchi pentru jabul la corp, nu din spate, urci cu crossul la cap și ieși. Schimbi nivelul fără să intri aproape.',
+  },
+  {
+    id: 'one-two-pivot-cross', name: 'Jab – Cross – Pivot – Cross', seq: ['Jab', 'Cross', 'Pivot out', 'Cross'], call: 'Jab, cross, pivot, cross', cat: 'power',
+    note: 'După 1-2 pivotezi într-un unghi nou și tragi crossul din nou, cu toată greutatea transferată de pe piciorul din spate.',
+  },
+  {
+    id: 'step-jab-cross-back', name: 'Step In – Jab – Cross – Step Back', seq: ['Step in', 'Jab', 'Cross', 'Step back'], call: 'Step in, jab, cross, step back', cat: 'footwork',
+    note: 'Intri exact cât trebuie ca să ajungi cu crossul, apoi ieși pe același drum. Lucrezi la distanța ta, nu la a lui.',
+  },
 ];
 
 export const CAT_NAMES: Record<ComboCat, string> = {
@@ -286,17 +319,47 @@ export const ROPE_MOVES = [
   { name: 'Front-Back', call: 'Front back', note: 'Sari înainte-înapoi, ca la intrarea și ieșirea din distanță.' },
 ];
 
+/** Agility ladder drills, the Thursday alternative to the jump rope. */
+export const LADDER_MOVES = [
+  { name: 'One Foot In', call: 'One foot in', note: 'Un picior în fiecare pătrat, pe vârfuri, brațele în gardă.' },
+  { name: 'Two Feet In', call: 'Two feet in', note: 'Ambele picioare în fiecare pătrat, contacte scurte cu solul.' },
+  { name: 'Lateral Shuffle', call: 'Lateral shuffle', note: 'Lateral, două picioare în fiecare pătrat; nu încrucișa picioarele, ca în ring.' },
+  { name: 'In-In-Out-Out', call: 'In, in, out, out', note: 'Intri cu ambele picioare, ieși lateral cu ambele. Ritm constant.' },
+  { name: 'Icky Shuffle', call: 'Icky shuffle', note: 'In-in-out pe diagonală, alternând partea. Privirea înainte, nu în jos.' },
+  { name: 'Boxer Step In-Out', call: 'Boxer in and out', note: 'În gardă, pas înainte în pătrat și înapoi, ca la intrarea și ieșirea din distanță.' },
+];
+
 /** Which combos the caller uses in each block. */
 // Which combinations the caller uses in each block, following the e-book's focus for that block (plan page 16):
 // Monday shadow "jabs & footwork", Monday bag "movement & punches", Tuesday easy shadow "slow and clean moves",
 // Thursday shadow "combinations", Thursday bag "angle changes & power", Friday easy shadow "distance work".
 const FOCUS: Record<string, string[]> = {
   jab: ['jab', 'double-jab', 'one-two', 'jab-out', 'jab-step-in', 'jab-circle', 'double-jab-back', 'ghost-step', 'beginner-defense', 'pull-counter'],
-  move: ['jab-out', 'off-ropes', 'close-range', 'liver-move', 'step-overhand', 'check-hook', 'combo-of-day', 'fake-jab-cross', 'body-head', 'body-body-head'],
+  move: ['jab-step-in', 'jab-out', 'one-two-angle', 'double-jab-cross-exit', 'jab-circle', 'fake-jab-cross', 'step-overhand', 'check-hook', 'combo-of-day', 'body-head'],
   slow: ['jab', 'one-two', 'jab-cross-hook', 'simple-body', 'guard-reset', 'jab-upper-roll', 'liver', 'peekaboo', 'alphabet'],
-  combo: ['liver', 'double-onetwo', 'four-punch', 'cross-hook-upper', 'body-uppers', 'jab-upper-roll', 'favorite', 'tyson-huh', 'tyson-slip', 'tyson-uppercuts', 'tyson-body-head', 'liver-setup', 'feint-liver', 'body-head', 'body-body-head'],
-  power: ['angle-finish', 'tyson-killer', 'peekaboo-killer', 'shift-upper-hook', 'tyson-switch', 'combo-of-day', 'check-hook', 'gazelle', 'ko-combo', 'body-hooks-finish', 'liver-cross', 'tap-uppercut', 'hooks-liver'],
-  distance: ['jab', 'double-jab', 'jab-out', 'double-jab-back', 'pull-counter', 'ghost-step', 'one-two', 'fake-jab-cross', 'step-overhand', 'hook-setup'],
+  combo: ['liver', 'double-onetwo', 'four-punch', 'cross-hook-upper', 'jab-feint-cross', 'one-two-hook-pivot', 'jab-upper-roll', 'favorite', 'combo-of-day', 'liver-setup', 'feint-liver', 'body-head', 'body-body-head', 'tyson-huh', 'tyson-slip'],
+  power: ['angle-finish', 'one-two-pivot-cross', 'one-two-hook-pivot', 'combo-of-day', 'check-hook', 'step-overhand', 'ko-combo', 'liver-move', 'tyson-killer', 'peekaboo-killer', 'gazelle', 'body-hooks-finish', 'liver-cross'],
+  distance: ['jab', 'double-jab', 'jab-out', 'double-jab-back', 'pull-counter', 'ghost-step', 'one-two', 'fake-jab-cross', 'jab-reset-reenter', 'hook-setup'],
+};
+
+/** From this height up the caller uses FOCUS_TALL: long range first, few inside exchanges. */
+export const TALL_CM = 190;
+
+/** Combinations that need a close-range exchange; a tall boxer gets them only where the focus calls for them. */
+export const INSIDE = new Set([
+  'tyson-huh', 'tyson-slip', 'tyson-uppercuts', 'tyson-body-head', 'tyson-switch', 'tyson-killer', 'peekaboo-killer', 'peekaboo',
+  'close-range', 'off-ropes', 'body-hooks-finish', 'body-uppers', 'shift-upper-hook', 'gazelle', 'hooks-liver', 'liver-cross', 'tap-uppercut', 'cross-hook-upper',
+]);
+
+// Same focus per block, built for a tall boxer (around 2 m): jab-led, straight punches, distance kept or retaken
+// with the feet, angle exits after the combination. Hooks and uppercuts stay where the distance allows them.
+const FOCUS_TALL: Record<string, string[]> = {
+  jab: ['jab', 'double-jab', 'jab-out', 'jab-step-in', 'jab-circle', 'double-jab-back', 'one-two-angle', 'step-jab-cross-back', 'ghost-step', 'pull-counter'],
+  move: ['one-two-angle', 'double-jab-cross-exit', 'step-jab-cross-back', 'jab-step-in', 'jab-out', 'jab-reset-reenter', 'jab-circle', 'fake-jab-cross', 'check-hook', 'one-two-hook-pivot'],
+  slow: ['jab', 'double-jab', 'one-two', 'one-two-angle', 'jab-body-cross', 'jab-cross-hook', 'guard-reset', 'beginner-defense', 'pull-counter'],
+  combo: ['double-jab-cross-exit', 'jab-feint-cross', 'one-two-angle', 'one-two-hook-pivot', 'jab-body-cross', 'double-onetwo', 'fake-jab-cross', 'jab-reset-reenter', 'hook-setup', 'combo-of-day', 'four-punch', 'liver-setup'],
+  power: ['one-two-pivot-cross', 'one-two-hook-pivot', 'angle-finish', 'double-jab-cross-exit', 'combo-of-day', 'step-overhand', 'check-hook', 'ko-combo', 'liver-move', 'pull-counter', 'liver-cross'],
+  distance: ['jab', 'double-jab', 'double-jab-back', 'jab-out', 'jab-reset-reenter', 'step-jab-cross-back', 'pull-counter', 'ghost-step', 'one-two-angle', 'fake-jab-cross'],
 };
 
 /** The order in which the combinations are learned, two per week: basics first, the long ones last. */
@@ -326,10 +389,11 @@ export function weekCombos(week = learnWeek()): Combo[] {
   return [all[i], all[(i + 1) % all.length]];
 }
 
-export function focusCombos(focus: string | undefined): Combo[] {
+/** heightCm: the boxer's height from the profile; tall boxers get the long-range set. */
+export function focusCombos(focus: string | undefined, heightCm = 0): Combo[] {
   const week = weekCombos();
   if (focus === 'week') return week;
-  const ids = FOCUS[focus ?? ''] ?? [];
+  const ids = (heightCm >= TALL_CM ? FOCUS_TALL : FOCUS)[focus ?? ''] ?? [];
   const list = ids.map((id) => COMBOS.find((c) => c.id === id)).filter((c): c is Combo => !!c);
   // "focus on combinations": the combinations of the week are called there too, so they stick
   return focus === 'combo' ? [...week, ...list.filter((c) => !week.includes(c))] : list;
@@ -341,12 +405,13 @@ export function tiktokUrl(vid: string): string {
 
 export const FOCUS_LINE: Record<string, string> = {
   week: 'Combinațiile săptămânii',
-  jab: 'Jab și joc de picioare',
-  move: 'Mișcare și pumni',
-  combo: 'Combinații',
-  power: 'Unghiuri și putere',
-  slow: 'Lent și curat',
-  distance: 'Lucru pe distanță',
+  jab: 'Jab & Footwork',
+  move: 'Punches & Movement',
+  combo: 'Combinations',
+  power: 'Angle Changes & Power',
+  slow: 'Slow, Clean Strikes',
+  distance: 'Distance Work',
   rope: 'Joc de picioare ușor',
+  ladder: 'Pași rapizi și preciși',
   legs: '',
 };

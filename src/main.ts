@@ -20,6 +20,7 @@ import { settingsHtml } from './ui/screens/settings.ts';
 import { bodyAct, bodyChange, bodyInput, hydratePhotos } from './ui/screens/body.ts';
 import { nuAct, nuChange, nuInput, nutriStartup, nutritionHtml } from './ui/screens/nutrition.ts';
 import { MORE_TABS, moreHtml } from './ui/screens/more.ts';
+import { discAct, disciplineHtml } from './ui/screens/discipline.ts';
 import { icsExport } from './ui/ics.ts';
 import { isDark, saveSteps, setTheme, startBlock, toggleMark } from './ui/screens/shared.ts';
 import { dayViewHtml, todayHtml } from './ui/screens/today.ts';
@@ -58,6 +59,8 @@ function screenHtml(): string {
       return mindHtml();
     case 'nutri':
       return nutritionHtml();
+    case 'disc':
+      return disciplineHtml();
     case 'more':
       return moreHtml();
     case 'progress':
@@ -441,6 +444,7 @@ document.addEventListener('click', (ev) => {
   }
   if (a.startsWith('body:')) return bodyAct(a, el, render);
   if (a.startsWith('nu:')) return nuAct(a, el, render);
+  if (a.startsWith('dc:')) return discAct(a, el, render);
   const hadPlayer = !!ctx.player;
   act(a, el);
   if (!hadPlayer && ctx.player) {

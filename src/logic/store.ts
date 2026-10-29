@@ -3,6 +3,7 @@
 import { EMOM_START } from '../data/workouts.ts';
 import { dayKey, uid } from './util.ts';
 import type { Fast, FastLog } from './nutri/fast.ts';
+import { freshDiscipline, type Discipline } from './discipline.ts';
 
 export type Kind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'wimhof' | 'breath' | 'shower' | 'row';
 
@@ -155,6 +156,8 @@ export interface State {
   /** The fast running now (16/8 or 24 h), and the finished ones. */
   fast: Fast | null;
   fasts: FastLog[];
+  /** Discipline Challenges: No Fap and Dopamine Discipline. */
+  disc: Discipline;
 }
 
 export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 200, startW: 80, goalW: 75, act: 1.55 };
@@ -211,6 +214,7 @@ export function freshState(today: string = dayKey()): State {
     nlog: {},
     fast: null,
     fasts: [],
+    disc: freshDiscipline(),
   };
 }
 
@@ -247,6 +251,10 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     nlog: isObj(r.nlog) ? (r.nlog as Record<string, { k: number; t: number }>) : {},
     fast: isObj(r.fast) && (r.fast.mode === '168' || r.fast.mode === '24') && typeof r.fast.start === 'number' ? (r.fast as Fast) : null,
     fasts: Array.isArray(r.fasts) ? r.fasts.filter((x) => isObj(x) && typeof x.start === 'number' && typeof x.end === 'number') : [],
+    disc: {
+      nofap: { ...base.disc.nofap, ...(isObj(r.disc) && isObj(r.disc.nofap) ? r.disc.nofap : {}) },
+      dopa: { ...base.disc.dopa, ...(isObj(r.disc) && isObj(r.disc.dopa) ? r.disc.dopa : {}) },
+    },
   };
 }
 

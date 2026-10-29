@@ -6,6 +6,7 @@ import { Track, haversine, routePath, simplify } from './geo.ts';
 import { activeStreak, advise, dayComplete, emomNext, habitMilestone, habitStreak, lastExercise, totals, weekDone } from './progress.ts';
 import { freshState, makeEntry, normalize } from './store.ts';
 import { fastStatus, hms } from './nutri/fast.ts';
+import { DOPA_RULES, dopaBest, dopaStreak, nextMilestone, nofapDays } from './discipline.ts';
 import { breathPos, holdStats } from './wimhof.ts';
 import { WEEK, blockName, blockLine, resolveBlock, type Picks } from '../data/plan.ts';
 import { ROW_CHALLENGES, rowChallenge, rowRests, rowTotal } from '../data/row.ts';
@@ -312,4 +313,20 @@ test('fasting: 16/8 and 24 h timers', () => {
   assert.ok(fastStatus({ mode: '24', start: t0 }, t0 + 24 * H).done);
   assert.equal(normalize({ fast: { mode: 'x', start: 1 } }).fast, null);
   assert.deepEqual(normalize({ fast: { mode: '24', start: t0 } }).fast, { mode: '24', start: t0 });
+});
+
+test('discipline: no fap days and dopamine streaks', () => {
+  assert.equal(nofapDays({ start: '2026-10-20', best: 0, resets: [] }, '2026-10-29'), 9);
+  assert.equal(nofapDays({ start: null, best: 0, resets: [] }, '2026-10-29'), 0);
+  assert.equal(nextMilestone(9), 14);
+  const all = DOPA_RULES.map((r) => r.id);
+  const d = { started: '2026-10-25', days: { '2026-10-25': all, '2026-10-26': all, '2026-10-27': ['cold'], '2026-10-28': all } as Record<string, string[]> };
+  assert.equal(dopaStreak(d, '2026-10-29'), 1); // today not done yet: yesterday counts
+  d.days['2026-10-29'] = all;
+  assert.equal(dopaStreak(d, '2026-10-29'), 2);
+  assert.equal(dopaBest(d), 2);
+  const s = normalize({ disc: { nofap: { start: '2026-10-01' } } });
+  assert.equal(s.disc.nofap.start, '2026-10-01');
+  assert.deepEqual(s.disc.nofap.resets, []);
+  assert.equal(s.disc.dopa.started, null);
 });

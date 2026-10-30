@@ -1,8 +1,8 @@
 // Round timer for Shadow Boxing, Heavy Bag, Jumping Rope / Agility Ladder and Wall Sit / Jumping Squats,
 // with Alex Hanma's combinations called out during the rounds.
 
-import type { ComboFocus } from '../../data/plan.ts';
-import { focusCombos, LADDER_MOVES, ROPE_MOVES, FOCUS_LINE, type Combo } from '../../data/combos.ts';
+import { WARMUP, type ComboFocus } from '../../data/plan.ts';
+import { focusCombos, LADDER_MOVES, ROPE_MOVES, FOCUS_LINE, roundThemes, type Combo, type RoundTheme } from '../../data/combos.ts';
 
 /** The e-book's focus line for each block, as printed on the plan page. */
 const BOOK_FOCUS: Record<string, string> = {
@@ -35,7 +35,12 @@ export interface RoundsCfg {
   tip?: string;
   cues?: string[];
   legSwap?: boolean;
+  /** Offer the 6-minute warm-up before round 1. */
+  warmup?: boolean;
 }
+
+/** Last seconds of a round that turn into a straight-punch sprint (second half of the rounds). */
+const SPRINT = 30;
 
 /** Footwork drills (rope, ladder) are called as moves, not combinations. */
 const isDrill = (f: ComboFocus | undefined): boolean => f === 'rope' || f === 'ladder';
@@ -67,13 +72,30 @@ class RoundsPlayer implements Player {
   caller: boolean;
   tip = '';
   saved = false;
+  themes: RoundTheme[] = [];
+  /** Sprint finish on the later rounds; on by default at the bag. */
+  sprint: boolean;
+  sprinting = false;
+  warm: boolean;
 
   constructor(cfg: RoundsCfg) {
     this.cfg = { ...cfg };
     if (cfg.legSwap) this.cfg.name = ctx.S.set.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit';
     this.calls = this.buildCalls();
+    this.themes = cfg.rounds > 1 ? roundThemes(cfg.focus, ctx.S.nut.h) : [];
     this.caller = this.calls.length > 0 && ctx.S.set.callEvery > 0;
+    this.sprint = cfg.focus === 'move' || cfg.focus === 'power';
+    this.warm = !!cfg.warmup;
     this.render();
+  }
+
+  /** The theme of a round (1-based), if the block has themes. */
+  themeOf(round: number | undefined): RoundTheme | null {
+    return round && this.themes.length ? this.themes[(round - 1) % this.themes.length] : null;
+  }
+
+  sprintRound(round: number | undefined): boolean {
+    return this.sprint && !!round && round > Math.floor(this.cfg.rounds / 2) && this.cfg.work >= 90;
   }
 
   buildCalls(): Call[] {
@@ -123,9 +145,12 @@ class RoundsPlayer implements Player {
       ${c.cues?.length ? `<ul class="ticks small">${c.cues.map((q) => `<li>${esc(q)}</li>`).join('')}</ul>` : ''}
       ${c.legSwap ? `<p class="dim">${esc(LEG_CUES[ctx.S.set.legMode])}</p>` : ''}
       ${howHtml(c.legSwap ? (ctx.S.set.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit') : c.name, undefined, { open: true })}
+      ${this.themes.length ? `<div class="call-box"><h4>Tema fiecărei runde</h4><ol class="small" style="margin:0;padding-left:18px">${this.themes.map((t) => `<li><b>${esc(t.name)}</b>: ${esc(t.cue)}</li>`).join('')}</ol>${this.themes.length < c.rounds ? '<p class="small dim" style="margin:6px 0 0">Apoi se reiau în ordine.</p>' : ''}</div>` : ''}
       ${this.callsHtml()}
       <div class="setup">
         ${legs}
+        ${c.warmup ? field('Încălzire', switchCtl('p:warm', this.warm, 'Încălzire'), `${WARMUP.length} mișcări, 6 min, înainte de runda 1`) : ''}
+        ${this.calls.length && !isDrill(c.focus) && c.rounds > 1 && c.work >= 90 ? field('Sprint final', switchCtl('p:sprint', this.sprint, 'Sprint final'), `Ultimele ${SPRINT} s din a doua jumătate a rundelor`) : ''}
         ${field('Runde', stepper('p:rounds', String(c.rounds), 'Runde'))}
         ${field('Lucru', stepper('p:work', mmss(c.work), 'Lucru'))}
         ${c.rounds > 1 ? field('Pauză', stepper('p:rest', mmss(c.rest), 'Pauză'), 'Cartea nu dă pauza; 1 minut e standardul din box') : ''}
@@ -138,17 +163,20 @@ class RoundsPlayer implements Player {
   runHtml(): string {
     const L = locate(this.phases, this.clock.t);
     const p = this.phases[L.i];
-    const last = p.kind === 'work' && L.left <= 10 && this.cfg.work > 20;
-    const cls = p.kind === 'work' ? (last ? 'ph-last' : 'ph-work') : p.kind === 'prep' ? 'ph-prep' : 'ph-rest';
-    const roundTxt = p.round ? `Runda ${p.round} din ${p.rounds}` : '';
+    const last = p.kind === 'work' && (L.left <= 10 || this.sprinting) && this.cfg.work > 20;
+    const cls = p.kind === 'work' ? (last ? 'ph-last' : 'ph-work') : p.kind === 'prep' || p.kind === 'move' ? 'ph-prep' : 'ph-rest';
+    const roundTxt = p.kind === 'move' ? `Încălzire ${p.round} din ${p.rounds}` : p.round ? `Runda ${p.round} din ${p.rounds}` : '';
+    const theme = p.kind === 'work' ? this.themeOf(p.round) : null;
     let panel = '';
-    if (p.kind === 'work' && this.call && this.caller) panel = this.callHtml('Acum');
+    if (p.kind === 'move') panel = `<div class="call-box"><h4>${esc(p.label)}</h4><p style="margin:0;font-weight:600">${esc(WARMUP[p.move ?? 0]?.cue ?? '')}</p></div>`;
+    else if (p.kind === 'work' && this.sprinting) panel = '<div class="call-box"><h4>Sprint</h4><div class="c-name">Lovituri drepte, viteză maximă</div><p class="small" style="margin:0">Jab-cross non-stop, pe toată distanța. Garda revine la fiecare pumn.</p></div>';
+    else if (p.kind === 'work' && this.call && this.caller) panel = this.callHtml(theme ? theme.name : 'Acum');
     else if (p.kind === 'work' && this.cfg.legSwap) panel = `<div class="call-box"><h4>Formă</h4><p style="margin:0">${esc(LEG_CUES[ctx.S.set.legMode])}</p></div>`;
     else if (p.kind === 'rest' && this.tip) panel = `<div class="call-box"><h4>Sfat de la Alex</h4><p style="margin:0;font-weight:600">${esc(this.tip)}</p></div>`;
     else if (p.kind === 'rest') panel = `<div class="call-box"><h4>Urmează</h4><p style="margin:0;font-weight:600">Runda ${(p.round ?? 0) + 1} din ${p.rounds}. Respiră adânc.</p></div>`;
     else if (p.kind === 'prep') panel = this.cfg.tip ? `<div class="call-box"><h4>Focus</h4><p style="margin:0;font-weight:600">${esc(this.cfg.tip)}</p></div>` : '';
     const body = `
-      <p class="phase-lbl" id="ph">${esc(p.kind === 'work' ? (this.cfg.focus && FOCUS_LINE[this.cfg.focus]) || 'Lucru' : p.label)}</p>
+      <p class="phase-lbl" id="ph">${esc(p.kind === 'work' ? (this.sprinting ? 'Sprint' : theme?.name || (this.cfg.focus && FOCUS_LINE[this.cfg.focus]) || 'Lucru') : p.kind === 'move' ? 'Încălzire' : p.label)}</p>
       <div class="big-time" id="t">${mmss(Math.ceil(L.left))}</div>
       <p class="round-lbl" id="rd">${esc(roundTxt)}</p>
       ${p.round && (p.rounds ?? 0) > 1 ? `<div class="rd-dots" aria-hidden="true">${Array.from({ length: p.rounds ?? 0 }, (_, i) => `<i class="${i + 1 < p.round! ? 'ok' : i + 1 === p.round ? (p.kind === 'work' ? 'on' : 'ok') : ''}"></i>`).join('')}</div>` : ''}
@@ -186,7 +214,11 @@ class RoundsPlayer implements Player {
   start(): void {
     unlock();
     const c = this.cfg;
-    this.phases = roundsSeq(c.rounds, c.work, c.rounds > 1 ? c.rest : 0, 5);
+    const rounds = roundsSeq(c.rounds, c.work, c.rounds > 1 ? c.rest : 0, 5);
+    // Warm-up first: its moves, then a short "get ready" before round 1.
+    this.phases = this.warm
+      ? [rounds[0], ...WARMUP.map((m, i): Phase => ({ kind: 'move', sec: m.sec, label: m.name, move: i, round: i + 1, rounds: WARMUP.length })), { kind: 'prep', sec: 10, label: 'Gata de runda 1' }, ...rounds.slice(1)]
+      : rounds;
     this.clock.start();
     this.st = 'run';
     this.lastI = -1;
@@ -195,12 +227,20 @@ class RoundsPlayer implements Player {
     this.tick();
   }
 
+  /** Calls for the round now running: its theme's combinations, or all of the block's. */
+  pool(): Call[] {
+    const L = locate(this.phases, this.clock.t);
+    const t = this.themeOf(this.phases[L.i]?.round);
+    return t ? t.combos.map((c) => ({ name: c.name, seq: c.seq, say: c.call, note: c.note })) : this.calls;
+  }
+
   nextCall(speak = true): void {
-    if (!this.calls.length) return;
-    let i = Math.floor(Math.random() * this.calls.length);
-    if (this.calls.length > 1 && i === this.callIdx) i = (i + 1) % this.calls.length;
+    const pool = this.pool();
+    if (!pool.length) return;
+    let i = Math.floor(Math.random() * pool.length);
+    if (pool.length > 1 && i === this.callIdx) i = (i + 1) % pool.length;
     this.callIdx = i;
-    this.call = this.calls[i];
+    this.call = pool[i];
     this.lastCall = this.clock.t;
     if (speak) say(this.call.say, 'en');
   }
@@ -221,27 +261,43 @@ class RoundsPlayer implements Player {
       this.lastSec = sec;
       setText('t', mmss(sec));
       if (p.kind === 'work') {
-        if (sec === 10 && this.cfg.work > 20) {
+        if (!this.sprinting && this.sprintRound(p.round) && sec <= SPRINT && sec > 1) {
+          this.sprinting = true;
+          hush();
+          sfx.warn();
+          buzz([150, 80, 150]);
+          say('Sprint! Straight punches, full speed', 'en');
+          this.render();
+        } else if (sec === 10 && this.cfg.work > 20 && !this.sprinting) {
           sfx.warn();
           buzz(120);
           this.render();
         }
       } else if (sec <= 3 && sec >= 1) sfx.tick();
     }
-    if (p.kind === 'work' && this.caller && this.clock.running && this.clock.t - this.lastCall >= this.every && L.left > 5) {
+    if (p.kind === 'work' && this.caller && !this.sprinting && this.clock.running && this.clock.t - this.lastCall >= this.every && L.left > 5) {
       this.nextCall();
       this.render();
     }
   }
 
   onPhase(p: Phase): void {
+    this.sprinting = false;
+    if (p.kind === 'move') {
+      if (p.round === 1) slam('Încălzire', `${WARMUP.length} mișcări`);
+      sfx.beep();
+      buzz(120);
+      return;
+    }
     if (p.kind === 'work') {
       if (p.round && p.rounds && p.rounds > 1) slam(p.round === p.rounds ? 'Ultima rundă' : `Runda ${p.round}`, `din ${p.rounds}`);
       else slam('Start');
       sfx.bell(1);
       buzz(350);
+      const th = this.themeOf(p.round);
       if (this.caller) {
         this.nextCall(false);
+        if (th) window.setTimeout(() => this.clock.running && say(th.name, 'ro'), 300);
         window.setTimeout(() => this.call && this.clock.running && say(this.call.say, 'en'), 900);
       }
     } else if (p.kind === 'rest') {
@@ -302,6 +358,12 @@ class RoundsPlayer implements Player {
         return this.render();
       case 'p:caller':
         this.caller = (el as HTMLInputElement).checked;
+        return;
+      case 'p:sprint':
+        this.sprint = (el as HTMLInputElement).checked;
+        return;
+      case 'p:warm':
+        this.warm = (el as HTMLInputElement).checked;
         return;
       case 'p:start':
         return this.start();

@@ -21,6 +21,8 @@ import { bodyAct, bodyChange, bodyInput, hydratePhotos } from './ui/screens/body
 import { nuAct, nuChange, nuInput, nutriStartup, nutritionHtml } from './ui/screens/nutrition.ts';
 import { MORE_TABS, moreHtml } from './ui/screens/more.ts';
 import { discAct, disciplineHtml } from './ui/screens/discipline.ts';
+import { labHtml } from './ui/screens/lab.ts';
+import { openLab } from './ui/players/lab.ts';
 import { icsExport } from './ui/ics.ts';
 import { isDark, saveSteps, setTheme, startBlock, toggleMark } from './ui/screens/shared.ts';
 import { dayViewHtml, todayHtml } from './ui/screens/today.ts';
@@ -61,6 +63,8 @@ function screenHtml(): string {
       return nutritionHtml();
     case 'disc':
       return disciplineHtml();
+    case 'lab':
+      return labHtml();
     case 'more':
       return moreHtml();
     case 'progress':
@@ -284,6 +288,9 @@ function act(a: string, el: HTMLElement): void {
     case 'ccat':
       setComboCat(el.dataset.k || 'all');
       return render();
+    case 'lab':
+      unlock();
+      return openLab(el.dataset.k || 'reset');
     case 'tool':
       unlock();
       return openTool(el.dataset.k || '');

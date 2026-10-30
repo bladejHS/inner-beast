@@ -11,6 +11,7 @@ import { habitCard } from './today.ts';
 import { top } from './shared.ts';
 
 const TOOLS = [
+  { k: 'lab', icon: 'wind', name: 'Breathwork Lab', sub: 'Reset, Tactical, Recovery, Advanced' },
   { k: 'wimhof', icon: 'wind', name: 'Wim Hof', sub: 'Meditație cu respirație și retenție' },
   { k: 'breath', icon: 'mind', name: '4-7-8', sub: 'Sesiunea de breathing' },
   { k: 'shower', icon: 'drop', name: 'Shower', sub: '1 min rece, 1 min cald' },
@@ -61,7 +62,7 @@ export function mindHtml(): string {
     <h1 class="stack">Minte</h1>
     ${art('eyes', 'mind-eyes')}
     <h2 class="sec">Unelte</h2>
-    <div class="tiles">${TOOLS.map((t) => `<button class="tile" data-a="tool" data-k="${t.k}">${ic(t.icon)}<b>${esc(t.name)}</b><span>${esc(t.k === 'wimhof' && hs.best ? `Record: ${mmss(hs.best)}` : t.sub)}</span></button>`).join('')}</div>
+    <div class="tiles">${TOOLS.map((t) => `<button class="tile" data-a="${t.k === 'lab' ? 'tab' : 'tool'}" data-k="${t.k}">${ic(t.icon)}<b>${esc(t.name)}</b><span>${esc(t.k === 'wimhof' && hs.best ? `Record: ${mmss(hs.best)}` : t.sub)}</span></button>`).join('')}</div>
     <h2 class="sec">De ce-ul tău<small>„Găsește-ți de ce-ul și îți vei găsi succesul.”</small></h2>
     ${whyBlock()}
     <h2 class="sec">Rutina de 28 de zile<small>Un singur lucru simplu, în fiecare zi. Nu te culci până nu e gata.</small></h2>

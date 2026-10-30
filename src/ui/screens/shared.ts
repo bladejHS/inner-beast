@@ -1,7 +1,7 @@
 // Pieces shared by the screens: header, program block cards, starting and checking off a block.
 
 import { focusCombos } from '../../data/combos.ts';
-import { resolveBlock, type Block, type RestKey } from '../../data/plan.ts';
+import { resolveBlock, WARMUP_SEC, type Block, type RestKey } from '../../data/plan.ts';
 import { ROW_CHALLENGES, rowChallenge } from '../../data/row.ts';
 import { makeEntry, type Kind } from '../../logic/store.ts';
 import { dayKey, esc, inWeek, num, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
@@ -52,7 +52,7 @@ export function startBlock(raw: Block): void {
   const b = resolveBlock(raw, ctx.S.set);
   switch (b.kind) {
     case 'rounds':
-      return openRounds({ name: b.name, rounds: b.rounds ?? 1, work: b.work ?? 180, rest: restFor(b.rest), focus: b.focus, block: b.id, tip: b.tip, cues: b.cues, legSwap: b.legSwap });
+      return openRounds({ name: b.name, rounds: b.rounds ?? 1, work: b.work ?? 180, rest: restFor(b.rest), focus: b.focus, block: b.id, tip: b.tip, cues: b.cues, legSwap: b.legSwap, warmup: b.warmup });
     case 'row':
       return openRow(b.id);
     case 'amrap':
@@ -122,7 +122,7 @@ export function blockMinutes(raw: Block): number {
   const b = resolveBlock(raw, ctx.S.set);
   if (b.kind === 'rounds') {
     const r = b.rounds ?? 1;
-    return Math.round((r * (b.work ?? 0) + (r - 1) * restFor(b.rest)) / 60);
+    return Math.round((r * (b.work ?? 0) + (r - 1) * restFor(b.rest) + (b.warmup ? WARMUP_SEC : 0)) / 60);
   }
   if (b.kind === 'shower') return ctx.S.set.showerRounds * 2 + (ctx.S.set.showerEndCold ? 1 : 0);
   if (b.kind === 'walk') return 75;

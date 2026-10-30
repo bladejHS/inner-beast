@@ -668,6 +668,30 @@ input:focus, textarea:focus { outline: none; border-color: var(--ink); }
 .dc-week i { display: block; width: 100%; height: 8px; background: var(--line); }
 .dc-week .part i { background: var(--line-2); }
 .dc-week .ok i { background: var(--red); }
+
+/* Breathwork Lab */
+.lab-head { margin: 0 -16px 18px; }
+.lab-hero { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: #050506; }
+.lab-sum { display: flex; gap: 18px; padding: 12px 16px 0; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+.lab-sum b { font: 800 22px/1 var(--display); letter-spacing: 0; color: var(--ink); margin-right: 6px; }
+.lab-modes { display: grid; gap: 0; border-top: 1px solid var(--line); }
+.lab-mode { display: grid; grid-template-columns: 44px 1fr 20px; align-items: center; gap: 12px; width: 100%; padding: 16px 2px; background: none; border: 0; border-bottom: 1px solid var(--line); color: inherit; text-align: left; cursor: pointer; }
+.lab-mode svg { width: 18px; height: 18px; color: var(--mute); }
+.lab-code { font: 800 13px/1 var(--display); letter-spacing: .16em; color: var(--red-2, var(--red)); text-transform: uppercase; }
+.lab-mode .lab-code { font-size: 20px; letter-spacing: 0; }
+.lab-mt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.lab-mt b { font: 900 24px/1 var(--display); letter-spacing: .04em; }
+.lab-mt span { font-size: 13px; line-height: 1.35; color: var(--mute); }
+.lab-mt em { font-style: normal; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2, var(--ink)); }
+.lab-mode:hover .lab-mt b, .lab-mode:focus-visible .lab-mt b { color: var(--red-2, var(--red)); }
+.lab-k { margin: 16px 0 6px; font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--red-2, var(--red)); }
+.lab-tl { display: flex; gap: 3px; margin: 14px 0 8px; }
+.lab-tl i { flex: 1; height: 4px; background: rgba(255, 255, 255, .14); transition: background-color .3s; }
+.lab-tl i.ok { background: var(--red-2, var(--red)); }
+.lab-tl i.on { background: #fff; }
+.lab-run[data-mode='tactical'] .orb { border-radius: 14%; }
+.lab-run[data-mode='recovery'] .orb { filter: saturate(.7) brightness(.85); }
+.lab-run[data-mode='advanced'] .orb { box-shadow: 0 0 0 2px var(--red-2, var(--red)) inset; }
 .bk-alt .chip { min-height: 32px; padding: 0 12px; font-size: 13px; }
 .bk.done .bk-calls { color: var(--mute-inv); }
 

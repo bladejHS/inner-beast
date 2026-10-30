@@ -6,6 +6,9 @@ import { Track, haversine, routePath, simplify } from './geo.ts';
 import { activeStreak, advise, dayComplete, emomNext, habitMilestone, habitStreak, lastExercise, totals, weekDone } from './progress.ts';
 import { freshState, makeEntry, normalize } from './store.ts';
 import { fastStatus, hms } from './nutri/fast.ts';
+import { LAB, labSeq } from './breathlab.ts';
+import { roundThemes } from '../data/combos.ts';
+import { WARMUP_SEC } from '../data/plan.ts';
 import { DOPA_RULES, dopaBest, dopaStreak, nextMilestone, nofapDays } from './discipline.ts';
 import { breathPos, holdStats } from './wimhof.ts';
 import { WEEK, blockName, blockLine, resolveBlock, type Picks } from '../data/plan.ts';
@@ -329,4 +332,34 @@ test('discipline: no fap days and dopamine streaks', () => {
   assert.equal(s.disc.nofap.start, '2026-10-01');
   assert.deepEqual(s.disc.nofap.resets, []);
   assert.equal(s.disc.dopa.started, null);
+});
+
+test('breathwork lab: four modes, whole cycles filling the minutes', () => {
+  assert.deepEqual(LAB.map((m) => m.name), ['RESET', 'TACTICAL', 'RECOVERY', 'ADVANCED']);
+  for (const m of LAB) {
+    assert.ok(m.mins.includes(m.rec), m.id);
+    const s = labSeq(m.id, m.rec, 0);
+    const t = totalSec(s);
+    assert.ok(t >= m.rec * 60 - 1 && t < m.rec * 60 + 40, `${m.id}: ${t}`);
+    assert.ok(s.every((p) => ['in', 'hold', 'out'].includes(p.kind)), m.id);
+  }
+  const tac = labSeq('tactical', 1, 0);
+  assert.deepEqual(tac.slice(0, 4).map((p) => [p.kind, p.sec]), [['in', 4], ['hold', 4], ['out', 4], ['hold', 4]]);
+  const adv = labSeq('advanced', 12, 0).filter((p, i, a) => p.kind === 'hold' && a[i - 1]?.kind === 'out');
+  assert.equal(adv[0].sec, 5);
+  assert.equal(Math.max(...adv.map((p) => p.sec)), 20);
+});
+
+test('rounds: themed rounds, a defensive distance round for a tall boxer, warm-up length', () => {
+  const tall = roundThemes('power', 200);
+  assert.ok(tall.length >= 3);
+  assert.ok(tall.some((t) => t.name === 'Apărare la distanță' && t.combos.some((c) => c.id === 'clinch-exit')));
+  for (const t of tall) assert.ok(t.combos.length >= 2, t.name);
+  assert.ok(!roundThemes('power', 175).some((t) => t.name === 'Apărare la distanță'));
+  assert.equal(roundThemes('slow', 200).length, 0);
+  assert.equal(roundThemes('jab', 200)[0].name, 'Doar jab');
+  assert.ok(roundThemes('jab', 200)[0].combos.every((c) => !c.seq.some((s) => /Cross|Hook|Uppercut/.test(s))));
+  assert.ok(WARMUP_SEC >= 300 && WARMUP_SEC <= 420);
+  const r = (id: string) => WEEK.flatMap((d) => d.blocks).find((b) => b.id === id)!;
+  assert.ok(r('mon-shadow').warmup && r('thu-rope').warmup);
 });

@@ -298,6 +298,19 @@ export const COMBOS: Combo[] = [
     id: 'step-jab-cross-back', name: 'Step In – Jab – Cross – Step Back', seq: ['Step in', 'Jab', 'Cross', 'Step back'], call: 'Step in, jab, cross, step back', cat: 'footwork',
     note: 'Intri exact cât trebuie ca să ajungi cu crossul, apoi ieși pe același drum. Lucrezi la distanța ta, nu la a lui.',
   },
+  // Getting out when a shorter opponent gets inside: not to fight there, to leave and reset the range.
+  {
+    id: 'clinch-exit', name: 'Frame – Pivot Out – Jab', seq: ['Frame (lead forearm)', 'Pivot out', 'Jab', 'Step back'], call: 'Frame, pivot, jab', cat: 'defense',
+    note: 'Când intră peste tine: antebrațul din față pe umărul sau pieptul lui ca distanțier, pivotezi pe piciorul din față și ieși. Jabul îl oprește să te urmărească.',
+  },
+  {
+    id: 'corner-exit', name: 'Corner Exit: Slip – Pivot – Step to the Side', seq: ['Slip', 'Pivot out', 'Step to the side', 'Jab'], call: 'Slip, pivot, step to the side, jab', cat: 'defense',
+    note: 'Cu spatele la colț sau la corzi: te eschivezi, pivotezi și ieși lateral spre centru. Ajungi tu în unghi, el rămâne cu fața la colț.',
+  },
+  {
+    id: 'catch-step-jab', name: 'Catch – Step Back – Jab – Cross', seq: ['Catch (rear hand)', 'Step back', 'Jab', 'Cross'], call: 'Catch, step back, jab, cross', cat: 'counter',
+    note: 'Prinzi jabul lui în palma din spate, un pas înapoi ca să fie din nou la capătul brațului tău, apoi 1-2 lung înainte să reintre.',
+  },
 ];
 
 export const CAT_NAMES: Record<ComboCat, string> = {
@@ -387,6 +400,52 @@ export function weekCombos(week = learnWeek()): Combo[] {
   const all = learnOrder();
   const i = (week * 2) % all.length;
   return [all[i], all[(i + 1) % all.length]];
+}
+
+const POWER_PUNCH = /Hook|Uppercut|Overhand|Gazelle/;
+const PUNCH = /Cross|Hook|Uppercut|Overhand|Body|Straight|Right|Left|Gazelle|Tap/;
+const MOVE = /Step|Pivot|Circle|Move|Slip|Pull|Lean|Ghost|Frame|Catch|Push off/;
+
+/** Defensive distance work: leave the pocket, retake the range. Tall boxers get a round of it in every boxing block. */
+const DEFENSE_IDS = ['pull-counter', 'double-jab-back', 'jab-reset-reenter', 'check-hook', 'clinch-exit', 'corner-exit', 'catch-step-jab', 'beginner-defense'];
+
+export interface RoundTheme {
+  name: string;
+  cue: string;
+  combos: Combo[];
+}
+
+const THEME_DEFS: Record<string, { name: string; cue: string; pick: (c: Combo) => boolean }> = {
+  jab: { name: 'Doar jab', cue: 'Doar mâna din față: simplu, dublu, la corp, din mișcare.', pick: (c) => c.seq.some((s) => /Jab/.test(s)) && !c.seq.some((s) => PUNCH.test(s)) },
+  straight: { name: 'Drepte și ieșire', cue: 'Jab și cross pe toată distanța, apoi ieși din linie.', pick: (c) => c.seq.some((s) => /Cross/.test(s)) && !c.seq.some((s) => POWER_PUNCH.test(s)) && c.seq.some((s) => MOVE.test(s)) },
+  power: { name: 'Putere și unghi', cue: 'Greutatea transferată, apoi pivot sau pas lateral.', pick: (c) => c.seq.some((s) => POWER_PUNCH.test(s) || /Pivot/.test(s)) },
+  defense: { name: 'Apărare la distanță', cue: 'Ieși din buzunar, reiei distanța, contrezi de la capătul jabului.', pick: (c) => DEFENSE_IDS.includes(c.id) },
+  free: { name: 'Combinații libere', cue: 'Tot ce ai lucrat, legat, cu ieșire la final.', pick: () => true },
+};
+
+const THEMES_BY_FOCUS: Record<string, string[]> = {
+  jab: ['jab', 'straight', 'defense'],
+  move: ['straight', 'jab', 'power', 'defense'],
+  combo: ['straight', 'power', 'free'],
+  power: ['straight', 'power', 'defense'],
+  distance: ['jab', 'defense', 'straight'],
+};
+
+/** One theme per round, cycling: round r uses themes[(r - 1) % length]. Themes with fewer than 2 combos are dropped. */
+export function roundThemes(focus: string | undefined, heightCm = 0): RoundTheme[] {
+  const keys = THEMES_BY_FOCUS[focus ?? ''];
+  if (!keys) return [];
+  const tall = heightCm >= TALL_CM;
+  const pool = focusCombos(focus, heightCm);
+  const extra = COMBOS.filter((c) => DEFENSE_IDS.includes(c.id) && (tall || !['clinch-exit', 'corner-exit'].includes(c.id)));
+  const list = (tall ? keys : keys.filter((k) => k !== 'defense' || focus === 'jab' || focus === 'distance'))
+    .map((k) => {
+      const d = THEME_DEFS[k];
+      const src = k === 'defense' ? extra : pool;
+      return { name: d.name, cue: d.cue, combos: src.filter(d.pick) };
+    })
+    .filter((t) => t.combos.length >= 2);
+  return list;
 }
 
 /** heightCm: the boxer's height from the profile; tall boxers get the long-range set. */

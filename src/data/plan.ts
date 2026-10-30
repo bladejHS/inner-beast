@@ -30,7 +30,22 @@ export interface Block {
   cues?: string[];
   /** A slot with two alternatives the user picks from (Thursday): see resolveBlock. */
   alt?: 'feet' | 'main';
+  /** First boxing block of the day: offers the warm-up before round 1. */
+  warmup?: boolean;
 }
+
+/** 6-minute warm-up before the first boxing block (Monday, Thursday). */
+export const WARMUP: Array<{ name: string; sec: number; cue: string }> = [
+  { name: 'Arm Circles', sec: 45, cue: 'Cercuri mari cu brațele, înainte, apoi înapoi.' },
+  { name: 'Shoulder Rolls', sec: 45, cue: 'Umerii rotiți larg, apoi mâinile în gardă și înapoi.' },
+  { name: 'Torso Twists', sec: 45, cue: 'Rotești trunchiul stânga-dreapta, șoldurile urmează.' },
+  { name: 'Hip Circles', sec: 45, cue: 'Mâinile pe șolduri, cercuri largi în ambele sensuri.' },
+  { name: 'Leg Swings', sec: 60, cue: 'Balansezi piciorul înainte-înapoi, 30 s pe fiecare.' },
+  { name: 'Light Bounce', sec: 60, cue: 'Țopăi ușor pe vârfuri, schimbi garda, scuturi brațele.' },
+  { name: 'Easy Shadow', sec: 60, cue: 'Shadow la 50%: jab, cross, pași. Doar ca să pornească motorul.' },
+];
+
+export const WARMUP_SEC = WARMUP.reduce((s, m) => s + m.sec, 0);
 
 /** The user's picks for the swappable blocks (a subset of the settings). */
 export interface Picks {
@@ -51,7 +66,7 @@ export const WEEK: Day[] = [
     idx: 0,
     title: 'Combat Training',
     blocks: [
-      { id: 'mon-shadow', kind: 'rounds', name: 'Shadow Boxing', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'jab', tip: 'Jab & Footwork: jabul e arma principală, picioarele îl duc în distanță.',
+      { id: 'mon-shadow', kind: 'rounds', name: 'Shadow Boxing', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'jab', warmup: true, tip: 'Jab & Footwork: jabul e arma principală, picioarele îl duc în distanță.',
         cues: ['Variezi jabul: simplu, dublu, la corp, din pas înainte și din retragere.', 'Te miști imediat după pumn: înainte, înapoi, lateral. Nu rămâi pe loc.', 'Pașii mici și preciși, distanța dintre tălpi rămâne aceeași.', 'Controlezi distanța cu mâna din față; după fiecare secvență revii în gardă, echilibrat.'] },
       { id: 'mon-bw', kind: 'amrap', name: 'Bodyweight Workout', dose: '10 min', min: 10, tip: 'Squats, push-ups și pull-ups, cât mai multe runde în 10 minute.' },
       { id: 'mon-bag', kind: 'rounds', name: 'Heavy Bag Training', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'move', tip: 'Punches & Movement: pumni curați legați de jocul de picioare.',
@@ -81,7 +96,7 @@ export const WEEK: Day[] = [
     idx: 3,
     title: 'Combat Training II',
     blocks: [
-      { id: 'thu-rope', kind: 'rounds', name: 'Jumping Rope', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'rope', alt: 'feet', tip: 'Concentrează-te pe un joc de picioare ușor.' },
+      { id: 'thu-rope', kind: 'rounds', name: 'Jumping Rope', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'rope', alt: 'feet', warmup: true, tip: 'Concentrează-te pe un joc de picioare ușor.' },
       { id: 'thu-shadow', kind: 'rounds', name: 'Shadow Boxing', dose: '3 × 3 min', rounds: 3, work: 180, rest: 'r3', focus: 'combo', tip: 'Combinations: combinații cu pregătire, ordine clară și ieșire controlată.',
         cues: ['Fiecare combinație are un scop: o pregătești cu jabul sau o fentă.', 'Loviturile curg una din alta, fără pauze, fără să pierzi echilibrul.', 'Lucrezi și de la distanță lungă, și combinații care se termină într-un unghi nou.', 'Garda rămâne sus: nu arunca pumni izolați, fără sens.'] },
       { id: 'thu-bag', kind: 'rounds', name: 'Heavy Bag Training', dose: '10 × 3 min', rounds: 10, work: 180, rest: 'r3', focus: 'power', alt: 'main', tip: 'Angle Changes & Power: putere reală, fără să strici tehnica.',

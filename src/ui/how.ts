@@ -3,7 +3,6 @@
 
 import { HOW, VAR_NOTES } from '../data/howto.ts';
 import { esc } from '../logic/util.ts';
-import { anim3d } from './beast3d.ts';
 
 const openKeys = new Set<string>();
 const closedKeys = new Set<string>();
@@ -22,7 +21,7 @@ document.addEventListener(
 );
 
 /** key: workout exercise id or display name; variation: the chosen variation, if any. */
-export function howHtml(key: string, variation?: string, opts: { open?: boolean; title?: string; no3d?: boolean } = {}): string {
+export function howHtml(key: string, variation?: string, opts: { open?: boolean; title?: string } = {}): string {
   const h = HOW[key];
   if (!h) return '';
   const note = variation ? VAR_NOTES[variation] : undefined;
@@ -30,7 +29,6 @@ export function howHtml(key: string, variation?: string, opts: { open?: boolean;
   return `<details class="how" data-how="${esc(key)}" ${open ? 'open' : ''}>
     <summary>${esc(opts.title ?? 'Cum se face')}</summary>
     <div class="how-body">
-      ${opts.no3d ? '' : anim3d(key, variation)}
       <ol>${h.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
       ${note ? `<p class="how-v"><b>${esc(variation ?? '')}:</b> ${esc(note)}</p>` : ''}
       ${h.mistake ? `<p class="how-x"><b>Atenție</b>${esc(h.mistake)}</p>` : ''}

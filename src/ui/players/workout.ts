@@ -137,7 +137,7 @@ class WorkoutPlayer implements Player {
       <p class="target">${esc(targetLine(ex))}</p>
       ${advHtml}
       <p class="cue">${esc(ex.cue)}</p>
-      ${howHtml(ex.id, ex.vars[x.lvl], { open: true })}
+      ${howHtml(ex.id, ex.vars[x.lvl])}
       ${ex.alex ? `<p class="alex"><b>Alex:</b> ${esc(ex.alex)}</p>` : ''}
       ${lastLine}
       ${main}`;

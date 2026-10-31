@@ -4,12 +4,9 @@ import { ic } from '../icons.ts';
 import { top } from './shared.ts';
 
 /** Tabs that live behind "Mai mult" (the bar marks it as current while one of them is open). */
-export const MORE_TABS: readonly string[] = ['act', 'jurnal', 'mon', 'nutri', 'mind', 'lab', 'disc', 'alex'];
+export const MORE_TABS: readonly string[] = ['nutri', 'mind', 'lab', 'disc', 'alex'];
 
 const LINKS: Array<{ a: string; k?: string; icon: string; t: string; s: string }> = [
-  { a: 'tab', k: 'act', icon: 'run', t: 'Activități', s: 'Trasee GPX și TCX, statistici, echipament' },
-  { a: 'tab', k: 'jurnal', icon: 'edit', t: 'Jurnal', s: 'Check-in zilnic, măsurători, simptome, obiective' },
-  { a: 'tab', k: 'mon', icon: 'bolt', t: 'Monitor', s: 'Puls live, HRV, Charge și Effort' },
   { a: 'tab', k: 'nutri', icon: 'bowl', t: 'Nutriție', s: 'Ținta zilei, mesele notate, tactica și necesarul' },
   { a: 'tab', k: 'mind', icon: 'mind', t: 'Minte', s: 'Wim Hof, respirație, duș alternativ, mobilitate, victorii' },
   { a: 'tab', k: 'lab', icon: 'wind', t: 'Breathwork Lab', s: 'Reset, Tactical, Recovery, Advanced' },

@@ -1,4 +1,4 @@
-// The 3D athlete: an original, stylised boxer that plays the exercise key poses in WebGL.
+// The 3D athlete: an original masked boxer (black balaclava with white war paint, black gloves and shorts) that plays the exercise key poses in WebGL.
 // One renderer for the whole app: the canvas moves to whichever .b3d host is on screen.
 // three.js loads only when the first host appears. Drag to turn the athlete.
 
@@ -50,6 +50,71 @@ let sway = 0;
 let dragYaw = 0;
 let raf = 0;
 
+/** The balaclava: black wool, an original white paint with drips, two eye holes. Centred on the +z side. */
+function maskTexture(three: typeof T): T.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = 1024;
+  c.height = 512;
+  const g = c.getContext('2d') as CanvasRenderingContext2D;
+  g.fillStyle = '#0b0b0d';
+  g.fillRect(0, 0, 1024, 512);
+  const x = 256; // u = .25 is +z on a three.js sphere
+  g.fillStyle = '#e9e6df';
+  g.beginPath();
+  g.ellipse(x, 215, 74, 92, 0, 0, Math.PI * 2);
+  g.fill();
+  for (const [dx, len] of [[-58, 86], [-34, 120], [-10, 96], [14, 132], [38, 100], [60, 78]]) g.fillRect(x + dx, 240, 12, len);
+  g.fillStyle = '#0b0b0d';
+  g.fillRect(x - 7, 225, 14, 80); // nose line
+  for (const s of [-1, 1]) {
+    g.fillStyle = '#0b0b0d';
+    g.beginPath();
+    g.ellipse(x + s * 38, 212, 28, 20, 0, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = '#c69274';
+    g.beginPath();
+    g.ellipse(x + s * 38, 212, 21, 13, 0, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = '#17110f';
+    g.beginPath();
+    g.arc(x + s * 38, 212, 7, 0, Math.PI * 2);
+    g.fill();
+  }
+  const t = new three.CanvasTexture(c);
+  t.colorSpace = three.SRGBColorSpace;
+  return t;
+}
+
+/** Skin with soft pectoral and abdominal shading, repeated so chest shows from both sides. */
+function bodyTexture(three: typeof T): T.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = c.height = 512;
+  const g = c.getContext('2d') as CanvasRenderingContext2D;
+  g.fillStyle = '#b98465';
+  g.fillRect(0, 0, 512, 512);
+  g.strokeStyle = 'rgba(70,35,20,.55)';
+  g.lineWidth = 9;
+  g.lineCap = 'round';
+  const line = (a: number, b: number, d: number, e: number): void => {
+    g.beginPath();
+    g.moveTo(a, b);
+    g.lineTo(d, e);
+    g.stroke();
+  };
+  line(256, 30, 256, 480);
+  g.beginPath();
+  g.ellipse(180, 120, 76, 58, 0, 0.1, Math.PI * 0.9);
+  g.ellipse(332, 120, 76, 58, 0, 0.1, Math.PI * 0.9);
+  g.stroke();
+  for (const y of [235, 305, 375]) line(190, y, 322, y);
+  const t = new three.CanvasTexture(c);
+  t.colorSpace = three.SRGBColorSpace;
+  t.wrapS = three.RepeatWrapping;
+  t.repeat.set(2, 1);
+  t.offset.x = 0.5;
+  return t;
+}
+
 function build(three: typeof T): Rig {
   const r = new three.WebGLRenderer({ antialias: true, alpha: true });
   r.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -68,9 +133,9 @@ function build(three: typeof T): Rig {
   scene.add(root);
   const props = new three.Group();
   root.add(props);
-  const skin = new three.MeshStandardMaterial({ color: 0xc69274, roughness: 0.48, metalness: 0.05 });
+  const skin = new three.MeshStandardMaterial({ color: 0xb98465, roughness: 0.38, metalness: 0.05 });
   const dark = new three.MeshStandardMaterial({ color: 0x0f0f11, roughness: 0.6 });
-  const red = new three.MeshStandardMaterial({ color: 0xa8101c, roughness: 0.4 });
+  const glove = new three.MeshStandardMaterial({ color: 0x08080a, roughness: 0.22, metalness: 0.2 });
   const limbs: T.Mesh[] = [];
   const up = new three.Vector3(0, 1, 0);
   const dir = new three.Vector3();
@@ -82,16 +147,18 @@ function build(three: typeof T): Rig {
     limbs.push(m);
   }
   // 10 joints: shoulders, elbows, gloves, knees, feet
-  const sizes = [3.2, 3.2, 2.2, 2.2, 3, 3, 2.7, 2.7, 2.2, 2.2];
+  const sizes = [3.7, 3.7, 2.2, 2.2, 3.5, 3.5, 2.7, 2.7, 2.2, 2.2];
   const joints = sizes.map((s, i) => {
-    const m = new three.Mesh(new three.SphereGeometry(s, 18, 14), i === 4 || i === 5 ? red : i > 7 ? dark : skin);
+    const m = new three.Mesh(new three.SphereGeometry(s, 18, 14), i === 4 || i === 5 ? glove : i > 7 ? dark : skin);
     root.add(m);
     return m;
   });
-  const torso = new three.Mesh(new three.CylinderGeometry(1, 0.72, 1, 24), skin);
+  const torso = new three.Mesh(new three.CylinderGeometry(1, 0.66, 1, 24), new three.MeshStandardMaterial({ map: bodyTexture(three), roughness: 0.38 }));
   const hips = new three.Mesh(new three.SphereGeometry(1, 20, 16), dark);
-  const head = new three.Mesh(new three.SphereGeometry(3.7, 24, 18), skin);
-  head.add(new three.Mesh(new three.SphereGeometry(3.85, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), dark));
+  const head = new three.Mesh(new three.SphereGeometry(3.7, 32, 22), new three.MeshStandardMaterial({ map: maskTexture(three), roughness: 0.9 }));
+  const collar = new three.Mesh(new three.CylinderGeometry(2.6, 3.6, 4.5, 20), dark);
+  collar.position.y = -3.6;
+  head.add(collar);
   root.add(torso, hips, head);
   return {
     three, r, scene, cam, root, props, torso, head, hips,
@@ -174,10 +241,12 @@ function pose(p: Pose, f: Fig3): void {
   const len = dir.length();
   R.torso.position.copy(hip).add(neck).multiplyScalar(0.5);
   R.torso.quaternion.setFromUnitVectors(new V(0, 1, 0), dir.normalize());
-  R.torso.scale.set(f.front ? 7.4 : 4.8, len, f.front ? 4.8 : 7.4);
+  R.torso.rotateY(f.front ? 0 : Math.PI / 2);
+  R.torso.scale.set(8.2, len, 5);
   R.hips.position.copy(hip);
   R.hips.scale.set(f.front ? 5.8 : 4.6, 3.8, f.front ? 4.6 : 5.8);
   R.head.position.copy(v(head2, 0, 0));
+  R.head.rotation.y = f.front ? 0 : p.t < 0 ? -Math.PI / 2 : Math.PI / 2;
 }
 
 function frame(now: number): void {
@@ -202,8 +271,8 @@ function fit(): void {
   rig.cam.aspect = w / h;
   rig.cam.updateProjectionMatrix();
   const span = fig.bar !== undefined && fig.bar < 20 ? 8.6 : 7.4;
-  const dist = Math.max(span, 9.5 / rig.cam.aspect) / (2 * Math.tan(rad(16))) * 0.82;
-  rig.root.position.set(0, -span / 2 + 0.1, 0);
+  const dist = Math.max(span, 9.5 / rig.cam.aspect) / (2 * Math.tan(rad(16))) * 1.02;
+  rig.root.position.set(0, -span / 2 - 0.25, 0);
   rig.cam.position.set(0, 0.7, dist);
   rig.cam.lookAt(0, 0, 0);
 }
@@ -242,7 +311,7 @@ function sync(): void {
   next.appendChild(canvas as HTMLCanvasElement);
   if (key !== figKey || !fig) {
     figKey = key;
-    fig = fig3d(next.dataset.b3d ?? '', next.dataset.v);
+    fig = fig3d(next.dataset.b3d ?? '');
     t0 = performance.now();
     if (fig) setProps(fig);
   }
@@ -281,7 +350,7 @@ export function initBeast3d(): void {
   later();
 }
 
-export function anim3d(name: string, variation?: string): string {
-  if (!fig3d(name, variation)) return '';
-  return `<div class="b3d" data-b3d="${esc(name)}"${variation ? ` data-v="${esc(variation)}"` : ''} role="img" aria-label="Animație 3D"></div>`;
+export function anim3d(name: string): string {
+  if (!fig3d(name)) return '';
+  return `<div class="b3d" data-b3d="${esc(name)}" role="img" aria-label="Animație 3D"></div>`;
 }

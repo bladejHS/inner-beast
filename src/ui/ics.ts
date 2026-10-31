@@ -1,10 +1,9 @@
 // Calendar reminders: a web app can't schedule notifications (least of all on iPhone), so the next 4 weeks of the plan
-// and the photo days go into the phone's calendar as an .ics file, each with an alarm.
+// go into the phone's calendar as an .ics file, each with an alarm.
 
 import { WEEK, blockLine } from '../data/plan.ts';
 import { addDays, dayKey, pad2, parseDay, weekdayIdx } from '../logic/util.ts';
 import { ctx, toast } from './ctx.ts';
-import { PHOTO_EVERY, photoDue } from './screens/body.ts';
 import { blockMinutes } from './screens/shared.ts';
 
 const icsEsc = (s: string): string => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
@@ -20,7 +19,6 @@ function fold(l: string): string {
   return out.join('\r\n');
 }
 const stamp = (d: Date): string => `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}T${pad2(d.getHours())}${pad2(d.getMinutes())}00`;
-const ymd = (k: string): string => k.replace(/-/g, '');
 
 export function icsText(time: string, alarm: number, today = dayKey()): string {
   const m = /^(\d{1,2}):(\d{2})$/.exec(time) ?? ['', '18', '00'];
@@ -38,12 +36,6 @@ export function icsText(time: string, alarm: number, today = dayKey()): string {
     L.push('BEGIN:VEVENT', `UID:beast-${k}@inner-beast`, `DTSTAMP:${now}`, `DTSTART:${stamp(st)}`, `DTEND:${stamp(en)}`, fold(`SUMMARY:${icsEsc(`Inner Beast · ${day.title}`)}`), fold(`DESCRIPTION:${icsEsc(day.blocks.map((b) => `• ${blockLine(b, ctx.S.set)}`).join('\n'))}`));
     if (alarm > 0) L.push(...alarmLines(`În ${alarm} de minute: ${day.title}`, `-PT${alarm}M`));
     L.push('END:VEVENT');
-  }
-  // photo days: the next one, then every 2 weeks, all-day with a reminder at 9 in the morning
-  let pk = addDays(today, photoDue(today));
-  while (pk <= addDays(today, 27)) {
-    L.push('BEGIN:VEVENT', `UID:beast-photo-${pk}@inner-beast`, `DTSTAMP:${now}`, `DTSTART;VALUE=DATE:${ymd(pk)}`, `DTEND;VALUE=DATE:${ymd(addDays(pk, 1))}`, fold(`SUMMARY:${icsEsc('Inner Beast · ziua pozei de progres')}`), fold(`DESCRIPTION:${icsEsc('Aceeași lumină, același loc, aceeași poziție. Adaugă poza în Progres.')}`), ...alarmLines('Azi e ziua pozei de progres', 'PT9H'), 'END:VEVENT');
-    pk = addDays(pk, PHOTO_EVERY);
   }
   L.push('END:VCALENDAR');
   return L.join('\r\n') + '\r\n';

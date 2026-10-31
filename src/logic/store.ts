@@ -2,7 +2,6 @@
 
 import { EMOM_START } from '../data/workouts.ts';
 import { dayKey, uid } from './util.ts';
-import type { Fast, FastLog } from './nutri/fast.ts';
 import { freshDiscipline, type Discipline } from './discipline.ts';
 
 export type Kind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'wimhof' | 'breath' | 'shower' | 'row' | 'coach';
@@ -153,9 +152,6 @@ export interface State {
   shop: Array<{ id: string; n: string; q: string; on: boolean }>;
   /** Daily base target and TDEE used, for the weekly scale correction. */
   nlog: Record<string, { k: number; t: number }>;
-  /** The fast running now (16/8 or 24 h), and the finished ones. */
-  fast: Fast | null;
-  fasts: FastLog[];
   /** Discipline Challenges: No Fap and Dopamine Discipline. */
   disc: Discipline;
   /** 30-day challenges running now: id → first day. */
@@ -214,8 +210,6 @@ export function freshState(today: string = dayKey()): State {
     supp: { on: {}, log: {} },
     shop: [],
     nlog: {},
-    fast: null,
-    fasts: [],
     disc: freshDiscipline(),
     chal: {},
   };
@@ -252,8 +246,6 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     supp: { on: {}, log: {}, ...(isObj(r.supp) ? r.supp : {}) },
     shop: Array.isArray(r.shop) ? r.shop.filter((x) => isObj(x) && typeof x.n === 'string') : [],
     nlog: isObj(r.nlog) ? (r.nlog as Record<string, { k: number; t: number }>) : {},
-    fast: isObj(r.fast) && (r.fast.mode === '168' || r.fast.mode === '24') && typeof r.fast.start === 'number' ? (r.fast as Fast) : null,
-    fasts: Array.isArray(r.fasts) ? r.fasts.filter((x) => isObj(x) && typeof x.start === 'number' && typeof x.end === 'number') : [],
     disc: {
       nofap: { ...base.disc.nofap, ...(isObj(r.disc) && isObj(r.disc.nofap) ? r.disc.nofap : {}) },
       dopa: { ...base.disc.dopa, ...(isObj(r.disc) && isObj(r.disc.dopa) ? r.disc.dopa : {}) },

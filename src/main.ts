@@ -17,8 +17,6 @@ import { chapterHtml, mindHtml } from './ui/screens/mind.ts';
 import { planHtml } from './ui/screens/plan.ts';
 import { historyHtml, progressHtml } from './ui/screens/progress.ts';
 import { settingsHtml } from './ui/screens/settings.ts';
-import { bodyAct, bodyChange, bodyInput, hydratePhotos } from './ui/screens/body.ts';
-import { fastAct } from './ui/screens/fast.ts';
 import { MORE_TABS, moreHtml } from './ui/screens/more.ts';
 import { openCoach } from './ui/players/coach.ts';
 import { discAct, disciplineHtml } from './ui/screens/discipline.ts';
@@ -31,7 +29,7 @@ import { dayViewHtml, todayHtml } from './ui/screens/today.ts';
 initAudio(() => ctx.S.set);
 initParallax();
 
-// five destinations; Nutriție, Minte and Alex live behind "Mai mult"
+// five destinations; Minte and Alex live behind "Mai mult"
 const TABS: Array<[Tab, string, string]> = [
   ['today', 'Azi', 'today'],
   ['plan', 'Plan', 'plan'],
@@ -84,7 +82,6 @@ function render(): void {
   const active = document.activeElement as HTMLElement | null;
   const keepId = active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT') ? active.id : '';
   app.innerHTML = screenHtml() + navHtml();
-  hydratePhotos(app);
   if (keepId) {
     const el = document.getElementById(keepId) as HTMLInputElement | null;
     el?.focus({ preventScroll: true });
@@ -396,7 +393,6 @@ function act(a: string, el: HTMLElement): void {
 
 function onChange(el: HTMLElement): void {
   const a = el.dataset.a || '';
-  if (a.startsWith('body:')) return bodyChange(a, el, render);
   if (a.startsWith('p:')) return ctx.player?.act(a, el);
   const S = ctx.S;
   if (a === 'set-bool') {
@@ -418,7 +414,6 @@ function onChange(el: HTMLElement): void {
 
 function onInput(el: HTMLElement): void {
   const a = el.dataset.a || '';
-  if (a.startsWith('body:')) return bodyInput(a, el);
   if (a.startsWith('p:')) return ctx.player?.input?.(el);
   if (a === 'why') {
     const k = el.dataset.k as 'victim' | 'winner' | 'drive';
@@ -448,8 +443,6 @@ document.addEventListener('click', (ev) => {
     ctx.player?.act(a, el);
     return;
   }
-  if (a.startsWith('body:')) return bodyAct(a, el, render);
-  if (a.startsWith('fa:')) return fastAct(a, el, render);
   if (a.startsWith('dc:')) return discAct(a, el, render);
   const hadPlayer = !!ctx.player;
   act(a, el);

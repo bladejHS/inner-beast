@@ -10,7 +10,6 @@ import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { ic } from '../icons.ts';
 import { top } from './shared.ts';
-import { photosHtml, weightHtml } from './body.ts';
 import { boxStats } from '../../logic/boxstats.ts';
 import { COMBOS } from '../../data/combos.ts';
 import { learned } from './alex.ts';
@@ -136,9 +135,6 @@ export function progressHtml(): string {
       <div class="stat"><b>${Math.round(t.coldMin)}</b><span>minute la rece</span></div>
       <div class="stat"><b>${t.bestHold ? mmss(t.bestHold) : '–'}</b><span>retenție record</span></div>
     </div>
-
-    ${weightHtml()}
-    ${photosHtml()}
 
     ${boxHtml(today)}
 

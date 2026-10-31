@@ -86,3 +86,9 @@ export function num(n: number): string {
 export function km(meters: number): string {
   return (meters / 1000).toFixed(2).replace('.', ',');
 }
+
+/** Race time: m:ss, or h:mm:ss from one hour up. */
+export function raceTime(sec: number): string {
+  const s = Math.max(0, Math.round(sec));
+  return s < 3600 ? mmss(s) : `${Math.floor(s / 3600)}:${pad2(Math.floor(s / 60) % 60)}:${pad2(s % 60)}`;
+}

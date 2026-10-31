@@ -19,6 +19,8 @@ import { historyHtml, progressHtml } from './ui/screens/progress.ts';
 import { settingsHtml } from './ui/screens/settings.ts';
 import { MORE_TABS, moreHtml } from './ui/screens/more.ts';
 import { openCoach } from './ui/players/coach.ts';
+import { challengeHtml, toggleRace } from './ui/screens/challenge.ts';
+import { resumeRace, startRace } from './ui/players/race.ts';
 import { discAct, disciplineHtml } from './ui/screens/discipline.ts';
 import { labHtml } from './ui/screens/lab.ts';
 import { openLab } from './ui/players/lab.ts';
@@ -29,11 +31,12 @@ import { dayViewHtml, todayHtml } from './ui/screens/today.ts';
 initAudio(() => ctx.S.set);
 initParallax();
 
-// five destinations; Minte and Alex live behind "Mai mult"
+// six destinations; Minte and Alex live behind "Mai mult"
 const TABS: Array<[Tab, string, string]> = [
   ['today', 'Azi', 'today'],
   ['plan', 'Plan', 'plan'],
   ['fight', 'Lupte', 'fight'],
+  ['challenge', 'Challenge', 'trophy'],
   ['progress', 'Progres', 'progress'],
   ['more', 'Mai mult', 'more'],
 ];
@@ -62,6 +65,8 @@ function screenHtml(): string {
       return disciplineHtml();
     case 'lab':
       return labHtml();
+    case 'challenge':
+      return challengeHtml();
     case 'more':
       return moreHtml();
     case 'progress':
@@ -443,6 +448,12 @@ document.addEventListener('click', (ev) => {
     ctx.player?.act(a, el);
     return;
   }
+  if (a === 'ch:open') {
+    toggleRace(el.dataset.k ?? '');
+    return render();
+  }
+  if (a === 'ch:go') return startRace(el.dataset.k ?? '', Number(el.dataset.i));
+  if (a === 'ch:resume') return resumeRace();
   if (a.startsWith('dc:')) return discAct(a, el, render);
   const hadPlayer = !!ctx.player;
   act(a, el);

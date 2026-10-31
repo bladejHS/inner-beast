@@ -4,7 +4,7 @@ import { WEEK } from '../../data/plan.ts';
 import { EMOM_GOAL, WORKOUTS } from '../../data/workouts.ts';
 import { activeStreak, dayProgress, exerciseTrend, totals, weekDone } from '../../logic/progress.ts';
 import type { Entry } from '../../logic/store.ts';
-import { addDays, dayKey, esc, km, mmss, num, paceStr, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
+import { addDays, dayKey, esc, km, mmss, raceTime, num, paceStr, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { bars, spark } from '../charts.ts';
 import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
@@ -46,6 +46,9 @@ function entryLine(e: Entry, del = false): string {
       break;
     case 'routine':
       what = mmss(e.dur);
+      break;
+    case 'race':
+      what = `${d.level}, ${raceTime(e.dur)}`;
       break;
     case 'coach':
       what = d.mode === 'box' ? `${d.punches} lovituri, gardă ${d.guard}%` : d.angle ? `${d.angle}°` : `${d.reps} repetări`;

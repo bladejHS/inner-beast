@@ -1251,3 +1251,7 @@ input:focus, textarea:focus, select:focus, .nfld input:focus, .nrow input:focus 
 .ch-grid i { aspect-ratio: 1; border-radius: 5px; background: var(--line); }
 .ch-grid i.on { background: var(--red); }
 .ch-grid i.now { box-shadow: inset 0 0 0 2px var(--ink); }
+
+/* six destinations in the bottom bar */
+.tabs { grid-template-columns: repeat(6, 1fr); }
+.tabs button { font-size: 8px; }

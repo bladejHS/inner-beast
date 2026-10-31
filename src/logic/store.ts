@@ -3,8 +3,9 @@
 import { EMOM_START } from '../data/workouts.ts';
 import { dayKey, uid } from './util.ts';
 import { freshDiscipline, type Discipline } from './discipline.ts';
+import type { RaceRun } from './race.ts';
 
-export type Kind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'wimhof' | 'breath' | 'shower' | 'row' | 'coach';
+export type Kind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'wimhof' | 'breath' | 'shower' | 'row' | 'coach' | 'race';
 
 export interface SetLog {
   id: string;
@@ -156,6 +157,8 @@ export interface State {
   disc: Discipline;
   /** 30-day challenges running now: id → first day. */
   chal: Record<string, string>;
+  /** The race simulation running now. */
+  race: RaceRun | null;
 }
 
 export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 200, startW: 80, goalW: 75, act: 1.55 };
@@ -212,6 +215,7 @@ export function freshState(today: string = dayKey()): State {
     nlog: {},
     disc: freshDiscipline(),
     chal: {},
+    race: null,
   };
 }
 
@@ -251,6 +255,7 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
       dopa: { ...base.disc.dopa, ...(isObj(r.disc) && isObj(r.disc.dopa) ? r.disc.dopa : {}) },
     },
     chal: isObj(r.chal) ? (r.chal as Record<string, string>) : {},
+    race: isObj(r.race) && typeof r.race.ev === 'string' && Array.isArray(r.race.splits) ? (r.race as unknown as RaceRun) : null,
   };
 }
 

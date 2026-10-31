@@ -1,5 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { raceTime } from './util.ts';
+import { advance, back, bestTime, elapsed, newRun, pause, resume, segElapsed } from './race.ts';
+import { LEVEL_NAMES, RACES } from '../data/races.ts';
 import { angle, GuardTracker, RepCounter, type Pt } from './coach.ts';
 import { boxStats } from './boxstats.ts';
 import { CHALLENGES, challengeDays } from '../data/challenges.ts';
@@ -401,4 +404,38 @@ test('30-day challenge counts days from the log; box stats add up', () => {
   assert.deepEqual([d[0], d[1], d.length], [false, true, 30]);
   const b = boxStats(log, '2026-10-10');
   assert.deepEqual([b.rounds, b.bagMin, b.punches, b.guard, b.called.X], [3, 9, 40, [80], 2]);
+});
+
+test('races: every event has all five levels, with real segments', () => {
+  assert.ok(RACES.length >= 6);
+  for (const r of RACES) {
+    assert.equal(r.levels.length, LEVEL_NAMES.length, r.id);
+    for (const l of r.levels) assert.ok(l.segs.length > 1 && l.est > 0 && l.segs.every((s) => s.name), l.name);
+  }
+  const hx = RACES.find((r) => r.id === 'hyrox')!.levels[3].segs;
+  assert.equal(hx.length, 16);
+  assert.equal(hx[15].detail, '100 repetări');
+  assert.equal(RACES.find((r) => r.id === 'spartan')!.levels[1].segs.length, 40);
+});
+
+test('race clock: pauses do not count, undo restores, survives by timestamps', () => {
+  const r = newRun('murph', 0, 0);
+  pause(r, 10000);
+  assert.equal(elapsed(r, 70000), 10);
+  resume(r, 70000);
+  assert.equal(elapsed(r, 80000), 20);
+  advance(r, 80000);
+  assert.deepEqual([r.i, r.splits], [1, [20]]);
+  assert.equal(segElapsed(r, 85000), 5);
+  back(r);
+  assert.deepEqual([r.i, segElapsed(r, 85000)], [0, 25]);
+  const log = [90, 80].map((dur) => makeEntry({ kind: 'race', name: 'x', dur, data: { ev: 'murph', lvl: 0 } }));
+  assert.equal(bestTime(log, 'murph', 0), 80);
+  assert.equal(bestTime(log, 'murph', 1), undefined);
+  assert.equal(normalize({ race: r }).race?.ev, 'murph');
+});
+
+test('race time switches to hours', () => {
+  assert.equal(raceTime(59 * 60), '59:00');
+  assert.equal(raceTime(13 * 3600 + 5 * 60 + 9), '13:05:09');
 });

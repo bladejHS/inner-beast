@@ -49,6 +49,7 @@ let t0 = 0;
 let sway = 0;
 let dragYaw = 0;
 let raf = 0;
+let gym: T.Group | null = null;
 
 /** The balaclava: black wool, an original white paint with drips, two eye holes. Centred on the +z side. */
 function maskTexture(three: typeof T): T.CanvasTexture {
@@ -115,25 +116,105 @@ function bodyTexture(three: typeof T): T.CanvasTexture {
   return t;
 }
 
+/** Rough dark brick for the back wall. */
+function brickTexture(three: typeof T): T.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = c.height = 512;
+  const g = c.getContext('2d') as CanvasRenderingContext2D;
+  g.fillStyle = '#0a0808';
+  g.fillRect(0, 0, 512, 512);
+  for (let y = 0; y < 16; y++) {
+    for (let x = -1; x < 8; x++) {
+      const v = 22 + ((x * 7 + y * 13) % 5) * 5;
+      g.fillStyle = `rgb(${v + 10},${v - 4},${v - 6})`;
+      g.fillRect(x * 74 + (y % 2) * 37, y * 32, 70, 28);
+    }
+  }
+  const t = new three.CanvasTexture(c);
+  t.colorSpace = three.SRGBColorSpace;
+  t.wrapS = t.wrapT = three.RepeatWrapping;
+  t.repeat.set(4, 2);
+  return t;
+}
+
+/** The dark boxing gym: concrete floor, brick wall, hanging heavy bags, ring ropes, a blue window glow. */
+function buildGym(three: typeof T): T.Group {
+  const gym = new three.Group();
+  const floor = new three.Mesh(new three.PlaneGeometry(40, 30), new three.MeshStandardMaterial({ color: 0x1b1716, roughness: 0.85 }));
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  const wall = new three.Mesh(new three.PlaneGeometry(40, 14), new three.MeshStandardMaterial({ map: brickTexture(three), roughness: 0.95 }));
+  wall.position.set(0, 7, -7);
+  const glow = new three.Mesh(new three.PlaneGeometry(3.2, 1.8), new three.MeshBasicMaterial({ color: 0x24506e }));
+  glow.position.set(3.4, 5, -6.95);
+  gym.add(floor, wall, glow);
+  const leather = new three.MeshStandardMaterial({ color: 0x0c0c0e, roughness: 0.3 });
+  const chain = new three.MeshStandardMaterial({ color: 0x55504c, roughness: 0.4, metalness: 0.8 });
+  for (const [x, z] of [[-4.6, -3.6], [4.8, -4.4], [-1.6, -5.4]]) {
+    const bag = new three.Mesh(new three.CapsuleGeometry(0.72, 2.6, 8, 20), leather);
+    bag.position.set(x, 3.6, z);
+    bag.castShadow = true;
+    const link = new three.Mesh(new three.CylinderGeometry(0.03, 0.03, 6, 6), chain);
+    link.position.set(x, 8.2, z);
+    gym.add(bag, link);
+  }
+  const rope = new three.MeshStandardMaterial({ color: 0x5c0c12, roughness: 0.6 });
+  for (const y of [1.1, 1.9, 2.7]) {
+    const q = new three.Mesh(new three.CylinderGeometry(0.05, 0.05, 30, 8), rope);
+    q.rotation.z = Math.PI / 2;
+    q.position.set(0, y, -2.6);
+    gym.add(q);
+  }
+  return gym;
+}
+
+/** A limb with a muscle belly, not a plain cylinder. Radius a at the top, b at the bottom. */
+function limbGeo(three: typeof T, a: number, b: number): T.LatheGeometry {
+  const pts: T.Vector2[] = [];
+  for (let i = 0; i <= 14; i++) {
+    const t = i / 14;
+    pts.push(new three.Vector2(lerp(b, a, t) * (1 + 0.2 * Math.sin(Math.PI * t ** 1.5)), t - 0.5));
+  }
+  return new three.LatheGeometry(pts, 22);
+}
+
+/** Waist to shoulders. */
+function torsoGeo(three: typeof T): T.LatheGeometry {
+  const prof: Array<[number, number]> = [[0, 0.68], [0.25, 0.64], [0.5, 0.72], [0.75, 0.94], [0.92, 1], [1, 0.72]];
+  return new three.LatheGeometry(prof.map(([y, x]) => new three.Vector2(x, y - 0.5)), 32);
+}
+
 function build(three: typeof T): Rig {
-  const r = new three.WebGLRenderer({ antialias: true, alpha: true });
+  const r = new three.WebGLRenderer({ antialias: true });
+  r.toneMapping = three.ACESFilmicToneMapping;
+  r.toneMappingExposure = 1.15;
+  r.shadowMap.enabled = true;
+  r.shadowMap.type = three.PCFSoftShadowMap;
   r.setPixelRatio(Math.min(devicePixelRatio, 2));
   canvas = r.domElement;
   const scene = new three.Scene();
+  scene.background = new three.Color(0x050405);
+  scene.fog = new three.Fog(0x050405, 11, 26);
+  gym = buildGym(three);
+  scene.add(gym);
   const cam = new three.PerspectiveCamera(32, 1.2, 0.1, 100);
-  scene.add(new three.HemisphereLight(0xfff1e8, 0x301014, 1.5));
-  const key = new three.DirectionalLight(0xffffff, 2.4);
-  key.position.set(3, 7, 6);
-  scene.add(key);
-  const rim = new three.DirectionalLight(0xff2436, 2.6);
-  rim.position.set(-5, 3, -5);
+  scene.add(new three.HemisphereLight(0x8a93a6, 0x140a08, 0.85));
+  const key = new three.SpotLight(0xffe6cc, 190, 22, 0.5, 0.65, 1.6);
+  key.position.set(1.5, 9.5, 3.5);
+  key.target.position.set(0, 0, 0);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.bias = -0.0006;
+  scene.add(key, key.target);
+  const rim = new three.DirectionalLight(0x5f93c4, 0.55);
+  rim.position.set(5, 3, -6);
   scene.add(rim);
   const root = new three.Group();
   root.scale.setScalar(0.1);
   scene.add(root);
   const props = new three.Group();
   root.add(props);
-  const skin = new three.MeshStandardMaterial({ color: 0xb98465, roughness: 0.38, metalness: 0.05 });
+  const skin = new three.MeshPhysicalMaterial({ color: 0xb98465, roughness: 0.42, clearcoat: 0.25, clearcoatRoughness: 0.5, side: three.DoubleSide });
   const dark = new three.MeshStandardMaterial({ color: 0x0f0f11, roughness: 0.6 });
   const glove = new three.MeshStandardMaterial({ color: 0x08080a, roughness: 0.22, metalness: 0.2 });
   const limbs: T.Mesh[] = [];
@@ -142,24 +223,32 @@ function build(three: typeof T): Rig {
   // 8 limbs: arm 0 upper/fore, arm 1 upper/fore, leg 0 thigh/shin, leg 1 thigh/shin
   for (let i = 0; i < 8; i++) {
     const [a, b] = LIMBS[i < 4 ? i % 2 : 2 + (i % 2)];
-    const m = new three.Mesh(new three.CylinderGeometry(a, b, 1, 18), i === 4 || i === 6 ? dark : skin);
+    const m = new three.Mesh(limbGeo(three, a, b), skin);
+    if (i === 4 || i === 6) {
+      const shorts = new three.Mesh(new three.CylinderGeometry(a * 1.2, a * 1.3, 0.62, 18), dark);
+      shorts.position.y = 0.2;
+      m.add(shorts);
+    }
     root.add(m);
     limbs.push(m);
   }
   // 10 joints: shoulders, elbows, gloves, knees, feet
-  const sizes = [3.7, 3.7, 2.2, 2.2, 3.5, 3.5, 2.7, 2.7, 2.2, 2.2];
+  const sizes = [3.1, 3.1, 2.2, 2.2, 3.5, 3.5, 2.7, 2.7, 2.2, 2.2];
   const joints = sizes.map((s, i) => {
     const m = new three.Mesh(new three.SphereGeometry(s, 18, 14), i === 4 || i === 5 ? glove : i > 7 ? dark : skin);
     root.add(m);
     return m;
   });
-  const torso = new three.Mesh(new three.CylinderGeometry(1, 0.66, 1, 24), new three.MeshStandardMaterial({ map: bodyTexture(three), roughness: 0.38 }));
+  const torso = new three.Mesh(torsoGeo(three), new three.MeshPhysicalMaterial({ map: bodyTexture(three), roughness: 0.42, clearcoat: 0.25, side: three.DoubleSide }));
   const hips = new three.Mesh(new three.SphereGeometry(1, 20, 16), dark);
   const head = new three.Mesh(new three.SphereGeometry(3.7, 32, 22), new three.MeshStandardMaterial({ map: maskTexture(three), roughness: 0.9 }));
   const collar = new three.Mesh(new three.CylinderGeometry(2.6, 3.6, 4.5, 20), dark);
   collar.position.y = -3.6;
   head.add(collar);
   root.add(torso, hips, head);
+  root.traverse((o) => {
+    o.castShadow = true;
+  });
   return {
     three, r, scene, cam, root, props, torso, head, hips,
     limb(i, a, b) {
@@ -182,9 +271,6 @@ function setProps(f: Fig3): void {
   R.props.clear();
   const mat = new three.MeshStandardMaterial({ color: 0x3a2a2c, roughness: 0.7 });
   const steel = new three.MeshStandardMaterial({ color: 0xb9b6b0, roughness: 0.3, metalness: 0.8 });
-  const d = new three.Mesh(new three.CircleGeometry(38, 48), new three.MeshBasicMaterial({ color: 0xa8101c, transparent: true, opacity: 0.16 }));
-  d.rotation.x = -Math.PI / 2;
-  R.props.add(d);
   if (f.bar !== undefined) {
     const b = new three.Mesh(new three.CylinderGeometry(0.8, 0.8, 34, 12), steel);
     if (f.front) b.rotation.z = Math.PI / 2;
@@ -273,6 +359,7 @@ function fit(): void {
   const span = fig.bar !== undefined && fig.bar < 20 ? 8.6 : 7.4;
   const dist = Math.max(span, 9.5 / rig.cam.aspect) / (2 * Math.tan(rad(16))) * 1.02;
   rig.root.position.set(0, -span / 2 - 0.25, 0);
+  if (gym) gym.position.y = rig.root.position.y;
   rig.cam.position.set(0, 0.7, dist);
   rig.cam.lookAt(0, 0, 0);
 }

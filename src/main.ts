@@ -18,7 +18,7 @@ import { planHtml } from './ui/screens/plan.ts';
 import { historyHtml, progressHtml } from './ui/screens/progress.ts';
 import { settingsHtml } from './ui/screens/settings.ts';
 import { bodyAct, bodyChange, bodyInput, hydratePhotos } from './ui/screens/body.ts';
-import { nuAct, nuChange, nuInput, nutriStartup, nutritionHtml } from './ui/screens/nutrition.ts';
+import { fastAct } from './ui/screens/fast.ts';
 import { MORE_TABS, moreHtml } from './ui/screens/more.ts';
 import { openCoach } from './ui/players/coach.ts';
 import { discAct, disciplineHtml } from './ui/screens/discipline.ts';
@@ -60,8 +60,6 @@ function screenHtml(): string {
       return alexHtml();
     case 'mind':
       return mindHtml();
-    case 'nutri':
-      return nutritionHtml();
     case 'disc':
       return disciplineHtml();
     case 'lab':
@@ -399,7 +397,6 @@ function act(a: string, el: HTMLElement): void {
 function onChange(el: HTMLElement): void {
   const a = el.dataset.a || '';
   if (a.startsWith('body:')) return bodyChange(a, el, render);
-  if (a.startsWith('nu:')) return nuChange(a, el, render);
   if (a.startsWith('p:')) return ctx.player?.act(a, el);
   const S = ctx.S;
   if (a === 'set-bool') {
@@ -422,7 +419,6 @@ function onChange(el: HTMLElement): void {
 function onInput(el: HTMLElement): void {
   const a = el.dataset.a || '';
   if (a.startsWith('body:')) return bodyInput(a, el);
-  if (a.startsWith('nu:')) return nuInput(a, el);
   if (a.startsWith('p:')) return ctx.player?.input?.(el);
   if (a === 'why') {
     const k = el.dataset.k as 'victim' | 'winner' | 'drive';
@@ -453,7 +449,7 @@ document.addEventListener('click', (ev) => {
     return;
   }
   if (a.startsWith('body:')) return bodyAct(a, el, render);
-  if (a.startsWith('nu:')) return nuAct(a, el, render);
+  if (a.startsWith('fa:')) return fastAct(a, el, render);
   if (a.startsWith('dc:')) return discAct(a, el, render);
   const hadPlayer = !!ctx.player;
   act(a, el);
@@ -526,7 +522,6 @@ window.addEventListener('popstate', () => {
   if (views.length) popView();
 });
 
-nutriStartup();
 render();
 enter();
 

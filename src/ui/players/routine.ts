@@ -9,6 +9,7 @@ import { addEntry, ask, closePlayer, mountPlayer, ovEl, type Player } from '../c
 import { ring } from '../charts.ts';
 import { figureFor, zoneLabel } from '../figures.ts';
 import { howHtml } from '../how.ts';
+import { anim3d } from '../beast3d.ts';
 import { art } from '../art.ts';
 import { chrome, ctrlBtn, setText } from './common.ts';
 
@@ -68,12 +69,12 @@ class RoutinePlayer implements Player {
       ${side ? `<p class="round-lbl" id="sd">${side}</p>` : ''}
       ${(() => {
         const r0 = ring(1 - L.left / p.sec, `<div><div class="mid-time" id="t">${mmss(Math.ceil(L.left))}</div></div>`, 6);
-        const fig = figureFor((m ?? r.moves[0]).name);
+        const fig = anim3d((m ?? r.moves[0]).name);
         const z = zoneLabel((m ?? r.moves[0]).name);
         return fig ? `<div class="mv"><div class="mv-fig">${fig}${z ? `<p class="mv-z">Simți în: <b>${esc(z)}</b></p>` : ''}</div>${r0}</div>` : r0;
       })()}
       <p class="cue">${esc(m ? m.cue : r.moves[0].cue)}</p>
-      ${howHtml((m ?? r.moves[0]).name, undefined, { open: true })}
+      ${howHtml((m ?? r.moves[0]).name, undefined, { open: true, no3d: true })}
       ${m?.alex ? '<p class="alex"><b>Alex</b> face asta în rutina lui de mobilitate.</p>' : ''}
       ${next && p.move !== undefined ? `<p class="prev">Urmează: ${esc(next.name)}</p>` : ''}`,
       { cls: p.kind === 'prep' ? 'ph-prep' : '', ctrl: ctrlBtn('p:prev', 'prev', 'Înapoi') + ctrlBtn('p:pause', paused ? 'play' : 'pause', paused ? 'Continuă' : 'Pauză', true) + ctrlBtn('p:skip', 'next', 'Următorul') },

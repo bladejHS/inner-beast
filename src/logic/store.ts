@@ -4,6 +4,8 @@ import { EMOM_START } from '../data/workouts.ts';
 import { dayKey, uid } from './util.ts';
 import type { Fast, FastLog } from './nutri/fast.ts';
 import { freshDiscipline, type Discipline } from './discipline.ts';
+import type { Activity, Gear } from './activities.ts';
+import type { Reading } from './monitor.ts';
 
 export type Kind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'wimhof' | 'breath' | 'shower' | 'row';
 
@@ -158,6 +160,17 @@ export interface State {
   fasts: FastLog[];
   /** Discipline Challenges: No Fap and Dopamine Discipline. */
   disc: Discipline;
+  /** Imported GPX/TCX activities and the gear they used. */
+  act: Activity[];
+  gear: Gear[];
+  /** Jurnal: daily check-in, measurements by name and day, symptoms, medication, goals. */
+  chk: Record<string, { mood?: number; energy?: number; stress?: number; note?: string }>;
+  meas: Record<string, Record<string, number>>;
+  symp: Array<{ id: string; date: string; text: string; lvl: number }>;
+  meds: Array<{ id: string; name: string; dose: string; days: string[] }>;
+  goals: Array<{ id: string; text: string; target: number; now: number }>;
+  /** Monitor: morning readings by day and finished sessions. */
+  mon: { age: number; days: Record<string, Reading>; log: Array<{ date: string; dur: number; eff: number; peak: number }> };
 }
 
 export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 200, startW: 80, goalW: 75, act: 1.55 };
@@ -215,6 +228,14 @@ export function freshState(today: string = dayKey()): State {
     fast: null,
     fasts: [],
     disc: freshDiscipline(),
+    act: [],
+    gear: [],
+    chk: {},
+    meas: {},
+    symp: [],
+    meds: [],
+    goals: [],
+    mon: { age: 30, days: {}, log: [] },
   };
 }
 
@@ -255,6 +276,14 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
       nofap: { ...base.disc.nofap, ...(isObj(r.disc) && isObj(r.disc.nofap) ? r.disc.nofap : {}) },
       dopa: { ...base.disc.dopa, ...(isObj(r.disc) && isObj(r.disc.dopa) ? r.disc.dopa : {}) },
     },
+    act: Array.isArray(r.act) ? r.act : [],
+    gear: Array.isArray(r.gear) ? r.gear : [],
+    chk: isObj(r.chk) ? (r.chk as State['chk']) : {},
+    meas: isObj(r.meas) ? (r.meas as State['meas']) : {},
+    symp: Array.isArray(r.symp) ? r.symp : [],
+    meds: Array.isArray(r.meds) ? r.meds : [],
+    goals: Array.isArray(r.goals) ? r.goals : [],
+    mon: { ...base.mon, ...(isObj(r.mon) ? r.mon : {}) },
   };
 }
 

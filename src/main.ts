@@ -20,6 +20,10 @@ import { settingsHtml } from './ui/screens/settings.ts';
 import { bodyAct, bodyChange, bodyInput, hydratePhotos } from './ui/screens/body.ts';
 import { nuAct, nuChange, nuInput, nutriStartup, nutritionHtml } from './ui/screens/nutrition.ts';
 import { MORE_TABS, moreHtml } from './ui/screens/more.ts';
+import { acAct, acChange, activitiesHtml } from './ui/screens/activities.ts';
+import { journalHtml, jrAct, jrInput } from './ui/screens/journal.ts';
+import { moAct, moInput, monitorHtml } from './ui/screens/monitor.ts';
+import { initBeast3d } from './ui/beast3d.ts';
 import { discAct, disciplineHtml } from './ui/screens/discipline.ts';
 import { labHtml } from './ui/screens/lab.ts';
 import { openLab } from './ui/players/lab.ts';
@@ -65,6 +69,12 @@ function screenHtml(): string {
       return disciplineHtml();
     case 'lab':
       return labHtml();
+    case 'act':
+      return activitiesHtml();
+    case 'jurnal':
+      return journalHtml();
+    case 'mon':
+      return monitorHtml();
     case 'more':
       return moreHtml();
     case 'progress':
@@ -395,6 +405,7 @@ function act(a: string, el: HTMLElement): void {
 
 function onChange(el: HTMLElement): void {
   const a = el.dataset.a || '';
+  if (a.startsWith('ac:')) return acChange(a, el, render);
   if (a.startsWith('body:')) return bodyChange(a, el, render);
   if (a.startsWith('nu:')) return nuChange(a, el, render);
   if (a.startsWith('p:')) return ctx.player?.act(a, el);
@@ -418,6 +429,8 @@ function onChange(el: HTMLElement): void {
 
 function onInput(el: HTMLElement): void {
   const a = el.dataset.a || '';
+  if (a.startsWith('jr:')) return jrInput(a, el);
+  if (a.startsWith('mo:')) return moInput(a, el);
   if (a.startsWith('body:')) return bodyInput(a, el);
   if (a.startsWith('nu:')) return nuInput(a, el);
   if (a.startsWith('p:')) return ctx.player?.input?.(el);
@@ -449,6 +462,9 @@ document.addEventListener('click', (ev) => {
     ctx.player?.act(a, el);
     return;
   }
+  if (a.startsWith('ac:')) return acAct(a, el, render);
+  if (a.startsWith('jr:')) return jrAct(a, el, render);
+  if (a.startsWith('mo:')) return moAct(a, render);
   if (a.startsWith('body:')) return bodyAct(a, el, render);
   if (a.startsWith('nu:')) return nuAct(a, el, render);
   if (a.startsWith('dc:')) return discAct(a, el, render);
@@ -524,6 +540,7 @@ window.addEventListener('popstate', () => {
 });
 
 nutriStartup();
+initBeast3d();
 render();
 enter();
 

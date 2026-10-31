@@ -218,7 +218,7 @@ class WorkoutPlayer implements Player {
         }
         const sets = x.vals.map((v, k) => (x.done[k] ? v : null));
         const adv = advise(x.ex, { log: { id: x.ex.id, name: x.ex.vars[x.lvl], sets, unit: unitOf(x.ex) }, lvl: x.lvl, date: '' }, x.lvl);
-        const tip = adv.kind === 'up' || adv.kind === 'down' || adv.kind === 'top' ? ` ${adv.text}` : '';
+        const tip = adv.kind === 'up' ? ` ${adv.text} Data viitoare pornești direct de acolo.` : adv.kind === 'down' || adv.kind === 'top' ? ` ${adv.text}` : '';
         const vals = x.ex.type === 'ytw' ? `${sets.filter((v) => v !== null).length} × 5-5-5` : `${sets.filter((v) => v !== null).join(', ')}${isSec(x.ex) ? ' s' : ''}`;
         return `<li><div><b>${esc(x.ex.vars[x.lvl])}</b><span>${vals}${tip ? '.' : ''}${esc(tip)}</span></div></li>`;
       })
@@ -460,7 +460,10 @@ class WorkoutPlayer implements Player {
       }
       if (!x.done.some(Boolean)) continue;
       ex.push({ id: x.ex.id, name: x.ex.vars[x.lvl], lvl: x.lvl, unit: unitOf(x.ex), sets: x.vals.map((v, k) => (x.done[k] ? v : null)) });
-      ctx.S.lvl[x.ex.id] = x.lvl;
+      const sets = x.vals.map((v, k) => (x.done[k] ? v : null));
+      const adv = advise(x.ex, { log: { id: x.ex.id, name: x.ex.vars[x.lvl], sets, unit: unitOf(x.ex) }, lvl: x.lvl, date: '' }, x.lvl);
+      // Progression is mandatory: the next session opens on the harder variation (the chips can still go back).
+      ctx.S.lvl[x.ex.id] = adv.kind === 'up' && adv.lvl !== undefined ? adv.lvl : x.lvl;
     }
     if (!ex.length) return;
     const core = this.xs.filter((x) => !x.ex.opt);

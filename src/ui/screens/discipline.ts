@@ -4,6 +4,8 @@ import { DOPA_RULES, dopaBest, dopaClean, dopaStreak, MILESTONES, nextMilestone,
 import { addDays, dayKey, esc, RO_DAYS, weekdayIdx } from '../../logic/util.ts';
 import { ask, ctx, save, toast } from '../ctx.ts';
 import { ic } from '../icons.ts';
+import { CHALLENGES, challengeDays, CHALLENGE_DAYS } from '../../data/challenges.ts';
+import { daysBetween } from '../../logic/util.ts';
 import { top } from './shared.ts';
 
 const zile = (n: number): string => `${n} ${n === 1 ? 'zi' : 'zile'}`;
@@ -49,12 +51,29 @@ function dopaCard(today: string): string {
     <button class="link" data-a="dc:dp-stop">Oprește provocarea</button></section>`;
 }
 
+function challengesHtml(today: string): string {
+  return CHALLENGES.map((c) => {
+    const start = ctx.S.chal[c.id];
+    if (!start) return `<section class="card"><div class="row"><div class="row-l"><h3>${esc(c.name)}</h3><p class="small dim" style="margin:0">${esc(c.sub)}</p></div><button class="btn ghost sm" data-a="dc:ch-start" data-k="${c.id}">Start</button></div></section>`;
+    const days = challengeDays(c, start, ctx.S.log);
+    const n = days.filter(Boolean).length;
+    const day = Math.min(CHALLENGE_DAYS + 1, daysBetween(start, today) + 1);
+    const over = day > CHALLENGE_DAYS;
+    return `<section class="card ${n === CHALLENGE_DAYS ? 'lime' : ''}"><div class="row"><h3 style="margin:0">${esc(c.name)}</h3><span class="ntag">${n} din ${CHALLENGE_DAYS}</span></div>
+      <p class="small dim">${over ? 'Provocare încheiată.' : `Ziua ${day}. ${esc(c.sub)}. Se bifează singur când salvezi sesiunea.`}</p>
+      <div class="ch-grid" aria-hidden="true">${days.map((d, i) => `<i class="${d ? 'on' : i + 1 === day ? 'now' : ''}"></i>`).join('')}</div>
+      <button class="link" data-a="dc:ch-stop" data-k="${c.id}">${over ? 'Închide' : 'Oprește'}</button></section>`;
+  }).join('');
+}
+
 export function disciplineHtml(): string {
   const today = dayKey();
   return `${top()}<h1 class="stack mid">Discipline Challenges</h1>
     <p class="dim" style="margin-top:-6px">Disciplina e un mușchi. Îl antrenezi zilnic, ca pe restul.</p>
     ${nofapCard(today)}
-    ${dopaCard(today)}`;
+    ${dopaCard(today)}
+    <h2 class="sec">Provocări de 30 de zile</h2>
+    ${challengesHtml(today)}`;
 }
 
 export function discAct(a: string, el: HTMLElement, render: () => void): void {
@@ -86,6 +105,16 @@ export function discAct(a: string, el: HTMLElement, render: () => void): void {
       if (dopaClean(D.dopa, today)) toast('Zi curată.');
       return render();
     }
+    case 'dc:ch-start':
+      ctx.S.chal[el.dataset.k ?? ''] = today;
+      save();
+      return render();
+    case 'dc:ch-stop':
+      return ask('Închizi provocarea?', 'Antrenamentele rămân în istoric.', 'Închide', () => {
+        delete ctx.S.chal[el.dataset.k ?? ''];
+        save();
+        render();
+      });
     case 'dc:dp-stop':
       return ask('Oprești provocarea?', 'Zilele bifate rămân salvate; o poți reporni oricând.', 'Oprește', () => {
         D.dopa.started = null;

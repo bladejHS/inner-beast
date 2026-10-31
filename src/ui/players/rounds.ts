@@ -67,6 +67,8 @@ class RoundsPlayer implements Player {
   lastSec = -1;
   calls: Call[] = [];
   call: Call | null = null;
+  /** How many times each combination was called, for the boxing statistics. */
+  called: Record<string, number> = {};
   callIdx = -1;
   lastCall = -999;
   caller: boolean;
@@ -241,6 +243,7 @@ class RoundsPlayer implements Player {
     if (pool.length > 1 && i === this.callIdx) i = (i + 1) % pool.length;
     this.callIdx = i;
     this.call = pool[i];
+    if (this.call) this.called[this.call.name] = (this.called[this.call.name] ?? 0) + 1;
     this.lastCall = this.clock.t;
     if (speak) say(this.call.say, 'en');
   }
@@ -331,7 +334,7 @@ class RoundsPlayer implements Player {
         block: full ? this.cfg.block : undefined,
         name: this.cfg.name,
         dur: this.clock.t,
-        data: { rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), focus: this.cfg.focus ?? '' },
+        data: { rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), focus: this.cfg.focus ?? '', called: this.called },
       }),
     );
     this.saved = true;

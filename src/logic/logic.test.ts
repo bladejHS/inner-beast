@@ -1,5 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { angle, GuardTracker, RepCounter, type Pt } from './coach.ts';
+import { boxStats } from './boxstats.ts';
+import { CHALLENGES, challengeDays } from '../data/challenges.ts';
 import { addDays, dayKey, inWeek, mmss, num, paceStr, weekStart, weekdayIdx } from './util.ts';
 import { Clock, breath478Seq, doneSec, locate, phaseStart, roundsSeq, showerSeq, totalSec } from './seq.ts';
 import { Track, haversine, routePath, simplify } from './geo.ts';
@@ -362,4 +365,59 @@ test('rounds: themed rounds, a defensive distance round for a tall boxer, warm-u
   assert.ok(WARMUP_SEC >= 300 && WARMUP_SEC <= 420);
   const r = (id: string) => WEEK.flatMap((d) => d.blocks).find((b) => b.id === id)!;
   assert.ok(r('mon-shadow').warmup && r('thu-rope').warmup);
+});
+
+test('camera coach: rep counting, shallow reps, slowing down', () => {
+  const r = new RepCounter(150, 100);
+  let t = 0;
+  const rep = (low: number, up = 0.5): void => {
+    for (const a of [170, 130, low, low, low, low, low]) r.feed(a, (t += 0.2));
+    t += up;
+    for (const a of [170, 170, 170, 170, 170]) r.feed(a, (t += 0.05));
+  };
+  rep(70);
+  assert.equal(r.reps, 1);
+  rep(115);
+  assert.equal(r.reps, 1);
+  assert.equal(r.shallow, 1);
+  for (let i = 0; i < 4; i++) rep(70);
+  assert.equal(r.slowed, false);
+  rep(70, 2);
+  assert.equal(r.slowed, true);
+});
+
+test('camera coach: punches, guard and angles', () => {
+  const pose = (lx: number, ly: number): Pt[] => {
+    const p: Pt[] = Array.from({ length: 33 }, () => ({ x: 0.5, y: 0.5, visibility: 1 }));
+    p[11] = { x: 0.45, y: 0.3 };
+    p[12] = { x: 0.55, y: 0.3 };
+    p[23] = { x: 0.46, y: 0.6 };
+    p[24] = { x: 0.54, y: 0.6 };
+    p[14] = { x: 0.6, y: 0.33 };
+    p[16] = { x: 0.55, y: 0.27 };
+    p[13] = { x: (0.45 + lx) / 2, y: (0.3 + ly) / 2 };
+    p[15] = { x: lx, y: ly };
+    return p;
+  };
+  const g = new GuardTracker();
+  g.feed(pose(0.47, 0.28), 0);
+  assert.equal(g.feed(pose(0.1, 0.3), 0.1).punch, true);
+  assert.equal(g.feed(pose(0.1, 0.3), 0.2).punch, false);
+  g.feed(pose(0.47, 0.28), 0.3);
+  assert.equal(g.punches, 1);
+  g.feed(pose(0.46, 0.55), 1);
+  assert.equal(g.feed(pose(0.46, 0.55), 2).drop, true);
+  assert.equal(Math.round(angle({ x: 1, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 })), 90);
+});
+
+test('30-day challenge counts days from the log; box stats add up', () => {
+  const c = CHALLENGES.find((x) => x.id === 'box')!;
+  const log = [
+    makeEntry({ kind: 'rounds', name: 'Heavy Bag Training', dur: 600, date: '2026-10-02', data: { rounds: 3, workDone: 540, focus: 'combo', called: { X: 2 } } }),
+    makeEntry({ kind: 'coach', name: 'Camera', dur: 60, date: '2026-10-02', data: { mode: 'box', punches: 40, guard: 80 } }),
+  ];
+  const d = challengeDays(c, '2026-10-01', log);
+  assert.deepEqual([d[0], d[1], d.length], [false, true, 30]);
+  const b = boxStats(log, '2026-10-10');
+  assert.deepEqual([b.rounds, b.bagMin, b.punches, b.guard, b.called.X], [3, 9, 40, [80], 2]);
 });

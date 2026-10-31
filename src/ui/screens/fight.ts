@@ -82,6 +82,7 @@ export function fightHtml(): string {
     ${weekCard(false)}
     <h2 class="sec">Timere</h2>
     <div class="timer-list">${QUICK.map(quickRow).join('')}
+      <button class="timer-row" data-a="tool" data-k="coach"><div><b>Antrenor cu camera</b><span>Garda, loviturile și ritmul, urmărite live</span></div>${ic('camera')}</button>
       <button class="timer-row" data-a="tool" data-k="peekaboo"><div><b>Peekaboo Workout</b><span>7 exerciții, câte 2 serii, de la Alex</span></div>${ic('shadow')}</button>
       <button class="timer-row" data-a="tool" data-k="homebox"><div><b>Home Boxing Rounds</b><span>3 × 3 min fără echipament, de la Alex</span></div>${ic('timer')}</button>
       <button class="timer-row" data-a="qt" data-k="free"><div><b>Runde libere</b><span>Setezi tu rundele, lucrul și pauza</span></div>${ic('timer')}</button>

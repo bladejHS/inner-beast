@@ -5,7 +5,7 @@ import { dayKey, uid } from './util.ts';
 import type { Fast, FastLog } from './nutri/fast.ts';
 import { freshDiscipline, type Discipline } from './discipline.ts';
 
-export type Kind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'wimhof' | 'breath' | 'shower' | 'row';
+export type Kind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'wimhof' | 'breath' | 'shower' | 'row' | 'coach';
 
 export interface SetLog {
   id: string;
@@ -158,6 +158,8 @@ export interface State {
   fasts: FastLog[];
   /** Discipline Challenges: No Fap and Dopamine Discipline. */
   disc: Discipline;
+  /** 30-day challenges running now: id → first day. */
+  chal: Record<string, string>;
 }
 
 export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 200, startW: 80, goalW: 75, act: 1.55 };
@@ -215,6 +217,7 @@ export function freshState(today: string = dayKey()): State {
     fast: null,
     fasts: [],
     disc: freshDiscipline(),
+    chal: {},
   };
 }
 
@@ -255,6 +258,7 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
       nofap: { ...base.disc.nofap, ...(isObj(r.disc) && isObj(r.disc.nofap) ? r.disc.nofap : {}) },
       dopa: { ...base.disc.dopa, ...(isObj(r.disc) && isObj(r.disc.dopa) ? r.disc.dopa : {}) },
     },
+    chal: isObj(r.chal) ? (r.chal as Record<string, string>) : {},
   };
 }
 

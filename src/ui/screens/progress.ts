@@ -11,6 +11,9 @@ import { art } from '../art.ts';
 import { ic } from '../icons.ts';
 import { top } from './shared.ts';
 import { photosHtml, weightHtml } from './body.ts';
+import { boxStats } from '../../logic/boxstats.ts';
+import { COMBOS } from '../../data/combos.ts';
+import { learned } from './alex.ts';
 
 function entryLine(e: Entry, del = false): string {
   const d = e.data as Record<string, unknown>;
@@ -45,12 +48,33 @@ function entryLine(e: Entry, del = false): string {
     case 'routine':
       what = mmss(e.dur);
       break;
+    case 'coach':
+      what = d.mode === 'box' ? `${d.punches} lovituri, gardă ${d.guard}%` : d.angle ? `${d.angle}°` : `${d.reps} repetări`;
+      break;
     case 'row':
       what = `${d.challenge}: ${num(Number(d.meters) || 0)} m${d.reps && Number(d.reps) > 1 ? `, ${d.intervals} din ${d.reps} intervale` : ''} în ${mmss(e.dur)}`;
       break;
   }
   if (d.manual && e.kind !== 'run' && e.kind !== 'walk') what = 'bifat manual';
   return `<li><div><b>${esc(e.name)}</b><span>${shortDay(e.date)}${what ? `, ${esc(what)}` : ''}${e.block ? '' : ', în afara planului'}</span></div>${del ? `<button class="icon-btn" data-a="hist-del" data-id="${e.id}" aria-label="Șterge">${ic('trash')}</button>` : ''}</li>`;
+}
+
+function boxHtml(today: string): string {
+  const b = boxStats(ctx.S.log, today);
+  if (!b.rounds && !b.punches) return '<h2 class="sec">Box</h2><p class="dim">După primele runde vezi aici statisticile.</p>';
+  const diff = Math.round(b.min30 - b.minPrev30);
+  const known = learned();
+  const rare = COMBOS.filter((c) => known.has(c.id)).sort((x, y) => (b.called[x.name] ?? 0) - (b.called[y.name] ?? 0)).slice(0, 3);
+  return `<h2 class="sec">Box<small>Ultimele 30 de zile: ${Math.round(b.min30)} min, ${diff >= 0 ? '+' : '−'}${Math.abs(diff)} față de cele 30 dinainte</small></h2>
+    <div class="stats">
+      <div class="stat"><b>${b.rounds}</b><span>runde în total</span></div>
+      <div class="stat"><b>${Math.round(b.bagMin)}</b><span>minute la sac</span></div>
+      <div class="stat"><b>${Math.round(b.shadowMin)}</b><span>minute de shadow</span></div>
+      <div class="stat"><b>${known.size} din ${COMBOS.length}</b><span>combinații învățate</span></div>
+      ${b.punches ? `<div class="stat"><b>${b.punches}</b><span>lovituri numărate cu camera</span></div>` : ''}
+    </div>
+    ${b.guard.length > 1 ? `<p class="small dim" style="margin-bottom:0">Garda sus, % din timp</p>${spark(b.guard)}` : ''}
+    ${rare.length ? `<p class="small dim">Exersate cel mai rar dintre cele învățate: ${rare.map((c) => esc(c.name)).join(', ')}.</p>` : ''}`;
 }
 
 export function progressHtml(): string {
@@ -115,6 +139,8 @@ export function progressHtml(): string {
 
     ${weightHtml()}
     ${photosHtml()}
+
+    ${boxHtml(today)}
 
     <h2 class="sec">Calistenie<small>Totalul de repetări pe sesiune, la varianta curentă</small></h2>
     <div class="ex-line"><div><b>Pull-up EMOM</b><span>Următoarea țintă: ${S.emom.min} min × ${S.emom.reps}. Spre 30 × 10: ${emomPct}%.</span></div><div class="bar" style="margin:0"><i style="width:${Math.min(100, emomPct)}%"></i></div></div>

@@ -14,7 +14,7 @@ function walk(dir) {
 }
 
 const files = walk(DIST)
-  .filter((f) => !/sw\.js$|\.map$|OFL\.txt$/.test(f))
+  .filter((f) => !/sw\.js$|\.map$|OFL\.txt$/.test(f) && !/[\\/]pose[\\/]/.test(f))
   .sort();
 const hash = createHash('sha256');
 for (const f of files) hash.update(f).update(readFileSync(f));
@@ -39,6 +39,14 @@ self.addEventListener('fetch', (e) => {
   if (r.method !== 'GET') return;
   const url = new URL(r.url);
   if (url.origin !== location.origin) return;
+  // The camera model is large: kept once first used, outside the versioned cache.
+  if (url.pathname.includes('/pose/')) {
+    e.respondWith(caches.open('pose-v1').then((c) => c.match(r).then((m) => m || fetch(r).then((res) => {
+      if (res.ok) c.put(r, res.clone());
+      return res;
+    }))));
+    return;
+  }
   if (r.mode === 'navigate') {
     e.respondWith(caches.match('./').then((m) => m || fetch(r)));
     return;

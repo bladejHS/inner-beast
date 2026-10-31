@@ -6,17 +6,9 @@ import { dayProgress, habitDone, habitMilestone, habitStreak, weekDone } from '.
 import { dayKey, esc, prettyDay, RO_DAYS, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
-import { clawSvg } from '../claws.ts';
 import { art } from '../art.ts';
 import { blockCard, blockMinutes, top } from './shared.ts';
 import { weekCard } from './alex.ts';
-
-function miniRing(n: number, total: number, size = 64): string {
-  const r = 26;
-  const c = 2 * Math.PI * r;
-  const off = c * (1 - n / total);
-  return `<svg class="mring" width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="${r}" class="mr-t"/><circle cx="32" cy="32" r="${r}" class="mr-v" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg>`;
-}
 
 /** Monday–Sunday strip: how much of each day is done this week. */
 export function weekStrip(today: string, active: number): string {
@@ -36,19 +28,43 @@ export function dayBody(day: Day, today: string, kicker: string): string {
   const mins = day.blocks.reduce((s, b) => s + blockMinutes(b), 0);
   const next = day.blocks.find((b) => !done.has(b.id));
   return `
-    <section class="hero">
+    <section class="hero mission">
       ${art('wolf', 'hero-art')}
-      ${clawSvg('currentColor', 'hero-claws')}
-      <p class="hero-k">${esc(kicker)}</p>
+      <p class="mission-k"><span>Today's Mission</span><b>${esc(kicker)}</b></p>
       <h1 class="hero-t">${esc(day.title)}</h1>
-      <div class="hero-row">
-        <div class="hero-meta"><span><b>${total}</b> blocuri</span><span><b>~${mins}</b> min</span></div>
-        <div class="hero-ring">${miniRing(n, total)}<b>${n}<small>/${total}</small></b></div>
-      </div>
-      ${next ? `<button class="btn hero-go" data-a="start" data-b="${next.id}">${ic('play')}Începe: ${esc(blockName(next, ctx.S.set))}</button>` : `<p class="hero-done">${ic('check')} Ziua e completă</p>`}
+      <div class="mission-m"><div><b>${n}/${total}</b><span>blocuri</span></div><div><b>~${mins}</b><span>minute</span></div></div>
+      <div class="segs" role="img" aria-label="${n} din ${total} blocuri făcute">${day.blocks.map((b, i) => `<i class="${done.has(b.id) ? 'on' : b === next ? 'next' : ''}" style="--i:${i}"></i>`).join('')}</div>
+      ${next ? `<button class="btn hero-go" data-a="start" data-b="${next.id}">${ic('play')}Începe: ${esc(blockName(next, ctx.S.set))}</button>` : '<p class="hero-done">Misiune încheiată.</p>'}
     </section>
+    ${overview(today)}
     ${weekStrip(today, day.idx)}
     <ol class="bks">${day.blocks.map((b, i) => blockCard(b, i + 1, today)).join('')}</ol>`;
+}
+
+/** Calories logged today in Beast Nutrition, which shares this origin. Null when that app holds nothing. */
+function fuelToday(today: string): number | null {
+  try {
+    const raw = localStorage.getItem('beast-nutrition:v2');
+    const days = raw ? (JSON.parse(raw) as { days?: Record<string, { kcal: number }[][]> }).days : null;
+    return days?.[today] ? days[today].flat().reduce((s, e) => s + e.kcal, 0) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The week at a glance, only from saved data. */
+function overview(today: string): string {
+  const done = weekDone(ctx.S.log, weekStart(today));
+  const total = WEEK.reduce((s, d) => s + d.blocks.length, 0);
+  const sleep = ctx.S.sleep[today];
+  const active = Object.keys(ctx.S.chal).length + (ctx.S.race ? 1 : 0);
+  const fuel = fuelToday(today);
+  return `<section class="ov" aria-label="Săptămâna ta">
+    <div class="metric wide"><b>${done.size}<small>/${total}</small></b><span>Blocuri săptămâna asta</span></div>
+    <button class="metric" data-a="tab" data-k="challenge"><b>${active}</b><span>Provocări active</span></button>
+    <div class="metric"><b>${sleep === undefined ? '–' : String(sleep).replace('.', ',')}<small>h</small></b><span>Somn</span></div>
+    ${fuel === null ? '' : `<a class="metric" href="../beast-nutrition/"><b>${fuel.toLocaleString('ro-RO')}</b><span>kcal azi, Fuel</span></a>`}
+  </section>`;
 }
 
 export function habitCard(compact = false): string {

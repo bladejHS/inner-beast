@@ -1,4 +1,6 @@
 import './styles.css';
+import './design.css';
+import { publishPlan } from './logic/bridge.ts';
 import { blockById, WEEK, type Block } from './data/plan.ts';
 import { rowChallenge } from './data/row.ts';
 import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
@@ -86,6 +88,7 @@ function render(): void {
   if (!app) return;
   const active = document.activeElement as HTMLElement | null;
   const keepId = active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT') ? active.id : '';
+  publishPlan(ctx.S.set);
   app.innerHTML = screenHtml() + navHtml();
   if (keepId) {
     const el = document.getElementById(keepId) as HTMLInputElement | null;

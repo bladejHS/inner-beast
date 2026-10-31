@@ -29,7 +29,7 @@ export function challengeHtml(): string {
   return `${top()}<h1 class="stack mid">Challenge</h1>
     <p class="dim" style="margin-top:-6px">Simulări de concurs pe cinci niveluri. Alege nivelul care te provoacă, nu pe cel mai mare.</p>
     ${run && cur ? `<section class="card lime"><div class="row"><div class="row-l"><h3>${esc(cur.name)}</h3><p class="small dim" style="margin:0">${esc(cur.levels[run.lvl].name)} e în desfășurare</p></div><button class="btn sm" data-a="ch:resume">Continuă</button></div></section>` : ''}
-    ${RACES.map(raceCard).join('')}
+    <div class="missions">${RACES.map(raceCard).join('')}</div>
     ${done.length ? `<h2 class="sec">Terminate</h2><ul class="hist">${done.map((e) => `<li><div><b>${esc(e.name)}</b><span>${shortDay(e.date)}, ${raceTime(e.dur)}</span></div></li>`).join('')}</ul>` : ''}
     <p class="small dim">Simulări de antrenament, fără legătură cu organizatorii acestor curse. Oprește-te dacă simți durere în piept, amețeală sau o accidentare.</p>`;
 }

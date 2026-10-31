@@ -439,3 +439,16 @@ test('race time switches to hours', () => {
   assert.equal(raceTime(59 * 60), '59:00');
   assert.equal(raceTime(13 * 3600 + 5 * 60 + 9), '13:05:09');
 });
+
+import { planSnapshot } from './bridge.ts';
+
+test('the plan published for Beast Nutrition follows the real week and the user picks', () => {
+  const base = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a', rest3: 60, rest1: 60 } as const;
+  const week = planSnapshot(base);
+  assert.equal(week.length, 7);
+  const bag = week[0]!.find((s) => s.id === 'mon-bag')!;
+  assert.deepEqual([bag.kind, bag.min, bag.focus], ['rounds', 19, 'move']);
+  assert.equal(week[6]!.find((s) => s.id === 'sun-legs')!.name, 'Wall Sit');
+  const row = planSnapshot({ ...base, thuMain: 'row' })[3]!.find((s) => s.id === 'thu-bag')!;
+  assert.equal(row.kind, 'row');
+});

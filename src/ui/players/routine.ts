@@ -9,8 +9,6 @@ import { addEntry, ask, closePlayer, mountPlayer, ovEl, type Player } from '../c
 import { ring } from '../charts.ts';
 import { figureFor, zoneLabel } from '../figures.ts';
 import { howHtml } from '../how.ts';
-import { anim3d } from '../beast3d.ts';
-import { ROUTINES_3D } from '../../data/poses3d.ts';
 import { art } from '../art.ts';
 import { chrome, ctrlBtn, setText } from './common.ts';
 
@@ -70,8 +68,7 @@ class RoutinePlayer implements Player {
       ${side ? `<p class="round-lbl" id="sd">${side}</p>` : ''}
       ${(() => {
         const r0 = ring(1 - L.left / p.sec, `<div><div class="mid-time" id="t">${mmss(Math.ceil(L.left))}</div></div>`, 6);
-        const n = (m ?? r.moves[0]).name;
-        const fig = ROUTINES_3D.includes(r.id) ? anim3d(n) : figureFor(n);
+        const fig = figureFor((m ?? r.moves[0]).name);
         const z = zoneLabel((m ?? r.moves[0]).name);
         return fig ? `<div class="mv"><div class="mv-fig">${fig}${z ? `<p class="mv-z">Simți în: <b>${esc(z)}</b></p>` : ''}</div>${r0}</div>` : r0;
       })()}

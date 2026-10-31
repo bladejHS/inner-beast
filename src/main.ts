@@ -20,7 +20,6 @@ import { settingsHtml } from './ui/screens/settings.ts';
 import { bodyAct, bodyChange, bodyInput, hydratePhotos } from './ui/screens/body.ts';
 import { nuAct, nuChange, nuInput, nutriStartup, nutritionHtml } from './ui/screens/nutrition.ts';
 import { MORE_TABS, moreHtml } from './ui/screens/more.ts';
-import { initBeast3d } from './ui/beast3d.ts';
 import { discAct, disciplineHtml } from './ui/screens/discipline.ts';
 import { labHtml } from './ui/screens/lab.ts';
 import { openLab } from './ui/players/lab.ts';
@@ -525,7 +524,6 @@ window.addEventListener('popstate', () => {
 });
 
 nutriStartup();
-initBeast3d();
 render();
 enter();
 

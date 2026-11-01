@@ -378,6 +378,13 @@ function act(a: string, el: HTMLElement): void {
       S.set.callEvery = Number(el.dataset.v) || 0;
       save();
       return render();
+    case 'set-opening':
+      try {
+        localStorage.setItem('beast:opening', el.dataset.v || 'full');
+      } catch {
+        /* storage blocked: the intro stays on */
+      }
+      return render();
     case 'set-leg':
       S.set.legMode = el.dataset.v === 'jump' ? 'jump' : 'wall';
       save();

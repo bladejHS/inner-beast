@@ -15,8 +15,17 @@ const step = (k: string, value: string, label: string): string =>
 const row = (label: string, hint: string, ctl: string): string =>
   `<div class="field"><div class="field-l">${esc(label)}${hint ? `<small>${esc(hint)}</small>` : ''}</div>${ctl}</div>`;
 
+function openingMode(): string {
+  try {
+    return localStorage.getItem('beast:opening') || 'full';
+  } catch {
+    return 'full';
+  }
+}
+
 export function settingsHtml(): string {
   const s = ctx.S.set;
+  const op = openingMode();
   const mm = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
   return `${top(true)}
     <h1 class="stack mid">Setări</h1>
@@ -25,6 +34,7 @@ export function settingsHtml(): string {
     ${row('Voce', 'Combinațiile strigate în engleză, indicațiile în română', sw('voice', s.voice, 'Voce'))}
     ${row('Vibrații', 'La schimbarea rundelor', sw('vibrate', s.vibrate, 'Vibrații'))}
     ${row('Ecranul rămâne aprins', 'Cât timp rulează un timer', sw('wake', s.wake, 'Ecran aprins'))}
+    ${row('Intro la pornire', 'Beast Awakening, doar la deschiderea aplicației', `<div class="chips">${[['full', 'Complet'], ['short', 'Scurt'], ['off', 'Oprit']].map(([v, l]) => `<button class="chip" aria-pressed="${op === v}" data-a="set-opening" data-v="${v}">${l}</button>`).join('')}</div>`)}
     <h2 class="sec">Runde</h2>
     ${row('Combinații strigate', 'În rundele de shadow boxing, sac și coardă', `<div class="chips">${[0, 10, 15, 20, 30].map((v) => `<button class="chip" aria-pressed="${s.callEvery === v}" data-a="set-call" data-v="${v}">${v ? `${v} s` : 'Oprit'}</button>`).join('')}</div>`)}
     ${row('Pauză la rundele de 3 minute', 'Cartea nu o precizează; standardul în box e 1 minut', step('rest3', mm(s.rest3), 'Pauză 3 minute'))}

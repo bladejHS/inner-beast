@@ -6,7 +6,8 @@ import { resolveBlock, WARMUP_SEC, WEEK, type Block, type Picks, type RestKey } 
 export const PLAN_KEY = 'beast:plan:v1';
 
 export interface Rests { rest3: number; rest1: number }
-export interface PlanSession { id: string; name: string; kind: string; min: number; focus?: string }
+/** `alt`: the slot has two options. This is the picked one, `other` the one left out, `detail` the rowing challenge. */
+export interface PlanSession { id: string; name: string; kind: string; min: number; focus?: string; alt?: { other: string; detail?: string } }
 
 function minutes(b: Block, r: Rests): number {
   if (b.kind === 'rounds') {
@@ -21,10 +22,17 @@ function minutes(b: Block, r: Rests): number {
   return b.min ?? 10;
 }
 
+function altOf(raw: Block, b: Block): PlanSession['alt'] {
+  if (raw.alt === 'feet') return { other: b.focus === 'ladder' ? 'Jumping Rope' : 'Agility Ladder' };
+  if (raw.alt === 'main') return b.kind === 'row' ? { other: raw.name, detail: b.dose } : { other: 'Machine Row' };
+  return undefined;
+}
+
 export function planSnapshot(set: Picks & Rests): PlanSession[][] {
   return WEEK.map((d) => d.blocks.map((raw) => {
     const b = resolveBlock(raw, set);
-    return { id: b.id, name: b.name, kind: b.kind, min: minutes(b, set), ...(b.focus ? { focus: b.focus } : {}) };
+    const alt = altOf(raw, b);
+    return { id: b.id, name: b.name, kind: b.kind, min: minutes(b, set), ...(b.focus ? { focus: b.focus } : {}), ...(alt ? { alt } : {}) };
   }));
 }
 

@@ -52,7 +52,7 @@ class WimHofPlayer implements Player {
           <li>Când simți nevoia, inspiri complet și ții ${RECOVERY_SEC} secunde.</li>
           <li>Repeți de ${s.whRounds} ori, apoi stai în liniște.</li>
         </ol>
-        <div class="card" style="border-color:var(--red)">
+        <div class="card" style="border-color:var(--accent)">
           <p style="margin:0 0 10px"><b>Siguranță.</b> Stai așezat sau întins. Niciodată în apă, la volan sau în picioare: poți leșina. Furnicăturile și o amețeală ușoară sunt normale; dacă te simți rău, te oprești. Dacă ai epilepsie, probleme cu inima, tensiune mare sau ești însărcinat, întreabă întâi medicul.</p>
           <label class="row" style="justify-content:flex-start;gap:12px;font-weight:700"><span class="switch"><input type="checkbox" data-a="p:safe" ${s.whSafety ? 'checked' : ''}><span></span></span>Am înțeles</label>
         </div>

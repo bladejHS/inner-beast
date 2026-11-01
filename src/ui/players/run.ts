@@ -39,13 +39,72 @@ const RUN_FIELDS: Array<[keyof RunInput, string, string, string]> = [
   ['paceMax', 'Pace Max', 'cel mai rapid, min/km', 'decimal'],
 ];
 
+const TIME_FIELDS: Array<keyof RunInput> = ['dur', 'paceAvg', 'paceMax'];
+
 function runFields(v: Partial<RunInput>): string {
-  return RUN_FIELDS.map(([k, label, hint, mode]) => `<div class="field"><div class="field-l">${label}<small>${hint}</small></div><input type="text" inputmode="${mode}" id="rf-${k}" value="${esc(v[k] ?? '')}" aria-label="${label}" style="width:110px"></div>`).join('');
+  return RUN_FIELDS.map(([k, label, hint, mode]) => {
+    const box = `<input type="text" inputmode="${mode}" id="rf-${k}" value="${esc(v[k] ?? '')}" aria-label="${label}" style="width:110px">`;
+    return `<div class="field"><div class="field-l">${label}<small>${hint}</small></div>${TIME_FIELDS.includes(k) ? `<div class="time-in">${box}<button type="button" class="colon" data-colon="rf-${k}" aria-label="Scrie două puncte la ${label}">:</button></div>` : box}</div>`;
+  }).join('');
 }
+
+// Phones' number keyboards have no ":", and a web app can't add a key, so the time fields carry their own.
+const colonBtn = (ev: Event): HTMLElement | null => (ev.target as Element).closest?.<HTMLElement>('[data-colon]') ?? null;
+document.addEventListener('mousedown', (ev) => {
+  if (colonBtn(ev)) ev.preventDefault(); // keeps the field focused and the keyboard up
+});
+document.addEventListener('click', (ev) => {
+  const inp = document.getElementById(colonBtn(ev)?.dataset.colon ?? '') as HTMLInputElement | null;
+  if (!inp) return;
+  const typing = document.activeElement === inp;
+  const end = inp.value.length;
+  inp.focus();
+  inp.setRangeText(':', typing ? (inp.selectionStart ?? end) : end, typing ? (inp.selectionEnd ?? end) : end, 'end');
+});
 
 function runInput(): RunInput {
   const read = (k: keyof RunInput): string => (document.getElementById(`rf-${k}`) as HTMLInputElement).value;
   return { dur: read('dur'), km: read('km'), hrAvg: read('hrAvg'), kcal: read('kcal'), hrMax: read('hrMax'), paceAvg: read('paceAvg'), paceMax: read('paceMax') };
+}
+
+/** A jog's target for today, shorter in a lighter week. */
+export function jogTarget(target: number): number {
+  return deloadOn(ctx.S.deload, dayKey()) ? lighter(target) : target;
+}
+
+/** Types in a jog from Polar Flow, also for an earlier day. */
+export function openPolar(cfg: RunCfg): void {
+  const today = dayKey();
+  openSheet(
+    `<h2>Rezultat Polar Flow</h2>
+    ${runFields({})}
+    <div class="field"><div class="field-l">Data<small>Ziua alergării</small></div><input type="date" id="rf-date" value="${today}" max="${today}" aria-label="Data alergării"></div>
+    <div style="height:14px"></div>
+    <button class="btn" data-a="m:save">Salvează</button>`,
+    {
+      'm:save': () => {
+        const date = (document.getElementById('rf-date') as HTMLInputElement).value || today;
+        if (date > today) return toast('Data nu poate fi în viitor.');
+        const v = readRun(runInput());
+        if (typeof v === 'string') return toast(v);
+        const { dur, ...stats } = v;
+        addEntry(
+          makeEntry({
+            kind: 'run',
+            block: dur >= (cfg.target ?? 1200) * 0.8 ? cfg.block : undefined,
+            name: 'Jogging',
+            dur,
+            ...(date === today ? {} : { date, ts: new Date(`${date}T12:00`).getTime() }),
+            data: { ...stats, splits: [], manual: true },
+          }),
+        );
+        closeSheet();
+        toast('Salvat.');
+        if (ctx.player) closePlayer(true);
+        else ctx.render();
+      },
+    },
+  );
 }
 
 type GpsState = 'off' | 'wait' | 'ok' | 'weak' | 'denied' | 'none';
@@ -66,7 +125,7 @@ class RunPlayer implements Player {
   steps = 0;
 
   constructor(cfg: RunCfg) {
-    this.cfg = cfg.target && deloadOn(ctx.S.deload, dayKey()) ? { ...cfg, target: lighter(cfg.target) } : cfg;
+    this.cfg = cfg.target ? { ...cfg, target: jogTarget(cfg.target) } : cfg;
     this.watch();
     this.render();
   }
@@ -138,7 +197,7 @@ class RunPlayer implements Player {
         <p>${this.gpsHtml()}</p>
         <p class="small dim">Ecranul rămâne aprins cât timp alergi. Dacă îl blochezi, unele telefoane opresc GPS-ul din browser.</p>
         <button class="btn" data-a="p:start" style="margin-top:12px">Start</button>
-        <button class="link" data-a="p:manual">Introdu manual (bandă, ceas)</button>`,
+        ${c.mode === 'run' ? '<button class="btn ghost" data-a="p:manual" style="margin-top:10px">Adaugă din Polar Flow</button>' : '<button class="link" data-a="p:manual">Introdu manual (bandă, ceas)</button>'}`,
       );
       return;
     }
@@ -180,7 +239,7 @@ class RunPlayer implements Player {
       </div>
       ${this.track.splits.length ? `<p class="small dim">Pe kilometru: ${this.track.splits.map((s, i) => mmss(s - (i ? this.track.splits[i - 1] : 0))).join(', ')}</p>` : ''}
       ${pts.length > 1 ? `<svg class="route" viewBox="0 0 300 160"><path d="${routePath(pts, 300, 160)}"/></svg>` : ''}
-      ${c.mode === 'run' ? `<h2 class="sec">Datele alergării<small>Corectează sau completează de pe ceas</small></h2>${runFields(this.gpsInput())}` : ''}
+      ${c.mode === 'run' ? `<h2 class="sec">Datele alergării<small>Corectează sau completează din Polar Flow</small></h2>${runFields(this.gpsInput())}` : ''}
       ${c.mode === 'walk' ? `<p style="margin-top:14px">Pași (din telefon sau estimare)</p><input type="number" inputmode="numeric" data-a="p:steps" value="${this.steps || est}" min="0" max="100000">` : ''}
       <div style="height:16px"></div>
       <button class="btn" data-a="p:save">${this.saved ? 'Salvat' : 'Salvează'}</button>
@@ -302,32 +361,23 @@ class RunPlayer implements Player {
   }
 
   manual(): void {
-    const walk = this.cfg.mode === 'walk';
+    if (this.cfg.mode === 'run') return openPolar(this.cfg);
     openSheet(
-      `<h2>${walk ? 'Plimbare' : 'Alergare'} manuală</h2>
-      ${walk
-        ? `<div class="field"><div class="field-l">Minute</div><input type="number" inputmode="decimal" id="mm" value="60" style="width:110px"></div>
+      `<h2>Plimbare manuală</h2>
+      <div class="field"><div class="field-l">Minute</div><input type="number" inputmode="decimal" id="mm" value="60" style="width:110px"></div>
       <div class="field"><div class="field-l">Distanță (km)</div><input type="number" inputmode="decimal" step="0.01" id="mk" value="" placeholder="ex. 3,2" style="width:110px"></div>
-      <div class="field"><div class="field-l">Pași</div><input type="number" inputmode="numeric" id="ms" value="10000" style="width:110px"></div>`
-        : runFields({ dur: raceTime(this.cfg.target ?? 1200) })}
+      <div class="field"><div class="field-l">Pași</div><input type="number" inputmode="numeric" id="ms" value="10000" style="width:110px"></div>
       <div style="height:14px"></div>
       <button class="btn" data-a="m:save">Salvează</button>`,
       {
         'm:save': () => {
-          if (walk) {
-            const min = parseFloat((document.getElementById('mm') as HTMLInputElement).value.replace(',', '.')) || 0;
-            const kmv = parseFloat((document.getElementById('mk') as HTMLInputElement).value.replace(',', '.')) || 0;
-            const st = parseInt((document.getElementById('ms') as HTMLInputElement).value, 10) || 0;
-            if (min <= 0) return toast('Scrie câte minute ai făcut.');
-            const today = dayKey();
-            ctx.S.steps[today] = Math.max(ctx.S.steps[today] ?? 0, st);
-            addEntry(makeEntry({ kind: 'walk', block: st >= 10000 ? this.cfg.block : undefined, name: 'Walk (10K Steps)', dur: min * 60, data: { m: kmv * 1000, steps: st, manual: true } }));
-          } else {
-            const v = readRun(runInput());
-            if (typeof v === 'string') return toast(v);
-            const { dur, ...stats } = v;
-            addEntry(makeEntry({ kind: 'run', block: dur >= (this.cfg.target ?? 1200) * 0.8 ? this.cfg.block : undefined, name: 'Jogging', dur, data: { ...stats, splits: [], manual: true } }));
-          }
+          const min = parseFloat((document.getElementById('mm') as HTMLInputElement).value.replace(',', '.')) || 0;
+          const kmv = parseFloat((document.getElementById('mk') as HTMLInputElement).value.replace(',', '.')) || 0;
+          const st = parseInt((document.getElementById('ms') as HTMLInputElement).value, 10) || 0;
+          if (min <= 0) return toast('Scrie câte minute ai făcut.');
+          const today = dayKey();
+          ctx.S.steps[today] = Math.max(ctx.S.steps[today] ?? 0, st);
+          addEntry(makeEntry({ kind: 'walk', block: st >= 10000 ? this.cfg.block : undefined, name: 'Walk (10K Steps)', dur: min * 60, data: { m: kmv * 1000, steps: st, manual: true } }));
           closeSheet();
           toast('Salvat.');
           closePlayer(true);

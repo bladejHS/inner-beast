@@ -159,6 +159,7 @@ export function blockCard(raw: Block, n: number, today: string): string {
     const st = ctx.S.steps[today] ?? 0;
     extra = `<div class="steps-in"><label class="sr" for="steps-in">Pași azi</label><input id="steps-in" type="number" inputmode="numeric" min="0" max="100000" data-a="steps" value="${st || ''}" placeholder="Pași azi"><span>din 10.000</span></div>`;
   }
+  if (b.kind === 'run') extra = `<button class="link" data-a="polar" data-b="${b.id}">Adaugă din Polar Flow</button>`;
   if (b.kind === 'rounds' && b.focus && b.focus !== 'legs' && b.focus !== 'rope' && b.focus !== 'ladder') {
     const cs = focusCombos(b.focus, ctx.S.nut.h);
     extra += `<p class="bk-calls"><b>Combinații:</b> ${esc(cs.slice(0, 4).map((c) => c.name).join(' · '))}${cs.length > 4 ? ` și încă ${cs.length - 4}` : ''}</p>`;

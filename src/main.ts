@@ -11,6 +11,7 @@ import { closePlayer, closeSheet, ctx, openSheet, ask, save, sheetAct, toast, ty
 import { ic } from './ui/icons.ts';
 import { openBreath } from './ui/players/breath.ts';
 import { openRoutine } from './ui/players/routine.ts';
+import { jogTarget, openPolar } from './ui/players/run.ts';
 import { openShower } from './ui/players/shower.ts';
 import { openWimHof } from './ui/players/wimhof.ts';
 import { fightHtml, setComboCat, startQuick } from './ui/screens/fight.ts';
@@ -257,6 +258,11 @@ function act(a: string, el: HTMLElement): void {
     case 'mark': {
       const b = blockById(el.dataset.b || '');
       if (b) toggleMark(b);
+      return;
+    }
+    case 'polar': {
+      const b = blockById(el.dataset.b || '');
+      if (b) openPolar({ mode: 'run', block: b.id, target: jogTarget((b.min ?? 20) * 60) });
       return;
     }
     case 'day':

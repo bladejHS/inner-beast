@@ -311,3 +311,9 @@ html::before { background: var(--paper); }
 .link { display: inline-flex; align-items: center; min-height: 44px; }
 .bars span { font-size: 12px; }
 .field:has(.chips) { flex-direction: column; align-items: stretch; }
+
+/* ---- typing a time: the phone's number keyboard has no colon ---- */
+.time-in { display: flex; gap: 6px; flex: none; }
+.colon { width: 44px; min-height: 44px; flex: none; background: var(--surface-2); border: 1px solid var(--line-2); color: var(--ink); font: 800 24px/1 var(--display); touch-action: manipulation; }
+.colon:active { background: var(--crimson); color: #fff; }
+input[type='date'] { flex: none; width: 160px; min-height: 46px; padding: 8px 10px; font-size: 16px; color-scheme: dark; background: var(--surface-2); border: 1px solid var(--line-2); border-radius: var(--r); color: var(--ink); }

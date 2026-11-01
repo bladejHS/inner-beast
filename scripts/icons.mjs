@@ -1,10 +1,10 @@
 // Renders the app icons from the ink wolf (public/art/wolf.webp, made by scripts/art.mjs): node scripts/icons.mjs
-// Paper-white wolf on black, so it stands out on a home screen.
+// Bone-white wolf on dark red, so it stands out on a home screen.
 import sharp from 'sharp';
 import { writeFileSync } from 'node:fs';
 
-const INK = { r: 13, g: 13, b: 13 };
-const PAPER = [243, 241, 236];
+const INK = { r: 122, g: 13, b: 20 };
+const PAPER = [246, 240, 238];
 
 /** scale: how much of the canvas height the wolf occupies (maskable icons need a safe zone). */
 async function icon(size, scale) {

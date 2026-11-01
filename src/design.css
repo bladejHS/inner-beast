@@ -1,5 +1,5 @@
 /* Inner Beast design system. Loaded after styles.css: tokens first, then components, then screens.
-   Elite performance, industrial, dark navy. Electric blue is rationed: actions, active states, key numbers. */
+   Elite performance, industrial, dark red. Crimson is rationed: actions, active states, key numbers. */
 
 @font-face { font-family: 'Barlow Condensed'; font-weight: 500 600; font-display: swap; src: url('/fonts/barlow-condensed-latin-600-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F; }
 @font-face { font-family: 'Barlow Condensed'; font-weight: 500 600; font-display: swap; src: url('/fonts/barlow-condensed-latin-ext-600-normal.woff2') format('woff2'); unicode-range: U+0100-024F; }
@@ -8,16 +8,16 @@
 
 /* ---- PASS 1: tokens ---- */
 :root, :root[data-theme='dark'] {
-  --obsidian: #05070b; --deep: #07111f; --gunmetal: #101c2d; --steel: #1a2a41;
-  --electric: #1677ff; --cyan: #48cfff; --white: #f2f6fc; --gray: #8b97a8;
+  --obsidian: #0b0506; --deep: #140709; --gunmetal: #1f0e10; --steel: #321518;
+  --crimson: #c0141d; --ember: #f04a45; --white: #f6f0ee; --gray: #a6938f;
 
   --paper: var(--obsidian); --paper-2: var(--gunmetal);
-  --surface-1: #0a1422; --surface-2: var(--gunmetal); --surface-3: var(--steel);
+  --surface-1: #120809; --surface-2: var(--gunmetal); --surface-3: var(--steel);
   --card: var(--surface-1);
-  --ink: var(--white); --ink-2: #c8d3e2; --mute: var(--gray); --mute-inv: #5f6d80;
-  --line: #16243a; --line-2: #243650;
-  --accent: var(--electric); --accent-2: var(--cyan);
-  --nav-bg: var(--deep); --nav-fg: #7d8a9c; --nav-on: var(--white); --nav-edge: var(--line);
+  --ink: var(--white); --ink-2: #dccfcc; --mute: var(--gray); --mute-inv: #7a6663;
+  --line: #2a1215; --line-2: #451d21;
+  --accent: var(--crimson); --accent-2: var(--ember);
+  --nav-bg: var(--deep); --nav-fg: #947f7c; --nav-on: var(--white); --nav-edge: var(--line);
 
   --display: 'Barlow Condensed', 'Arial Narrow', Impact, sans-serif;
   --body: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -43,7 +43,7 @@
 .stack { font: var(--t-page); letter-spacing: 0; }
 .stack.mid { font: var(--t-page); }
 .sec { font: var(--t-section); letter-spacing: .01em; border-top: 1px solid var(--line-2); padding-top: var(--s-3); margin: var(--s-6) 0 var(--s-3); position: relative; }
-.sec::before { content: ''; position: absolute; top: -1px; left: 0; width: 34px; height: 2px; background: var(--electric); }
+.sec::before { content: ''; position: absolute; top: -1px; left: 0; width: 34px; height: 2px; background: var(--crimson); }
 .card h3, .bk h3 { font: var(--t-card); letter-spacing: .005em; }
 .bk h3 { overflow-wrap: break-word; }
 .brand { font: 800 19px/1 var(--display); letter-spacing: .12em; }
@@ -52,9 +52,9 @@
 .btn, .card, .bk, .tile, .chip, .wk-d, .stepper, .more-r, .combo, .tip-card, .dc, .stat, .kpi, input[type='text'], input[type='number'], textarea { border-radius: var(--r); }
 .more-i, .bk-ic { border-radius: var(--r-sm); }
 
-.btn { font: 800 20px/1 var(--display); letter-spacing: .08em; min-height: 56px; background: var(--electric); color: #fff; box-shadow: none; clip-path: var(--notch); border-radius: 0; transition: transform var(--t-fast) var(--ease), background-color var(--t-fast); }
-.btn:hover { background: var(--cyan); }
-.btn:active { transform: scale(.985); background: #0f5fd1; }
+.btn { font: 800 20px/1 var(--display); letter-spacing: .08em; min-height: 56px; background: var(--crimson); color: #fff; box-shadow: none; clip-path: var(--notch); border-radius: 0; transition: transform var(--t-fast) var(--ease), background-color var(--t-fast); }
+.btn:hover { background: #d8262e; }
+.btn:active { transform: scale(.985); background: #8e0d15; }
 .btn:disabled { background: var(--steel); color: var(--gray); }
 .btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-2); clip-path: none; border-radius: var(--r); }
 .btn.ghost:hover { box-shadow: inset 0 0 0 1px var(--gray); background: transparent; }
@@ -66,16 +66,16 @@
 .chip[aria-pressed='true'], .chip.on { background: var(--white); color: var(--obsidian); border-color: var(--white); }
 
 .card { background: var(--surface-1); border: 1px solid var(--line); box-shadow: var(--shadow-1); }
-.card.lime { border-color: var(--line-2); border-left: 2px solid var(--electric); box-shadow: none; margin-right: 0; }
+.card.lime { border-color: var(--line-2); border-left: 2px solid var(--crimson); box-shadow: none; margin-right: 0; }
 .card.white { background: var(--surface-2); color: var(--ink); border-color: var(--line-2); }
 
 .tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 7px; border: 1px solid var(--line-2); font: var(--t-label); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
-.tag.hot { border-color: var(--electric); color: var(--cyan); }
+.tag.hot { border-color: var(--crimson); color: var(--ember); }
 
 .segs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; }
 .segs i { height: 6px; background: var(--steel); transform-origin: left; }
-.segs i.on { background: var(--electric); animation: seg-in var(--t-slow) var(--ease) both; animation-delay: calc(var(--i, 0) * 60ms); }
-.segs i.next { background: #3a5378; }
+.segs i.on { background: var(--crimson); animation: seg-in var(--t-slow) var(--ease) both; animation-delay: calc(var(--i, 0) * 60ms); }
+.segs i.next { background: #6e2a2e; }
 @keyframes seg-in { from { transform: scaleX(0); } }
 
 .metric { display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: var(--s-3); background: var(--surface-1); }
@@ -83,12 +83,12 @@
 .metric b small { font: 600 15px/1 var(--display); color: var(--gray); margin-left: 2px; }
 .metric span { font: var(--t-label); letter-spacing: .1em; text-transform: uppercase; color: var(--gray); }
 
-/* the tab bar: label stays readable, the active item gets a blue bar */
+/* the tab bar: label stays readable, the active item gets a red bar */
 .tabs { background: var(--deep); }
 .tabs button { font: 700 9px/1 var(--body); letter-spacing: .03em; transition: color var(--t-mid); }
 .tabs button svg { transition: transform var(--t-mid) var(--ease); }
-.tabs button[aria-current='page']::before { background: var(--electric); left: 22%; right: 22%; height: 2px; animation: nav-in var(--t-mid) var(--ease); }
-.tabs button[aria-current='page'] svg { transform: translateY(-1px); color: var(--electric); }
+.tabs button[aria-current='page']::before { background: var(--crimson); left: 22%; right: 22%; height: 2px; animation: nav-in var(--t-mid) var(--ease); }
+.tabs button[aria-current='page'] svg { transform: translateY(-1px); color: var(--crimson); }
 @keyframes nav-in { from { transform: scaleX(0); } }
 
 /* ---- motion presets ---- */
@@ -107,11 +107,11 @@
 }
 
 /* ---- PASS 2: dashboard ---- */
-.mission { position: relative; margin: 4px calc(-1 * var(--gutter)) 0; padding: var(--s-4) var(--gutter) var(--s-4); background: radial-gradient(90% 70% at 88% 12%, rgba(22, 119, 255, .17), transparent 70%), var(--deep); border-bottom: 1px solid var(--line); overflow: hidden; min-height: 0; }
-.mission .hero-art { color: #0d2547; right: -34px; top: -6px; width: 62%; max-width: 300px; }
+.mission { position: relative; margin: 4px calc(-1 * var(--gutter)) 0; padding: var(--s-4) var(--gutter) var(--s-4); background: radial-gradient(90% 70% at 88% 12%, rgba(192, 20, 29, .17), transparent 70%), var(--deep); border-bottom: 1px solid var(--line); overflow: hidden; min-height: 0; }
+.mission .hero-art { color: #3a0c11; right: -34px; top: -6px; width: 62%; max-width: 300px; }
 .mission .hero-claws { display: none; }
 .mission-k { position: relative; display: flex; justify-content: space-between; gap: 8px; font: var(--t-label); letter-spacing: .14em; text-transform: uppercase; color: var(--gray); margin: 0 0 var(--s-5); }
-.mission-k b { color: var(--cyan); font-weight: 700; }
+.mission-k b { color: var(--ember); font-weight: 700; }
 .mission .hero-t { font: var(--t-display); max-width: 100%; letter-spacing: 0; text-shadow: none; overflow-wrap: normal; hyphens: none; }
 .mission-m { position: relative; display: flex; gap: var(--s-5); margin: var(--s-4) 0 var(--s-3); }
 .mission-m div { display: flex; flex-direction: column; gap: 2px; }
@@ -132,23 +132,23 @@
 .bk { background: var(--surface-1); border: 1px solid var(--line); box-shadow: none; }
 .bk-ic { border: 1px solid var(--line-2); background: var(--surface-2); color: var(--ink); }
 .bk-go { background: var(--surface-3); color: var(--white); border-radius: var(--r); }
-.bk:first-child:not(.done) .bk-go, .bk.next .bk-go { background: var(--electric); color: #fff; }
+.bk:first-child:not(.done) .bk-go, .bk.next .bk-go { background: var(--crimson); color: #fff; }
 .bk.done { background: var(--surface-1); color: var(--gray); border-color: var(--line); }
 .bk.done h3 { color: var(--gray); }
-.bk.done .bk-go { box-shadow: inset 0 0 0 1px var(--line-2); color: var(--cyan); }
-.bk.done .bk-ic { background: var(--electric); color: #fff; border-color: var(--electric); }
+.bk.done .bk-go { box-shadow: inset 0 0 0 1px var(--line-2); color: var(--ember); }
+.bk.done .bk-ic { background: var(--crimson); color: #fff; border-color: var(--crimson); }
 
 /* ---- PASS 2: challenges as missions ---- */
 .missions { counter-reset: m; }
 .missions > .card { counter-increment: m; padding: 0; }
 .missions .more-r { position: relative; border: 0; border-radius: 0; background: transparent; padding: var(--s-4); grid-template-columns: 34px 1fr 18px; box-shadow: none; }
-.missions .more-r::before { content: counter(m, decimal-leading-zero); font: 800 26px/1 var(--display); color: var(--electric); }
+.missions .more-r::before { content: counter(m, decimal-leading-zero); font: 800 26px/1 var(--display); color: var(--crimson); }
 .missions .more-i { display: none; }
 .missions .more-t b { font: 800 27px/1 var(--display); }
 .missions .hist, .missions .card > p { padding-left: var(--s-4); padding-right: var(--s-4); }
 .ch-grid { gap: 3px; }
 .ch-grid i { border-radius: var(--r-sm); background: var(--steel); }
-.ch-grid i.on { background: var(--electric); }
+.ch-grid i.on { background: var(--crimson); }
 
 /* ---- PASS 2: active training ---- */
 .pl { background: var(--deep); }
@@ -159,12 +159,12 @@
 .round-lbl, .phase-lbl { font: 700 13px/1.2 var(--body); letter-spacing: .14em; }
 .pl-ctrl button { border-radius: var(--r); transition: transform var(--t-fast) var(--ease), background-color var(--t-fast); }
 .pl-ctrl button:active { transform: scale(.95); }
-.pl-ctrl button.main { background: var(--electric); }
+.pl-ctrl button.main { background: var(--crimson); }
 .pl-ctrl button.main svg { color: #fff; }
 
 /* ---- PASS 2: breathwork ---- */
-.lab-hero { background: radial-gradient(70% 90% at 50% 0, rgba(22, 119, 255, .12), transparent 70%), var(--deep); border: 1px solid var(--line); border-radius: var(--r); }
-.orb { box-shadow: 0 0 70px rgba(22, 119, 255, .22); }
+.lab-hero { background: radial-gradient(70% 90% at 50% 0, rgba(192, 20, 29, .12), transparent 70%), var(--deep); border: 1px solid var(--line); border-radius: var(--r); }
+.orb { box-shadow: 0 0 70px rgba(192, 20, 29, .22); }
 .orb-txt { font-family: var(--display); font-weight: 800; }
 
 /* ---- PASS 2: analytics and settings ---- */

@@ -1,5 +1,5 @@
 // The splash picture, the title lettering and the day banners, from the PNGs on the Desktop: node scripts/photos.mjs [srcDir]
-// After this, run scripts/recolor.py: the emblem and the background are shown blue, with the wolf cut out.
+// After this, run scripts/recolor.py: the emblem and the background are shown dark red, with the wolf cut out.
 // The banners come cut out of one 2 × 4 sheet (thin grey lines between the panels).
 import sharp from 'sharp';
 import { mkdirSync, readdirSync } from 'node:fs';

@@ -31,7 +31,7 @@ export function setTheme(dark: boolean): void {
   } catch {
     /* ignore */
   }
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#05070b' : '#f3f1ec');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0b0506' : '#f3f1ec');
 }
 
 export function top(back = false): string {

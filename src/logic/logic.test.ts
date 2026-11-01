@@ -427,12 +427,29 @@ test('race clock: pauses do not count, undo restores, survives by timestamps', (
   advance(r, 80000);
   assert.deepEqual([r.i, r.splits], [1, [20]]);
   assert.equal(segElapsed(r, 85000), 5);
-  back(r);
+  back(r, 85000);
   assert.deepEqual([r.i, segElapsed(r, 85000)], [0, 25]);
   const log = [90, 80].map((dur) => makeEntry({ kind: 'race', name: 'x', dur, data: { ev: 'murph', lvl: 0 } }));
   assert.equal(bestTime(log, 'murph', 0), 80);
   assert.equal(bestTime(log, 'murph', 1), undefined);
   assert.equal(normalize({ race: r }).race?.ev, 'murph');
+});
+
+test('race clock: going back to a timed segment restarts it and rewinds the clock', () => {
+  const r = newRun('fight', 0, 0);
+  advance(r, 120000, 120);
+  advance(r, 180000, 60);
+  back(r, 190000, true);
+  assert.deepEqual([r.i, r.splits, segElapsed(r, 190000), elapsed(r, 190000)], [1, [120], 0, 120]);
+  assert.equal(segElapsed(r, 200000), 10);
+  back(r, 200000, true);
+  assert.deepEqual([r.i, r.splits, segElapsed(r, 200000), elapsed(r, 200000)], [0, [], 0, 0]);
+  pause(r, 205000);
+  advance(r, 205000, 120);
+  back(r, 206000, true);
+  assert.deepEqual([r.pausedAt, segElapsed(r, 206000)], [205000, 0]);
+  resume(r, 215000);
+  assert.equal(segElapsed(r, 220000), 5);
 });
 
 test('race time switches to hours', () => {

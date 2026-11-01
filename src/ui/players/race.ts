@@ -116,7 +116,7 @@ class RacePlayer implements Player {
         save();
         return this.render();
       case 'p:back':
-        back(run);
+        back(run, now, !!this.level.segs[run.i - 1]?.sec);
         save();
         return this.render();
       case 'p:quit':

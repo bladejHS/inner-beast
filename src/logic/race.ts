@@ -44,11 +44,15 @@ export function advance(r: RaceRun, now: number, sec?: number): void {
   r.i++;
 }
 
-/** Undo a mistaken tap: the last segment's time goes back into the current one. */
-export function back(r: RaceRun): void {
+/**
+ * Undo a mistaken tap: the last segment's time goes back into the current one.
+ * A timed segment has nothing to go back into, so it restarts and the clock rewinds to its start.
+ */
+export function back(r: RaceRun, now: number, restart = false): void {
   if (!r.splits.length) return;
   r.splits.pop();
   r.i--;
+  if (restart) r.paused += segElapsed(r, now) * 1000;
 }
 
 export function bestTime(log: Entry[], ev: string, lvl: number): number | undefined {

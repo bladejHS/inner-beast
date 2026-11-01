@@ -2,8 +2,9 @@
 
 import { Track, routePath, simplify, MAX_ACC, type Fix } from '../../logic/geo.ts';
 import { Clock } from '../../logic/seq.ts';
+import { readRun, type RunInput } from '../../logic/runlog.ts';
 import { makeEntry } from '../../logic/store.ts';
-import { dayKey, esc, km, mmss, num, paceStr } from '../../logic/util.ts';
+import { dayKey, esc, km, mmss, num, paceStr, raceTime } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, closeSheet, ctx, mountPlayer, openSheet, ovEl, save, toast, type Player } from '../ctx.ts';
 import { ring } from '../charts.ts';
@@ -26,6 +27,25 @@ const RUN_CUES: Array<[number, string]> = [
   [900, 'Ultimele cinci minute. Puțin mai repede, controlat.'],
   [1200, 'Douăzeci de minute. Gata, sau continui ușor.'],
 ];
+
+const RUN_FIELDS: Array<[keyof RunInput, string, string, string]> = [
+  ['dur', 'Duration', '25:30 sau 1:05:30', 'decimal'],
+  ['km', 'Distance', 'km', 'decimal'],
+  ['hrAvg', 'HR Avg', 'bpm', 'numeric'],
+  ['kcal', 'Calories', 'kcal', 'numeric'],
+  ['hrMax', 'HR Max', 'bpm', 'numeric'],
+  ['paceAvg', 'Pace Avg', 'min/km, ex. 5:30', 'decimal'],
+  ['paceMax', 'Pace Max', 'cel mai rapid, min/km', 'decimal'],
+];
+
+function runFields(v: Partial<RunInput>): string {
+  return RUN_FIELDS.map(([k, label, hint, mode]) => `<div class="field"><div class="field-l">${label}<small>${hint}</small></div><input type="text" inputmode="${mode}" id="rf-${k}" value="${esc(v[k] ?? '')}" aria-label="${label}" style="width:110px"></div>`).join('');
+}
+
+function runInput(): RunInput {
+  const read = (k: keyof RunInput): string => (document.getElementById(`rf-${k}`) as HTMLInputElement).value;
+  return { dur: read('dur'), km: read('km'), hrAvg: read('hrAvg'), kcal: read('kcal'), hrMax: read('hrMax'), paceAvg: read('paceAvg'), paceMax: read('paceMax') };
+}
 
 type GpsState = 'off' | 'wait' | 'ok' | 'weak' | 'denied' | 'none';
 
@@ -158,11 +178,21 @@ class RunPlayer implements Player {
       </div>
       ${this.track.splits.length ? `<p class="small dim">Pe kilometru: ${this.track.splits.map((s, i) => mmss(s - (i ? this.track.splits[i - 1] : 0))).join(', ')}</p>` : ''}
       ${pts.length > 1 ? `<svg class="route" viewBox="0 0 300 160"><path d="${routePath(pts, 300, 160)}"/></svg>` : ''}
+      ${c.mode === 'run' ? `<h2 class="sec">Datele alergării<small>Corectează sau completează de pe ceas</small></h2>${runFields(this.gpsInput())}` : ''}
       ${c.mode === 'walk' ? `<p style="margin-top:14px">Pași (din telefon sau estimare)</p><input type="number" inputmode="numeric" data-a="p:steps" value="${this.steps || est}" min="0" max="100000">` : ''}
       <div style="height:16px"></div>
       <button class="btn" data-a="p:save">${this.saved ? 'Salvat' : 'Salvează'}</button>
       <button class="link" data-a="p:discard">Nu salva</button>`,
     );
+  }
+
+  /** What the GPS measured, as a starting point for the form. */
+  gpsInput(): Partial<RunInput> {
+    const { m, splits } = this.track;
+    const t = this.clock.t;
+    const avg = m > 50 ? (t / m) * 1000 : 0;
+    const laps = splits.map((s, i) => s - (i ? splits[i - 1] : 0));
+    return { dur: raceTime(t), km: m ? km(m) : '', paceAvg: avg ? paceStr(avg) : '', paceMax: avg && laps.length ? paceStr(Math.min(avg, ...laps)) : '' };
   }
 
   start(): void {
@@ -229,19 +259,25 @@ class RunPlayer implements Player {
     this.watchId = null;
   }
 
-  saveEntry(): void {
-    if (this.saved) return;
+  /** False when the form has a mistake; the user stays on it. */
+  saveEntry(): boolean {
+    if (this.saved) return true;
     const t = this.clock.t;
     const c = this.cfg;
     if (c.mode === 'run') {
-      const full = t >= (c.target ?? 1200) * 0.8;
+      const v = readRun(runInput());
+      if (typeof v === 'string') {
+        toast(v);
+        return false;
+      }
+      const { dur, ...stats } = v;
       addEntry(
         makeEntry({
           kind: 'run',
-          block: full ? c.block : undefined,
+          block: dur >= (c.target ?? 1200) * 0.8 ? c.block : undefined,
           name: 'Jogging',
-          dur: t,
-          data: { m: Math.round(this.track.m), pace: this.track.m > 50 ? Math.round((t / this.track.m) * 1000) : 0, splits: this.track.splits, pts: simplify(this.track.pts, 15) },
+          dur,
+          data: { ...stats, splits: this.track.splits, pts: simplify(this.track.pts, 15) },
         }),
       );
     } else {
@@ -260,31 +296,35 @@ class RunPlayer implements Player {
     }
     save();
     this.saved = true;
+    return true;
   }
 
   manual(): void {
     const walk = this.cfg.mode === 'walk';
     openSheet(
       `<h2>${walk ? 'Plimbare' : 'Alergare'} manuală</h2>
-      <div class="field"><div class="field-l">Minute</div><input type="number" inputmode="decimal" id="mm" value="${walk ? 60 : Math.round((this.cfg.target ?? 1200) / 60)}" style="width:110px"></div>
+      ${walk
+        ? `<div class="field"><div class="field-l">Minute</div><input type="number" inputmode="decimal" id="mm" value="60" style="width:110px"></div>
       <div class="field"><div class="field-l">Distanță (km)</div><input type="number" inputmode="decimal" step="0.01" id="mk" value="" placeholder="ex. 3,2" style="width:110px"></div>
-      ${walk ? '<div class="field"><div class="field-l">Pași</div><input type="number" inputmode="numeric" id="ms" value="10000" style="width:110px"></div>' : ''}
+      <div class="field"><div class="field-l">Pași</div><input type="number" inputmode="numeric" id="ms" value="10000" style="width:110px"></div>`
+        : runFields({ dur: raceTime(this.cfg.target ?? 1200) })}
       <div style="height:14px"></div>
       <button class="btn" data-a="m:save">Salvează</button>`,
       {
         'm:save': () => {
-          const min = parseFloat((document.getElementById('mm') as HTMLInputElement).value.replace(',', '.')) || 0;
-          const kmv = parseFloat((document.getElementById('mk') as HTMLInputElement).value.replace(',', '.')) || 0;
-          const st = walk ? parseInt((document.getElementById('ms') as HTMLInputElement).value, 10) || 0 : 0;
-          if (min <= 0) return toast('Scrie câte minute ai făcut.');
-          const t = min * 60;
-          const m = kmv * 1000;
           if (walk) {
+            const min = parseFloat((document.getElementById('mm') as HTMLInputElement).value.replace(',', '.')) || 0;
+            const kmv = parseFloat((document.getElementById('mk') as HTMLInputElement).value.replace(',', '.')) || 0;
+            const st = parseInt((document.getElementById('ms') as HTMLInputElement).value, 10) || 0;
+            if (min <= 0) return toast('Scrie câte minute ai făcut.');
             const today = dayKey();
             ctx.S.steps[today] = Math.max(ctx.S.steps[today] ?? 0, st);
-            addEntry(makeEntry({ kind: 'walk', block: st >= 10000 ? this.cfg.block : undefined, name: 'Walk (10K Steps)', dur: t, data: { m, steps: st, manual: true } }));
+            addEntry(makeEntry({ kind: 'walk', block: st >= 10000 ? this.cfg.block : undefined, name: 'Walk (10K Steps)', dur: min * 60, data: { m: kmv * 1000, steps: st, manual: true } }));
           } else {
-            addEntry(makeEntry({ kind: 'run', block: t >= (this.cfg.target ?? 1200) * 0.8 ? this.cfg.block : undefined, name: 'Jogging', dur: t, data: { m, pace: m > 0 ? Math.round((t / m) * 1000) : 0, splits: [], manual: true } }));
+            const v = readRun(runInput());
+            if (typeof v === 'string') return toast(v);
+            const { dur, ...stats } = v;
+            addEntry(makeEntry({ kind: 'run', block: dur >= (this.cfg.target ?? 1200) * 0.8 ? this.cfg.block : undefined, name: 'Jogging', dur, data: { ...stats, splits: [], manual: true } }));
           }
           closeSheet();
           toast('Salvat.');
@@ -311,7 +351,7 @@ class RunPlayer implements Player {
         }
         return this.finish();
       case 'p:save':
-        this.saveEntry();
+        if (!this.saveEntry()) return;
         toast('Salvat.');
         return closePlayer(true);
       case 'p:discard':
@@ -332,8 +372,7 @@ class RunPlayer implements Player {
   close(): boolean {
     if (this.st === 'done' && !this.saved) {
       ask('Salvezi?', 'Ai terminat, dar nu ai salvat.', 'Salvează', () => {
-        this.saveEntry();
-        closePlayer(true);
+        if (this.saveEntry()) closePlayer(true);
       }, 'Nu salva', false, () => {
         this.saved = true;
         closePlayer(true);
@@ -346,8 +385,7 @@ class RunPlayer implements Player {
     this.render();
     ask('Te oprești?', 'Termin înregistrarea și salvez?', 'Termină și salvează', () => {
       this.finish();
-      this.saveEntry();
-      closePlayer(true);
+      if (this.saveEntry()) closePlayer(true);
     }, 'Continuă', false, () => {
       this.clock.resume();
       this.render();

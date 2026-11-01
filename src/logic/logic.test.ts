@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { raceTime } from './util.ts';
+import { parseTime, readRun } from './runlog.ts';
 import { advance, back, bestTime, elapsed, newRun, pause, resume, segElapsed } from './race.ts';
 import { LEVEL_NAMES, RACES } from '../data/races.ts';
 import { angle, GuardTracker, RepCounter, type Pt } from './coach.ts';
@@ -433,6 +434,23 @@ test('race clock: pauses do not count, undo restores, survives by timestamps', (
   assert.equal(bestTime(log, 'murph', 0), 80);
   assert.equal(bestTime(log, 'murph', 1), undefined);
   assert.equal(normalize({ race: r }).race?.ev, 'murph');
+});
+
+test('run log: reads times the way a watch shows them', () => {
+  assert.deepEqual(['25', '25:30', '25,30', '5.05', '1:05:30', ''].map(parseTime), [1500, 1530, 1530, 305, 3930, 0]);
+  for (const bad of ['abc', '5:7', '5:75', '25,5', '1:2:3']) assert.ok(isNaN(parseTime(bad)), bad);
+});
+
+test('run log: checks the form, and only the duration is required', () => {
+  const blank = { dur: '', km: '', hrAvg: '', kcal: '', hrMax: '', paceAvg: '', paceMax: '' };
+  assert.deepEqual(readRun({ ...blank, dur: '30:00', km: '5,0' }), { dur: 1800, m: 5000, pace: 360, paceMax: 0, hrAvg: 0, hrMax: 0, kcal: 0 });
+  assert.deepEqual(readRun({ dur: '30:00', km: '5', hrAvg: '148', kcal: '410', hrMax: '172', paceAvg: '5:55', paceMax: '4:50' }), { dur: 1800, m: 5000, pace: 355, paceMax: 290, hrAvg: 148, hrMax: 172, kcal: 410 });
+  assert.equal(typeof readRun(blank), 'string');
+  assert.equal(typeof readRun({ ...blank, dur: '30', km: 'x' }), 'string');
+  assert.equal(typeof readRun({ ...blank, dur: '30', paceAvg: '5:00', paceMax: '6:00' }), 'string');
+  assert.equal(typeof readRun({ ...blank, dur: '30', hrAvg: '180', hrMax: '170' }), 'string');
+  assert.equal(typeof readRun({ ...blank, dur: '30', hrAvg: '999' }), 'string');
+  assert.equal(typeof readRun({ ...blank, dur: '30', kcal: '12.5' }), 'string');
 });
 
 test('race clock: going back to a timed segment restarts it and rewinds the clock', () => {

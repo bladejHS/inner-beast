@@ -30,7 +30,14 @@ function entryLine(e: Entry, del = false): string {
       break;
     }
     case 'run':
-      what = d.manual && !d.m ? `${mmss(e.dur)}` : `${km(Number(d.m) || 0)} km în ${mmss(e.dur)}, ${paceStr(Number(d.pace) || 0)} /km`;
+      what = [
+        d.m ? `${km(Number(d.m))} km în ${raceTime(e.dur)}` : raceTime(e.dur),
+        d.pace ? `${paceStr(Number(d.pace))} /km` : '',
+        d.paceMax ? `max ${paceStr(Number(d.paceMax))} /km` : '',
+        d.hrAvg ? `HR avg ${d.hrAvg}` : '',
+        d.hrMax ? `HR max ${d.hrMax}` : '',
+        d.kcal ? `${num(Number(d.kcal))} kcal` : '',
+      ].filter(Boolean).join(', ');
       break;
     case 'walk':
       what = `${d.steps ? `${num(Number(d.steps))} pași` : ''}${d.m ? `, ${km(Number(d.m))} km` : ''}`.replace(/^, /, '');

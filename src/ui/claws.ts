@@ -56,6 +56,15 @@ export const CLAWS: Claw[] = [
   claw([90, 14], [54, 86], 4, 8.5),
 ];
 
+const GASH = 'M30 0C27 30 20 65 8 100C22 70 33 35 36 0Z';
+const RAKE_AT: [number, number][] = [[0, 0], [19, -6], [38, -2], [57, -4]];
+
+/** Four solid claw gashes; the box sets the size, so the shape stretches with it. */
+export function rake(cls = ''): string {
+  const gashes = (c: string, dx: number) => RAKE_AT.map(([x, y]) => `<path class="${c}" transform="translate(${x + dx} ${y})" d="${GASH}"/>`).join('');
+  return `<svg class="rake ${cls}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${gashes('rk-b', 2)}${gashes('rk-f', 0)}</svg>`;
+}
+
 export function clawSvg(color = '#C7FE51', cls = ''): string {
   return `<svg class="${cls}" viewBox="0 0 100 100" aria-hidden="true">${CLAWS.map((c) => `<path d="${c.fill}" fill="${color}"/>`).join('')}</svg>`;
 }

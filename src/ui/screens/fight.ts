@@ -78,7 +78,7 @@ export function fightHtml(): string {
     )
     .join('');
   return `${top()}
-    <div class="fight-art"><div class="title-art"><h1>Lupte</h1>${art('fighter')}</div>${art('boxer')}</div>
+    <div class="fight-art"><div class="title-art"><h1>Lupte</h1>${art('fighter')}</div></div>
     ${weekCard(false)}
     <h2 class="sec">Timere</h2>
     <div class="timer-list">${QUICK.map(quickRow).join('')}

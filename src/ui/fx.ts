@@ -2,7 +2,7 @@
 // the round slam with a gong ring, and the full-screen "day done" celebration.
 // Everything is skipped when the phone asks for reduced motion.
 
-import { CLAWS } from './claws.ts';
+import { CLAWS, rake } from './claws.ts';
 
 const reduced = (): boolean => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const BASE = import.meta.env.BASE_URL;
@@ -85,7 +85,7 @@ export function slam(text: string, sub = ''): void {
   const el = document.createElement('div');
   el.className = 'slam';
   el.setAttribute('aria-hidden', 'true');
-  el.innerHTML = `<i class="gong"></i><i class="gong g2"></i><b>${text}</b>${sub ? `<span>${sub}</span>` : ''}`;
+  el.innerHTML = `${rake('slam-rake')}<i class="gong"></i><i class="gong g2"></i><b>${text}</b>${sub ? `<span>${sub}</span>` : ''}`;
   document.body.appendChild(el);
   // take the colour of the phase that is starting
   window.setTimeout(() => {

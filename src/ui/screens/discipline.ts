@@ -2,6 +2,7 @@
 
 import { DOPA_RULES, dopaBest, dopaClean, dopaStreak, MILESTONES, nextMilestone, nofapDays } from '../../logic/discipline.ts';
 import { addDays, dayKey, esc, RO_DAYS, weekdayIdx } from '../../logic/util.ts';
+import { art } from '../art.ts';
 import { ask, ctx, save, toast } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { CHALLENGES, challengeDays, CHALLENGE_DAYS } from '../../data/challenges.ts';
@@ -68,7 +69,7 @@ function challengesHtml(today: string): string {
 
 export function disciplineHtml(): string {
   const today = dayKey();
-  return `${top()}<h1 class="stack mid">Discipline Challenges</h1>
+  return `${top()}<div class="art-head">${art('jester')}<h1 class="stack mid">Discipline Challenges</h1></div>
     <p class="dim" style="margin-top:-6px">Disciplina e un mușchi. Îl antrenezi zilnic, ca pe restul.</p>
     ${nofapCard(today)}
     ${dopaCard(today)}

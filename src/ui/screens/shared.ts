@@ -6,6 +6,7 @@ import { ROW_CHALLENGES, rowChallenge } from '../../data/row.ts';
 import { makeEntry, type Kind } from '../../logic/store.ts';
 import { dayKey, esc, inWeek, num, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { art } from '../art.ts';
+import { rake } from '../claws.ts';
 import { addEntry, ask, ctx, fresh, save, toast } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { openAmrap } from '../players/amrap.ts';
@@ -31,7 +32,7 @@ export function setTheme(dark: boolean): void {
   } catch {
     /* ignore */
   }
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0b0506' : '#f3f1ec');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#050404' : '#f3f1ec');
 }
 
 export function top(back = false): string {
@@ -166,6 +167,7 @@ export function blockCard(raw: Block, n: number, today: string): string {
   const just = done && fresh.block === b.id && Date.now() < fresh.until;
   if (just) fresh.block = '';
   return `<li class="bk ${done ? 'done' : ''} ${just ? 'just' : ''}">
+    ${just ? rake('bk-rake') : ''}
     <div class="bk-top">
       <button class="bk-ic" data-a="mark" data-b="${b.id}" aria-label="${done ? 'Anulează bifa' : 'Bifează fără timer'}">${done ? ic('check') : ic(blockIcon(b))}</button>
       <div class="bk-main">

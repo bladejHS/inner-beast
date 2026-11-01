@@ -281,6 +281,7 @@ class RoundsPlayer implements Player {
     if (sec !== this.lastSec) {
       this.lastSec = sec;
       setText('t', mmss(sec));
+      document.querySelector('.pl')?.toggleAttribute('data-final', p.kind === 'work' && sec <= 3);
       if (p.kind === 'work') {
         if (!this.sprinting && this.sprintRound(p.round) && sec <= SPRINT && sec > 1) {
           this.sprinting = true;

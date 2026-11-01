@@ -6,7 +6,8 @@ import { dayProgress, deloadDue, deloadOn, DELOAD_WEEKS, habitDone, habitMilesto
 import { dayKey, esc, prettyDay, RO_DAYS, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
-import { art } from '../art.ts';
+import { art, dayPhoto } from '../art.ts';
+import { rake } from '../claws.ts';
 import { blockCard, blockMinutes, top } from './shared.ts';
 import { weekCard } from './alex.ts';
 
@@ -29,7 +30,8 @@ export function dayBody(day: Day, today: string, kicker: string): string {
   const next = day.blocks.find((b) => !done.has(b.id));
   return `
     <section class="hero mission">
-      ${art('wolf', 'hero-art')}
+      ${dayPhoto(day.idx, 'mission-ph')}
+      ${rake('mission-rake')}
       <p class="mission-k"><span>Today's Mission</span><b>${esc(kicker)}</b></p>
       <h1 class="hero-t">${esc(day.title)}</h1>
       <div class="mission-m"><div><b>${n}/${total}</b><span>blocuri</span></div><div><b>~${mins}</b><span>minute</span></div></div>

@@ -2,7 +2,7 @@
 
 import { HABIT_STEPS } from '../../data/book.ts';
 import { WEEK, blockName, type Day } from '../../data/plan.ts';
-import { dayProgress, habitDone, habitMilestone, habitStreak, weekDone } from '../../logic/progress.ts';
+import { dayProgress, deloadDue, deloadOn, DELOAD_WEEKS, habitDone, habitMilestone, habitStreak, weekDone } from '../../logic/progress.ts';
 import { dayKey, esc, prettyDay, RO_DAYS, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
@@ -117,6 +117,13 @@ function dailyCard(): string {
   return `<section class="card"><div class="row"><div class="row-l"><h3>Mobilitate zilnică</h3><p class="small dim" style="margin:0">10 minute, opțional. Alex face mobilitate în fiecare zi ca să rămână rapid.</p></div><button class="bk-go" data-a="tool" data-k="daily" aria-label="Start mobilitate zilnică">${ic('play')}</button></div></section>`;
 }
 
+/** The six-week proposal, and the reminder while a lighter week is on. The plan itself never changes. */
+function deloadCard(today: string): string {
+  if (deloadOn(ctx.S.deload, today)) return '<section class="card"><h3>Săptămână ușoară</h3><p class="small dim" style="margin:0">Aceleași blocuri, cu aproximativ 2/3 din serii, runde și timp. Antrenamentele nu se numără la progres. Revii normal de luni.</p></section>';
+  if (!deloadDue(ctx.S.log, ctx.S.deload, today)) return '';
+  return `<section class="card lime"><h3>Săptămână ușoară?</h3><p class="small">Ai ${DELOAD_WEEKS} săptămâni de muncă în spate. Propun o săptămână cu aceleași blocuri, dar cu aproximativ 2/3 din serii, runde și timp, ca să revii mai puternic.</p><div class="btn-row"><button class="btn sm" data-a="deload" data-k="1">Accept</button><button class="btn ghost sm" data-a="deload" data-k="0">Nu acum</button></div></section>`;
+}
+
 function introCard(): string {
   let seen = false;
   try {
@@ -134,6 +141,7 @@ export function todayHtml(): string {
   const day = WEEK[idx];
   return `${top()}
     ${introCard()}
+    ${deloadCard(today)}
     ${dayBody(day, today, prettyDay(today))}
     <h2 class="sec">De învățat</h2>
     ${weekCard(false)}

@@ -14,6 +14,8 @@ export interface SetLog {
   sets: Array<number | null>;
   unit: 'reps' | 'sec' | 'ytw' | 'emom';
   emom?: { min: number; reps: number; done: number };
+  /** Added weight, on the hardest variation. */
+  kg?: number;
 }
 
 export interface Entry {
@@ -159,6 +161,8 @@ export interface State {
   chal: Record<string, string>;
   /** The race simulation running now. */
   race: RaceRun | null;
+  /** Lighter weeks: the Monday the six-week count restarted, and the Monday of the lighter week now on. */
+  deload: { last: string; week: string };
 }
 
 export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 200, startW: 80, goalW: 75, act: 1.55 };
@@ -216,6 +220,7 @@ export function freshState(today: string = dayKey()): State {
     disc: freshDiscipline(),
     chal: {},
     race: null,
+    deload: { last: '', week: '' },
   };
 }
 
@@ -256,6 +261,7 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     },
     chal: isObj(r.chal) ? (r.chal as Record<string, string>) : {},
     race: isObj(r.race) && typeof r.race.ev === 'string' && Array.isArray(r.race.splits) ? (r.race as unknown as RaceRun) : null,
+    deload: { ...base.deload, ...(isObj(r.deload) ? r.deload : {}) },
   };
 }
 

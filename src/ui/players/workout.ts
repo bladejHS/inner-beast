@@ -1,10 +1,10 @@
 // Calisthenics workout player: variations, sets with last-time numbers, rest timer, hold timer and the pull-up EMOM.
 
 import { EMOM_GOAL, workoutById, type Exercise, type Workout } from '../../data/workouts.ts';
-import { advise, emomNext, lastExercise, type LastEx } from '../../logic/progress.ts';
+import { advise, deloadOn, emomAdvice, emomNext, lastExercise, lighter, loadable, stalled, STALL_TEXT, type Advice, type LastEx } from '../../logic/progress.ts';
 import { Clock } from '../../logic/seq.ts';
 import { makeEntry, type SetLog } from '../../logic/store.ts';
-import { esc, mmss, shortDay } from '../../logic/util.ts';
+import { dayKey, esc, mmss, shortDay } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, type Player } from '../ctx.ts';
 import { howHtml } from '../how.ts';
@@ -28,6 +28,9 @@ interface XS {
   vals: number[];
   done: boolean[];
   last?: LastEx;
+  /** The session before `last`. */
+  prev?: LastEx;
+  kg: number;
   emom?: EmomState;
 }
 
@@ -56,26 +59,32 @@ class WorkoutPlayer implements Player {
   lastRestSec = -1;
   saved = false;
   savedEntry: SetLog[] = [];
+  /** Accepted lighter week: fewer sets, and nothing here moves the progression. */
+  deload = deloadOn(ctx.S.deload, dayKey());
 
   constructor(wid: string, block?: string) {
     this.w = workoutById(wid);
     this.block = block;
-    this.xs = this.w.ex.map((ex) => this.initX(ex, ctx.S.lvl[ex.id] ?? ex.start));
+    this.xs = this.w.ex.map((ex) => this.initX(this.deload ? { ...ex, sets: lighter(ex.sets) } : ex, ctx.S.lvl[ex.id] ?? ex.start));
     this.render();
   }
 
   initX(ex: Exercise, lvl: number): XS {
     const last = lastExercise(ctx.S.log, ex.id);
-    const lastSets = last && last.lvl === lvl ? last.log.sets : [];
+    const prev = last ? lastExercise(ctx.S.log, ex.id, last.ts) : undefined;
+    const nextKg = advise(ex, last, lvl, prev).kg;
+    const lastSets = last && last.lvl === lvl && !nextKg ? last.log.sets : [];
     const base = ex.type === 'max' ? 0 : ex.lo ?? 0;
     const vals = Array.from({ length: ex.sets }, (_, k) => {
       const v = lastSets[k];
       if (typeof v === 'number' && v > 0) return v;
-      if (ex.type === 'max' && last) return Math.max(0, ...last.log.sets.filter((x): x is number => typeof x === 'number'));
+      if (ex.type === 'max' && last && last.lvl === lvl) return Math.max(0, ...last.log.sets.filter((x): x is number => typeof x === 'number'));
       return base;
     });
-    const xs: XS = { ex, lvl: Math.min(lvl, ex.vars.length - 1), vals, done: Array(ex.sets).fill(false), last };
-    if (ex.type === 'emom') xs.emom = { min: ctx.S.emom.min, reps: ctx.S.emom.reps, st: 'setup', marks: [], clock: new Clock(), lastSec: -1, lastMin: -1 };
+    const top = Math.min(lvl, ex.vars.length - 1);
+    const kg = loadable(ex, top) ? nextKg ?? (last?.lvl === lvl ? last.log.kg ?? 0 : 0) : 0;
+    const xs: XS = { ex, lvl: top, vals, done: Array(ex.sets).fill(false), last, prev, kg };
+    if (ex.type === 'emom') xs.emom = { min: this.deload ? lighter(ctx.S.emom.min) : ctx.S.emom.min, reps: ctx.S.emom.reps, st: 'setup', marks: [], clock: new Clock(), lastSec: -1, lastMin: -1 };
     return xs;
   }
 
@@ -104,6 +113,7 @@ class WorkoutPlayer implements Player {
       `<h1 class="pl-h">${esc(this.w.name)}</h1>
       <p class="pl-sub">${this.xs.length} exerciții${this.w.id === 'legs' ? '' : ', aproximativ 50–60 de minute cu pauze'}</p>
       <p class="dim">La fiecare exercițiu alegi varianta potrivită. Când atingi capătul intervalului la toate seriile, aplicația îți propune varianta următoare: progresia e obligatorie.</p>
+      ${this.deload ? '<div class="advice">Săptămână ușoară: mai puține serii, fără să forțezi. Sesiunea nu se numără la progres.</div>' : ''}
       <ul class="hist" style="margin:8px 0 18px">${rows}</ul>
       <button class="btn" data-a="p:begin">Start</button>`,
     );
@@ -124,7 +134,7 @@ class WorkoutPlayer implements Player {
       ex.vars.length > 1
         ? `<div class="vars" role="group" aria-label="Variante">${ex.vars.map((v, k) => `<button class="chip" aria-pressed="${k === x.lvl}" data-a="p:lvl" data-k="${k}">${esc(v)}</button>`).join('')}</div>`
         : '';
-    const adv = advise(ex, x.last, x.lvl);
+    const adv = this.advice(x);
     const advHtml = adv.text ? `<div class="advice ${adv.kind === 'up' ? 'up' : ''}">${esc(adv.text)}${adv.lvl !== undefined && adv.lvl !== x.lvl ? ` <button class="link" style="color:inherit;padding:0" data-a="p:lvl" data-k="${adv.lvl}">Alege</button>` : ''}</div>` : '';
     const lastVals = x.last ? (ex.type === 'ytw' ? `${x.last.log.sets.filter((v) => v).length} serii` : `${x.last.log.sets.filter((v) => v !== null && v > 0).join(', ')}${isSec(ex) ? ' s' : ''}`) : '';
     const lastLine = x.last && ex.type !== 'emom' ? `<p class="prev">Data trecută (${shortDay(x.last.date)}, ${esc(ex.vars[x.last.lvl] ?? '')}): ${lastVals}</p>` : '';
@@ -146,6 +156,17 @@ class WorkoutPlayer implements Player {
     return chrome(this.w.name, body, { cls: '' }).replace(/<\/div>\s*$/, `${nav}${over}</div>`);
   }
 
+  advice(x: XS): Advice {
+    if (this.deload) return { kind: 'stay', text: '' };
+    const adv = advise(x.ex, x.last, x.lvl, x.prev);
+    return adv.kind === 'stay' && adv.text && x.ex.type !== 'ytw' && stalled(ctx.S.log, x.ex.id, x.lvl, x.kg) ? { ...adv, text: STALL_TEXT } : adv;
+  }
+
+  kgHtml(x: XS): string {
+    if (!loadable(x.ex, x.lvl)) return '';
+    return `<div class="field"><div class="field-l">Greutate<small>kg, opțional</small></div><input type="number" inputmode="decimal" step="0.5" min="0" max="300" value="${x.kg || ''}" data-a="p:kg" aria-label="Greutate în kg" style="width:96px"></div>`;
+  }
+
   setsHtml(x: XS): string {
     const ex = x.ex;
     const rows = x.vals
@@ -159,14 +180,18 @@ class WorkoutPlayer implements Player {
         return `<div class="set ${d ? 'done' : ''}"><span class="sn">Seria ${k + 1}</span>${ctl}<button class="ok" data-a="p:set" data-k="${k}" aria-label="${okLabel}">${ic(isSec(ex) && !d ? 'play' : 'check')}</button></div>`;
       })
       .join('');
-    return `<div class="sets">${rows}</div>`;
+    return `${this.kgHtml(x)}<div class="sets">${rows}</div>`;
   }
 
   emomHtml(x: XS): string {
     const e = x.emom!;
     const toGoal = Math.round(((e.min * e.reps) / (EMOM_GOAL.min * EMOM_GOAL.reps)) * 100);
     if (e.st === 'setup') {
+      const ea = this.deload ? null : emomAdvice(ctx.S.log, ctx.S.emom, x.lvl, x.ex.vars);
+      const show = ea && (ea.lvl !== undefined || ea.reps !== e.reps);
       return `
+        ${show ? `<div class="advice">${esc(ea.text)} <button class="link" style="color:inherit;padding:0" ${ea.lvl !== undefined ? `data-a="p:lvl" data-k="${ea.lvl}"` : `data-a="p:eadv" data-k="${ea.reps}"`}>Alege</button></div>` : ''}
+        ${this.kgHtml(x)}
         <div class="setup">
           <div class="field"><div class="field-l">Minute</div><div class="stepper"><button data-a="p:emin" data-d="-1" aria-label="Scade">−</button><output>${e.min}</output><button data-a="p:emin" data-d="1" aria-label="Crește">+</button></div></div>
           <div class="field"><div class="field-l">Tracțiuni pe minut</div><div class="stepper"><button data-a="p:ereps" data-d="-1" aria-label="Scade">−</button><output>${e.reps}</output><button data-a="p:ereps" data-d="1" aria-label="Crește">+</button></div></div>
@@ -189,7 +214,7 @@ class WorkoutPlayer implements Player {
     }
     const n = e.marks.filter(Boolean).length;
     const nx = emomNext({ min: e.min, reps: e.reps }, n);
-    return `<div class="advice ${n >= e.min ? 'up' : ''}">${n} din ${e.min} minute făcute. Data viitoare: ${nx.min} × ${nx.reps}.</div>`;
+    return `<div class="advice ${n >= e.min && !this.deload ? 'up' : ''}">${n} din ${e.min} minute făcute.${this.deload ? '' : ` Data viitoare: ${nx.min} × ${nx.reps}.`}</div>`;
   }
 
   restHtml(): string {
@@ -206,6 +231,11 @@ class WorkoutPlayer implements Player {
     return `<div class="rest-ov" role="timer"><p class="phase-lbl">${esc(ex.vars[this.x.lvl])}</p><div class="big-time" id="ht">${Math.floor(s)}</div><p class="pl-sub">${esc(target)}</p><button class="btn" style="max-width:420px" data-a="p:holdstop">Stop</button></div>`;
   }
 
+  /** What today's sets lead to. */
+  advise(x: XS, sets: Array<number | null>): Advice {
+    return advise(x.ex, { log: { id: x.ex.id, name: x.ex.vars[x.lvl], sets, unit: unitOf(x.ex), kg: x.kg || undefined }, lvl: x.lvl, date: '' }, x.lvl, x.last);
+  }
+
   doneHtml(): string {
     const lines = this.xs
       .filter((x) => x.done.some(Boolean) || x.emom?.st === 'done')
@@ -214,11 +244,11 @@ class WorkoutPlayer implements Player {
           const e = x.emom!;
           const n = e.marks.filter(Boolean).length;
           const nx = emomNext({ min: e.min, reps: e.reps }, n);
-          return `<li><div><b>${esc(x.ex.vars[x.lvl])}</b><span>${n} din ${e.min} minute × ${e.reps}. Data viitoare: ${nx.min} × ${nx.reps}.</span></div></li>`;
+          return `<li><div><b>${esc(x.ex.vars[x.lvl])}</b><span>${n} din ${e.min} minute × ${e.reps}.${this.deload ? '' : ` Data viitoare: ${nx.min} × ${nx.reps}.`}</span></div></li>`;
         }
         const sets = x.vals.map((v, k) => (x.done[k] ? v : null));
-        const adv = advise(x.ex, { log: { id: x.ex.id, name: x.ex.vars[x.lvl], sets, unit: unitOf(x.ex) }, lvl: x.lvl, date: '' }, x.lvl);
-        const tip = adv.kind === 'up' ? ` ${adv.text} Data viitoare pornești direct de acolo.` : adv.kind === 'down' || adv.kind === 'top' ? ` ${adv.text}` : '';
+        const adv = this.advise(x, sets);
+        const tip = this.deload ? '' : adv.kind === 'up' ? ` ${adv.text} Data viitoare pornești direct de acolo.` : adv.kind === 'down' || adv.kind === 'top' ? ` ${adv.text}` : '';
         const vals = x.ex.type === 'ytw' ? `${sets.filter((v) => v !== null).length} × 5-5-5` : `${sets.filter((v) => v !== null).join(', ')}${isSec(x.ex) ? ' s' : ''}`;
         return `<li><div><b>${esc(x.ex.vars[x.lvl])}</b><span>${vals}${tip ? '.' : ''}${esc(tip)}</span></div></li>`;
       })
@@ -381,6 +411,9 @@ class WorkoutPlayer implements Player {
         this.hold = null;
         this.i = Math.max(0, this.i - 1);
         return this.render();
+      case 'p:eadv':
+        if (x.emom) x.emom.reps = k;
+        return this.render();
       case 'p:emin':
         if (x.emom) x.emom.min = Math.max(1, Math.min(40, x.emom.min + d));
         return this.render();
@@ -417,6 +450,7 @@ class WorkoutPlayer implements Player {
 
   input(el: HTMLElement): void {
     if (el.dataset.a === 'p:vin') this.typeReps(Number(el.dataset.k), (el as HTMLInputElement).value);
+    if (el.dataset.a === 'p:kg') this.x.kg = Math.max(0, Math.min(300, parseFloat((el as HTMLInputElement).value) || 0));
   }
 
   typeReps(k: number, raw: string): void {
@@ -453,17 +487,17 @@ class WorkoutPlayer implements Player {
         const e = x.emom!;
         if (e.st === 'setup') continue;
         const n = e.marks.filter(Boolean).length;
-        ex.push({ id: x.ex.id, name: x.ex.vars[x.lvl], lvl: x.lvl, unit: 'emom', sets: e.marks.map((m) => (m ? e.reps : null)), emom: { min: e.min, reps: e.reps, done: n } });
-        ctx.S.emom = emomNext({ min: e.min, reps: e.reps }, n);
+        ex.push({ id: x.ex.id, name: x.ex.vars[x.lvl], lvl: x.lvl, unit: 'emom', sets: e.marks.map((m) => (m ? e.reps : null)), emom: { min: e.min, reps: e.reps, done: n }, ...(x.kg ? { kg: x.kg } : {}) });
+        if (!this.deload) ctx.S.emom = emomNext({ min: e.min, reps: e.reps }, n);
         ctx.S.lvl[x.ex.id] = x.lvl;
         continue;
       }
       if (!x.done.some(Boolean)) continue;
-      ex.push({ id: x.ex.id, name: x.ex.vars[x.lvl], lvl: x.lvl, unit: unitOf(x.ex), sets: x.vals.map((v, k) => (x.done[k] ? v : null)) });
       const sets = x.vals.map((v, k) => (x.done[k] ? v : null));
-      const adv = advise(x.ex, { log: { id: x.ex.id, name: x.ex.vars[x.lvl], sets, unit: unitOf(x.ex) }, lvl: x.lvl, date: '' }, x.lvl);
+      ex.push({ id: x.ex.id, name: x.ex.vars[x.lvl], lvl: x.lvl, unit: unitOf(x.ex), sets, ...(x.kg ? { kg: x.kg } : {}) });
+      const adv = this.advise(x, sets);
       // Progression is mandatory: the next session opens on the harder variation (the chips can still go back).
-      ctx.S.lvl[x.ex.id] = adv.kind === 'up' && adv.lvl !== undefined ? adv.lvl : x.lvl;
+      ctx.S.lvl[x.ex.id] = adv.kind === 'up' && adv.lvl !== undefined && !this.deload ? adv.lvl : x.lvl;
     }
     if (!ex.length) return;
     const core = this.xs.filter((x) => !x.ex.opt);
@@ -474,7 +508,7 @@ class WorkoutPlayer implements Player {
         block: doneCore * 2 >= core.length ? this.block : undefined,
         name: this.w.name,
         dur: (Date.now() - this.t0) / 1000,
-        data: { wid: this.w.id, ex },
+        data: { wid: this.w.id, ex, ...(this.deload ? { deload: true } : {}) },
       }),
     );
     save();

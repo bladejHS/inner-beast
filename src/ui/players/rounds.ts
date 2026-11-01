@@ -16,8 +16,9 @@ const BOOK_FOCUS: Record<string, string> = {
 };
 import { REST_TIPS } from '../../data/alex.ts';
 import { Clock, doneSec, locate, phaseStart, roundsSeq, type Phase } from '../../logic/seq.ts';
-import { makeEntry } from '../../logic/store.ts';
-import { esc, mmss } from '../../logic/util.ts';
+import { deloadOn, lighter } from '../../logic/progress.ts';
+import { makeEntry, type Entry } from '../../logic/store.ts';
+import { dayKey, esc, mmss } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock, hush } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
 import { slam } from '../fx.ts';
@@ -79,9 +80,13 @@ class RoundsPlayer implements Player {
   sprint: boolean;
   sprinting = false;
   warm: boolean;
+  /** The saved session, rated on the final screen. */
+  entry: Entry | null = null;
+  deload = deloadOn(ctx.S.deload, dayKey());
 
   constructor(cfg: RoundsCfg) {
     this.cfg = { ...cfg };
+    if (this.deload) this.cfg.rounds = lighter(cfg.rounds);
     if (cfg.legSwap) this.cfg.name = ctx.S.set.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit';
     this.calls = this.buildCalls();
     this.themes = cfg.rounds > 1 ? roundThemes(cfg.focus, ctx.S.nut.h) : [];
@@ -143,6 +148,7 @@ class RoundsPlayer implements Player {
     const body = `
       <h1 class="pl-h">${esc(c.name)}</h1>
       ${c.focus && FOCUS_LINE[c.focus] ? `<p class="pl-sub">${esc(FOCUS_LINE[c.focus])}</p>` : ''}
+      ${this.deload ? `<div class="advice">Săptămână ușoară: ${c.rounds} ${c.rounds === 1 ? 'rundă' : 'runde'}, fără să forțezi.</div>` : ''}
       ${c.tip ? `<p class="dim">${esc(c.tip)}</p>` : ''}
       ${c.cues?.length ? `<ul class="ticks small">${c.cues.map((q) => `<li>${esc(q)}</li>`).join('')}</ul>` : ''}
       ${c.legSwap ? `<p class="dim">${esc(LEG_CUES[ctx.S.set.legMode])}</p>` : ''}
@@ -198,12 +204,24 @@ class RoundsPlayer implements Player {
     return `<div class="call-box" aria-live="polite"><h4>${esc(h)}</h4><div class="c-name">${esc(c.name)}</div>${c.seq.length ? `<div class="seq">${c.seq.map((s) => `<span>${esc(s)}</span>`).join('')}</div>` : ''}${c.note ? `<p class="small" style="margin:0">${esc(c.note)}</p>` : ''}</div>`;
   }
 
+  /** Boxing sessions get two quick ratings for the progress score. */
+  rateHtml(): string {
+    const e = this.entry;
+    const f = this.cfg.focus;
+    if (!e || !f || isDrill(f) || f === 'legs') return '';
+    const chips = (a: string, cur: unknown): string => `<div class="chips" style="justify-content:center">${[1, 2, 3, 4, 5].map((n) => `<button class="chip" aria-pressed="${cur === n}" data-a="${a}" data-k="${n}">${n}</button>`).join('')}</div>`;
+    return `<p style="margin:14px 0 6px;font-weight:600">Cât de curată a fost tehnica?<br><span class="small dim">1 slab, 5 excelent</span></p>${chips('p:q', e.data.q)}
+      <p style="margin:14px 0 6px;font-weight:600">Cât de greu a fost?<br><span class="small dim">1 ușor, 5 la limită</span></p>${chips('p:rpe', e.data.rpe)}
+      <div style="height:16px"></div>`;
+  }
+
   doneHtml(): string {
     const r = this.roundsDone();
     const body = `
       ${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1>
       <p class="lead">${esc(this.cfg.name)}: ${r} din ${this.cfg.rounds} ${this.cfg.rounds === 1 ? 'rundă' : 'runde'}, ${mmss(doneSec(this.phases, this.clock.t, 'work'))} de lucru.</p>
       <p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p>
+      ${this.rateHtml()}
       <button class="btn" data-a="p:close">Închide</button>`;
     return chrome(this.cfg.name, body, { center: true });
   }
@@ -328,15 +346,14 @@ class RoundsPlayer implements Player {
     const work = doneSec(this.phases, this.clock.t, 'work');
     if (work < 30) return;
     const full = r >= Math.ceil(this.cfg.rounds * 0.8);
-    addEntry(
-      makeEntry({
-        kind: 'rounds',
-        block: full ? this.cfg.block : undefined,
-        name: this.cfg.name,
-        dur: this.clock.t,
-        data: { rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), focus: this.cfg.focus ?? '', called: this.called },
-      }),
-    );
+    this.entry = makeEntry({
+      kind: 'rounds',
+      block: full ? this.cfg.block : undefined,
+      name: this.cfg.name,
+      dur: this.clock.t,
+      data: { rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), focus: this.cfg.focus ?? '', called: this.called },
+    });
+    addEntry(this.entry);
     this.saved = true;
     if (!full && this.cfg.block) toast('Salvat ca sesiune parțială.');
   }
@@ -345,6 +362,11 @@ class RoundsPlayer implements Player {
     const d = Number(el.dataset.d || 0);
     const c = this.cfg;
     switch (a) {
+      case 'p:q':
+      case 'p:rpe':
+        if (this.entry) this.entry.data[a === 'p:q' ? 'q' : 'rpe'] = Number(el.dataset.k);
+        save();
+        return this.render();
       case 'p:rounds':
         c.rounds = Math.max(1, Math.min(30, c.rounds + d));
         return this.render();

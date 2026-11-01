@@ -1,16 +1,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { raceTime } from './util.ts';
-import { parseTime, readRun } from './runlog.ts';
+import { parseTime, readRun, runAdvice } from './runlog.ts';
 import { advance, back, bestTime, elapsed, newRun, pause, resume, segElapsed } from './race.ts';
 import { LEVEL_NAMES, RACES } from '../data/races.ts';
 import { angle, GuardTracker, RepCounter, type Pt } from './coach.ts';
-import { boxStats } from './boxstats.ts';
+import { boxCycle, boxScore, boxStats } from './boxstats.ts';
 import { CHALLENGES, challengeDays } from '../data/challenges.ts';
 import { addDays, dayKey, inWeek, mmss, num, paceStr, weekStart, weekdayIdx } from './util.ts';
 import { Clock, breath478Seq, doneSec, locate, phaseStart, roundsSeq, showerSeq, totalSec } from './seq.ts';
 import { Track, haversine, routePath, simplify } from './geo.ts';
-import { activeStreak, advise, dayComplete, emomNext, habitMilestone, habitStreak, lastExercise, totals, weekDone } from './progress.ts';
+import { activeStreak, advise, amrapBest, amrapUp, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, habitMilestone, habitStreak, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
 import { freshState, makeEntry, normalize } from './store.ts';
 import { LAB, labSeq } from './breathlab.ts';
 import { roundThemes } from '../data/combos.ts';
@@ -486,4 +486,101 @@ test('the plan published for Beast Nutrition follows the real week and the user 
   assert.equal(week[6]!.find((s) => s.id === 'sun-legs')!.name, 'Wall Sit');
   const row = planSnapshot({ ...base, thuMain: 'row' })[3]!.find((s) => s.id === 'thu-bag')!;
   assert.equal(row.kind, 'row');
+});
+
+const lastOf = (id: string, sets: number[], lvl: number, kg?: number) => ({ log: { id, name: id, sets, unit: 'reps' as const, kg }, lvl, date: 'x' });
+const session = (id: string, sets: number[], lvl: number, date: string, kg?: number, extra = {}) => makeEntry({ kind: 'workout', name: 'x', dur: 60, date, ts: Date.parse(date), data: { ex: [{ id, name: id, unit: 'reps', sets, lvl, kg }], ...extra } });
+
+test('progression: a fixed target has to be met twice before moving up', () => {
+  const lunges = exerciseById('lunges')!;
+  assert.equal(advise(lunges, lastOf('lunges', [15, 15, 15, 15], 0), 0).kind, 'stay');
+  assert.equal(advise(lunges, lastOf('lunges', [15, 15, 15, 15], 0), 0, lastOf('lunges', [15, 15, 15, 12], 0)).kind, 'stay');
+  assert.equal(advise(lunges, lastOf('lunges', [15, 15, 15, 15], 0), 0, lastOf('lunges', [15, 15, 15, 15], 0)).kind, 'up');
+  const push = exerciseById('pushups')!;
+  assert.equal(advise(push, lastOf('pushups', [15, 15, 15, 15], 1), 1).kind, 'up');
+});
+
+test('progression: Dead Hang moves up at 60 s on every set', () => {
+  const hang = exerciseById('hang')!;
+  assert.equal(advise(hang, lastOf('hang', [60, 62], 0), 0).kind, 'up');
+  assert.equal(advise(hang, lastOf('hang', [60, 50], 0), 0).kind, 'stay');
+  assert.equal(advise(hang, lastOf('hang', [70, 70], 2), 2).kind, 'stay');
+  assert.match(advise(hang, lastOf('hang', [70, 70], 0), 1).text, /Variantă nouă/);
+});
+
+test('progression: weight is noted on the hardest variation and goes up by 2.5 kg', () => {
+  const dips = exerciseById('dips')!;
+  assert.deepEqual([loadable(dips, 3), loadable(dips, 2), loadable(exerciseById('hollow')!, 2), loadable(exerciseById('emom')!, 3)], [true, false, false, true]);
+  assert.equal(advise(dips, lastOf('dips', [12, 12, 12, 12], 3, 10), 3).kg, 12.5);
+  assert.equal(advise(dips, lastOf('dips', [12, 12, 12, 12], 3), 3).kg, undefined);
+  assert.equal(advise(dips, lastOf('dips', [12, 12, 12, 9], 3, 10), 3).kg, undefined);
+});
+
+test('stalling: three sessions that do not beat the one before them', () => {
+  const log = [session('pushups', [10, 10], 1, '2026-10-01'), session('pushups', [10, 9], 1, '2026-10-08'), session('pushups', [10, 10], 1, '2026-10-15')];
+  assert.equal(stalled(log, 'pushups', 1), false);
+  assert.equal(stalled([...log, session('pushups', [9, 9], 1, '2026-10-22')], 'pushups', 1), true);
+  assert.equal(stalled([...log, session('pushups', [11, 10], 1, '2026-10-22')], 'pushups', 1), false);
+  assert.equal(stalled([...log, session('pushups', [9, 9], 1, '2026-10-22', 5)], 'pushups', 1), false);
+  assert.deepEqual(variationPath([...log, session('pushups', [9], 2, '2026-10-22')], 'pushups'), [{ lvl: 1, date: '2026-10-01' }, { lvl: 2, date: '2026-10-22' }]);
+});
+
+test('EMOM: proposes a step down after two misses and a lighter start on a harder variation', () => {
+  const run = (done: number, lvl = 2) => makeEntry({ kind: 'workout', name: 'x', dur: 60, data: { ex: [{ id: 'emom', name: 'e', unit: 'emom', sets: [], lvl, emom: { min: 10, reps: 6, done } }] } });
+  const vars = exerciseById('emom')!.vars;
+  const cur = { min: 10, reps: 6 };
+  assert.equal(emomAdvice([run(8)], cur, 2, vars), null);
+  assert.equal(emomAdvice([run(8), run(9)], cur, 2, vars)?.reps, 5);
+  assert.equal(emomAdvice([run(8), run(10), run(9)], cur, 2, vars), null);
+  assert.equal(emomAdvice([run(10)], cur, 3, vars)?.reps, 3);
+  assert.equal(emomAdvice([run(30)], { min: 30, reps: 10 }, 2, vars)?.lvl, 3);
+});
+
+test('bodyweight workout: records and the next scheme stay per scheme', () => {
+  const am = (rounds: number, scheme: number, extra = 0) => makeEntry({ kind: 'amrap', name: 'x', dur: 600, data: { rounds, extra, scheme } });
+  const log = [am(9, 0), am(5, 1, 3), am(5, 1, 7), am(7, 1)];
+  assert.equal(amrapBest(log, 1)?.data.rounds, 7);
+  assert.equal(amrapBest(log, 2), undefined);
+  assert.equal(amrapUp(log, 0), null);
+  assert.equal(amrapUp(log, 1), null);
+  assert.equal(amrapUp([...log, am(7, 1)], 1), 2);
+  assert.equal(amrapUp([am(9, 2), am(9, 2)], 2), null);
+});
+
+test('box score and its eight-week targets', () => {
+  assert.equal(boxScore({ rounds: 5, planned: 5 }), undefined);
+  assert.equal(boxScore({ rounds: 5, planned: 5, q: 5, rpe: 1 }), 100);
+  assert.equal(boxScore({ rounds: 5, planned: 5, q: 3, rpe: 3 }), 60);
+  assert.equal(boxScore({ rounds: 2, planned: 4, q: 5, rpe: 1 }), 50);
+  const box = (date: string, q: number, focus = 'jab') => makeEntry({ kind: 'rounds', name: 'x', dur: 900, date, data: { rounds: 5, planned: 5, focus, q, rpe: 3 } });
+  assert.equal(boxCycle([box('2026-09-07', 3), box('2026-09-08', 3)], '2026-09-09'), null);
+  const log = [box('2026-09-07', 3), box('2026-09-08', 3), box('2026-09-09', 3), box('2026-09-10', 5, 'rope')];
+  const c = boxCycle(log, '2026-09-10')!;
+  assert.deepEqual([c.week, c.check, c.base, c.target, c.now], [1, 4, 60, 65, 60]);
+  assert.deepEqual([boxCycle(log, '2026-10-20')!.week, boxCycle(log, '2026-10-20')!.check, boxCycle(log, '2026-10-20')!.target, boxCycle(log, '2026-10-20')!.now], [7, 8, 70, null]);
+  assert.equal(boxCycle(log, '2026-11-03')!.week, 1);
+});
+
+test('lighter week: proposed after six active weeks, and it does not count for progress', () => {
+  const log = Array.from({ length: 42 }, (_, i) => makeEntry({ kind: 'walk', name: 'x', dur: 60, date: addDays('2026-08-03', i), data: {} }));
+  const mon = '2026-09-14';
+  assert.equal(deloadDue(log, { last: '', week: '' }, addDays(mon, -7)), false);
+  assert.equal(deloadDue(log, { last: '', week: '' }, mon), true);
+  assert.equal(deloadDue(log.filter((_, i) => i % 7 === 0), { last: '', week: '' }, mon), false);
+  assert.equal(deloadDue(log, { last: mon, week: mon }, addDays(mon, 3)), false);
+  assert.deepEqual([deloadOn({ week: mon }, addDays(mon, 6)), deloadOn({ week: mon }, addDays(mon, 7))], [true, false]);
+  assert.deepEqual([lighter(5), lighter(3), lighter(10), lighter(4), lighter(1)], [4, 2, 7, 3, 1]);
+  const light = [session('pushups', [10, 10], 1, '2026-10-01'), session('pushups', [5], 1, '2026-10-08', undefined, { deload: true })];
+  assert.deepEqual(lastExercise(light, 'pushups')?.log.sets, [10, 10]);
+  assert.equal(normalize({ deload: { last: mon, week: mon } }).deload.week, mon);
+  assert.deepEqual(normalize({}).deload, { last: '', week: '' });
+});
+
+test('run advice compares pulse and pace, and sets a target', () => {
+  const run = (pace: number, hrAvg?: number) => makeEntry({ kind: 'run', name: 'x', dur: 1200, data: { pace, hrAvg } });
+  assert.equal(runAdvice([]), '');
+  assert.match(runAdvice([run(360)]), /5:55 \/km\. Notează HR Avg/);
+  assert.match(runAdvice([run(360, 150), run(362, 145)]), /5 bpm mai puțin/);
+  assert.match(runAdvice([run(360, 150), run(340, 150)]), /Mai rapid cu 20 s\/km/);
+  assert.match(runAdvice([run(360, 150), run(358, 158)]), /8 bpm mai mare/);
 });

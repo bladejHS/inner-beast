@@ -126,7 +126,7 @@ export const WORKOUTS: Workout[] = [
       },
       {
         id: 'hang', name: 'Dead Hang', vars: ['Dead Hang', 'Active Hang', 'One-arm Assisted Hang'], start: 0,
-        type: 'max', sets: 2, rest: 60, muscles: 'priză, umeri',
+        type: 'max', sets: 2, hi: 60, rest: 60, muscles: 'priză, umeri',
         cue: 'Atârni cât poți, relaxat. Notezi secundele.',
       },
     ],
@@ -166,9 +166,10 @@ export function exerciseById(id: string): Exercise | undefined {
 
 /** Monday's 10-minute bodyweight block: as many rounds as possible. */
 export const BW_MOVES = ['Pull-ups', 'Push-ups', 'Squats'];
-export const BW_SCHEMES = [
-  { name: 'Ușor', reps: [3, 6, 9] },
-  { name: 'Standard', reps: [5, 10, 15] },
+/** `up`: full rounds, twice in a row, that earn the next scheme. */
+export const BW_SCHEMES: Array<{ name: string; reps: number[]; up?: number }> = [
+  { name: 'Ușor', reps: [3, 6, 9], up: 8 },
+  { name: 'Standard', reps: [5, 10, 15], up: 7 },
   { name: 'Greu', reps: [7, 14, 21] },
 ];
 

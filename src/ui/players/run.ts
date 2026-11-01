@@ -2,7 +2,8 @@
 
 import { Track, routePath, simplify, MAX_ACC, type Fix } from '../../logic/geo.ts';
 import { Clock } from '../../logic/seq.ts';
-import { readRun, type RunInput } from '../../logic/runlog.ts';
+import { deloadOn, lighter } from '../../logic/progress.ts';
+import { readRun, runAdvice, type RunInput } from '../../logic/runlog.ts';
 import { makeEntry } from '../../logic/store.ts';
 import { dayKey, esc, km, mmss, num, paceStr, raceTime } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
@@ -65,7 +66,7 @@ class RunPlayer implements Player {
   steps = 0;
 
   constructor(cfg: RunCfg) {
-    this.cfg = cfg;
+    this.cfg = cfg.target && deloadOn(ctx.S.deload, dayKey()) ? { ...cfg, target: lighter(cfg.target) } : cfg;
     this.watch();
     this.render();
   }
@@ -132,6 +133,7 @@ class RunPlayer implements Player {
         `<h1 class="pl-h">${this.name}</h1>
         <p class="pl-sub">${c.mode === 'run' ? `${Math.round((c.target ?? 1200) / 60)} de minute` : '10.000 de pași, prin natură'}</p>
         <p class="dim">${c.mode === 'run' ? 'Începe încet, respiră calm, crește viteza încet și constant.' : 'Mergi prin natură. Pașii îi iei din telefon sau îi estimez din distanță.'}</p>
+        ${c.mode === 'run' && runAdvice(ctx.S.log) ? `<div class="advice">${esc(runAdvice(ctx.S.log))}</div>` : ''}
         ${howHtml(c.mode === 'run' ? 'Jogging' : 'Walk (10K Steps)', undefined, { open: true })}
         <p>${this.gpsHtml()}</p>
         <p class="small dim">Ecranul rămâne aprins cât timp alergi. Dacă îl blochezi, unele telefoane opresc GPS-ul din browser.</p>

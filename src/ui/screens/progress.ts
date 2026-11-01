@@ -1,8 +1,9 @@
 // "Progres": the week, totals, calisthenics, runs, Wim Hof, sleep, steps and the full history.
 
 import { WEEK } from '../../data/plan.ts';
-import { EMOM_GOAL, WORKOUTS } from '../../data/workouts.ts';
-import { activeStreak, dayProgress, exerciseTrend, totals, weekDone } from '../../logic/progress.ts';
+import { BW_SCHEMES, EMOM_GOAL, WORKOUTS } from '../../data/workouts.ts';
+import { activeStreak, amrapBest, amrapTrend, dayProgress, exerciseTrend, stalled, totals, variationPath, weekDone } from '../../logic/progress.ts';
+import { runAdvice } from '../../logic/runlog.ts';
 import type { Entry } from '../../logic/store.ts';
 import { addDays, dayKey, esc, km, mmss, raceTime, num, paceStr, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { bars, spark } from '../charts.ts';
@@ -10,7 +11,7 @@ import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { ic } from '../icons.ts';
 import { top } from './shared.ts';
-import { boxStats } from '../../logic/boxstats.ts';
+import { boxCycle, boxScore, boxStats } from '../../logic/boxstats.ts';
 import { COMBOS } from '../../data/combos.ts';
 import { learned } from './alex.ts';
 
@@ -19,10 +20,10 @@ function entryLine(e: Entry, del = false): string {
   let what = '';
   switch (e.kind) {
     case 'rounds':
-      what = d.manual ? 'bifat manual' : `${d.rounds} din ${d.planned} runde, ${mmss(Number(d.workDone) || 0)} lucru`;
+      what = d.manual ? 'bifat manual' : `${d.rounds} din ${d.planned} runde, ${mmss(Number(d.workDone) || 0)} lucru${boxScore(d) !== undefined ? `, scor ${boxScore(d)}` : ''}`;
       break;
     case 'amrap':
-      what = `${d.rounds} runde + ${d.extra} repetări`;
+      what = `${BW_SCHEMES[Number(d.scheme) || 0]?.name ?? ''}, ${d.rounds} runde + ${d.extra} repetări`;
       break;
     case 'workout': {
       const ex = (d.ex as Array<{ name: string; sets: Array<number | null> }>) || [];
@@ -73,6 +74,7 @@ function boxHtml(today: string): string {
   if (!b.rounds && !b.punches) return '<h2 class="sec">Box</h2><p class="dim">După primele runde vezi aici statisticile.</p>';
   const diff = Math.round(b.min30 - b.minPrev30);
   const known = learned();
+  const cy = boxCycle(ctx.S.log, today);
   const rare = COMBOS.filter((c) => known.has(c.id)).sort((x, y) => (b.called[x.name] ?? 0) - (b.called[y.name] ?? 0)).slice(0, 3);
   return `<h2 class="sec">Box<small>Ultimele 30 de zile: ${Math.round(b.min30)} min, ${diff >= 0 ? '+' : '−'}${Math.abs(diff)} față de cele 30 dinainte</small></h2>
     <div class="stats">
@@ -82,6 +84,9 @@ function boxHtml(today: string): string {
       <div class="stat"><b>${known.size} din ${COMBOS.length}</b><span>combinații învățate</span></div>
       ${b.punches ? `<div class="stat"><b>${b.punches}</b><span>lovituri numărate cu camera</span></div>` : ''}
     </div>
+    ${cy
+      ? `<div class="ex-line"><div><b>Scor box, săptămâna ${cy.week} din 8</b><span>Ținta la săptămâna ${cy.check}: ${cy.target}. Acum: ${cy.now ?? '–'}, ai pornit de la ${cy.base}.</span></div>${spark(cy.scores)}</div>`
+      : '<p class="small dim">Notează tehnica și efortul la finalul a 3 sesiuni și primești scorul de box, cu ținte la săptămânile 4 și 8.</p>'}
     ${b.guard.length > 1 ? `<p class="small dim" style="margin-bottom:0">Garda sus, % din timp</p>${spark(b.guard)}` : ''}
     ${rare.length ? `<p class="small dim">Exersate cel mai rar dintre cele învățate: ${rare.map((c) => esc(c.name)).join(', ')}.</p>` : ''}`;
 }
@@ -109,13 +114,18 @@ export function progressHtml(): string {
       const last = tr[tr.length - 1];
       const unit = ex.type === 'time' || ex.id === 'hang' ? ' s' : '';
       const same = tr.filter((x) => x.lvl === last.lvl);
-      const best = ex.type === 'ytw' ? `${last.total} × 5-5-5 data trecută` : `Cel mai bun: ${Math.max(...same.map((x) => x.best))}${unit}`;
-      exLines.push(`<div class="ex-line"><div><b>${esc(ex.vars[last.lvl] ?? ex.name)}</b><span>${best}, ultima dată ${shortDay(last.date)}</span></div>${spark(same.map((x) => x.total))}</div>`);
+      const kg = Math.max(...same.map((x) => x.kg));
+      const best = ex.type === 'ytw' ? `${last.total} × 5-5-5 data trecută` : `Cel mai bun: ${Math.max(...same.filter((x) => x.kg === kg).map((x) => x.best))}${unit}${kg ? ` cu ${String(kg).replace('.', ',')} kg` : ''}`;
+      const path = variationPath(S.log, ex.id);
+      const road = path.length > 1 ? `, drumul: ${path.map((p) => `${esc(ex.vars[p.lvl] ?? '')} (${shortDay(p.date)})`).join(', ')}` : '';
+      const stuck = ex.type !== 'ytw' && stalled(S.log, ex.id, last.lvl, last.kg) ? ', fără progres la ultimele 3 sesiuni' : '';
+      exLines.push(`<div class="ex-line"><div><b>${esc(ex.vars[last.lvl] ?? ex.name)}</b><span>${best}, ultima dată ${shortDay(last.date)}${road}${stuck}</span></div>${spark(same.map((x) => x.total))}</div>`);
     }
   }
   const emomPct = Math.round(((S.emom.min * S.emom.reps) / (EMOM_GOAL.min * EMOM_GOAL.reps)) * 100);
   const amraps = S.log.filter((e) => e.kind === 'amrap');
-  const amrapBest = amraps.reduce((m, e) => Math.max(m, Number(e.data.rounds) || 0), 0);
+  const sch = S.set.bwScheme;
+  const amBest = amrapBest(S.log, sch);
 
   // runs
   const runs = S.log.filter((e) => e.kind === 'run');
@@ -150,10 +160,11 @@ export function progressHtml(): string {
 
     <h2 class="sec">Calistenie<small>Totalul de repetări pe sesiune, la varianta curentă</small></h2>
     <div class="ex-line"><div><b>Pull-up EMOM</b><span>Următoarea țintă: ${S.emom.min} min × ${S.emom.reps}. Spre 30 × 10: ${emomPct}%.</span></div><div class="bar" style="margin:0"><i style="width:${Math.min(100, emomPct)}%"></i></div></div>
-    ${amraps.length ? `<div class="ex-line"><div><b>Bodyweight Workout</b><span>Ultima dată ${amraps[amraps.length - 1].data.rounds} runde, recordul ${amrapBest}</span></div>${spark(amraps.slice(-12).map((e) => Number(e.data.rounds) || 0))}</div>` : ''}
+    ${amraps.length ? `<div class="ex-line"><div><b>Bodyweight Workout</b><span>Ultima dată ${amraps[amraps.length - 1].data.rounds} runde${amBest ? `, recordul la ${esc(BW_SCHEMES[sch].name)}: ${amBest.data.rounds} runde + ${amBest.data.extra}` : ''}</span></div>${spark(amrapTrend(S.log, sch))}</div>` : ''}
     ${exLines.join('') || '<p class="dim">După primul antrenament de push, pull sau picioare vezi aici fiecare exercițiu.</p>'}
 
     <h2 class="sec">Alergare</h2>
+    ${runAdvice(S.log) ? `<p class="small dim">${esc(runAdvice(S.log))}</p>` : ''}
     ${runs.length ? `${paces.length > 1 ? `<p class="small dim" style="margin:0">Ritmul mediu (mai jos e mai rapid)</p>${spark(paces, true)}` : ''}<ul class="hist">${runs.slice(-6).reverse().map((e) => entryLine(e)).join('')}</ul>` : '<p class="dim">Duminică: 20 de minute de jogging, cu GPS.</p>'}
 
     <h2 class="sec">Wim Hof<small>Cea mai lungă retenție din fiecare sesiune</small></h2>

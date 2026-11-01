@@ -1,6 +1,7 @@
 // Monday's 10-minute bodyweight workout: squats, push-ups and pull-ups, as many rounds as possible.
 
 import { BW_MOVES, BW_SCHEMES } from '../../data/workouts.ts';
+import { amrapBest, amrapUp } from '../../logic/progress.ts';
 import { Clock } from '../../logic/seq.ts';
 import { makeEntry } from '../../logic/store.ts';
 import { esc, mmss, shortDay } from '../../logic/util.ts';
@@ -49,6 +50,8 @@ class AmrapPlayer implements Player {
       `<ul class="amrap-moves">${BW_MOVES.map((m, i) => `<li><span>${esc(m)}</span><b${big ? '' : ' style="font-size:22px"'}>${this.reps[i]}</b></li>`).join('')}</ul>`;
     if (this.st === 'ready') {
       const l = this.last();
+      const best = amrapBest(ctx.S.log, this.scheme);
+      const up = amrapUp(ctx.S.log, this.scheme);
       el.innerHTML = chrome(
         'Bodyweight Workout',
         `<h1 class="pl-h">Bodyweight Workout</h1>
@@ -58,6 +61,8 @@ class AmrapPlayer implements Player {
         ${moves(true)}
         ${BW_MOVES.map((m) => howHtml(m, undefined, { title: `Cum se face: ${m}` })).join('')}
         ${l ? `<p class="prev">Data trecută (${shortDay(l.date)}): ${l.rounds} runde + ${l.extra} repetări${l.scheme !== this.scheme ? ', altă variantă' : ''}. Progresia e obligatorie: bate-l.</p>` : ''}
+        ${best ? `<p class="prev">Recordul la ${esc(BW_SCHEMES[this.scheme].name)}: ${best.data.rounds} runde + ${best.data.extra} repetări.</p>` : ''}
+        ${up !== null ? `<div class="advice up">Ai făcut de două ori cel puțin ${BW_SCHEMES[this.scheme].up} runde. Treci la ${esc(BW_SCHEMES[up].name)}. <button class="link" style="color:inherit;padding:0" data-a="p:scheme" data-i="${up}">Alege</button></div>` : ''}
         <button class="btn" data-a="p:start" style="margin-top:14px">Start</button>`,
       );
       return;

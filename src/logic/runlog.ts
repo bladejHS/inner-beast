@@ -1,4 +1,7 @@
-// The numbers of a run as typed in from a watch or a treadmill.
+// The numbers of a run as typed in from a watch or a treadmill, and what they say about the next one.
+
+import type { Entry } from './store.ts';
+import { paceStr } from './util.ts';
 
 export interface RunInput {
   dur: string;
@@ -57,4 +60,20 @@ export function readRun(v: RunInput): RunStats | string {
   const kcal = whole(v.kcal, 0, 20000);
   if (isNaN(kcal)) return 'Caloriile sunt un număr întreg.';
   return { dur, m, pace, paceMax, hrAvg, hrMax, kcal };
+}
+
+/** Compares the last runs with a pulse, and sets a pace for the next one: 5 s faster than the best of the last four. */
+export function runAdvice(log: Entry[]): string {
+  const runs = log.filter((e) => e.kind === 'run' && Number(e.data.pace) > 0);
+  if (!runs.length) return '';
+  const pace = (e: Entry): number => Number(e.data.pace);
+  const hr = (e: Entry): number => Number(e.data.hrAvg) || 0;
+  const target = paceStr(Math.min(...runs.slice(-4).map(pace)) - 5);
+  const beat = runs.filter((e) => hr(e) > 0).slice(-2);
+  if (beat.length < 2) return `Ținta de azi: ${target} /km. Notează HR Avg ca să vezi dacă același ritm te costă mai puțin.`;
+  const dp = pace(beat[1]) - pace(beat[0]);
+  const dh = hr(beat[1]) - hr(beat[0]);
+  if (Math.abs(dp) <= 10 && dh >= 5) return `Puls cu ${dh} bpm mai mare la același ritm. Poate fi oboseală: azi rămâi la ${paceStr(pace(beat[1]))} /km și urmărește pulsul.`;
+  const note = Math.abs(dp) <= 10 && dh <= -3 ? `Același ritm cu ${-dh} bpm mai puțin: rezistența crește. ` : dp <= -10 && dh <= 3 ? `Mai rapid cu ${-dp} s/km la același puls: formă mai bună. ` : '';
+  return `${note}Ținta de azi: ${target} /km sau același ritm cu puls mai mic.`;
 }

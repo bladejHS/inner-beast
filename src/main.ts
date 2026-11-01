@@ -4,7 +4,7 @@ import { publishPlan } from './logic/bridge.ts';
 import { blockById, WEEK, type Block } from './data/plan.ts';
 import { rowChallenge } from './data/row.ts';
 import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
-import { dayKey, esc, uid, weekdayIdx } from './logic/util.ts';
+import { addDays, dayKey, esc, uid, weekdayIdx, weekStart } from './logic/util.ts';
 import { initAudio, unlock } from './ui/audio.ts';
 import { countUp, initParallax, revealBelowFold } from './ui/fx.ts';
 import { closePlayer, closeSheet, ctx, openSheet, ask, save, sheetAct, toast, type Tab, type View } from './ui/ctx.ts';
@@ -307,6 +307,13 @@ function act(a: string, el: HTMLElement): void {
         /* ignore */
       }
       return render();
+    case 'deload': {
+      // Not now: the proposal comes back next week.
+      const mon = weekStart(today);
+      S.deload = el.dataset.k === '1' ? { last: mon, week: mon } : { last: addDays(mon, -35), week: '' };
+      save();
+      return render();
+    }
     case 'hab': {
       const h = S.habits.find((x) => !x.archived);
       if (!h) return;

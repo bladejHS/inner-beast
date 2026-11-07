@@ -5,7 +5,7 @@ import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks
 import { ROW_CHALLENGES, rowChallenge } from '../../data/row.ts';
 import { activeStreak, cycleAt, deloadOn, growMinutes } from '../../logic/progress.ts';
 import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
-import { zone2 } from '../../logic/runlog.ts';
+import { zone2, zoneHard } from '../../logic/runlog.ts';
 import { dayKey, esc, inWeek, num, pad2, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { addEntry, ask, ctx, fresh, save, toast, type Tab } from '../ctx.ts';
 import { ic } from '../icons.ts';
@@ -88,7 +88,8 @@ export function planPicks(today = dayKey()): Settings & Picks {
   const light = deloadOn(S.deload, today);
   for (const b of ALL_BLOCKS) if (b.grow) grown[b.id] = light ? b.grow.base : growMinutes(S.log, b.id, S.cycle.start, b.grow);
   picksKey = key;
-  picksVal = { ...S.set, cycle: cycleAt(S.cycle.start, today)?.id, grown };
+  const c = cycleAt(S.cycle.start, today);
+  picksVal = { ...S.set, cycle: c?.id, cycleWeek: c?.week, grown };
   return picksVal;
 }
 
@@ -101,7 +102,7 @@ export function startBlock(raw: Block): void {
   const b = liveBlock(raw);
   switch (b.kind) {
     case 'rounds':
-      return openRounds({ name: b.name, rounds: b.rounds ?? 1, work: b.work ?? 180, rest: blockRest(b), focus: b.focus, block: b.id, tip: b.tip, cues: b.cues, legSwap: b.legSwap, warmup: b.warmup, burstFrom: b.burstFrom });
+      return openRounds({ name: b.name, rounds: b.rounds ?? 1, work: b.work ?? 180, rest: blockRest(b), focus: b.focus, block: b.id, tip: b.tip, cues: b.cues, legSwap: b.legSwap, warmup: b.warmup, burstFrom: b.burstFrom, hiit: b.hiit });
     case 'cardio':
       return openRounds({ name: b.name, rounds: 1, work: (b.min ?? 20) * 60, rest: 0, block: b.id, tip: b.tip, cues: b.cues, cardio: true });
     case 'row':
@@ -158,13 +159,13 @@ const ICON_BY_ID: Record<string, string> = {
   'mon-bag': 'bag', 'thu-bag': 'bag', 'thu-power': 'bolt', 'thu-rope': 'rope', 'sun-legs': 'stretch', 'mon-bw': 'bolt',
   'tue-cal': 'fight', 'fri-cal': 'fight', 'sun-lunges': 'fight', 'tue-stretch': 'stretch', 'fri-stretch': 'stretch', 'tue-cool': 'stretch',
   'sat-mob': 'stretch', 'wed-walk': 'walk', 'wed-shower': 'drop', 'wed-med': 'wind', 'sat-med': 'wind',
-  'sat-breath': 'mind', 'sun-jog': 'run', 'tue-row': 'row',
+  'sat-breath': 'mind', 'sun-jog': 'run', 'tue-row': 'row', 'knee-tue': 'wall', 'knee-sat': 'wall',
 };
 
 export function blockIcon(raw: Block): string {
   const b = liveBlock(raw);
   if (b.focus === 'ladder') return 'ladder';
-  if (b.kind === 'row') return 'row';
+  if (b.kind === 'row' || b.hiit || (b.kind === 'cardio' && b.alt === 'aero')) return 'row';
   return ICON_BY_ID[b.id] ?? 'timer';
 }
 
@@ -190,7 +191,9 @@ function altPicker(b: Block): string {
       ? [['rope', 'Jumping Rope', s.thuFeet === 'rope'], ['ladder', 'Agility Ladder', s.thuFeet === 'ladder']]
       : b.alt === 'partner'
         ? [['shadow', 'Singur', s.thuPartner !== 'spar'], ['spar', 'Cu partener', s.thuPartner === 'spar']]
-        : [['bag', 'Heavy Bag', s.thuMain === 'bag'], ['row', 'Machine Row', s.thuMain === 'row']];
+        : b.alt === 'aero'
+          ? [['row', 'Vâslitor', s.sunAero !== 'run'], ['run', 'Alergare', s.sunAero === 'run']]
+          : [['bag', 'Heavy Bag', s.thuMain === 'bag'], ['row', 'Machine Row', s.thuMain === 'row']];
   const chips = (act: string, list: Array<[string, string, boolean]>, label: string) =>
     `<div class="chips rd-alt" role="group" aria-label="${esc(label)}">${list.map(([v, l, on]) => `<button class="chip" aria-pressed="${on}" data-a="${act}" data-b="${b.id}" data-v="${v}">${esc(l)}</button>`).join('')}</div>`;
   let html = chips('alt', opts, 'Alege activitatea');
@@ -214,7 +217,11 @@ export function blockCard(raw: Block, n: number, today: string, next = false): s
   }
   if (b.kind === 'run' || b.kind === 'cardio') {
     const [lo, hi] = zone2(ctx.S.set.hrMax);
-    extra = `<p class="rd-hr">${ic('pulse')}<span>Zona 2: <b>${lo}–${hi}</b> bpm</span></p>`;
+    extra += `<p class="rd-hr">${ic('pulse')}<span>Zona 2: <b>${lo}–${hi}</b> bpm</span></p>`;
+  }
+  if (b.hiit) {
+    const [lo, hi] = zoneHard(ctx.S.set.hrMax);
+    extra += `<p class="rd-hr">${ic('pulse')}<span>Intervale: <b>${lo}–${hi}</b> bpm</span></p>`;
   }
   if (b.kind === 'run') extra += `<button class="link" data-a="polar" data-b="${b.id}">Adaugă din Polar Flow</button>`;
   if (b.kind === 'rounds' && b.focus && b.burstFrom !== 1 && b.focus !== 'legs' && b.focus !== 'rope' && b.focus !== 'ladder') {

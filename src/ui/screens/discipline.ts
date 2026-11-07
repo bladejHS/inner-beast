@@ -10,7 +10,7 @@ import { pageHead, top } from './shared.ts';
 
 const zile = (n: number): string => `${n} ${n === 1 ? 'zi' : 'zile'}`;
 
-function nofapCard(today: string): string {
+export function nofapCard(today: string): string {
   const n = ctx.S.disc.nofap;
   if (!n.start) {
     return `<section class="card"><h3>No Fap</h3>
@@ -32,7 +32,7 @@ function nofapCard(today: string): string {
     ${n.resets.length ? `<p class="small dim" style="margin:8px 0 0">Reluat de ${n.resets.length} ori. Contează că te ridici.</p>` : ''}</section>`;
 }
 
-function dopaCard(today: string): string {
+export function dopaCard(today: string): string {
   const d = ctx.S.disc.dopa;
   if (!d.started) {
     return `<section class="card"><h3>Dopamine Discipline</h3>
@@ -51,7 +51,7 @@ function dopaCard(today: string): string {
     <button class="link" data-a="dc:dp-stop">Oprește provocarea</button></section>`;
 }
 
-function challengesHtml(today: string): string {
+export function challengesHtml(today: string): string {
   return CHALLENGES.map((c) => {
     const start = ctx.S.chal[c.id];
     if (!start) return `<section class="card"><div class="row"><div class="row-l"><h3>${esc(c.name)}</h3><p class="small dim" style="margin:0">${esc(c.sub)}</p></div><button class="btn ghost sm" data-a="dc:ch-start" data-k="${c.id}">Start</button></div></section>`;

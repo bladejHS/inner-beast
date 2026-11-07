@@ -31,5 +31,6 @@ test('a rowing pick carries its challenge and its own workload; the punch-out go
 test('the other boxing days keep their sessions and only Thursday has alternatives', () => {
   const week = planSnapshot(base);
   assert.deepEqual([0, 1, 4].map((d) => week[d]!.filter((s) => s.kind === 'rounds').length), [2, 1, 1]);
-  assert.ok(week.flat().filter((s) => s.alt).every((s) => s.id.startsWith('thu-')));
+  assert.ok(week.flat().filter((s) => s.alt).every((s) => s.id.startsWith('thu-') || s.id === 'sun-jog'));
+  assert.deepEqual(week[6]!.find((s) => s.id === 'sun-jog')!.alt, { other: 'Jogging' });
 });

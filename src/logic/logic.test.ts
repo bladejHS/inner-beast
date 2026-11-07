@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { raceTime } from './util.ts';
-import { parseTime, readRun, runAdvice, zone2 } from './runlog.ts';
+import { parseTime, readRun, runAdvice, zone2, zoneHard } from './runlog.ts';
 import { kneeAdvice, kneeAsk, kneeStreak, legDays } from './knee.ts';
 import { advance, back, bestTime, elapsed, newRun, pause, resume, segElapsed } from './race.ts';
 import { LEVEL_NAMES, RACES } from '../data/races.ts';
@@ -56,9 +56,9 @@ test('the week keeps the days of the book, reordered for an all-round athlete', 
   assert.equal(r('thu-bag').rounds, 6);
   assert.equal(r('tue-easy').work, 600);
   assert.equal(r('tue-row').kind, 'cardio');
-  assert.deepEqual(WEEK[5].blocks.map((b) => b.id), ['sun-legs', 'sun-lunges']); // legs two days before Monday
+  assert.deepEqual(WEEK[5].blocks.map((b) => b.id), ['sun-legs', 'sun-lunges', 'knee-sat']); // legs two days before Monday
   assert.equal(WEEK[6].blocks[0].id, 'sun-jog');
-  assert.deepEqual(r('sun-jog').grow, { base: 20, step: 2, cap: 30 });
+  assert.deepEqual(r('sun-jog').grow, { base: 20, step: 2, cap: 40 });
   const P: Picks = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a' };
   assert.equal(blockName(r('sun-lunges'), P), 'Speed, Power & Leg Strength');
   const ids = WEEK.flatMap((d) => d.blocks.map((b) => b.id));
@@ -690,7 +690,7 @@ test('Upper Strength: the second strength dose replaces the AMRAP on Monday in c
   assert.equal(resolveBlock(bw, P).kind, 'amrap');
   const up = workoutById('upper');
   assert.deepEqual(up.ex.map((x) => [x.id, x.sets, x.lo, x.hi, x.rest]), [['pull-str', 3, 3, 5, 150], ['dips-str', 3, 3, 5, 150]]);
-  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 45], ['pull', 50], ['legs', 60], ['upper', 15]]);
+  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 45], ['pull', 50], ['legs', 60], ['upper', 15], ['knee', 8]]);
 });
 
 test('knees: three clean Leg Days bring Box Jump, three more with Box Jump bring CMJ and Broad Jump', () => {
@@ -733,4 +733,22 @@ test('pulse: zone 2 is 60-70 % of the maximum, and an easy run above it is calle
   assert.match(runAdvice([run(400)], zone2(192)), /zona 2: 115–134 bpm/);
   assert.match(runAdvice([run(400, 152)], zone2(192)), /152 bpm, peste zona 2/);
   assert.doesNotMatch(runAdvice([run(400, 130)], zone2(192)), /peste zona 2/);
+});
+
+test('Monday in B and C: rower intervals every other week; Sunday rows by default; the knee block twice a week', () => {
+  const bw = WEEK[0].blocks.find((b) => b.id === 'mon-bw')!;
+  const P: Picks = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a' };
+  const at = (cycle: 'A' | 'B' | 'C', cycleWeek: number) => resolveBlock(bw, { ...P, cycle, cycleWeek });
+  assert.deepEqual([at('B', 1).kind, at('B', 3).kind, at('C', 1).kind], ['amrap', 'amrap', 'amrap']);
+  const iv = at('B', 2);
+  assert.deepEqual([iv.id, iv.kind, iv.name, iv.rounds, iv.work, iv.restSec, iv.hiit], ['mon-bw', 'rounds', 'Rower Intervals', 4, 240, 180, true]);
+  assert.equal(at('C', 4).name, 'Rower Intervals');
+  assert.equal(at('A', 2).name, 'Upper Strength');
+  assert.deepEqual(zoneHard(192), [163, 182]);
+  const jog = WEEK[6].blocks.find((b) => b.id === 'sun-jog')!;
+  assert.deepEqual([resolveBlock(jog, P).kind, resolveBlock(jog, P).name], ['cardio', 'Easy Row']);
+  assert.deepEqual([resolveBlock(jog, { ...P, sunAero: 'run' }).kind, resolveBlock(jog, { ...P, sunAero: 'run' }).name], ['run', 'Jogging']);
+  assert.equal(resolveBlock(jog, { ...P, grown: { 'sun-jog': 34 } }).dose, '34 min');
+  assert.deepEqual(WEEK.flatMap((d) => d.blocks).filter((b) => b.workout === 'knee').map((b) => b.id), ['knee-tue', 'knee-sat']);
+  assert.deepEqual(workoutById('knee').ex.map((x) => x.id), ['knee-iso', 'knee-step', 'tib']);
 });

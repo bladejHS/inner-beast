@@ -36,18 +36,20 @@ initAudio(() => ctx.S.set);
 
 const BASE = import.meta.env.BASE_URL;
 
-// Five places with labels always on, nothing behind "More"; Settings only behind the gear. Azi sits in the middle,
-// under the thumb, as the wolf. The order left to right is also the direction the claw swipe takes between tabs.
+// Six places with labels always on, nothing behind "More"; Settings only behind the gear (the user asked on
+// 2026-11-07 for Provocări in the bar). Training on the left of the wolf (Azi), mind and progress on the right.
+// The order left to right is also the direction the claw swipe takes between tabs.
 const ORDER: Array<[Tab, string, string]> = [
   ['plan', 'Plan', 'plan'],
   ['fight', 'Lupte', 'fight'],
+  ['challenge', 'Provocări', 'cup'],
   ['today', 'Azi', ''],
   ['mind', 'Minte', 'mind'],
   ['progress', 'Progres', 'progress'],
 ];
 
 /** Screens that open from a tab: the bar keeps their tab marked, and their back button returns there. */
-export const PARENT: Partial<Record<Tab, Tab>> = { alex: 'fight', lab: 'mind', disc: 'mind', challenge: 'progress' };
+export const PARENT: Partial<Record<Tab, Tab>> = { alex: 'fight', lab: 'mind', disc: 'challenge' };
 
 /** Links into a section of a tab (data-to): the section that holds the anchor. */
 const ANCHOR_SEG: Record<string, [Tab, string]> = { tests: ['progress', 'tests'], why: ['mind', 'mental'], wins: ['mind', 'mental'] };
@@ -374,10 +376,15 @@ function act(a: string, el: HTMLElement): void {
   switch (a) {
     case 'tab': {
       let k = (el.dataset.k as Tab) || 'today';
-      // Alex lives in Lupte now, as its third section
+      // Alex lives in Lupte now, as its third section; Discipline in Provocări
       if (k === 'alex') {
         k = 'fight';
         ctx.seg.fight = 'alex';
+        saveSegs();
+      }
+      if (k === 'disc') {
+        k = 'challenge';
+        ctx.seg.challenge = 'disc';
         saveSegs();
       }
       const to = el.dataset.to;
@@ -595,6 +602,7 @@ function act(a: string, el: HTMLElement): void {
     case 'alt':
       if (el.dataset.b === 'thu-rope') S.set.thuFeet = el.dataset.v === 'ladder' ? 'ladder' : 'rope';
       else if (el.dataset.b === 'thu-shadow') S.set.thuPartner = el.dataset.v === 'spar' ? 'spar' : 'shadow';
+      else if (el.dataset.b === 'sun-jog') S.set.sunAero = el.dataset.v === 'run' ? 'run' : 'row';
       else S.set.thuMain = el.dataset.v === 'row' ? 'row' : 'bag';
       save();
       return render();

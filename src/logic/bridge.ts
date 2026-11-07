@@ -26,6 +26,7 @@ function altOf(raw: Block, b: Block): PlanSession['alt'] {
   if (raw.alt === 'feet') return { other: b.focus === 'ladder' ? 'Jumping Rope' : 'Agility Ladder' };
   if (raw.alt === 'partner') return { other: b.name === raw.name ? 'Technical Sparring / Pads' : raw.name };
   if (raw.alt === 'main') return b.kind === 'row' ? { other: raw.name, detail: b.dose } : { other: 'Machine Row' };
+  if (raw.alt === 'aero') return { other: b.kind === 'cardio' ? raw.name : 'Easy Row' };
   return undefined;
 }
 

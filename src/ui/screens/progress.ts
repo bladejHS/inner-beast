@@ -161,15 +161,11 @@ function logSeg(): string {
 
 export function progressHtml(): string {
   const seg = segOf('progress', PROGRESS_SEGS.map(([k]) => k));
-  const body = seg === 'train' ? trainSeg() : seg === 'tests' ? `${testsHtml()}${challengeLink()}` : seg === 'log' ? logSeg() : weekSeg();
+  const body = seg === 'train' ? trainSeg() : seg === 'tests' ? testsHtml() : seg === 'log' ? logSeg() : weekSeg();
   return `${top()}
     ${pageHead('Progres', 'Ce ai construit, săptămână de săptămână.')}
     ${segBar('Secțiuni Progres', PROGRESS_SEGS, seg)}
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
-}
-
-function challengeLink(): string {
-  return `<button class="row-link big" data-a="tab" data-k="challenge"><span class="rl-ic">${ic('trophy')}</span><span class="rl-t"><b>Provocări</b><span>Curse simulate (Hyrox, Murph, Fight Night și altele) și provocări de 30 de zile</span></span>${ic('chev')}</button>`;
 }
 
 /** Antrenament: boxing, calisthenics and the aerobic work. */

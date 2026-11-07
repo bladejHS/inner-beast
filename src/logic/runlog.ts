@@ -71,6 +71,11 @@ export function zone2(hrMax: number): [number, number] {
   return [Math.round(hrMax * 0.6), Math.round(hrMax * 0.7)];
 }
 
+/** Hard intervals (4 × 4): 85–95 % of the maximum heart rate. */
+export function zoneHard(hrMax: number): [number, number] {
+  return [Math.round(hrMax * 0.85), Math.round(hrMax * 0.95)];
+}
+
 export function runAdvice(log: Entry[], zone?: [number, number]): string {
   const runs = log.filter((e) => e.kind === 'run' && Number(e.data.pace) > 0);
   if (!runs.length) return '';

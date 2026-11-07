@@ -26,7 +26,8 @@ const RUN_CUES: Array<[number, string]> = [
   [300, 'Poți vorbi în propoziții? Dacă nu, încetinește.'],
   [600, 'Același ritm ușor. Umerii relaxați.'],
   [1200, 'Douăzeci de minute. Rămâi în ritmul de conversație.'],
-  [1800, 'Treizeci de minute. Gata.'],
+  [1800, 'Treizeci de minute.'],
+  [2400, 'Patruzeci de minute.'],
 ];
 
 const RUN_FIELDS: Array<[keyof RunInput, string, string, string]> = [

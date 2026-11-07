@@ -19,7 +19,7 @@ import { burstAt, Clock, doneSec, locate, phaseStart, roundsSeq, type Phase } fr
 import { deloadOn, lighter } from '../../logic/progress.ts';
 import { makeEntry, type Entry } from '../../logic/store.ts';
 import { dayKey, esc, mmss } from '../../logic/util.ts';
-import { zone2 } from '../../logic/runlog.ts';
+import { zone2, zoneHard } from '../../logic/runlog.ts';
 import { buzz, say, sfx, unlock, hush } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
 import { slam } from '../fx.ts';
@@ -43,6 +43,8 @@ export interface RoundsCfg {
   burstFrom?: number;
   /** Easy aerobic work (row, bike, jog) on one long round: saved as cardio, never as boxing. */
   cardio?: boolean;
+  /** Hard intervals on the rower (4 × 4): no combinations, the pulse window on screen, saved as cardio. */
+  hiit?: boolean;
 }
 
 /** Last seconds of a round that turn into a straight-punch sprint (second half of the rounds). */
@@ -95,8 +97,8 @@ class RoundsPlayer implements Player {
     this.cfg = { ...cfg };
     if (this.deload) this.cfg.rounds = lighter(cfg.rounds);
     if (cfg.legSwap) this.cfg.name = ctx.S.set.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit';
-    this.calls = cfg.cardio || cfg.burstFrom === 1 ? [] : this.buildCalls();
-    this.themes = cfg.rounds > 1 && !cfg.cardio && cfg.burstFrom !== 1 ? roundThemes(cfg.focus, ctx.S.nut.h) : [];
+    this.calls = cfg.cardio || cfg.hiit || cfg.burstFrom === 1 ? [] : this.buildCalls();
+    this.themes = cfg.rounds > 1 && !cfg.cardio && !cfg.hiit && cfg.burstFrom !== 1 ? roundThemes(cfg.focus, ctx.S.nut.h) : [];
     this.caller = this.calls.length > 0 && ctx.S.set.callEvery > 0;
     // Off by default: long all-out finishes wear technique down; the tested burst format is the punch-out.
     this.sprint = false;
@@ -167,6 +169,7 @@ class RoundsPlayer implements Player {
       ${burstBox}
       ${this.deload ? `<div class="advice">Săptămână ușoară: ${c.rounds} ${c.rounds === 1 ? 'rundă' : 'runde'}, fără să forțezi.</div>` : ''}
       ${c.cardio ? this.zoneHtml() : ''}
+      ${c.hiit ? this.hardHtml(true) : ''}
       ${c.tip ? `<p class="dim">${esc(c.tip)}</p>` : ''}
       ${c.cues?.length ? `<ul class="ticks small">${c.cues.map((q) => `<li>${esc(q)}</li>`).join('')}</ul>` : ''}
       ${c.legSwap ? `<p class="dim">${esc(LEG_CUES[ctx.S.set.legMode])}</p>` : ''}
@@ -200,6 +203,7 @@ class RoundsPlayer implements Player {
     else if (p.kind === 'work' && this.sprinting) panel = '<div class="call-box"><h4>Sprint</h4><div class="c-name">Lovituri drepte, viteză maximă</div><p class="small" style="margin:0">Jab-cross non-stop, pe toată distanța. Garda revine la fiecare pumn.</p></div>';
     else if (p.kind === 'work' && this.call && this.caller) panel = this.callHtml(theme ? theme.name : 'Acum');
     else if (p.kind === 'work' && this.cfg.cardio) panel = this.zoneHtml();
+    else if (this.cfg.hiit && (p.kind === 'work' || p.kind === 'rest')) panel = this.hardHtml(p.kind === 'work');
     else if (p.kind === 'work' && this.cfg.legSwap) panel = `<div class="call-box"><h4>Formă</h4><p style="margin:0">${esc(LEG_CUES[ctx.S.set.legMode])}</p></div>`;
     else if (p.kind === 'rest' && this.tip) panel = `<div class="call-box"><h4>Sfat de la Alex</h4><p style="margin:0;font-weight:600">${esc(this.tip)}</p></div>`;
     else if (p.kind === 'rest') panel = `<div class="call-box"><h4>Urmează</h4><p style="margin:0;font-weight:600">Runda ${(p.round ?? 0) + 1} din ${p.rounds}. Respiră adânc.</p></div>`;
@@ -226,6 +230,15 @@ class RoundsPlayer implements Player {
   zoneHtml(): string {
     const [lo, hi] = zone2(ctx.S.set.hrMax);
     return `<div class="call-box"><h4>Puls, zona 2</h4><div class="c-name">${lo}–${hi} bpm</div><p class="small" style="margin:0">Dacă trece de ${hi}, tragi mai ușor până coboară. Trebuie să poți vorbi în propoziții.</p></div>`;
+  }
+
+  /** Hard intervals: the window to hold while working, and the easy pace between. */
+  hardHtml(work: boolean): string {
+    const [lo, hi] = zoneHard(ctx.S.set.hrMax);
+    const easy = zone2(ctx.S.set.hrMax)[1];
+    return work
+      ? `<div class="call-box"><h4>Puls, intervale</h4><div class="c-name">${lo}–${hi} bpm</div><p class="small" style="margin:0">Tare, dar egal: pulsul urcă spre ${lo} abia în minutul doi. Dacă nu-l mai poți ține, încetinești puțin, nu te oprești.</p></div>`
+      : `<div class="call-box"><h4>Ușor</h4><div class="c-name">Sub ${easy} bpm</div><p class="small" style="margin:0">Vâslești lejer, nu te oprești: pulsul coboară până la intervalul următor.</p></div>`;
   }
 
   callHtml(h: string): string {
@@ -399,12 +412,14 @@ class RoundsPlayer implements Player {
     const full = this.cfg.rounds === 1 ? work >= planned * 0.8 : r >= Math.ceil(this.cfg.rounds * 0.8);
     const bursts = this.cfg.burstFrom ? this.phases.filter((p) => p.kind === 'work' && this.isBurst(p.round) && p.round! <= r).length : 0;
     this.entry = makeEntry({
-      kind: this.cfg.cardio ? 'cardio' : 'rounds',
+      kind: this.cfg.cardio || this.cfg.hiit ? 'cardio' : 'rounds',
       block: full ? this.cfg.block : undefined,
       name: this.cfg.name,
       dur: this.clock.t,
       data: this.cfg.cardio
         ? { min: Math.round(work / 60), workDone: Math.round(work), ...(this.deload ? { deload: true } : {}) }
+        : this.cfg.hiit
+          ? { hiit: true, rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), ...(this.deload ? { deload: true } : {}) }
         : { rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), focus: this.cfg.focus ?? '', called: this.called, ...(bursts ? { bursts } : {}) },
     });
     addEntry(this.entry);

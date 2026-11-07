@@ -70,6 +70,8 @@ export interface Settings {
   bellThroughMute: boolean;
   /** Maximum heart rate, for the easy zone (zone 2 = 60–70 %). Default: 208 − 0.7 × 23 years. */
   hrMax: number;
+  /** Sunday's easy aerobic slot. Row by default: kinder to the knees while they hurt. */
+  sunAero: 'run' | 'row';
 }
 
 /** A logged meal: name, kcal, protein, carbs, fat (g); pl = which plan meal it was ("t2"). */
@@ -204,6 +206,7 @@ export const DEFAULT_SETTINGS: Settings = {
   whSafety: false,
   bellThroughMute: false,
   hrMax: 192,
+  sunAero: 'row',
 };
 
 export function defaultHabit(today: string): Habit {

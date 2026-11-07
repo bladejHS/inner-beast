@@ -41,7 +41,7 @@ export interface Exercise {
 }
 
 export interface Workout {
-  id: 'push' | 'pull' | 'legs' | 'upper';
+  id: 'push' | 'pull' | 'legs' | 'upper' | 'knee';
   name: string;
   /** About how long it takes, rests included. */
   min: number;
@@ -234,6 +234,31 @@ export const WORKOUTS: Workout[] = [
         id: 'dips-str', name: 'Dips', vars: ['Negative Dips', 'Parallel Bar Dips', 'Weighted Dips'], start: 1,
         type: 'reps', sets: 3, lo: 3, hi: 5, rest: 150, muscles: 'piept, triceps',
         cue: 'La fel: serii scurte, grele, cu 2 repetări în rezervă. Umerii jos, cotul la 90°. La 3 × 5 curat adaugi greutate.',
+      },
+    ],
+  },
+  {
+    // Eight minutes for the knees, after Tuesday's push session and after Leg Day, while jumps hurt them.
+    // Isometric holds ease tendon pain for a while (Rio 2015; later trials are mixed), slow loaded work builds the
+    // tendon (heavy slow resistance, Kongsgaard 2009), and the front of the shin takes part of the braking.
+    id: 'knee',
+    name: 'Knee Armor',
+    min: 8,
+    ex: [
+      {
+        id: 'knee-iso', name: 'Isometric Hold', vars: ['Wall Sit Hold', 'Spanish Squat Hold'], start: 0,
+        type: 'time', sets: 4, lo: 30, hi: 45, rest: 45, muscles: 'cvadriceps, tendonul rotulian',
+        cue: 'Cobori până unde durerea e cel mult 3 din 10, nu mai jos de 90°, și ții. Spanish Squat: o bandă groasă în spatele genunchilor, prinsă de un stâlp; te lași pe spate cu tibiile verticale.',
+      },
+      {
+        id: 'knee-step', name: 'Slow Step-downs', vars: ['Step-down (low step)', 'Step-down (high step)', 'Weighted Step-down'], start: 0,
+        type: 'reps', sets: 2, lo: 6, hi: 10, perSide: true, rest: 45, muscles: 'cvadriceps, controlul genunchiului',
+        cue: 'Pe un picior, cobori în 3 secunde până când călcâiul celuilalt atinge ușor solul, apoi urci. Genunchiul merge în linie cu degetele, nu spre interior.',
+      },
+      {
+        id: 'tib', name: 'Tibialis Raises', vars: ['Wall Tibialis Raises'], start: 0,
+        type: 'reps', sets: 2, lo: 15, hi: 25, rest: 30, muscles: 'tibia anterioară',
+        cue: 'Spatele la perete, călcâiele la o palmă de el: ridici vârfurile cât de sus poți și cobori lent. Arde pe față, e normal.',
       },
     ],
   },

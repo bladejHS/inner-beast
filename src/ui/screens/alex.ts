@@ -31,7 +31,13 @@ export function toggleLearned(id: string): void {
 }
 
 /** Steps of a combination that are movement, not punches: drawn as outlined chips. */
-export const MOVE = /^(Switch|Slip|Roll|Bob|Weave|Lean|Small step|Push off|Step|Ghost|Duck|Level|Back to|Close the|Move|Pivot|Feint|Hop|Tap|Shift|Fake)/;
+export const MOVE = /^(Switch|Slip|Roll|Bob|Weave|Lean|Small step|Push off|Step|Ghost|Duck|Level|Back to|Close the|Move|Pivot|Feint|Hop|Tap|Shift|Fake|Read|Reset|Clinch|Frame|Circle)/;
+
+/** Where a combination comes from: the kickboxing source, or Alex's TikTok video. */
+export function srcLink(c: Combo): string {
+  if (c.kb) return c.kb.url ? `<a class="src" href="${c.kb.url}" target="_blank" rel="noopener">${ic('ext')}${esc(c.kb.t)}</a>` : `<span class="src">${esc(c.kb.t)}</span>`;
+  return c.vid ? `<a class="src" href="${tiktokUrl(c.vid)}" target="_blank" rel="noopener">${ic('ext')}${esc(c.src ?? 'TikTok')}</a>` : '';
+}
 
 export function seqHtml(c: Combo): string {
   return `<div class="seq">${c.seq.map((s) => `<span class="${MOVE.test(s) ? 'move' : ''}">${esc(s)}</span>`).join('')}</div>`;
@@ -48,7 +54,7 @@ export function weekCard(full: boolean): string {
         <div class="wc-main">
           <h3>${esc(c.name)}</h3>
           ${seqHtml(c)}
-          ${full ? `<p>${esc(c.note)}</p>${c.vid ? `<a class="src" href="${tiktokUrl(c.vid)}" target="_blank" rel="noopener">${ic('ext')}${esc(c.src ?? 'TikTok')}</a>` : ''}` : ''}
+          ${full ? `<p>${esc(c.note)}</p>${srcLink(c)}` : ''}
           <button class="chip ${done.has(c.id) ? 'on' : ''}" data-a="learned" data-id="${c.id}" aria-pressed="${done.has(c.id)}">${done.has(c.id) ? `${ic('check')} Învățată` : 'Am învățat-o'}</button>
         </div>
       </div>`,
@@ -57,7 +63,7 @@ export function weekCard(full: boolean): string {
   return `<section class="card wc" aria-label="Combinațiile săptămânii">
     <p class="label">Săptămâna ${learnWeek() + 1}</p>
     <h3>Combinațiile săptămânii</h3>
-    <p class="small dim" style="margin:0 0 4px">Una nouă și una de recapitulat. Joi, în shadow boxing, prima rundă e doar cu cea nouă.</p>
+    <p class="small dim" style="margin:0 0 4px">Una nouă și una de recapitulat. Joi, în shadow kickboxing, prima rundă e doar cu cea nouă.</p>
     ${items}
     <button class="btn sm wide" data-a="qt" data-k="week">${ic('play')} Exersează-le: 3 × 3 min</button>
   </section>`;

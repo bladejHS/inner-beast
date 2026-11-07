@@ -51,7 +51,7 @@ export const TESTS: FitTest[] = [
     how: 'Pe fiecare parte; notezi partea mai slabă. Diferențele mari între părți merită lucrate.',
   },
   {
-    id: 'punchout', name: 'Punch-out Test', what: 'Capacitate anaerobă, specifică boxului', unit: 'punches', higher: true, every: 'În săptămâna ușoară',
+    id: 'punchout', name: 'Punch-out Test', what: 'Capacitate anaerobă, specifică sporturilor de lovire', unit: 'punches', higher: true, every: 'În săptămâna ușoară',
     how: 'O singură rundă de punch-out (14 × 3 s) filmată. Numeri loviturile din toate exploziile și urmărești dacă ultimele trei sunt mult sub primele trei.',
   },
   {

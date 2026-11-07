@@ -6,6 +6,7 @@ import { ROW_CHALLENGES, rowChallenge } from '../../data/row.ts';
 import { activeStreak, cycleAt, deloadOn, growMinutes } from '../../logic/progress.ts';
 import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
 import { zone2, zoneHard } from '../../logic/runlog.ts';
+import { kneeSore, legDays, type LegDay } from '../../logic/knee.ts';
 import { dayKey, esc, inWeek, num, pad2, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { addEntry, ask, ctx, fresh, save, toast, type Tab } from '../ctx.ts';
 import { ic } from '../icons.ts';
@@ -35,6 +36,11 @@ export function top(back: boolean | Tab = false): string {
         : `<div class="brand"><i class="brand-wolf" style="--m:url(${BASE}art/wolf.webp)" aria-hidden="true"></i><span>Inner <b>Beast</b></span></div>`;
   const run = streak > 1 ? `<button class="streak${streak >= 7 ? ' hot' : ''}" data-a="tab" data-k="progress" aria-label="${streak} zile active la rând">${ic('claw')}<b class="num">${streak}</b><span>zile</span></button>` : '';
   return `<header class="top">${left}<div class="top-r">${run}<button class="icon-btn" data-a="settings" aria-label="Setări">${ic('gear')}</button></div></header>`;
+}
+
+/** The last Leg Day's knee note, when it rules out kicks in today's fighting rounds (logic/knee.ts). */
+export function soreKnee(): LegDay | null {
+  return kneeSore(legDays(ctx.S.log, ctx.S.knee), dayKey());
 }
 
 /** The big slanted title of a tab, with one line under it. The title rises out of its own box on entry. */
@@ -225,8 +231,9 @@ export function blockCard(raw: Block, n: number, today: string, next = false): s
   }
   if (b.kind === 'run') extra += `<button class="link" data-a="polar" data-b="${b.id}">Adaugă din Polar Flow</button>`;
   if (b.kind === 'rounds' && b.focus && b.burstFrom !== 1 && b.focus !== 'legs' && b.focus !== 'rope' && b.focus !== 'ladder') {
-    const cs = focusCombos(b.focus, ctx.S.nut.h);
-    extra += `<p class="rd-calls"><b>Combinații strigate:</b> ${esc(cs.slice(0, 4).map((c) => c.name).join(', '))}${cs.length > 4 ? ` și încă ${cs.length - 4}` : ''}</p>`;
+    const sore = soreKnee();
+    const cs = focusCombos(b.focus, ctx.S.nut.h, !sore);
+    extra += `<p class="rd-calls"><b>${sore ? 'Doar box, cât genunchiul cere pauză de la kick-uri:' : 'Combinații strigate:'}</b> ${esc(cs.slice(0, 4).map((c) => c.name).join(', '))}${cs.length > 4 ? ` și încă ${cs.length - 4}` : ''}</p>`;
   }
   const when = done ? doneWhen(entries[0].date, today) : '';
   const just = done && fresh.block === b.id && Date.now() < fresh.until;

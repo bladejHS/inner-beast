@@ -2,6 +2,8 @@
 // athlete (strength, power, speed, endurance, mobility and fighting), after the research in research_notes/.
 // Inside a day: skill and power first, then strength, then conditioning, and long static stretching last.
 // While jumps hurt the user's knees (2026-11-07), the power work has no landings: see the legs workout.
+// The fighting blocks are kickboxing since 2026-11-07, for the user's 2 m (see data/combos.ts): block ids, rounds and
+// rests are the e-book's, the names, tips and cues are kickboxing ones.
 // Session and exercise names stay in English, as in the e-book; tips are in Romanian.
 // Block ids are stable keys in saved logs and in Beast Nutrition, so they do not name the weekday:
 // sun-legs and sun-lunges are on Saturday, sat-mob, sat-med and sat-breath on Sunday.
@@ -50,7 +52,7 @@ export interface Block {
   warmup?: boolean;
   /** From this round on (1-based), every round is a punch-out (see BURST). */
   burstFrom?: number;
-  /** Needs the bag: becomes the same protocol in shadow boxing when Thursday's main slot is the rowing machine. */
+  /** Needs the bag: becomes the same protocol in shadow when Thursday's main slot is the rowing machine. */
   bagOnly?: boolean;
   /** Changes in one emphasis of the 12-week loop. */
   cycle?: Partial<Record<CycleId, CycleVariant>>;
@@ -62,15 +64,16 @@ export interface Block {
   grow?: { base: number; step: number; cap: number };
 }
 
-/** 6-minute warm-up before the first boxing block (Monday, Thursday). */
+/** 7-minute warm-up before the first fighting block (Monday, Thursday): the hips open for the kicks, no jumping. */
 export const WARMUP: Array<{ name: string; sec: number; cue: string }> = [
   { name: 'Arm Circles', sec: 45, cue: 'Cercuri mari cu brațele, înainte, apoi înapoi.' },
   { name: 'Shoulder Rolls', sec: 45, cue: 'Umerii rotiți larg, apoi mâinile în gardă și înapoi.' },
   { name: 'Torso Twists', sec: 45, cue: 'Rotești trunchiul stânga-dreapta, șoldurile urmează.' },
   { name: 'Hip Circles', sec: 45, cue: 'Mâinile pe șolduri, cercuri largi în ambele sensuri.' },
-  { name: 'Leg Swings', sec: 60, cue: 'Balansezi piciorul înainte-înapoi, 30 s pe fiecare.' },
-  { name: 'Light Bounce', sec: 60, cue: 'Țopăi ușor pe vârfuri, schimbi garda, scuturi brațele.' },
-  { name: 'Easy Shadow', sec: 60, cue: 'Shadow la 50%: jab, cross, pași. Doar ca să pornească motorul.' },
+  { name: 'Leg Swings', sec: 60, cue: 'Te ții de perete și balansezi piciorul înainte-înapoi, 30 s pe fiecare.' },
+  { name: 'Lateral Leg Swings', sec: 45, cue: 'Cu fața la perete, balansezi piciorul prin fața corpului și în lateral: deschide șoldul pentru kick-uri.' },
+  { name: 'Light Footwork', sec: 60, cue: 'Pași mici pe vârfuri, înainte, înapoi și lateral, fără sărituri. Scuturi brațele.' },
+  { name: 'Easy Shadow', sec: 60, cue: 'Shadow la 50%: jab, cross, apoi teep și low kick lente, cu pivot pe vârf.' },
 ];
 
 export const WARMUP_SEC = WARMUP.reduce((s, m) => s + m.sec, 0);
@@ -97,7 +100,9 @@ export interface Day {
   blocks: Block[];
 }
 
-const WRAPS = 'Bandaje și mănuși la fiecare sesiune de sac: mâna e zona cel mai des accidentată la boxeri.';
+const WRAPS = 'Bandaje și mănuși la fiecare sesiune de sac. Tibia se obișnuiește treptat: primele săptămâni lovești ușor cu picioarele, apoi crești puterea de la o săptămână la alta.';
+/** The knee rule for every kick (FightCamp; the pivot foot carries the risk, JSSM 2021). */
+const PIVOT = 'La fiecare kick: pivot pe vârful piciorului de sprijin, până când călcâiul ajunge spre țintă. Pe o talpă care se agață (adidași, cauciuc) genunchiul se răsucește: lovești desculț, pe o suprafață pe care piciorul se poate roti.';
 
 /** Eight minutes for the knees, after Tuesday's push session and after Leg Day, while jumps hurt them. */
 const KNEE_ARMOR = (id: string): Block => ({
@@ -117,18 +122,18 @@ export const WEEK: Day[] = [
     idx: 0,
     title: 'Combat Training',
     blocks: [
-      { id: 'mon-shadow', kind: 'rounds', name: 'Shadow Boxing', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'jab', warmup: true, tip: 'Jab & Footwork: jabul e arma principală, picioarele îl duc în distanță.',
-        cues: ['Variezi jabul: simplu, dublu, la corp, din pas înainte și din retragere.', 'Te miști imediat după pumn: înainte, înapoi, lateral. Nu rămâi pe loc.', 'După fiecare serie ieși lateral din linie, cu un pas sau un pivot.', 'Controlezi distanța cu mâna din față; după fiecare secvență revii în gardă, echilibrat.'] },
-      { id: 'mon-bag', kind: 'rounds', name: 'Heavy Bag Training', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'move', tip: 'Punches & Movement: pumni curați legați de jocul de picioare, în ritm moderat.',
-        cues: [WRAPS, 'Prioritate la loviturile drepte: jab și cross, întinse complet.', 'Intri în distanță, lovești, ieși: pas lateral sau schimbare de unghi după fiecare combinație.', 'Nu lovi din loc și nu urmări doar puterea: tehnica și poziția primează.'],
+      { id: 'mon-shadow', kind: 'rounds', name: 'Shadow Kickboxing', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'jab', warmup: true, tip: 'Jab, Teep & Footwork: jabul și teep-ul țin distanța, picioarele te duc unde vrei. Pentru omul mai lung, loviturile drepte sunt regele.',
+        cues: ['Variezi jabul și teep-ul: simplu, dublu, la corp, din pas înainte și din retragere.', 'Teep când îți imaginezi că intră: îl oprești la capătul piciorului tău.', 'După fiecare serie ieși în cerc sau pivotezi; nu te retragi în linie dreaptă.', 'Stai înalt și lovești în jos: nu te apleca ca să-l ajungi.'] },
+      { id: 'mon-bag', kind: 'rounds', name: 'Heavy Bag Training', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'move', tip: 'Strikes & Movement: pumni și low kick-uri legate de jocul de picioare, în ritm moderat.',
+        cues: [WRAPS, PIVOT, 'Jab și cross întinse complet, apoi piciorul: 1-2-low kick și ieși în unghi.', 'Nu lovi din loc și nu urmări doar puterea: tehnica și poziția primează.'],
         cycle: {
           B: { dose: '2 × 3 min + 3 punch-out', line: '5 runde Heavy Bag: 2 × 3 min, apoi 3 runde punch-out', burstFrom: 3 },
           C: { dose: '2 × 3 min + 3 punch-out', line: '5 runde Heavy Bag: 2 × 3 min, apoi 3 runde punch-out', burstFrom: 3 },
         } },
-      { id: 'mon-bw', kind: 'amrap', name: 'Bodyweight Workout', dose: '10 min', min: 10, tip: 'La final, după box, ca oboseala să nu strice tehnica. Pull-ups, push-ups și squats, cât mai multe runde în 10 minute.',
+      { id: 'mon-bw', kind: 'amrap', name: 'Bodyweight Workout', dose: '10 min', min: 10, tip: 'La final, după kickboxing, ca oboseala să nu strice tehnica. Pull-ups, push-ups și squats, cât mai multe runde în 10 minute.',
         cycle: {
           // the second strength dose for pulling and pressing, in the strength emphasis (approved by the user on 2026-11-07)
-          A: { kind: 'workout', workout: 'upper', name: 'Upper Strength', dose: '15 min', line: '15 min Upper Strength: Pull-ups, Dips', min: 15, tip: 'A doua doză de forță a săptămânii pentru tras și împins: tracțiuni și dips, 3 × 3–5 grele, cu 2 repetări în rezervă și 150 s pauză. La final, după box.' },
+          A: { kind: 'workout', workout: 'upper', name: 'Upper Strength', dose: '15 min', line: '15 min Upper Strength: Pull-ups, Dips', min: 15, tip: 'A doua doză de forță a săptămânii pentru tras și împins: tracțiuni și dips, 3 × 3–5 grele, cu 2 repetări în rezervă și 150 s pauză. La final, după kickboxing.' },
         },
         // VO2max on the rower, every other week of the power and capacity emphases (4 × 4 min, Helgerud 2007)
         cycleEven: { B: ROWER_4X4, C: ROWER_4X4 } },
@@ -141,8 +146,8 @@ export const WEEK: Day[] = [
       { id: 'tue-stretch', kind: 'routine', name: 'Dynamic Warm-up', dose: '10 min', routine: 'stretch-push', min: 10, tip: 'Încălzire în mișcare pentru umeri și șolduri. Întinderile lungi vin la final: ținute înainte de exercițiile explozive, scad puterea.' },
       { id: 'tue-cal', kind: 'workout', name: 'Calisthenics: Chest, Shoulders, Triceps', dose: '45 min', line: '45 min Calisthenics (Chest, Shoulders, Triceps) + Split Squat', workout: 'push', min: 45, tip: 'Push-ups (variante) și dips, cu explozivele primele, plus a doua doză de picioare a săptămânii.' },
       KNEE_ARMOR('knee-tue'),
-      { id: 'tue-easy', kind: 'rounds', name: 'Easy Shadow Boxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'slow', tip: 'Slow, Clean Strikes: fiecare lovitură lentă, precisă, deliberată.',
-        cues: ['Calitatea bate viteza, volumul și puterea. Nu grăbi combinațiile.', 'Aliniere corectă: pumnul, cotul și umărul pe aceeași linie, brațul întins complet.', 'Greutatea se mută controlat, din picior și șold; rămâi în echilibru.', 'Mâna revine la bărbie după fiecare lovitură, garda nu cade.'] },
+      { id: 'tue-easy', kind: 'rounds', name: 'Easy Shadow Kickboxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'slow', tip: 'Slow, Clean Technique: fiecare lovitură de picior lentă, pe bucăți, ca să-i înveți mecanica.',
+        cues: ['Kick-urile la jumătate de viteză: genunchiul sus, pivot pe vârf, șoldul prin țintă, revii în gardă.', 'Echilibrul înaintea vitezei: dacă nu revii stabil, încetinești.', 'Check-ul: genunchiul din față sus, tibia ușor în afară, garda sus.', 'Pumnii întinși complet, iar mâna revine la bărbie după fiecare lovitură.'] },
       { id: 'tue-row', kind: 'cardio', name: 'Easy Row', dose: '20 min', min: 20, grow: { base: 20, step: 5, cap: 30 }, tip: 'Aerob ușor pe vâslitor, în zona 2 de puls: ritm de conversație. Crește cu 5 minute la fiecare sesiune făcută, până la 30.',
         cues: ['Ții pulsul în zona 2 de pe centură; dacă trece de ea, tragi mai ușor.', 'Împingi din picioare, apoi spatele, apoi brațele; revii în ordine inversă.', 'Vine după forță, nu înainte.'] },
       { id: 'tue-cool', kind: 'routine', name: 'Cool-down Stretch', dose: '5 min', routine: 'cooldown', min: 5, tip: 'A doua zi de flexibilitate a săptămânii: piept, dorsali și flexorii șoldului, câte 60 de secunde.' },
@@ -162,13 +167,13 @@ export const WEEK: Day[] = [
     title: 'Combat Training II',
     blocks: [
       { id: 'thu-rope', kind: 'rounds', name: 'Jumping Rope', dose: '3 × 3 min', rounds: 3, work: 180, rest: 'r3', focus: 'rope', alt: 'feet', warmup: true, tip: 'Încălzire pentru picioare: joc ușor, pe vârfuri, sărituri de 1–2 cm pe o suprafață care amortizează. Dacă simți genunchii, alege Agility Ladder.' },
-      { id: 'thu-shadow', kind: 'rounds', name: 'Shadow Boxing', dose: '3 × 3 min', rounds: 3, work: 180, rest: 'r3', focus: 'combo', alt: 'partner', tip: 'Combinations: combinații cu pregătire, ordine clară și ieșire controlată.',
-        cues: ['Fiecare combinație are un scop: o pregătești cu jabul sau o fentă.', 'Loviturile curg una din alta, fără pauze, fără să pierzi echilibrul.', 'Lucrezi și de la distanță lungă, și combinații care se termină într-un unghi nou.', 'Garda rămâne sus: nu arunca pumni izolați, fără sens.'] },
+      { id: 'thu-shadow', kind: 'rounds', name: 'Shadow Kickboxing', dose: '3 × 3 min', rounds: 3, work: 180, rest: 'r3', focus: 'combo', alt: 'partner', tip: 'Combinations: pumni și picioare legate, cu pregătire, ordine clară și ieșire controlată.',
+        cues: ['Fiecare combinație are un scop: o pregătești cu jabul, cu teep-ul sau cu o fentă.', 'Stil olandez: pumnii pregătesc, piciorul închide; după kick ieși în unghi.', 'Lovitura de după vine din șoldul pe care l-a încărcat cea dinainte (Ernesto Hoost).', 'Garda rămâne sus și când lovești cu piciorul: o mână e mereu la bărbie.'] },
       { id: 'thu-power', kind: 'rounds', name: 'Punch-out', dose: '3 × 14 × 3 s', line: '3 runde punch-out: 14 × 3 s la maxim, 10 s ușor', rounds: 3, work: BURST_SEC, restSec: 60, focus: 'power', burstFrom: 1, bagOnly: true,
         tip: 'Protocolul testat pe boxeri: 14 explozii de 3 secunde la maxim, cu 10 secunde ușor între ele, de trei ori. Cam 2 minute de efort maxim în total.',
         cues: [WRAPS, 'Lovește prin sac, nu în el: ținta e la o palmă în spatele suprafeței.', 'Mâna pleacă și se întoarce ca un bici; în cele 10 secunde doar respiri și te miști.', 'Dacă exploziile încetinesc vizibil, oprește runda.'] },
-      { id: 'thu-bag', kind: 'rounds', name: 'Heavy Bag Training', dose: '6 × 3 min', rounds: 6, work: 180, rest: 'r3', focus: 'power', alt: 'main', tip: 'Angle Changes & Power: unghiuri și putere tehnică, nu la maxim.',
-        cues: [WRAPS, 'Ieși de pe linia centrală înainte sau după combinație: pas lateral, pivot, repoziționare.', 'Împinge podeaua cu piciorul din spate și trimite pumnul prin sac.', 'Nicio lovitură puternică pe tehnică proastă sau din poziție greșită.'],
+      { id: 'thu-bag', kind: 'rounds', name: 'Heavy Bag Training', dose: '6 × 3 min', rounds: 6, work: 180, rest: 'r3', focus: 'power', alt: 'main', tip: 'Dutch Combinations & Power: pumnii pregătesc, piciorul închide. Putere tehnică, nu la maxim.',
+        cues: [WRAPS, PIVOT, 'Kick-ul trece prin sac, cu tibia, nu cu laba; brațul de pe partea lui coboară, cealaltă mână stă la bărbie.', 'Nicio lovitură puternică pe tehnică proastă sau din poziție greșită.'],
         cycle: { C: { rounds: 8, dose: '8 × 3 min' } } },
     ],
   },
@@ -178,8 +183,8 @@ export const WEEK: Day[] = [
     blocks: [
       { id: 'fri-stretch', kind: 'routine', name: 'Dynamic Warm-up', dose: '10 min', routine: 'stretch-pull', min: 10, tip: 'Încălzire în mișcare pentru umeri, omoplați și priză, înainte de tracțiuni.' },
       { id: 'fri-cal', kind: 'workout', name: 'Calisthenics: Back, Biceps, Shoulders', dose: '50 min', line: "50 min Calisthenics (Back, Biceps, Shoulders) + Farmer's Carry", workout: 'pull', min: 50, tip: 'Pull-ups (variante), ramat, umărul posterior, plus cărat greutăți pentru priză și trunchi.' },
-      { id: 'fri-easy', kind: 'rounds', name: 'Easy Shadow Boxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'distance', tip: 'Distance Work: controlul distanței e obiectivul principal.',
-        cues: ['Stai la capătul jabului: găsești distanța exactă de lovit și o păstrezi.', 'Intri și ieși din distanță: înainte, înapoi, lateral.', 'Leagă distanța de momentul combinației: știi când angajezi și când rămâi afară.', 'După ce lovești, recuperezi distanța imediat.'] },
+      { id: 'fri-easy', kind: 'rounds', name: 'Easy Shadow Kickboxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'distance', tip: 'Distance Work: controlul distanței e obiectivul principal. La 2 m, distanța lungă e a ta.',
+        cues: ['Stai la capătul jabului și al teep-ului: tu ajungi la el, el nu ajunge la tine.', 'Pe pasul lui: teep sau low kick exact când pune piciorul jos.', 'Când te presează, ieși în cerc; înapoi în linie dreaptă ajungi la corzi.', 'Dacă ajunge aproape: genunchi, antebrațele pe umerii lui, apoi ieși.'] },
     ],
   },
   {
@@ -224,7 +229,7 @@ export function resolveBlock(b: Block, p: Picks): Block {
   if (grown && grown !== b.min) r = { ...r, min: grown, dose: `${grown} min` };
   if (r.legSwap) return { ...r, name: p.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit' };
   if (r.bagOnly && p.thuMain === 'row') {
-    return { ...r, name: 'Punch-out Shadow', tip: 'Fără sac azi: același protocol în shadow boxing, lovituri drepte cât de rapid poți, cu șoldul și trunchiul în fiecare pumn.', cues: ['Brațul se întinde complet, pe toată distanța.', 'În cele 10 secunde doar respiri și te miști.', 'Dacă exploziile încetinesc vizibil, oprește runda.'] };
+    return { ...r, name: 'Punch-out Shadow', tip: 'Fără sac azi: același protocol în shadow, lovituri drepte cât de rapid poți, cu șoldul și trunchiul în fiecare pumn.', cues: ['Brațul se întinde complet, pe toată distanța.', 'În cele 10 secunde doar respiri și te miști.', 'Dacă exploziile încetinesc vizibil, oprește runda.'] };
   }
   if (r.alt === 'feet' && p.thuFeet === 'ladder') {
     return { ...r, name: 'Agility Ladder', focus: 'ladder', tip: 'Pași rapizi și preciși prin scară, pe vârfuri, cu garda sus.', cues: undefined };
@@ -232,8 +237,8 @@ export function resolveBlock(b: Block, p: Picks): Block {
   if (r.alt === 'partner' && p.thuPartner === 'spar') {
     return {
       ...r, name: 'Technical Sparring / Pads', focus: undefined,
-      tip: 'Partea pe care niciun timer nu o înlocuiește: reacționezi la un om. Mănuși cu antrenorul sau sparring tehnic, controlat.',
-      cues: ['Cu un antrenor de față, cască, proteză și mănuși de sparring.', 'Tehnic, nu la KO: dacă ritmul crește, vă opriți și reluați.', 'Lucrezi la distanța ta: jab, ieșire, unghi.'],
+      tip: 'Partea pe care niciun timer nu o înlocuiește: reacționezi la un om. Thai pads cu un antrenor sau sparring tehnic, controlat.',
+      cues: ['Sparring doar cu un antrenor de față, cu tibiere, cască, proteză și mănuși de sparring.', 'Tehnic, nu la KO: dacă ritmul crește, vă opriți și reluați.', 'Pe pads: teep la intrarea lui, check și contră, 1-2-low kick cu ieșire în unghi.'],
     };
   }
   if (r.alt === 'aero' && (p.sunAero ?? 'row') === 'row') {
@@ -253,7 +258,7 @@ export function resolveBlock(b: Block, p: Picks): Block {
   return r;
 }
 
-/** The plan-page line for a block, e.g. "5 × 3 min Shadow Boxing". */
+/** The plan-page line for a block, e.g. "5 × 3 min Shadow Kickboxing". */
 export function blockLine(b: Block, p: Picks): string {
   const r = resolveBlock(b, p);
   if (r.kind === 'row') return `${r.name}, ${r.dose}`;

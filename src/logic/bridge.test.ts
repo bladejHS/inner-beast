@@ -17,7 +17,7 @@ test('Thursday publishes only the picked options and names the one left out', ()
   assert.deepEqual([ladder[0]!.id, ladder[0]!.name, ladder[0]!.focus], ['thu-rope', 'Agility Ladder', 'ladder']);
   assert.deepEqual(ladder[0]!.alt, { other: 'Jumping Rope' });
   const spar = thursday({ thuPartner: 'spar' });
-  assert.deepEqual([spar[1]!.name, spar[1]!.alt], ['Technical Sparring / Pads', { other: 'Shadow Boxing' }]);
+  assert.deepEqual([spar[1]!.name, spar[1]!.alt], ['Technical Sparring / Pads', { other: 'Shadow Kickboxing' }]);
 });
 
 test('a rowing pick carries its challenge and its own workload; the punch-out goes to shadow boxing', () => {

@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { raceTime } from './util.ts';
 import { parseTime, readRun, runAdvice, zone2, zoneHard } from './runlog.ts';
-import { kneeAdvice, kneeAsk, kneeStreak, legDays } from './knee.ts';
+import { kneeAdvice, kneeAsk, kneeSore, kneeStreak, legDays } from './knee.ts';
 import { advance, back, bestTime, elapsed, newRun, pause, resume, segElapsed } from './race.ts';
 import { LEVEL_NAMES, RACES } from '../data/races.ts';
 import { angle, GuardTracker, RepCounter, type Pt } from './coach.ts';
@@ -22,7 +22,7 @@ import { BURST_SEC, WEEK, blockName, blockLine, resolveBlock, type Picks } from 
 import { ROW_CHALLENGES, rowChallenge, rowRests, rowTotal } from '../data/row.ts';
 import { WORKOUTS, exerciseById, workoutById } from '../data/workouts.ts';
 import { ROUTINES, routineSeconds } from '../data/routines.ts';
-import { COMBOS, INSIDE, focusCombos } from '../data/combos.ts';
+import { COMBOS, INSIDE, focusCombos, learnOrder, usesLegs, weekCombos } from '../data/combos.ts';
 import { BOOK } from '../data/book.ts';
 
 test('dates: the program week starts on Monday', () => {
@@ -336,21 +336,40 @@ test('machine row: four challenges, 250 m × 8 with 45 s between intervals only'
   assert.equal(rowChallenge('x').id, 'a');
 });
 
-test('combinations: a 200 cm boxer gets jab-led, long-range sets', () => {
+test('combinations: a 200 cm fighter gets long-range kickboxing sets, a sore knee gets boxing', () => {
   const ids = new Set(COMBOS.map((c) => c.id));
   assert.equal(ids.size, COMBOS.length);
   for (const f of ['jab', 'move', 'slow', 'combo', 'power', 'distance']) {
-    const tall = focusCombos(f, 200).filter((c) => !['week'].includes(c.id));
+    const tall = focusCombos(f, 200);
     assert.ok(tall.length >= 8, f);
     const inside = tall.filter((c) => INSIDE.has(c.id)).length;
     assert.ok(inside <= 2, `${f}: ${inside} close-range combos`);
-    const jabLed = tall.filter((c) => /^(Jab|Step in|Fake jab)/.test(c.seq[0])).length;
-    assert.ok(jabLed / tall.length >= 0.6, `${f}: ${jabLed}/${tall.length} jab-led`);
+    assert.ok(tall.filter(usesLegs).length / tall.length >= 0.4, `${f}: kicks`);
+    // no jumping technique while jumps hurt the knees
+    assert.ok(!tall.some((c) => c.seq.some((s) => /Hop|Flying|Jump|Switch step/.test(s))), `${f}: no jumps`);
+    // a bad knee note: a full set with nothing on one leg
+    const sore = focusCombos(f, 200, false);
+    assert.ok(sore.length >= 8 && !sore.some(usesLegs), `${f}: sore knee`);
     // generic profile still works
     assert.ok(focusCombos(f, 175).length >= 4, f);
   }
-  // hooks are kept where distance allows them, not removed
-  assert.ok(focusCombos('power', 200).some((c) => c.seq.some((s) => /Hook/.test(s))));
+  // the Dutch finish, with the hook kept where distance allows it
+  assert.ok(focusCombos('power', 200).some((c) => c.seq.some((s) => /Hook/.test(s)) && /Kick/.test(c.seq[c.seq.length - 1])));
+  // every kickboxing item names its source and explains itself
+  for (const c of COMBOS.filter((x) => x.id.startsWith('kb-'))) assert.ok(c.kb && c.note.length > 80, c.id);
+  // the learning plan: the first kickboxing week (2026-11-02) brings the teep and reviews the 1-2
+  assert.deepEqual(weekCombos(1, 200).map((c) => c.id), ['kb-teep', 'one-two']);
+  assert.deepEqual(learnOrder(200).slice(2, 6).map((c) => c.id), ['kb-low', 'kb-check', 'kb-jab-teep', 'kb-12-low']);
+  assert.ok(learnOrder(200).findIndex((c) => c.id === 'kb-body-high') > 20);
+});
+
+test('knee rule: a bad note on the last Leg Day of the past week means no kicks', () => {
+  const leg = (date: string, d?: number, m?: number) => ({ date, cmj: 0, d, m });
+  assert.equal(kneeSore([leg('2026-11-07', 6)], '2026-11-09')?.date, '2026-11-07');
+  assert.equal(kneeSore([leg('2026-11-07', 2, 5)], '2026-11-09')?.date, '2026-11-07');
+  assert.equal(kneeSore([leg('2026-11-07', 4)], '2026-11-09'), null);
+  assert.equal(kneeSore([leg('2026-10-30', 7)], '2026-11-09'), null);
+  assert.equal(kneeSore([], '2026-11-09'), null);
 });
 
 test('height: an unconfirmed nutrition profile takes the 200 cm default, a confirmed one keeps its own', () => {
@@ -395,15 +414,21 @@ test('breathwork lab: four modes, whole cycles filling the minutes', () => {
   assert.equal(Math.max(...adv.map((p) => p.sec)), 20);
 });
 
-test('rounds: themed rounds, a defensive distance round for a tall boxer, warm-up length', () => {
+test('rounds: kickboxing themes for a tall fighter, boxing themes on a sore knee, warm-up length', () => {
   const tall = roundThemes('power', 200);
-  assert.ok(tall.length >= 3);
-  assert.ok(tall.some((t) => t.name === 'Apărare la distanță' && t.combos.some((c) => c.id === 'clinch-exit')));
+  assert.deepEqual(tall.map((t) => t.name), ['Pumni, apoi piciorul', 'Genunchi la intrare', 'Lovituri de picior', 'Check, teep și distanță']);
+  assert.ok(tall[3].combos.some((c) => c.id === 'kb-check-cross') && tall[3].combos.some((c) => c.id === 'clinch-exit'));
   for (const t of tall) assert.ok(t.combos.length >= 2, t.name);
-  assert.ok(!roundThemes('power', 175).some((t) => t.name === 'Apărare la distanță'));
+  assert.ok(!roundThemes('power', 175).some((t) => t.name === 'Check, teep și distanță'));
   assert.equal(roundThemes('slow', 200).length, 0);
-  assert.equal(roundThemes('jab', 200)[0].name, 'Doar jab');
-  assert.ok(roundThemes('jab', 200)[0].combos.every((c) => !c.seq.some((s) => /Cross|Hook|Uppercut/.test(s))));
+  const jab = roundThemes('jab', 200)[0];
+  assert.equal(jab.name, 'Jab și teep');
+  assert.ok(jab.combos.every((c) => !c.seq.some((s) => /Cross|Hook|Uppercut|Low Kick|Body Kick/.test(s))));
+  // a sore knee: the boxing rounds from before, nothing on one leg
+  const sore = roundThemes('power', 200, false);
+  assert.ok(sore.some((t) => t.name === 'Apărare la distanță' && t.combos.some((c) => c.id === 'clinch-exit')));
+  assert.ok(sore.every((t) => !t.combos.some(usesLegs)));
+  assert.equal(roundThemes('combo', 200, false)[0].name, 'Combinații de box');
   assert.ok(WARMUP_SEC >= 300 && WARMUP_SEC <= 420);
   const r = (id: string) => WEEK.flatMap((d) => d.blocks).find((b) => b.id === id)!;
   assert.ok(r('mon-shadow').warmup && r('thu-rope').warmup);

@@ -95,6 +95,15 @@ export function kneeAdvice(exId: string, lvl: number, days: LegDay[]): Advice | 
   return null;
 }
 
+/**
+ * The last Leg Day, when its knee note was bad (5 of 10 or more) and it was in the last 7 days. The fighting rounds
+ * then call boxing only: a roundhouse kick turns on the supporting knee, a teep and a knee load it on one leg.
+ */
+export function kneeSore(days: LegDay[], today: string): LegDay | null {
+  const l = days[0];
+  return l && kneeBad(l) && daysBetween(l.date, today) <= 7 ? l : null;
+}
+
 /** The note still missing on Azi: today's session, or the morning after a Leg Day of the last two days. */
 export function kneeAsk(days: LegDay[], today: string): { date: string; field: 'd' | 'm' } | null {
   const l = days[0];

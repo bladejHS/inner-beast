@@ -96,12 +96,21 @@ function run(dist: number): Seg[] {
   ];
 }
 
-function fight(rounds: number, min: number): Seg[] {
-  const focus = ['Jab și distanță', 'Combinații', 'Lucru la corp', 'Mișcare și unghiuri', 'Putere'];
+function fight(rounds: number, min: number, bout = ''): Seg[] {
+  const focus = ['Jab, teep și distanță', 'Pumni, apoi piciorul', 'La corp: body kick și genunchi', 'Check, contră și ieșiri în cerc', 'Putere: combinațiile tale cele mai bune'];
   return Array.from({ length: rounds }, (_, i) => [
-    { name: `Runda ${i + 1} din ${rounds}`, detail: focus[i % focus.length], alt: 'Shadow Boxing sau sac', sec: min * 60 },
+    { name: `${bout}Runda ${i + 1} din ${rounds}`, detail: focus[i % focus.length], alt: 'Shadow Kickboxing sau sac', sec: min * 60 },
     ...(i < rounds - 1 ? [{ name: 'Pauză', detail: 'Respiră adânc, bei apă', sec: 60, rest: true }] : []),
   ]).flat();
+}
+
+/** A K-1 tournament night: the same fighter goes 3 × 3 min up to three times, with a break between the bouts. */
+function tournament(bouts: number): Seg[] {
+  const names = bouts === 2 ? ['Semifinala', 'Finala'] : ['Sfertul de finală', 'Semifinala', 'Finala'];
+  return names.flatMap((n, i) => [
+    ...fight(3, 3, `${n}, `),
+    ...(i < names.length - 1 ? [{ name: 'Pauză între meciuri', detail: 'Te miști ușor, bei apă, rămâi cald', sec: 300, rest: true }] : []),
+  ]);
 }
 
 function murph(mile: number, pull: number, push: number, squat: number): Seg[] {
@@ -160,14 +169,14 @@ export const RACES: Race[] = [
     ],
   },
   {
-    id: 'fight', name: 'Fight Night', sub: 'Gala ta de box, runde cronometrate', icon: 'fight',
-    note: 'Rundele trec singure, cu pauză de 1 minut. Ține ritmul până la ultimul gong.',
+    id: 'fight', name: 'Fight Night', sub: 'Gala ta de kickboxing, runde cronometrate', icon: 'fight',
+    note: 'Rundele trec singure, cu pauză de 1 minut. Ține ritmul până la ultimul gong. Un meci de kickboxing are 3 runde de 3 minute; cel pentru titlu, 5. La turneele K-1, același luptător urca în ring de până la trei ori în aceeași seară.',
     levels: [
       { name: '3 × 2 min', est: 8, segs: fight(3, 2) },
-      { name: '4 × 3 min', est: 15, segs: fight(4, 3) },
-      { name: '6 × 3 min', est: 23, segs: fight(6, 3) },
-      { name: '10 × 3 min', est: 39, segs: fight(10, 3) },
-      { name: '12 × 3 min', est: 47, segs: fight(12, 3) },
+      { name: '3 × 3 min', est: 11, segs: fight(3, 3) },
+      { name: '5 × 3 min, titlu', est: 19, segs: fight(5, 3) },
+      { name: 'Turneu: 2 meciuri', est: 27, segs: tournament(2) },
+      { name: 'Turneu K-1: 3 meciuri', est: 43, segs: tournament(3) },
     ],
   },
   {

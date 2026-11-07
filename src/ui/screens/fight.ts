@@ -1,13 +1,14 @@
-// "Lupte" in three sections: Timere (round timers and Alex's sessions), Combinații (the week's pair, the basic punches,
-// all of Alex Hanma's combinations) and Alex (his routines, workouts, technique and mindset).
+// "Lupte" in three sections: Timere (round timers and Alex's sessions), Combinații (the week's pair, the kickboxing
+// techniques and combinations for a 2 m fighter, the punches, Alex Hanma's boxing combinations) and Alex (his routines,
+// workouts, technique and mindset).
 
 import { srcUrl, type TipCard } from '../../data/alex.ts';
-import { CAT_NAMES, COMBOS, tiktokUrl, type ComboCat } from '../../data/combos.ts';
+import { CAT_NAMES, COMBOS, type Combo, type ComboCat } from '../../data/combos.ts';
 import { WEEK, blockName, type Block } from '../../data/plan.ts';
 import { dayKey, esc, weekdayIdx } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { howHtml } from '../how.ts';
-import { alexBody, MOVE, nextWeeks, weekCard } from './alex.ts';
+import { alexBody, MOVE, nextWeeks, srcLink, weekCard } from './alex.ts';
 import { ic } from '../icons.ts';
 import { openRounds } from '../players/rounds.ts';
 import { blockRest, liveBlock, pageHead, restFor, segBar, segOf, top } from './shared.ts';
@@ -26,7 +27,7 @@ interface Quick {
 }
 
 const QUICK: Quick[] = [
-  { k: 'shadow', name: 'Shadow Boxing', icon: 'shadow', match: (b) => b.name === 'Shadow Boxing', def: { rounds: 3, work: 180, rest: 'r3', focus: 'combo' } },
+  { k: 'shadow', name: 'Shadow Kickboxing', icon: 'shadow', match: (b) => b.name === 'Shadow Kickboxing', def: { rounds: 3, work: 180, rest: 'r3', focus: 'combo' } },
   { k: 'bag', name: 'Heavy Bag Training', icon: 'bag', match: (b) => b.name === 'Heavy Bag Training', def: { rounds: 5, work: 180, rest: 'r3', focus: 'power' } },
   { k: 'rope', name: 'Jumping Rope', icon: 'rope', match: (b) => b.name === 'Jumping Rope', def: { rounds: 5, work: 180, rest: 'r3', focus: 'rope' } },
   { k: 'legs', name: 'Wall Sit', icon: 'wall', match: (b) => !!b.legSwap, def: { rounds: 5, work: 60, rest: 'r1', focus: 'legs' } },
@@ -80,32 +81,39 @@ function timersSeg(): string {
       ${timerRow('qt', 'free', 'timer', 'Runde libere', 'Setezi tu rundele, lucrul și pauza')}
     </div>
     <section class="card lime" style="margin-top:28px"><p class="label">Partener</p><h3>Ce nu poți antrena singur</h3>
-      <p class="dim">Shadow boxing-ul, sacul și timerele construiesc tehnica și condiția. Reacția la un om, distanța reală și apărarea sub presiune se învață doar cu cineva în față: mănuși cu un antrenor sau sparring tehnic, controlat, cu protecție.</p>
-      <p class="dim" style="margin:0">O singură sesiune pe săptămână cu un antrenor schimbă cel mai mult. Joi poți alege „Cu partener” în locul shadow boxing-ului.</p>
+      <p class="dim">Shadow-ul, sacul și timerele construiesc tehnica și condiția. Reacția la un om, distanța reală, check-ul la o lovitură adevărată și apărarea sub presiune se învață doar cu cineva în față: Thai pads cu un antrenor sau sparring tehnic, controlat, cu tibiere și cască.</p>
+      <p class="dim" style="margin:0">O singură sesiune pe săptămână cu un antrenor de kickboxing schimbă cel mai mult. Joi poți alege „Cu partener” în locul shadow-ului.</p>
     </section>`;
 }
 
-function combosSeg(): string {
-  const cats: Array<ComboCat | 'all'> = ['all', 'basics', 'combo', 'power', 'defense', 'counter', 'footwork'];
-  const list = COMBOS.filter((c) => cat === 'all' || c.cat === cat);
-  const combos = list
-    .map(
-      (c) => `<article class="combo">
+function comboCard(c: Combo): string {
+  return `<article class="combo">
       <h3>${esc(c.name)}</h3>
       <div class="seq">${c.seq.map((s) => `<span class="${MOVE.test(s) ? 'move' : ''}">${esc(s)}</span>`).join('')}</div>
       <p>${esc(c.note)}</p>
-      ${c.vid ? `<a class="src" href="${tiktokUrl(c.vid)}" target="_blank" rel="noopener">${ic('ext')}${esc(c.src ?? 'TikTok')}</a>` : '<span class="src">Baza pe care insistă Alex</span>'}
-    </article>`,
-    )
-    .join('');
+      ${srcLink(c) || '<span class="src">Baza pe care insistă Alex</span>'}
+    </article>`;
+}
+
+function combosSeg(): string {
+  const cats: Array<ComboCat | 'all'> = ['all', 'kicks', 'basics', 'combo', 'power', 'defense', 'counter', 'footwork'];
+  const pick = (c: Combo): boolean => cat === 'all' || c.cat === cat;
+  const kb = COMBOS.filter((c) => c.kb && pick(c));
+  const box = COMBOS.filter((c) => !c.kb && pick(c));
+  const count = (n: number): string => `${n} ${n === 1 ? 'combinație' : 'combinații'}`;
   return `${weekCard(true)}
     ${nextWeeks()}
-    <h2 class="sec">Loviturile de bază<small>Cum se face fiecare lovitură și mișcare din combinații.</small></h2>
+    <h2 class="sec">Loviturile de kickboxing<small>Pentru un luptător de 2 m: poziția, teep-ul, low kick-urile, genunchiul și check-ul.</small></h2>
+    ${['Kickboxing Stance', 'Teep', 'Low Kick', 'Inside Low Kick', 'Body Kick', 'Knee', 'Check', 'High Kick'].map((k) => howHtml(k, undefined, { title: k })).join('')}
+    <h2 class="sec">Pumnii și mișcarea<small>Cum se face fiecare pumn și fiecare mișcare din combinații.</small></h2>
     ${['Jab', 'Cross', 'Hook', 'Uppercut', 'Overhand', 'Gazelle Punch', 'Check Hook', 'Slip & Roll', 'Footwork'].map((k) => howHtml(k, undefined, { title: k })).join('')}
-    <h2 class="sec">Combinații de la Alex<small>Citite cadru cu cadru din video-urile lui de pe TikTok. Le auzi și în timpul rundelor de shadow boxing și sac.</small></h2>
+    <h2 class="sec">Combinații de kickboxing<small>Pentru luptătorul înalt: de la Ernesto Hoost, din meciurile lui Semmy Schilt și de la antrenori de Muay Thai. Le auzi în rundele de shadow și de sac.</small></h2>
     <div class="chips filter" role="group" aria-label="Filtru">${cats.map((c) => `<button class="chip" aria-pressed="${cat === c}" data-a="ccat" data-k="${c}">${c === 'all' ? 'Toate' : esc(CAT_NAMES[c])}</button>`).join('')}</div>
-    <p class="small dim">${list.length} ${list.length === 1 ? 'combinație' : 'combinații'}</p>
-    ${combos}`;
+    <p class="small dim">${count(kb.length)}</p>
+    ${kb.map(comboCard).join('')}
+    <h2 class="sec">Combinații de box de la Alex<small>Citite cadru cu cadru din video-urile lui de pe TikTok. Pumnii lui rămân în runde, iar când genunchiul cere pauză de la kick-uri, rundele sunt doar cu ele.</small></h2>
+    <p class="small dim">${count(box.length)}</p>
+    ${box.map(comboCard).join('')}`;
 }
 
 export const FIGHT_SEGS: Array<[string, string]> = [['timers', 'Timere'], ['combos', 'Combinații'], ['alex', 'Alex']];
@@ -114,7 +122,7 @@ export function fightHtml(): string {
   const seg = segOf('fight', FIGHT_SEGS.map(([k]) => k));
   const body = seg === 'combos' ? combosSeg() : seg === 'alex' ? alexBody() : timersSeg();
   return `${top()}
-    ${pageHead('Lupte', 'Runde, combinații și tot ce a arătat Alex.')}
+    ${pageHead('Lupte', 'Runde de kickboxing, combinații și tot ce a arătat Alex.')}
     ${segBar('Secțiuni Lupte', FIGHT_SEGS, seg)}
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }

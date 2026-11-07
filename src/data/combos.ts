@@ -1,9 +1,21 @@
-// Combinations and drills taken from Alex Hanma's TikTok (@alexhanma___), read frame by frame from his videos.
-// Punch and drill names stay in English (as he labels them); notes are Romanian.
+// The combat material. Since 2026-11-07 the fighting part is kickboxing, built for the user's 2 m: long range first
+// (jab, teep, inside low kick), the Dutch rule that punches set up a kick, knees for whoever gets close, and checks for
+// the long lead leg a shorter fighter goes after. Sources, each linked on its combination: Ernesto Hoost's combinations
+// (Dynamic Striking), Semmy Schilt's fights (Sherdog, a 2010 analysis of his final with Peter Aerts), Ubud Muay Thai on
+// beating smaller opponents, FightCamp on the roundhouse kick, and Jack Slack on reach. No jumping techniques (no
+// flying knees, no hop switch kicks) while jumps hurt the user's knees.
+// Alex Hanma's boxing combinations (@alexhanma___ on TikTok, read frame by frame) stay in the library, and they are
+// what the caller uses on a day the knee notes say no kicks. Strike names stay in English; notes are Romanian.
 
 import { daysBetween, dayKey, weekStart } from '../logic/util.ts';
 
-export type ComboCat = 'basics' | 'combo' | 'power' | 'defense' | 'counter' | 'footwork';
+export type ComboCat = 'kicks' | 'basics' | 'combo' | 'power' | 'defense' | 'counter' | 'footwork';
+
+/** Where a kickboxing item comes from: a label, and a link when there is one. */
+export interface Ref {
+  t: string;
+  url?: string;
+}
 
 export interface Combo {
   id: string;
@@ -16,9 +28,132 @@ export interface Combo {
   /** TikTok video id on @alexhanma___ (none for the basics). */
   vid?: string;
   src?: string;
+  /** Kickboxing material (not Alex's): its source. */
+  kb?: Ref;
 }
 
-export const COMBOS: Combo[] = [
+const HOOST: Ref = { t: 'Ernesto Hoost, Dynamic Striking', url: 'https://dynamicstriking.com/blogs/news/combining-our-punches-kicks-with-ernesto-hoost' };
+const SCHILT: Ref = { t: 'Schilt – Aerts, analiză', url: 'https://themeparkatitsdarkest.com/2010/09/08/fighting-as-a-taller-fighter/' };
+const SHERDOG: Ref = { t: 'Sherdog despre Semmy Schilt', url: 'https://sherdog.com/news/articles/5/Sherdogs-Top-10-Greatest-Combat-Athletes-190359' };
+const TALL: Ref = { t: 'Ubud Muay Thai: adversari mai scunzi', url: 'https://www.ubudmuaythai.com/blog/how-to-beat-smaller-opponents-muay-thai' };
+const KICK: Ref = { t: 'FightCamp: greșelile la roundhouse', url: 'https://blog.joinfightcamp.com/training/5-common-mistakes-to-avoid-when-doing-a-roundhouse-kick/' };
+const SLACK: Ref = { t: 'Jack Slack: reach și distanță', url: 'https://www.vice.com/en/article/yp8zew/on-the-point-of-a-spear-the-game-of-reach-and-range' };
+const BASE: Ref = { t: 'Baza kickboxingului' };
+
+/** Kickboxing for a tall fighter: the single techniques first, then combinations, then defence and counters. */
+const KB: Combo[] = [
+  {
+    id: 'kb-teep', name: 'Lead Teep', seq: ['Lead Teep'], call: 'Teep', cat: 'kicks', kb: TALL,
+    note: 'Jabul picioarelor și arma ta principală de distanță. Genunchiul din față urcă spre piept, apoi împingi talpa prin pieptul sau șoldul lui și duci șoldul înainte. Îl dai când pășește spre tine: la piept îl împinge înapoi, la șold îi strică echilibrul. Piciorul se întoarce pe același drum.',
+  },
+  {
+    id: 'kb-low', name: 'Rear Low Kick', seq: ['Rear Low Kick'], call: 'Low kick', cat: 'kicks', kb: KICK,
+    note: 'Pas mic în afară cu piciorul din față, apoi pivot pe vârful piciorului de sprijin până când călcâiul ajunge spre el: așa genunchiul nu se răsucește. Șoldul se rotește prin țintă și lovești cu tibia, nu cu laba, în exteriorul coapsei. Revii imediat în gardă.',
+  },
+  {
+    id: 'kb-inside', name: 'Inside Low Kick', seq: ['Lead Inside Low Kick'], call: 'Inside low kick', cat: 'kicks', kb: BASE,
+    note: 'Scurtă și rapidă, cu piciorul din față, în interiorul coapsei sau al gambei lui. De la distanța ta lungă îi strică pasul și echilibrul. Nu e o lovitură de KO, e una care îl deranjează mereu.',
+  },
+  {
+    id: 'kb-body', name: 'Rear Body Kick', seq: ['Rear Body Kick'], call: 'Body kick', cat: 'kicks', kb: TALL,
+    note: 'Aceeași mecanică ca low kick-ul, cu pivotul complet, dar ținta sunt coastele. La un adversar mai scund, corpul lui e cam la înălțimea șoldului tău: ajungi acolo cu mai puțină mobilitate decât îi trebuie lui pentru corpul tău. Loviturile la corp îi taie respirația și elanul.',
+  },
+  {
+    id: 'kb-knee', name: 'Rear Knee', seq: ['Rear Knee'], call: 'Knee', cat: 'kicks', kb: SCHILT,
+    note: 'Când intră sau se apleacă: împingi șoldul înainte și duci genunchiul din spate drept în corpul lui, ridicat pe vârful piciorului de sprijin. Te lași puțin pe spate, ca să-ți scoți capul din linie: așa îi oprea Semmy Schilt (2,12 m) pe cei care ajungeau aproape. Fără săritură.',
+  },
+  {
+    id: 'kb-check', name: 'Check', seq: ['Check'], call: 'Check', cat: 'kicks', kb: BASE,
+    note: 'Apărarea de bază a unui om înalt: piciorul tău lung din față e ținta preferată a celor mai scunzi. Ridici genunchiul din față, ușor în afară, ca lovitura lui să se oprească în tibia ta, cu garda sus. Pui piciorul jos și răspunzi imediat.',
+  },
+  {
+    id: 'kb-rear-teep', name: 'Rear Teep', seq: ['Rear Teep'], call: 'Rear teep', cat: 'kicks', kb: BASE,
+    note: 'Teep cu piciorul din spate: pleacă mai încet, dar împinge mult mai tare. Îl folosești când l-ai dezechilibrat deja sau când vrei să-l trimiți spre corzi.',
+  },
+  {
+    id: 'kb-jab-teep', name: 'Jab – Teep', seq: ['Jab', 'Lead Teep'], call: 'Jab, teep', cat: 'basics', kb: TALL,
+    note: 'Cele două arme lungi, una după alta. Jabul măsoară distanța și îi ia privirea, teep-ul îl împinge înapoi la capătul picioarelor tale. Rămâi acolo unde tu ajungi la el și el nu ajunge la tine.',
+  },
+  {
+    id: 'kb-jab-inside', name: 'Jab – Inside Low Kick', seq: ['Jab', 'Lead Inside Low Kick'], call: 'Jab, inside low kick', cat: 'basics', kb: BASE,
+    note: 'Cel mai sigur atac de la distanță lungă. Jabul îi ține privirea sus, iar low kick-ul pe interior vine imediat după, tot cu partea din față. Garda nu se deschide deloc.',
+  },
+  {
+    id: 'kb-12-low', name: 'Jab – Cross – Low Kick – Pivot', seq: ['Jab', 'Cross', 'Rear Low Kick', 'Pivot out'], call: 'Jab, cross, low kick, pivot', cat: 'combo', kb: TALL,
+    note: 'Combinația de bază a kickboxingului: pumnii ridică garda și privirea, piciorul închide. După kick pivotezi sau ieși în unghi, ca să nu-i rămâi în față pentru contră.',
+  },
+  {
+    id: 'kb-123-low', name: 'Jab – Cross – Hook – Low Kick', seq: ['Jab', 'Cross', 'Lead Hook', 'Rear Low Kick'], call: 'Jab, cross, hook, low kick', cat: 'power', kb: HOOST,
+    note: 'Clasicul olandez. Croșeul de stânga îți încarcă șoldul pentru low kick-ul de dreapta: după o lovitură, șoldul e deja rotit pentru următoarea (Ernesto Hoost). Croșeul îl dai doar dacă 1-2 te-a adus în distanță.',
+  },
+  {
+    id: 'kb-hook-body', name: 'Lead Hook – Body Kick', seq: ['Lead Hook', 'Rear Body Kick'], call: 'Hook, body kick', cat: 'power', kb: HOOST,
+    note: 'Din lista lui Ernesto Hoost: croșeul îl face să-și strângă garda la cap, iar coastele rămân libere pentru kick. Fiecare atac îi cere o apărare, iar apărarea deschide altă țintă.',
+  },
+  {
+    id: 'kb-cross-lbody', name: 'Cross – Lead Body Kick', seq: ['Cross', 'Lead Body Kick'], call: 'Cross, lead body kick', cat: 'power', kb: HOOST,
+    note: 'Tot de la Hoost: după cross, șoldul s-a rotit și piciorul din față e încărcat, iar kick-ul cu el ajunge la ficat. Fără săritură: piciorul pleacă din loc sau după un pas mic în afară.',
+  },
+  {
+    id: 'kb-double-jab-low', name: 'Double Jab – Low Kick', seq: ['Jab', 'Jab', 'Rear Low Kick'], call: 'Double jab, low kick', cat: 'combo', kb: BASE,
+    note: 'Jaburile îi acoperă privirea și îl țin pe loc, iar low kick-ul vine pe sub ele. La 2 m, jabul tău ajunge de departe, deci și kick-ul de după el.',
+  },
+  {
+    id: 'kb-inside-cross', name: 'Inside Low Kick – Cross', seq: ['Lead Inside Low Kick', 'Cross'], call: 'Inside low kick, cross', cat: 'combo', kb: BASE,
+    note: 'Low kick-ul pe interior îi duce greutatea și privirea în jos, iar cross-ul vine pe mijloc în timp ce piciorul tău se pune jos înainte. Kick-ul și pasul înainte sunt o singură mișcare.',
+  },
+  {
+    id: 'kb-12-teep', name: 'Jab – Cross – Teep', seq: ['Jab', 'Cross', 'Lead Teep'], call: 'Jab, cross, teep', cat: 'footwork', kb: SLACK,
+    note: 'Pentru omul mai lung, loviturile drepte sunt regele. După 1-2 vrea să-ți răspundă; teep-ul îl împinge înapoi înaintea contrei lui și te pune din nou la distanța ta.',
+  },
+  {
+    id: 'kb-fake-teep-low', name: 'Fake Teep – Low Kick', seq: ['Fake teep', 'Rear Low Kick'], call: 'Fake teep, low kick', cat: 'combo', kb: BASE,
+    note: 'Ridici genunchiul din față ca pentru teep, iar el se oprește sau coboară mâna să-l prindă. Pui piciorul jos în față și tragi low kick-ul. Fenta merge doar dacă teep-ul tău adevărat l-a durut înainte.',
+  },
+  {
+    id: 'kb-jab-knee', name: 'Jab – Knee', seq: ['Jab', 'Rear Knee'], call: 'Jab, knee', cat: 'combo', kb: SHERDOG,
+    note: 'Jabul îl face să se aplece sau să intre pe sub el, iar genunchiul îl așteaptă. Unui adversar mai scund care intră aplecat, genunchiul tău îi ajunge înaintea pumnilor lui. Despre Schilt se scria că, dacă ajungeai prea aproape, genunchii lui erau copleșitori.',
+  },
+  {
+    id: 'kb-hoost-chain', name: 'Hoost Chain', seq: ['Cross', 'Lead Hook', 'Rear Low Kick', 'Lead Hook', 'Cross', 'Lead Body Kick'], call: 'Cross, hook, low kick. Hook, cross, lead body kick', cat: 'power', kb: HOOST,
+    note: 'Lanțul lui Ernesto Hoost, de patru ori campion K-1: pumn, pumn, kick, de două ori la rând. Fiecare lovitură o încarcă pe următoarea. La sac îl lucrezi întâi lent, pe bucăți, apoi legat.',
+  },
+  {
+    id: 'kb-body-high', name: 'Body Kick – Jab – High Kick', seq: ['Rear Body Kick', 'Jab', 'Rear High Kick'], call: 'Body kick, jab, high kick', cat: 'power', kb: HOOST,
+    note: 'După câteva body kick-uri își coboară cotul ca să-și apere coastele, iar același kick urcă la cap: cine își apără corpul își lasă capul liber (Hoost). Doar cât de sus îți permite mobilitatea, fără să forțezi: un body kick curat bate un high kick smucit.',
+  },
+  {
+    id: 'kb-check-cross', name: 'Check – Cross', seq: ['Check', 'Cross'], call: 'Check, cross', cat: 'counter', kb: BASE,
+    note: 'El dă low kick, tu îl oprești cu tibia, pui piciorul jos în față și răspunzi cu cross-ul înainte să-și revină. O apărare fără răspuns îl lasă să încerce din nou.',
+  },
+  {
+    id: 'kb-check-teep', name: 'Check – Teep', seq: ['Check', 'Lead Teep'], call: 'Check, teep', cat: 'counter', kb: BASE,
+    note: 'Piciorul cu care ai blocat e deja sus: îl împingi direct în teep și îl trimiți înapoi la distanța ta. Pentru un om înalt e contra ideală, fiindcă îți ia înapoi spațiul imediat.',
+  },
+  {
+    id: 'kb-low-on-step', name: 'Low Kick on His Step', seq: ['Read his step', 'Rear Low Kick'], call: 'On his step, low kick', cat: 'counter', kb: TALL,
+    note: 'Când pășește spre tine, greutatea lui e pe piciorul din față: atunci aterizează low kick-ul, exact pe pasul lui. În shadow îți imaginezi intrarea lui; cu un partener, exersați momentul.',
+  },
+  {
+    id: 'kb-teep-on-entry', name: 'Teep on His Entry, Reset', seq: ['Read his step', 'Lead Teep', 'Reset stance'], call: 'He steps in, teep, reset', cat: 'defense', kb: TALL,
+    note: 'Exercițiul de bază pentru un om înalt: când intră, teep la piept sau la șold, apoi îți refaci poziția. Nu-l lași să ajungă la distanța lui.',
+  },
+  {
+    id: 'kb-lean-knee', name: 'Lean Back – Knee', seq: ['Lean back', 'Rear Knee', 'Step back'], call: 'Lean back, knee', cat: 'counter', kb: SCHILT,
+    note: 'Ce făcea Schilt când adversarul ajungea aproape: își scotea capul din linie lăsându-se pe spate și aducea genunchiul în același timp. Nu rămâi pe spate: după genunchi faci un pas înapoi sau în lateral și revii în gardă.',
+  },
+  {
+    id: 'kb-circle-teep', name: 'Circle Out – Teep', seq: ['Circle out', 'Lead Teep'], call: 'Circle, teep', cat: 'footwork', kb: SCHILT,
+    note: 'Când te presează, nu te retragi în linie dreaptă: așa ajungi la corzi, unde lungimea ta nu mai contează. Asta încerca Peter Aerts împotriva lui Schilt. Ieși în cerc, apoi dai teep când vine după tine.',
+  },
+  {
+    id: 'kb-clinch-knee', name: 'Clinch: Stand Tall – Knee – Out', seq: ['Clinch (stand tall)', 'Rear Knee', 'Frame', 'Lead Teep'], call: 'Clinch, knee, out', cat: 'defense', kb: TALL,
+    note: 'În clinci stai drept, deasupra lui, și îi controlezi capul. Un genunchi la corp sau la coapsă, apoi antebrațele pe umerii lui: faci spațiu și ieși cu un teep. În kickboxing (regulile K-1 și Glory) clinciul e scurt: o lovitură, apoi separarea.',
+  },
+];
+
+/** Alex Hanma's boxing combinations and the long-range boxing set built for a tall boxer. */
+const BOX: Combo[] = [
   {
     id: 'jab', name: 'The Jab', seq: ['Jab'], call: 'Jab', cat: 'basics',
     note: 'Rotești umărul și șoldul în lovitură: doar din braț, jabul are o fracțiune din putere. Umărul urcă și acoperă bărbia, mâna din spate stă la față, brațul se întinde complet și revine imediat.',
@@ -313,7 +448,10 @@ export const COMBOS: Combo[] = [
   },
 ];
 
+export const COMBOS: Combo[] = [...KB, ...BOX];
+
 export const CAT_NAMES: Record<ComboCat, string> = {
+  kicks: 'Picioare și genunchi',
   basics: 'Bazele',
   combo: 'Combinații',
   power: 'Putere și unghiuri',
@@ -342,11 +480,36 @@ export const LADDER_MOVES = [
   { name: 'Boxer Step In-Out', call: 'Boxer in and out', note: 'În gardă, pas înainte în pătrat și înapoi, ca la intrarea și ieșirea din distanță.' },
 ];
 
-/** Which combos the caller uses in each block. */
-// Which combinations the caller uses in each block, following the e-book's focus for that block (plan page 16):
-// Monday shadow "jabs & footwork", Monday bag "movement & punches", Tuesday easy shadow "slow and clean moves",
-// Thursday shadow "combinations", Thursday bag "angle changes & power", Friday easy shadow "distance work".
-const FOCUS: Record<string, string[]> = {
+/** A leg technique: a kick, a teep, a knee or a check (a fake teep is not one). */
+const LEG = /Kick|Teep|Knee|^Check$/;
+export const legStrike = (s: string): boolean => LEG.test(s);
+export const usesLegs = (c: Combo): boolean => c.seq.some(legStrike);
+
+const byIds = (ids: string[]): Combo[] => ids.map((id) => COMBOS.find((c) => c.id === id)).filter((c): c is Combo => !!c);
+
+// What the caller uses in each block. The focus of each block still follows the e-book (plan page 16): Monday shadow
+// "jabs & footwork", Monday bag "movement & punches", Tuesday easy shadow "slow and clean moves", Thursday shadow
+// "combinations", Thursday bag "angle changes & power", Friday easy shadow "distance work", each one now in kickboxing.
+// For a fighter from TALL_CM up: long weapons first, the kick at the end of the punches, knees and checks for the
+// shorter man who comes in, and exits on a circle.
+const KB_FOCUS_TALL: Record<string, string[]> = {
+  jab: ['jab', 'double-jab', 'kb-teep', 'kb-jab-teep', 'kb-jab-inside', 'kb-teep-on-entry', 'kb-circle-teep', 'jab-step-in', 'jab-out', 'double-jab-back', 'kb-inside', 'pull-counter'],
+  move: ['kb-12-low', 'kb-jab-teep', 'kb-low', 'kb-teep', 'kb-inside-cross', 'kb-double-jab-low', 'kb-12-teep', 'one-two-angle', 'kb-check-cross', 'kb-jab-knee', 'step-jab-cross-back'],
+  slow: ['kb-teep', 'kb-low', 'kb-check', 'kb-knee', 'kb-body', 'kb-inside', 'kb-jab-teep', 'kb-12-low', 'kb-rear-teep', 'one-two'],
+  combo: ['kb-12-low', 'kb-123-low', 'kb-hook-body', 'kb-cross-lbody', 'kb-fake-teep-low', 'kb-double-jab-low', 'kb-inside-cross', 'kb-12-teep', 'kb-jab-knee', 'kb-check-cross', 'kb-check-teep', 'jab-feint-cross'],
+  power: ['kb-123-low', 'kb-hook-body', 'kb-cross-lbody', 'kb-hoost-chain', 'kb-12-low', 'kb-body', 'kb-low', 'kb-knee', 'kb-jab-knee', 'kb-double-jab-low', 'kb-body-high', 'one-two-hook-pivot'],
+  distance: ['jab', 'kb-teep', 'kb-jab-teep', 'kb-teep-on-entry', 'kb-low-on-step', 'kb-circle-teep', 'kb-lean-knee', 'kb-check-teep', 'pull-counter', 'double-jab-back', 'kb-inside', 'kb-clinch-knee'],
+};
+
+/** Under TALL_CM the same sets, with a little inside work where the block allows it. */
+const KB_FOCUS: Record<string, string[]> = {
+  ...KB_FOCUS_TALL,
+  combo: [...KB_FOCUS_TALL.combo, 'body-head', 'liver'],
+  power: [...KB_FOCUS_TALL.power, 'four-punch', 'liver-cross'],
+};
+
+// The boxing sets from before the switch to kickboxing: the caller falls back to them when the knee says no kicks.
+const BOX_FOCUS: Record<string, string[]> = {
   jab: ['jab', 'double-jab', 'one-two', 'jab-out', 'jab-step-in', 'jab-circle', 'double-jab-back', 'ghost-step', 'beginner-defense', 'pull-counter'],
   move: ['jab-step-in', 'jab-out', 'one-two-angle', 'double-jab-cross-exit', 'jab-circle', 'fake-jab-cross', 'step-overhand', 'check-hook', 'combo-of-day', 'body-head'],
   slow: ['jab', 'one-two', 'jab-cross-hook', 'simple-body', 'guard-reset', 'jab-upper-roll', 'liver', 'peekaboo', 'alphabet'],
@@ -355,18 +518,18 @@ const FOCUS: Record<string, string[]> = {
   distance: ['jab', 'double-jab', 'jab-out', 'double-jab-back', 'pull-counter', 'ghost-step', 'one-two', 'fake-jab-cross', 'jab-reset-reenter', 'hook-setup'],
 };
 
-/** From this height up the caller uses FOCUS_TALL: long range first, few inside exchanges. */
+/** From this height up the caller uses the tall sets: long range first, few inside exchanges. */
 export const TALL_CM = 190;
 
-/** Combinations that need a close-range exchange; a tall boxer gets them only where the focus calls for them. */
+/** Combinations that need a close-range exchange; a tall fighter gets them only where the focus calls for them. */
 export const INSIDE = new Set([
   'tyson-huh', 'tyson-slip', 'tyson-uppercuts', 'tyson-body-head', 'tyson-switch', 'tyson-killer', 'peekaboo-killer', 'peekaboo',
   'close-range', 'off-ropes', 'body-hooks-finish', 'body-uppers', 'shift-upper-hook', 'gazelle', 'hooks-liver', 'liver-cross', 'tap-uppercut', 'cross-hook-upper',
 ]);
 
-// Same focus per block, built for a tall boxer (around 2 m): jab-led, straight punches, distance kept or retaken
-// with the feet, angle exits after the combination. Hooks and uppercuts stay where the distance allows them.
-const FOCUS_TALL: Record<string, string[]> = {
+// Same boxing focus per block, built for a tall boxer (around 2 m): jab-led, straight punches, distance kept or
+// retaken with the feet, angle exits after the combination. Hooks and uppercuts stay where the distance allows them.
+const BOX_FOCUS_TALL: Record<string, string[]> = {
   jab: ['jab', 'double-jab', 'jab-out', 'jab-step-in', 'jab-circle', 'double-jab-back', 'one-two-angle', 'step-jab-cross-back', 'ghost-step', 'pull-counter'],
   move: ['one-two-angle', 'double-jab-cross-exit', 'step-jab-cross-back', 'jab-step-in', 'jab-out', 'jab-reset-reenter', 'jab-circle', 'fake-jab-cross', 'check-hook', 'one-two-hook-pivot'],
   slow: ['jab', 'double-jab', 'one-two', 'one-two-angle', 'jab-body-cross', 'jab-cross-hook', 'guard-reset', 'beginner-defense', 'pull-counter'],
@@ -375,8 +538,20 @@ const FOCUS_TALL: Record<string, string[]> = {
   distance: ['jab', 'double-jab', 'double-jab-back', 'jab-out', 'jab-reset-reenter', 'step-jab-cross-back', 'pull-counter', 'ghost-step', 'one-two-angle', 'fake-jab-cross'],
 };
 
-/** The order in which the combinations are learned, two per week: basics first, the long ones last. */
-const LEARN = [
+/**
+ * The order in which the material is learned, one new item a week: the kicking basics first, one at a time, each
+ * paired with what it opens; the long chains and the high kick last. Item 0 is the 1-2 the user already knows, so
+ * the first kickboxing week (2026-11-02) reviews it while the teep is new. The boxing order follows.
+ */
+const KB_LEARN = [
+  'one-two', 'kb-teep', 'kb-low', 'kb-check', 'kb-jab-teep', 'kb-12-low', 'kb-knee', 'kb-teep-on-entry', 'kb-inside', 'kb-check-cross',
+  'kb-body', 'kb-jab-knee', 'kb-123-low', 'kb-low-on-step', 'kb-circle-teep', 'kb-check-teep', 'kb-hook-body', 'kb-double-jab-low',
+  'kb-jab-inside', 'kb-lean-knee', 'kb-inside-cross', 'kb-fake-teep-low', 'kb-cross-lbody', 'kb-12-teep', 'kb-clinch-knee', 'kb-rear-teep',
+  'kb-hoost-chain', 'kb-body-high',
+];
+
+/** The boxing learning orders from before, now after the kickboxing material. */
+const BOX_LEARN = [
   'one-two', 'jab-cross-hook', 'double-jab', 'jab-out', 'simple-body', 'body-head', 'beginner-defense', 'guard-reset',
   'body-body-head', 'liver', 'double-onetwo', 'fake-jab-cross', 'jab-upper-roll', 'four-punch', 'cross-hook-upper', 'body-uppers', 'pull-counter', 'step-overhand', 'check-hook', 'hook-setup',
   'favorite', 'combo-of-day', 'tyson-huh', 'tyson-slip', 'peekaboo', 'alphabet', 'tyson-uppercuts', 'tyson-body-head',
@@ -385,18 +560,17 @@ const LEARN = [
 ];
 const FIRST_WEEK = '2026-10-26';
 
-/** The order for a boxer from TALL_CM up: long range, the jab and the exits first, a defence early, and no inside fighting. */
-const LEARN_TALL = [
+const BOX_LEARN_TALL = [
   'double-jab', 'jab-step-in', 'jab-out', 'one-two', 'catch-step-jab', 'one-two-angle', 'double-jab-back', 'jab-circle', 'step-jab-cross-back',
   'guard-reset', 'jab-body-cross', 'pull-counter', 'jab-reset-reenter', 'double-jab-cross-exit', 'jab-cross-hook', 'one-two-hook-pivot',
   'corner-exit', 'clinch-exit', 'check-hook', 'jab-feint-cross', 'liver-setup',
 ];
 
-/** The learning order. A tall boxer gets the long-range order; inside-fighting combinations stay in the library only. */
+/** The learning order: kickboxing first, then the boxing order (the long-range one for a tall fighter, without inside fighting). */
 export function learnOrder(heightCm = 0): Combo[] {
-  const ids = heightCm >= TALL_CM ? LEARN_TALL : LEARN;
-  const listed = ids.map((id) => COMBOS.find((c) => c.id === id)).filter((c): c is Combo => !!c);
-  return [...listed, ...COMBOS.filter((c) => !ids.includes(c.id) && c.id !== 'jab' && !(heightCm >= TALL_CM && INSIDE.has(c.id)))];
+  const tall = heightCm >= TALL_CM;
+  const ids = [...KB_LEARN, ...(tall ? BOX_LEARN_TALL : BOX_LEARN).filter((id) => !KB_LEARN.includes(id))];
+  return [...byIds(ids), ...COMBOS.filter((c) => !ids.includes(c.id) && c.id !== 'jab' && !(tall && INSIDE.has(c.id)))];
 }
 
 /** Week number in the learning plan (0 = the week the app got this feature). */
@@ -420,28 +594,65 @@ export function recentCombos(n: number, week = learnWeek(), heightCm = 0): Combo
   return Array.from({ length: Math.min(n, all.length) }, (_, k) => all[(week - k + all.length * 4) % all.length]);
 }
 
-const POWER_PUNCH = /Hook|Uppercut|Overhand|Gazelle/;
-const PUNCH = /Cross|Hook|Uppercut|Overhand|Body|Straight|Right|Left|Gazelle|Tap/;
-const MOVE = /Step|Pivot|Circle|Move|Slip|Pull|Lean|Ghost|Frame|Catch|Push off/;
-
-/** Defensive distance work: leave the pocket, retake the range. Tall boxers get a round of it in every boxing block. */
-const DEFENSE_IDS = ['pull-counter', 'double-jab-back', 'jab-reset-reenter', 'check-hook', 'clinch-exit', 'corner-exit', 'catch-step-jab', 'beginner-defense'];
-
 export interface RoundTheme {
   name: string;
   cue: string;
   combos: Combo[];
 }
 
-const THEME_DEFS: Record<string, { name: string; cue: string; pick: (c: Combo) => boolean }> = {
+interface ThemeDef {
+  name: string;
+  cue: string;
+  pick: (c: Combo) => boolean;
+}
+
+// ---------- kickboxing themes ----------
+
+const KB_MOVE = /Step|Pivot|Circle|Move|Slip|Pull|Lean|Ghost|Frame|Catch|Push off|Read|Reset|Clinch|Fake/;
+const isMove = (s: string): boolean => KB_MOVE.test(s);
+const LONG = /^(Jab|Lead Teep|Rear Teep)/;
+const KICKS = /Kick|Teep/;
+const KNEE = /Knee/;
+const PUNCHES = /Jab|Cross|Hook|Uppercut|Overhand|Straight/;
+/** The last strike of a combination (moves and checks left out). */
+const lastStrike = (c: Combo): string => [...c.seq].reverse().find((s) => !isMove(s) && s !== 'Check') ?? '';
+
+/** Check, teep and distance: the defensive round a tall fighter gets in every block. */
+const KB_DEFENSE = ['kb-check-cross', 'kb-check-teep', 'kb-teep-on-entry', 'kb-low-on-step', 'kb-circle-teep', 'kb-lean-knee', 'kb-clinch-knee', 'pull-counter', 'double-jab-back', 'clinch-exit', 'corner-exit'];
+
+const KB_THEMES: Record<string, ThemeDef> = {
+  long: { name: 'Jab și teep', cue: 'Doar armele lungi: jab simplu, dublu, la corp, și teep-ul care îl ține afară.', pick: (c) => c.seq.some((s) => LONG.test(s)) && c.seq.every((s) => isMove(s) || LONG.test(s)) },
+  kicks: { name: 'Lovituri de picior', cue: 'Teep, low kick, body kick: pivot pe vârf, călcâiul spre țintă, apoi revii imediat în gardă.', pick: (c) => c.seq.some((s) => KICKS.test(s)) },
+  dutch: { name: 'Pumni, apoi piciorul', cue: 'Stil olandez: pumnii pregătesc, piciorul închide. După kick ieși în unghi.', pick: (c) => c.seq.some((s) => PUNCHES.test(s)) && KICKS.test(lastStrike(c)) },
+  knees: { name: 'Genunchi la intrare', cue: 'Când intră sau se apleacă: genunchiul din spate, stai înalt, capul puțin pe spate.', pick: (c) => c.seq.some((s) => KNEE.test(s)) },
+  defense: { name: 'Check, teep și distanță', cue: 'Check la low kick și răspuns imediat; teep când intră; ieși în cerc, nu înapoi în linie dreaptă.', pick: (c) => KB_DEFENSE.includes(c.id) },
+};
+
+const KB_THEMES_BY_FOCUS: Record<string, string[]> = {
+  jab: ['long', 'kicks', 'defense'],
+  move: ['dutch', 'kicks', 'long', 'defense'],
+  power: ['dutch', 'knees', 'kicks', 'defense'],
+  distance: ['long', 'defense', 'knees'],
+};
+
+// ---------- boxing themes (the no-kick fallback) ----------
+
+const POWER_PUNCH = /Hook|Uppercut|Overhand|Gazelle/;
+const PUNCH = /Cross|Hook|Uppercut|Overhand|Body|Straight|Right|Left|Gazelle|Tap/;
+const MOVE = /Step|Pivot|Circle|Move|Slip|Pull|Lean|Ghost|Frame|Catch|Push off/;
+
+/** Defensive distance work: leave the pocket, retake the range. Tall boxers get a round of it in every boxing block. */
+const BOX_DEFENSE = ['pull-counter', 'double-jab-back', 'jab-reset-reenter', 'check-hook', 'clinch-exit', 'corner-exit', 'catch-step-jab', 'beginner-defense'];
+
+const BOX_THEMES: Record<string, ThemeDef> = {
   jab: { name: 'Doar jab', cue: 'Doar mâna din față: simplu, dublu, la corp, din mișcare.', pick: (c) => c.seq.some((s) => /Jab/.test(s)) && !c.seq.some((s) => PUNCH.test(s)) },
   straight: { name: 'Drepte și ieșire', cue: 'Jab și cross pe toată distanța, apoi ieși din linie.', pick: (c) => c.seq.some((s) => /Cross/.test(s)) && !c.seq.some((s) => POWER_PUNCH.test(s)) && c.seq.some((s) => MOVE.test(s)) },
   power: { name: 'Putere și unghi', cue: 'Greutatea transferată, apoi pivot sau pas lateral.', pick: (c) => c.seq.some((s) => POWER_PUNCH.test(s) || /Pivot/.test(s)) },
-  defense: { name: 'Apărare la distanță', cue: 'Ieși din buzunar, reiei distanța, contrezi de la capătul jabului.', pick: (c) => DEFENSE_IDS.includes(c.id) },
+  defense: { name: 'Apărare la distanță', cue: 'Ieși din buzunar, reiei distanța, contrezi de la capătul jabului.', pick: (c) => BOX_DEFENSE.includes(c.id) },
   free: { name: 'Combinații libere', cue: 'Tot ce ai lucrat, legat, cu ieșire la final.', pick: () => true },
 };
 
-const THEMES_BY_FOCUS: Record<string, string[]> = {
+const BOX_THEMES_BY_FOCUS: Record<string, string[]> = {
   jab: ['jab', 'straight', 'defense'],
   move: ['straight', 'jab', 'power', 'defense'],
   combo: ['straight', 'power', 'free'],
@@ -463,30 +674,47 @@ function learningThemes(heightCm: number): RoundTheme[] {
   ];
 }
 
-/** One theme per round, cycling: round r uses themes[(r - 1) % length]. Themes with fewer than 2 combos are dropped. */
-export function roundThemes(focus: string | undefined, heightCm = 0): RoundTheme[] {
-  if (focus === 'combo') return learningThemes(heightCm);
-  const keys = THEMES_BY_FOCUS[focus ?? ''];
-  if (!keys) return [];
-  const tall = heightCm >= TALL_CM;
-  const pool = focusCombos(focus, heightCm);
-  const extra = COMBOS.filter((c) => DEFENSE_IDS.includes(c.id) && (tall || !['clinch-exit', 'corner-exit'].includes(c.id)));
-  const list = (tall ? keys : keys.filter((k) => k !== 'defense' || focus === 'jab' || focus === 'distance'))
+function themesFrom(defs: Record<string, ThemeDef>, keys: string[], focus: string, pool: Combo[], extra: Combo[], tall: boolean): RoundTheme[] {
+  return (tall ? keys : keys.filter((k) => k !== 'defense' || focus === 'jab' || focus === 'distance'))
     .map((k) => {
-      const d = THEME_DEFS[k];
+      const d = defs[k];
       const src = k === 'defense' ? extra : pool;
       return { name: d.name, cue: d.cue, combos: src.filter(d.pick) };
     })
     .filter((t) => t.combos.length >= 2);
-  return list;
 }
 
-/** heightCm: the boxer's height from the profile; tall boxers get the long-range set. */
-export function focusCombos(focus: string | undefined, heightCm = 0): Combo[] {
+/**
+ * One theme per round, cycling: round r uses themes[(r - 1) % length]. Themes with fewer than 2 combos are dropped.
+ * kicks = false (a sore knee): boxing themes on the boxing sets, and Thursday's learning rounds become boxing rounds.
+ */
+export function roundThemes(focus: string | undefined, heightCm = 0, kicks = true): RoundTheme[] {
+  const tall = heightCm >= TALL_CM;
+  const f = focus ?? '';
+  if (!kicks) {
+    if (f === 'combo') return [{ name: 'Combinații de box', cue: 'Azi fără lovituri de picior: genunchiul are nevoie de pauză.', combos: focusCombos('combo', heightCm, false) }];
+    const keys = BOX_THEMES_BY_FOCUS[f];
+    if (!keys) return [];
+    const extra = COMBOS.filter((c) => BOX_DEFENSE.includes(c.id) && (tall || !['clinch-exit', 'corner-exit'].includes(c.id)));
+    return themesFrom(BOX_THEMES, keys, f, focusCombos(f, heightCm, false), extra, tall);
+  }
+  if (f === 'combo') return learningThemes(heightCm);
+  const keys = KB_THEMES_BY_FOCUS[f];
+  if (!keys) return [];
+  const extra = COMBOS.filter((c) => KB_DEFENSE.includes(c.id) && (tall || !['clinch-exit', 'corner-exit', 'kb-clinch-knee'].includes(c.id)));
+  return themesFrom(KB_THEMES, keys, f, focusCombos(f, heightCm), extra, tall);
+}
+
+/**
+ * heightCm: the fighter's height from the profile; tall fighters get the long-range sets.
+ * kicks = false when the last Leg Day's knee note was bad: the boxing sets, no kicks, no knees, no checks.
+ */
+export function focusCombos(focus: string | undefined, heightCm = 0, kicks = true): Combo[] {
+  const tall = heightCm >= TALL_CM;
+  if (!kicks) return byIds((tall ? BOX_FOCUS_TALL : BOX_FOCUS)[focus === 'week' || !focus ? 'combo' : focus] ?? []);
   const week = weekCombos(learnWeek(), heightCm);
   if (focus === 'week') return week;
-  const ids = (heightCm >= TALL_CM ? FOCUS_TALL : FOCUS)[focus ?? ''] ?? [];
-  const list = ids.map((id) => COMBOS.find((c) => c.id === id)).filter((c): c is Combo => !!c);
+  const list = byIds((tall ? KB_FOCUS_TALL : KB_FOCUS)[focus ?? ''] ?? []);
   // "focus on combinations": the combinations of the week are called there too, so they stick
   return focus === 'combo' ? [...week, ...list.filter((c) => !week.includes(c))] : list;
 }
@@ -497,11 +725,11 @@ export function tiktokUrl(vid: string): string {
 
 export const FOCUS_LINE: Record<string, string> = {
   week: 'Combinațiile săptămânii',
-  jab: 'Jab & Footwork',
-  move: 'Punches & Movement',
+  jab: 'Jab, Teep & Footwork',
+  move: 'Strikes & Movement',
   combo: 'Combinations',
-  power: 'Angle Changes & Power',
-  slow: 'Slow, Clean Strikes',
+  power: 'Dutch Combinations & Power',
+  slow: 'Slow, Clean Technique',
   distance: 'Distance Work',
   rope: 'Joc de picioare ușor',
   ladder: 'Pași rapizi și preciși',

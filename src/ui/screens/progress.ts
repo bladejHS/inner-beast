@@ -95,12 +95,12 @@ function entryLine(e: Entry, del = false): string {
 
 function boxHtml(today: string): string {
   const b = boxStats(ctx.S.log, today);
-  if (!b.rounds && !b.punches) return '<h2 class="sec first">Box</h2><p class="dim">După primele runde vezi aici statisticile.</p>';
+  if (!b.rounds && !b.punches) return '<h2 class="sec first">Kickboxing</h2><p class="dim">După primele runde vezi aici statisticile.</p>';
   const diff = Math.round(b.min30 - b.minPrev30);
   const known = learned();
   const cy = boxCycle(ctx.S.log, today);
   const rare = COMBOS.filter((c) => known.has(c.id)).sort((x, y) => (b.called[x.name] ?? 0) - (b.called[y.name] ?? 0)).slice(0, 3);
-  return `<h2 class="sec first">Box<small>Ultimele 30 de zile: ${Math.round(b.min30)} min, ${diff >= 0 ? '+' : '−'}${Math.abs(diff)} față de cele 30 dinainte</small></h2>
+  return `<h2 class="sec first">Kickboxing<small>Ultimele 30 de zile: ${Math.round(b.min30)} min, ${diff >= 0 ? '+' : '−'}${Math.abs(diff)} față de cele 30 dinainte</small></h2>
     <div class="stats">
       <div class="stat"><b>${b.rounds}</b><span>runde în total</span></div>
       <div class="stat"><b>${Math.round(b.bagMin)}</b><span>minute la sac</span></div>
@@ -109,8 +109,8 @@ function boxHtml(today: string): string {
       ${b.punches ? `<div class="stat"><b>${b.punches}</b><span>lovituri numărate cu camera</span></div>` : ''}
     </div>
     ${cy
-      ? `<div class="ex-line"><div><b>Scor box, săptămâna ${cy.week} din 8</b><span>Ținta la săptămâna ${cy.check}: ${cy.target}. Acum: ${cy.now ?? '–'}, ai pornit de la ${cy.base}.</span></div>${spark(cy.scores)}</div>`
-      : '<p class="small dim">Notează tehnica și efortul la finalul a 3 sesiuni și primești scorul de box, cu ținte la săptămânile 4 și 8.</p>'}
+      ? `<div class="ex-line"><div><b>Scor de kickboxing, săptămâna ${cy.week} din 8</b><span>Ținta la săptămâna ${cy.check}: ${cy.target}. Acum: ${cy.now ?? '–'}, ai pornit de la ${cy.base}.</span></div>${spark(cy.scores)}</div>`
+      : '<p class="small dim">Notează tehnica și efortul la finalul a 3 sesiuni și primești scorul de kickboxing, cu ținte la săptămânile 4 și 8.</p>'}
     ${b.guard.length > 1 ? `<p class="small dim" style="margin-bottom:0">Garda sus, % din timp</p>${spark(b.guard)}` : ''}
     ${rare.length ? `<p class="small dim">Exersate cel mai rar dintre cele învățate: ${rare.map((c) => esc(c.name)).join(', ')}.</p>` : ''}`;
 }

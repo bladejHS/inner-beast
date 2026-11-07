@@ -48,7 +48,7 @@ export function settingsHtml(): string {
     ${row('Animații', mo === 'lite' ? 'Reduse: fără zgârieturi între ecrane, fără explozii la runde' : 'Complete: zgârieturi între ecrane, runde care lovesc, scântei la final', `<div class="chips">${[['full', 'Complete'], ['lite', 'Reduse']].map(([v, l]) => `<button class="chip" aria-pressed="${mo === v}" data-a="set-motion" data-v="${v}">${l}</button>`).join('')}</div>`)}
     ${row('Intro la pornire', 'Automat: complet la prima pornire și după o versiune nouă, altfel doar lupul, o clipă', `<div class="chips">${[['auto', 'Automat'], ['full', 'Mereu'], ['short', 'Scurt'], ['off', 'Oprit']].map(([v, l]) => `<button class="chip" aria-pressed="${op === v}" data-a="set-opening" data-v="${v}">${l}</button>`).join('')}</div>`)}
     <h2 class="sec">Runde</h2>
-    ${row('Combinații strigate', 'În rundele de shadow boxing, sac și coardă', `<div class="chips">${[0, 10, 15, 20, 30].map((v) => `<button class="chip" aria-pressed="${s.callEvery === v}" data-a="set-call" data-v="${v}">${v ? `${v} s` : 'Oprit'}</button>`).join('')}</div>`)}
+    ${row('Combinații strigate', 'În rundele de shadow, sac și coardă', `<div class="chips">${[0, 10, 15, 20, 30].map((v) => `<button class="chip" aria-pressed="${s.callEvery === v}" data-a="set-call" data-v="${v}">${v ? `${v} s` : 'Oprit'}</button>`).join('')}</div>`)}
     ${row('Pauză la rundele de 3 minute', 'Cartea nu o precizează; standardul în box e 1 minut', step('rest3', mm(s.rest3), 'Pauză 3 minute'))}
     ${row('Pauză la intervalele de 1 minut', 'Timerul rapid de Wall Sit / Jumping Squats', step('rest1', mm(s.rest1), 'Pauză 1 minut'))}
     <h2 class="sec">Puls<small>Pentru vâslitul de marți și alergarea de duminică, cu centura de puls.</small></h2>

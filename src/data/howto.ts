@@ -278,31 +278,105 @@ export const HOW: Record<string, How> = {
   },
 
   // ---------- timer blocks ----------
-  'Shadow Boxing': {
+  'Shadow Kickboxing': {
     steps: [
-      'Poziția de luptă: piciorul stâng în față (dreptaci), tălpile la lățimea umerilor, genunchii ușor îndoiți.',
-      'Garda sus: pumnii la bărbie, coatele pe lângă corp, bărbia jos.',
-      'Lovești aerul pe toată distanța, cu brațul întins complet, și aduci mâna imediat înapoi în gardă.',
-      'Te miști între lovituri: pași mici, fără să încrucișezi picioarele, plus eschive și schimbări de unghi.',
+      'Poziția de kickboxing: piciorul stâng în față (dreptaci), tălpile la lățimea umerilor, greutatea puțin mai mult pe piciorul din spate, ca cel din față să fie ușor pentru teep și check.',
+      'Garda sus: pumnii la bărbie, coatele strânse pe coaste, bărbia jos.',
+      'Pumnii pe toată distanța, kick-urile cu pivot pe vârful piciorului de sprijin. După fiecare lovitură revii în gardă, echilibrat.',
+      'Te miști între lovituri: pași mici, ieșiri în cerc și unghiuri, fără să încrucișezi picioarele.',
       'Ascultă combinațiile strigate de aplicație și leagă-le de mișcare.',
     ],
-    mistake: 'Să lovești pe jumătate și să stai pe loc. Alex: fiecare pumn pe toată distanța, relaxat până la impact.',
+    mistake: 'Să rămâi cu piciorul în aer după kick sau cu garda jos. Kick-ul se termină abia când ești înapoi în gardă.',
   },
-  'Easy Shadow Boxing': {
+  'Easy Shadow Kickboxing': {
     steps: [
-      'Aceeași poziție de luptă, dar la jumătate de viteză.',
-      'Fiecare lovitură curată, întinsă complet, cu rotația șoldului și a umărului.',
-      'Verifici unde rămâi descoperit și cum îți muți greutatea. Respiri calm, ca la recuperare.',
+      'Aceeași poziție de kickboxing, la jumătate de viteză.',
+      'Fiecare kick lent, pe bucăți: genunchiul sus, pivotul, șoldul, revenirea în gardă.',
+      'Verifici unde rămâi descoperit și dacă revii stabil pe picioare. Respiri calm, ca la recuperare.',
     ],
   },
   'Heavy Bag Training': {
     steps: [
-      'Bandaje și mănuși grele (14–16 oz la un om înalt și greu). Te așezi la o lungime de braț de sac, în gardă.',
-      'Lovești cu tot corpul: împingi din picior, rotești șoldul și umărul, pumnul strâns doar la impact.',
-      'După fiecare combinație ieși din linie sau schimbi unghiul, nu rămâi în fața sacului.',
-      'Expiri scurt la fiecare lovitură și aduci mâna înapoi la bărbie.',
+      'Bandaje și mănuși grele (14–16 oz la un om înalt și greu). Te așezi la distanța de jab, în gardă.',
+      'Pumnii cu tot corpul: împingi din picior, rotești șoldul și umărul, pumnul strâns doar la impact.',
+      'Kick-urile cu tibia, nu cu laba: pivot pe vârful piciorului de sprijin, șoldul trece prin sac. Dacă sacul nu coboară până la coapsă, low kick-urile le dai în partea lui de jos; un sac lung (150–180 cm) e cel mai bun pentru picioare.',
+      'Tibia se obișnuiește treptat: primele săptămâni lovești ușor, apoi crești puterea de la o săptămână la alta.',
+      'După fiecare combinație ieși din linie sau schimbi unghiul. Expiri scurt la fiecare lovitură.',
     ],
-    mistake: 'Să împingi sacul în loc să-l pocnești și să lași garda jos după pumn. Dacă te dor încheietura sau încheieturile degetelor, te oprești: mâna e cea mai accidentată zonă la boxeri.',
+    mistake: 'Să lovești cu laba sau cu glezna (oase mici, se rup ușor) și să pivotezi pe o talpă care se agață: genunchiul se răsucește. Lovești desculț, pe o suprafață pe care piciorul se poate roti. Dacă te dor încheieturile, tibia sau genunchiul, te oprești.',
+  },
+  // ---------- kickboxing techniques (Lupte → Combinații) ----------
+  'Kickboxing Stance': {
+    steps: [
+      'Piciorul stâng în față (dreptaci), tălpile la lățimea umerilor, șoldurile pe jumătate spre adversar: nu complet din profil ca la box, ca să poți ridica piciorul din față.',
+      'Greutatea puțin mai mult pe piciorul din spate: cel din față rămâne ușor, gata de teep sau de check.',
+      'Genunchii ușor îndoiți, nu adânc: la 2 m, o poziție joasă îți obosește genunchii și te scurtează. Stai înalt și lovești în jos.',
+      'Garda sus și coatele strânse pe coaste: corpul tău e ținta preferată a celor mai scunzi.',
+      'Distanța ta e la capătul jabului și al teep-ului: acolo tu ajungi la el, el nu ajunge la tine.',
+    ],
+    mistake: 'Poziția de box, lungă și aplecată pe piciorul din față: piciorul acela devine țintă pentru low kick și nu-l mai poți ridica la timp.',
+  },
+  Teep: {
+    steps: [
+      'Din gardă, ridici genunchiul din față sus, spre piept, cu degetele trase înapoi.',
+      'Împingi talpa (perna de sub degete) drept înainte, prin pieptul sau șoldul lui, și duci șoldul înainte la final.',
+      'Trunchiul se lasă puțin pe spate, garda rămâne sus, piciorul de sprijin e ușor îndoit.',
+      'Piciorul se întoarce pe același drum, în gardă, sau îl pui jos în față dacă intri cu un jab.',
+    ],
+    mistake: 'Să-l dai ca pe un șut de jos în sus, fără să ridici genunchiul: nu împinge, iar piciorul ți-l prinde ușor.',
+  },
+  'Low Kick': {
+    steps: [
+      'Pas mic în afară cu piciorul din față, pe vârf: îți deschide șoldul și îți scoate capul din linia lui.',
+      'Pivotezi pe vârful piciorului de sprijin până când călcâiul ajunge spre el; genunchiul de sprijin rămâne ușor îndoit. Așa se rotește tot corpul, iar genunchiul nu e răsucit.',
+      'Șoldul trece prin țintă și lovești cu tibia (între genunchi și gleznă) în exteriorul coapsei lui; piciorul trece prin țintă ca o bâtă.',
+      'Brațul de pe partea piciorului care lovește coboară spre spate pentru echilibru, cealaltă mână stă la bărbie.',
+      'Piciorul se întoarce pe același drum și ești din nou în gardă.',
+    ],
+    mistake: 'Talpa de sprijin lipită de sol: corpul nu se poate roti, iar toată răsucirea intră în genunchi. Și lovitura cu laba sau cu glezna, în loc de tibie.',
+  },
+  'Inside Low Kick': {
+    steps: [
+      'Fără pas mare: ridici scurt piciorul din față și lovești în interiorul coapsei sau al gambei lui, cu tibia.',
+      'Rotația e mică, din șold, iar piciorul de sprijin urcă pe vârf.',
+      'Revii imediat în gardă: e o lovitură rapidă, care îi strică pasul, nu una de putere.',
+    ],
+    mistake: 'Să o încarci ca pe un low kick mare: pierzi viteza și rămâi cu greutatea pe piciorul din față.',
+  },
+  'Body Kick': {
+    steps: [
+      'Ca la low kick: pas mic în afară, pivot complet pe vârf, călcâiul spre el.',
+      'Șoldul se rotește complet și tibia lovește coastele, la mijlocul corpului; piciorul trece prin țintă.',
+      'Brațul din aceeași parte coboară, cealaltă mână apără fața.',
+      'Ridici piciorul doar cât îți permite mobilitatea: puterea vine din rotație, nu din înălțime.',
+    ],
+    mistake: 'Să ridici genunchiul îndoit și să întinzi doar gamba, fără șold: lovitura nu are putere și te dezechilibrează.',
+  },
+  Knee: {
+    steps: [
+      'Din gardă, împingi șoldul înainte și ridici genunchiul din spate drept în corpul lui, cu vârful piciorului în jos.',
+      'Te ridici pe vârful piciorului de sprijin și te lași puțin pe spate, ca să-ți scoți capul din linia lui.',
+      'Mâinile țin garda sau îi controlează scurt capul și umerii, în clinci.',
+      'Revii imediat în gardă; în kickboxing dai o singură lovitură din clinci, apoi ieși.',
+    ],
+    mistake: 'Să ridici genunchiul fără șold: e o ridicare, nu o lovitură. Și fără săritură: genunchii zburători rămân deoparte cât timp te dor genunchii.',
+  },
+  Check: {
+    steps: [
+      'Ridici piciorul din față: genunchiul sus și ușor în afară, ca tibia ta să întâlnească lovitura lui.',
+      'Garda sus și strânsă: un low kick vine des după un pumn.',
+      'Piciorul de sprijin ușor îndoit; stai drept, nu te lași pe spate.',
+      'Pui piciorul jos și răspunzi imediat: cross sau teep.',
+    ],
+    mistake: 'Să ridici genunchiul drept în sus, așa că lovitura intră în coapsă, sau să te uiți în jos după picior.',
+  },
+  'High Kick': {
+    steps: [
+      'Ca body kick-ul: pas în afară, pivot complet pe vârf, șoldul trece prin țintă.',
+      'Ținta e gâtul sau capul; la un adversar mai scund e mai jos decât crezi.',
+      'Doar cât de sus îți permite mobilitatea, fără să forțezi. În plan vine târziu, după ce body kick-ul iese curat.',
+    ],
+    mistake: 'Să te lași mult pe spate ca să ajungi sus: pierzi echilibrul, iar un picior prins sus te trântește. Kick-urile înalte încarcă cel mai mult piciorul de sprijin (Journal of Sports Science and Medicine, 2021).',
   },
   'Punch-out': {
     steps: [

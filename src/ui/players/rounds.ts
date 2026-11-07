@@ -1,7 +1,8 @@
-// Round timer for Shadow Boxing, Heavy Bag, punch-outs, Jumping Rope / Agility Ladder, easy cardio and the
-// Wall Sit / Jumping Squats quick timer, with Alex Hanma's combinations called out during the rounds.
+// Round timer for Shadow Kickboxing, Heavy Bag, punch-outs, Jumping Rope / Agility Ladder, easy cardio and the
+// Wall Sit / Jumping Squats quick timer, with the kickboxing combinations called out during the rounds (Alex Hanma's
+// boxing ones on a day the knee note says no kicks).
 
-import { BURST, BURST_SEC, WARMUP, type ComboFocus } from '../../data/plan.ts';
+import { BURST, BURST_SEC, WARMUP, WARMUP_SEC, type ComboFocus } from '../../data/plan.ts';
 import { focusCombos, LADDER_MOVES, ROPE_MOVES, FOCUS_LINE, roundThemes, type Combo, type RoundTheme } from '../../data/combos.ts';
 
 /** The e-book's focus line for each block, as printed on the plan page. */
@@ -20,6 +21,7 @@ import { deloadOn, lighter } from '../../logic/progress.ts';
 import { makeEntry, type Entry } from '../../logic/store.ts';
 import { dayKey, esc, mmss } from '../../logic/util.ts';
 import { zone2, zoneHard } from '../../logic/runlog.ts';
+import { kneeSore, legDays, type LegDay } from '../../logic/knee.ts';
 import { buzz, say, sfx, unlock, hush } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
 import { slam } from '../fx.ts';
@@ -83,6 +85,8 @@ class RoundsPlayer implements Player {
   tip = '';
   saved = false;
   themes: RoundTheme[] = [];
+  /** The last Leg Day, when its knee note rules out kicks today. */
+  sore: LegDay | null = null;
   /** Sprint finish on the later rounds; on by default at the bag. */
   sprint: boolean;
   sprinting = false;
@@ -97,8 +101,10 @@ class RoundsPlayer implements Player {
     this.cfg = { ...cfg };
     if (this.deload) this.cfg.rounds = lighter(cfg.rounds);
     if (cfg.legSwap) this.cfg.name = ctx.S.set.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit';
+    // a bad knee note on the last Leg Day: boxing rounds today, no kicks (logic/knee.ts)
+    this.sore = cfg.focus && !isDrill(cfg.focus) && cfg.focus !== 'legs' ? kneeSore(legDays(ctx.S.log, ctx.S.knee), dayKey()) : null;
     this.calls = cfg.cardio || cfg.hiit || cfg.burstFrom === 1 ? [] : this.buildCalls();
-    this.themes = cfg.rounds > 1 && !cfg.cardio && !cfg.hiit && cfg.burstFrom !== 1 ? roundThemes(cfg.focus, ctx.S.nut.h) : [];
+    this.themes = cfg.rounds > 1 && !cfg.cardio && !cfg.hiit && cfg.burstFrom !== 1 ? roundThemes(cfg.focus, ctx.S.nut.h, !this.sore) : [];
     this.caller = this.calls.length > 0 && ctx.S.set.callEvery > 0;
     // Off by default: long all-out finishes wear technique down; the tested burst format is the punch-out.
     this.sprint = false;
@@ -122,7 +128,7 @@ class RoundsPlayer implements Player {
   buildCalls(): Call[] {
     const f = this.cfg.focus;
     if (isDrill(f)) return (f === 'ladder' ? LADDER_MOVES : ROPE_MOVES).map((m) => ({ name: m.name, seq: [], say: m.call, note: m.note }));
-    return focusCombos(f, ctx.S.nut.h).map((c: Combo) => ({ name: c.name, seq: c.seq, say: c.call, note: c.note }));
+    return focusCombos(f, ctx.S.nut.h, !this.sore).map((c: Combo) => ({ name: c.name, seq: c.seq, say: c.call, note: c.note }));
   }
 
   callsHtml(): string {
@@ -133,7 +139,7 @@ class RoundsPlayer implements Player {
       .map((c) => `<li><b>${esc(c.name)}</b>${c.seq.length ? `<span>${esc(c.seq.join(' → '))}</span>` : ''}</li>`)
       .join('');
     return `<details class="how" ${isDrill(f) ? '' : 'open'}><summary>${isDrill(f) ? 'Mișcările' : 'Combinațiile'} (${this.calls.length})</summary><div class="how-body">
-      ${book ? `<p class="small" style="margin:0 0 8px"><b>Din carte:</b> ${esc(book)}</p>` : ''}
+      ${book ? `<p class="small" style="margin:0 0 8px"><b>Din carte:</b> ${esc(book)}${this.sore || isDrill(f) ? '' : ', adaptat pentru kickboxing'}</p>` : ''}
       <ul class="calls">${list}</ul>
       <p class="small dim" style="margin:6px 0 0">Ți le strig pe rând în timpul rundelor. Le găsești explicate în Lupte.</p>
     </div></details>`;
@@ -168,6 +174,7 @@ class RoundsPlayer implements Player {
       ${c.focus && FOCUS_LINE[c.focus] && !c.cardio ? `<p class="pl-sub">${esc(FOCUS_LINE[c.focus])}</p>` : ''}
       ${burstBox}
       ${this.deload ? `<div class="advice">Săptămână ușoară: ${c.rounds} ${c.rounds === 1 ? 'rundă' : 'runde'}, fără să forțezi.</div>` : ''}
+      ${this.sore && this.calls.length ? `<div class="advice">Genunchiul: la ultimul Leg Day ai notat ${Math.max(this.sore.d ?? 0, this.sore.m ?? 0)} din 10. Azi îți strig doar combinații de box, fără kick-uri și genunchi.</div>` : ''}
       ${c.cardio ? this.zoneHtml() : ''}
       ${c.hiit ? this.hardHtml(true) : ''}
       ${c.tip ? `<p class="dim">${esc(c.tip)}</p>` : ''}
@@ -178,11 +185,11 @@ class RoundsPlayer implements Player {
       ${this.callsHtml()}
       <div class="setup">
         ${legs}
-        ${c.warmup ? field('Încălzire', switchCtl('p:warm', this.warm, 'Încălzire'), `${WARMUP.length} mișcări, 6 min, înainte de runda 1`) : ''}
+        ${c.warmup ? field('Încălzire', switchCtl('p:warm', this.warm, 'Încălzire'), `${WARMUP.length} mișcări, ${Math.round(WARMUP_SEC / 60)} min, înainte de runda 1`) : ''}
         ${this.calls.length && !isDrill(c.focus) && c.rounds > 1 && c.work >= 90 && !bursts ? field('Sprint final', switchCtl('p:sprint', this.sprint, 'Sprint final'), `Ultimele ${SPRINT} s din a doua jumătate a rundelor`) : ''}
         ${c.cardio ? '' : field('Runde', stepper('p:rounds', String(c.rounds), 'Runde'))}
         ${c.burstFrom === 1 ? '' : field(c.cardio ? 'Durată' : 'Lucru', stepper('p:work', mmss(c.work), c.cardio ? 'Durată' : 'Lucru'))}
-        ${c.rounds > 1 ? field('Pauză', stepper('p:rest', mmss(c.rest), 'Pauză'), bursts === c.rounds ? 'Un minut între runde, ca în protocolul testat' : 'Cartea nu dă pauza; 1 minut e standardul din box') : ''}
+        ${c.rounds > 1 ? field('Pauză', stepper('p:rest', mmss(c.rest), 'Pauză'), bursts === c.rounds ? 'Un minut între runde, ca în protocolul testat' : 'Cartea nu dă pauza; 1 minut e standardul în box și kickboxing') : ''}
         ${callerRow}
       </div>
       <button class="btn" data-a="p:start">Start</button>`;

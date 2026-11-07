@@ -23,7 +23,7 @@ export function clawSwipe(dir: number): void {
   const el = document.getElementById('swipe');
   if (!el) return;
   el.dataset.dir = dir < 0 ? 'l' : 'r';
-  replay(el, 'go');
+  replay(el, 'rip');
 }
 
 /** "RUNDA 2": slams onto the timer with claws and a shock ring, and the screen shakes once. */

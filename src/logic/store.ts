@@ -39,6 +39,9 @@ export interface Habit {
   start: string;
   days: Record<string, number>;
   archived?: boolean;
+  /** A number that grows: `start` in the first 7 days from `from`, then `step` more every 7 days (user, 2026-11-07:
+   *  push-ups from 10, 3 more each week). */
+  prog?: { start: number; step: number; from: string };
 }
 
 export interface Settings {
@@ -210,7 +213,7 @@ export const DEFAULT_SETTINGS: Settings = {
 };
 
 export function defaultHabit(today: string): Habit {
-  return { id: 'pushups50', name: '50 Push-ups', type: 'count', goal: 50, start: today, days: {} };
+  return { id: 'pushups50', name: 'Push-ups', type: 'count', goal: 10, start: today, days: {}, prog: { start: 10, step: 3, from: today } };
 }
 
 export function freshState(today: string = dayKey()): State {

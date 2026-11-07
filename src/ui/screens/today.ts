@@ -2,7 +2,7 @@
 
 import { HABIT_STEPS } from '../../data/book.ts';
 import { WEEK, type Day } from '../../data/plan.ts';
-import { cycleAt, dayProgress, deloadDue, deloadOn, habitDone, habitMilestone, habitStreak, weekDone } from '../../logic/progress.ts';
+import { cycleAt, dayProgress, deloadDue, deloadOn, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, weekDone } from '../../logic/progress.ts';
 import { dayKey, esc, prettyDay, RO_DAYS, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
@@ -101,11 +101,16 @@ export function habitCard(compact = false): string {
   const msText = ms ? HABIT_STEPS.find(([d]) => d === ms)?.[1] ?? '' : '';
   const late = !ok && new Date().getHours() >= 20;
   const dayN = Math.min(28, streak + (ok ? 0 : 1));
+  const goal = habitGoal(h, today);
+  // small targets count one by one; "Toate" fills the day's number in one tap
+  const steps = goal <= 30 ? [-1, 1, 5] : [-10, 10, 25];
+  const grow = h.prog ? `<p class="small dim" style="margin:8px 0 0">Săptămâna ${habitWeek(h, today)}: ${goal} pe zi. Crește cu ${h.prog.step} în fiecare săptămână; săptămâna viitoare ${goal + h.prog.step}.</p>` : '';
   const body =
     h.type === 'count'
-      ? `<div class="habit-count num">${val}<small> / ${h.goal}</small></div>
-         <div class="bar" style="--fill:${Math.min(1, val / h.goal).toFixed(3)}"><i></i></div>
-         <div class="chips">${[-10, 10, 25, 50].map((d) => `<button class="chip" data-a="hab" data-n="${d}">${d > 0 ? '+' : '−'}${Math.abs(d)}</button>`).join('')}</div>`
+      ? `<div class="habit-count num">${val}<small> / ${goal}</small></div>
+         <div class="bar" style="--fill:${Math.min(1, val / goal).toFixed(3)}"><i></i></div>
+         <div class="chips">${steps.map((d) => `<button class="chip" data-a="hab" data-n="${d}">${d > 0 ? '+' : '−'}${Math.abs(d)}</button>`).join('')}<button class="chip" data-a="hab-fill" ${val >= goal ? 'aria-pressed="true"' : ''}>Toate ${goal}</button></div>
+         ${grow}`
       : `<button class="btn ${ok ? 'ghost' : ''}" data-a="hab-check">${ok ? 'Făcut azi' : 'Bifează azi'}</button>`;
   return `<section class="card habit ${ok ? 'lime' : ''}" aria-label="Rutina zilei">
     <div class="row"><div class="row-l"><p class="label">Rutina zilei · ziua ${dayN} din 28</p><h3>${esc(h.name)}</h3>${streak ? `<p class="small dim" style="margin:0">Serie de ${streak} ${streak === 1 ? 'zi' : 'zile'}</p>` : ''}</div>${ok ? `<span class="ok-mark">${ic('check')}</span>` : ''}</div>

@@ -260,8 +260,32 @@ export function activeStreak(log: Entry[], today: string): number {
   return n;
 }
 
+/** The day's target: the fixed goal, or the growing one (start, then `step` more every 7 days from `from`). */
+export function habitGoal(h: Habit, day: string): number {
+  if (h.type === 'check') return 1;
+  if (!h.prog) return h.goal;
+  const week = Math.max(0, Math.floor(daysBetween(h.prog.from, day) / 7));
+  return h.prog.start + h.prog.step * week;
+}
+
+/** The week of a growing target (1 = the first 7 days). */
+export function habitWeek(h: Habit, day: string): number {
+  return h.prog ? Math.max(0, Math.floor(daysBetween(h.prog.from, day) / 7)) + 1 : 0;
+}
+
 export function habitDone(h: Habit, day: string): boolean {
-  return (h.days[day] ?? 0) >= (h.type === 'check' ? 1 : h.goal);
+  return (h.days[day] ?? 0) >= habitGoal(h, day);
+}
+
+/** The push-up routine grows from 10, 3 more each week (asked on 2026-11-07). Turns the active push-up habit into
+ *  that once; true when it changed something, so the caller saves. Another routine is left as it is. */
+export function growPushups(habits: Habit[], today: string): boolean {
+  const h = habits.find((x) => !x.archived);
+  if (!h || h.prog || h.type !== 'count' || !/push|flot/i.test(h.name)) return false;
+  h.prog = { start: 10, step: 3, from: today };
+  h.goal = 10;
+  h.name = 'Push-ups';
+  return true;
 }
 
 export function habitStreak(h: Habit, today: string): number {

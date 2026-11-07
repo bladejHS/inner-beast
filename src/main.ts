@@ -3,6 +3,7 @@ import { publishPlan } from './logic/bridge.ts';
 import { blockById, WEEK, type Block } from './data/plan.ts';
 import { rowChallenge } from './data/row.ts';
 import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
+import { growPushups, habitGoal } from './logic/progress.ts';
 import { dayKey, esc, shortDay, uid, weekdayIdx, weekStart } from './logic/util.ts';
 import { initAudio, unlock } from './ui/audio.ts';
 import { closePlayer, closeSheet, ctx, openSheet, ask, save, sheetAct, toast, type Tab, type View } from './ui/ctx.ts';
@@ -278,29 +279,36 @@ function habitSheet(fresh: boolean): void {
   const h = ctx.S.habits.find((x) => !x.archived);
   const name = fresh ? '' : h?.name ?? '';
   const type = fresh ? 'check' : h?.type ?? 'count';
-  const goal = fresh ? 1 : h?.goal ?? 50;
+  const goal = fresh ? 1 : h?.prog ? h.prog.start : h?.goal ?? 10;
+  const step = fresh ? 0 : h?.prog?.step ?? 0;
   openSheet(
     `<h2>${fresh ? 'Obicei nou' : 'Rutina zilei'}</h2>
-    <p class="dim">Un singur lucru bun pentru tine, atât de simplu încât îl faci zilnic. Sugestia din carte: 50 de flotări.</p>
+    <p class="dim">Un singur lucru bun pentru tine, atât de simplu încât îl faci zilnic. Flotările pornesc de la 10 și cresc cu 3 în fiecare săptămână.</p>
     <label class="small" for="hb-name" style="font-weight:700">Ce faci zilnic</label>
     <input type="text" id="hb-name" value="${esc(name)}" placeholder="ex. 50 Push-ups, 10 minute de citit" maxlength="60">
-    <div class="field"><div class="field-l">Număr de atins<small>Gol = doar bifezi</small></div><input type="number" id="hb-goal" inputmode="numeric" value="${type === 'count' ? goal : ''}" style="width:100px" min="1" max="1000"></div>
+    <div class="field"><div class="field-l">Număr de atins<small>Gol = doar bifezi. Cu creștere: numărul din prima săptămână.</small></div><input type="number" id="hb-goal" inputmode="numeric" value="${type === 'count' ? goal : ''}" style="width:100px" min="1" max="1000"></div>
+    <div class="field"><div class="field-l">Crește în fiecare săptămână cu<small>0 = numărul rămâne fix</small></div><input type="number" id="hb-step" inputmode="numeric" value="${step || ''}" placeholder="0" style="width:100px" min="0" max="100"></div>
     <div style="height:12px"></div>
     <button class="btn" data-a="hb-save">Salvează</button>`,
     {
       'hb-save': () => {
         const n = (document.getElementById('hb-name') as HTMLInputElement).value.trim();
         const g = parseInt((document.getElementById('hb-goal') as HTMLInputElement).value, 10);
+        const st = Math.max(0, parseInt((document.getElementById('hb-step') as HTMLInputElement).value, 10) || 0);
         if (!n) return toast('Scrie ce faci zilnic.');
         const today = dayKey();
+        // a growing count keeps its first week when only the name changes
+        const prog = g > 0 && st > 0 ? { start: g, step: st, from: h && !fresh && h.prog && h.prog.start === g && h.prog.step === st ? h.prog.from : today } : undefined;
         if (fresh || !h) {
           if (h) h.archived = true;
-          const nh: Habit = { id: uid(), name: n, type: g > 0 ? 'count' : 'check', goal: g > 0 ? g : 1, start: today, days: {} };
+          const nh: Habit = { id: uid(), name: n, type: g > 0 ? 'count' : 'check', goal: g > 0 ? g : 1, start: today, days: {}, ...(prog ? { prog } : {}) };
           ctx.S.habits.push(nh);
         } else {
           h.name = n;
           h.type = g > 0 ? 'count' : 'check';
           h.goal = g > 0 ? g : 1;
+          if (prog) h.prog = prog;
+          else delete h.prog;
         }
         save();
         closeSheet();
@@ -514,8 +522,18 @@ function act(a: string, el: HTMLElement): void {
     case 'hab': {
       const h = S.habits.find((x) => !x.archived);
       if (!h) return;
+      const goal = habitGoal(h, today);
       h.days[today] = Math.max(0, (h.days[today] ?? 0) + (Number(el.dataset.n) || 0));
-      if ((h.days[today] ?? 0) >= h.goal && (h.days[today] ?? 0) - (Number(el.dataset.n) || 0) < h.goal) toast(`${h.name}: făcut azi.`);
+      if ((h.days[today] ?? 0) >= goal && (h.days[today] ?? 0) - (Number(el.dataset.n) || 0) < goal) toast(`${h.name}: făcut azi.`);
+      save();
+      return render();
+    }
+    case 'hab-fill': {
+      const h = S.habits.find((x) => !x.archived);
+      if (!h) return;
+      const goal = habitGoal(h, today);
+      if ((h.days[today] ?? 0) < goal) toast(`${h.name}: făcut azi.`);
+      h.days[today] = Math.max(h.days[today] ?? 0, goal);
       save();
       return render();
     }
@@ -750,6 +768,9 @@ window.addEventListener('popstate', () => {
   }
   if (views.length) popView();
 });
+
+// the push-up routine grows from 10, 3 more each week (asked on 2026-11-07): kept from the first day it is seen
+if (growPushups(ctx.S.habits, dayKey())) save();
 
 render();
 

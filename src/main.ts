@@ -102,6 +102,28 @@ swipe.setAttribute('aria-hidden', 'true');
 swipe.innerHTML = '<b></b><i></i><i></i><i></i>';
 document.body.appendChild(swipe);
 
+/** The wolf in the tab bar roars: on picking Azi again, and when the opening's wolf lands in it. */
+function roar(): void {
+  if (lite()) return;
+  const w = nav.querySelector<HTMLElement>('.nav-wolf');
+  if (!w) return;
+  w.classList.remove('roar');
+  void w.offsetWidth;
+  w.classList.add('roar');
+}
+
+// The opening rips open (index.html): the screen underneath makes its entry, and the wolf lands in the bar.
+addEventListener('beast:reveal', () => {
+  const app = document.getElementById('app');
+  if (!app || lite()) return;
+  app.classList.remove('enter-tab', 'enter-seg');
+  void app.offsetWidth;
+  app.classList.add('enter-tab');
+  clearTimeout(enterTimer);
+  enterTimer = window.setTimeout(() => app.classList.remove('enter-tab', 'enter-seg'), 1100);
+});
+addEventListener('beast:landed', roar);
+
 let navOn = '';
 function syncNav(): void {
   const cur = PARENT[ctx.tab] ?? ctx.tab;
@@ -114,12 +136,7 @@ function syncNav(): void {
   if (cur !== navOn) {
     nav.dataset.on = cur;
     // the wolf roars when Azi is picked again
-    if (cur === 'today' && navOn) {
-      const w = nav.querySelector('.nav-wolf');
-      w?.classList.remove('roar');
-      void (w as HTMLElement | null)?.offsetWidth;
-      w?.classList.add('roar');
-    }
+    if (cur === 'today' && navOn) roar();
     navOn = cur;
   }
 }

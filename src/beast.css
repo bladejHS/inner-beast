@@ -97,7 +97,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 800; }
 .back { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; padding: 0 12px 0 0; border: 0; background: none; color: var(--ink-2); font: 700 semi-expanded 12px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; }
 .back svg { width: 24px; height: 24px; color: var(--red-text); }
 .streak {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px 0 10px;
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px 0 10px;
   border: 1px solid var(--n5); background: var(--n1); color: var(--ink); --cut: 8px;
 }
 .streak svg { width: 18px; height: 18px; color: var(--red-hot); }
@@ -667,8 +667,8 @@ input[type='date'] { flex: none; width: 160px; min-height: 48px; padding: 8px 10
 }
 #swipe i:nth-of-type(2) { margin-left: 18px; width: 11px; }
 #swipe i:nth-of-type(3) { margin-left: 43px; }
-#swipe.go b { animation: swipe-flash .45s ease-out both; }
-#swipe.go i { animation: swipe-r .44s var(--e-snap) both; }
+#swipe.go b { animation: swipe-flash .36s ease-out both; }
+#swipe.go i { animation: swipe-r .36s var(--e-snap) both; }
 #swipe.go i:nth-of-type(2) { animation-delay: .04s; }
 #swipe.go i:nth-of-type(3) { animation-delay: .08s; }
 #swipe.go[data-dir='l'] i { animation-name: swipe-l; }
@@ -893,41 +893,41 @@ input[type='date'] { flex: none; width: 160px; min-height: 48px; padding: 8px 10
 
 /* ---------- entries: only when a screen or a section opens ---------- */
 /* the poster title rises out of its box, the blade cuts in, the rest follows one after another */
-#app.enter-tab .ph-t span, #app.enter-tab .ms-t span { animation: rise .62s var(--e-out) both; }
-#app.enter-tab .ph-blade, #app.enter-tab .sec::before { animation: blade .5s var(--e-snap) .12s both; }
-#app.enter-tab .ph-s, #app.enter-tab .ph-k, #app.enter-tab .ms-k { animation: up .5s var(--e-out) .1s both; }
-#app.enter-tab > :not(.top):not(.ph):not(.seg):not(.mission) { animation: up .55s var(--e-out) both; }
-#app.enter-tab > :nth-child(3) { animation-delay: .05s; }
-#app.enter-tab > :nth-child(4) { animation-delay: .1s; }
-#app.enter-tab > :nth-child(5) { animation-delay: .15s; }
-#app.enter-tab > :nth-child(6) { animation-delay: .2s; }
-#app.enter-tab > :nth-child(n+7) { animation-delay: .24s; }
-#app.enter-tab .ms-row, #app.enter-tab .segs, #app.enter-tab .cta { animation: up .55s var(--e-out) .16s both; }
-#app.enter-tab .cta { animation-delay: .24s; }
-#app.enter-tab .ms-img { animation: photo .9s var(--e-out) both; }
-#app.enter-tab .rd { animation: from-rail .55s var(--e-out) both; }
-#app.enter-tab .rd:nth-child(2) { animation-delay: .07s; }
-#app.enter-tab .rd:nth-child(3) { animation-delay: .14s; }
-#app.enter-tab .rd:nth-child(4) { animation-delay: .21s; }
-#app.enter-tab .rd:nth-child(n+5) { animation-delay: .28s; }
-#app.enter-tab .dcs > li { animation: up .55s var(--e-out) both; }
-#app.enter-tab .dcs > li:nth-child(2) { animation-delay: .05s; }
-#app.enter-tab .dcs > li:nth-child(3) { animation-delay: .1s; }
-#app.enter-tab .dcs > li:nth-child(n+4) { animation-delay: .15s; }
-#app.enter-seg .seg-body > * { animation: up .45s var(--e-out) both; }
-#app.enter-seg .seg-body > :nth-child(2) { animation-delay: .04s; }
-#app.enter-seg .seg-body > :nth-child(3) { animation-delay: .08s; }
-#app.enter-seg .seg-body > :nth-child(n+4) { animation-delay: .12s; }
-#app.enter-tab .stats .stat, #app.enter-seg .stats .stat { animation: pop .5s var(--spring) both; }
-#app.enter-tab .stats .stat:nth-child(2), #app.enter-seg .stats .stat:nth-child(2) { animation-delay: .05s; }
-#app.enter-tab .stats .stat:nth-child(3), #app.enter-seg .stats .stat:nth-child(3) { animation-delay: .1s; }
-#app.enter-tab .stats .stat:nth-child(n+4), #app.enter-seg .stats .stat:nth-child(n+4) { animation-delay: .15s; }
+#app.enter-tab .ph-t span, #app.enter-tab .ms-t span { animation: rise .46s var(--e-out) both; }
+#app.enter-tab .ph-blade, #app.enter-tab .sec::before { animation: blade .36s var(--e-snap) .08s both; }
+#app.enter-tab .ph-s, #app.enter-tab .ph-k, #app.enter-tab .ms-k { animation: up .4s var(--e-out) .06s both; }
+#app.enter-tab > :not(.top):not(.ph):not(.seg):not(.mission) { animation: up .42s var(--e-out) both; }
+#app.enter-tab > :nth-child(3) { animation-delay: .035s; }
+#app.enter-tab > :nth-child(4) { animation-delay: .05s; }
+#app.enter-tab > :nth-child(5) { animation-delay: .1s; }
+#app.enter-tab > :nth-child(6) { animation-delay: .13s; }
+#app.enter-tab > :nth-child(n+7) { animation-delay: .16s; }
+#app.enter-tab .ms-row, #app.enter-tab .segs, #app.enter-tab .cta { animation: up .42s var(--e-out) .1s both; }
+#app.enter-tab .cta { animation-delay: .16s; }
+#app.enter-tab .ms-img { animation: photo .7s var(--e-out) both; }
+#app.enter-tab .rd { animation: from-rail .42s var(--e-out) both; }
+#app.enter-tab .rd:nth-child(2) { animation-delay: .05s; }
+#app.enter-tab .rd:nth-child(3) { animation-delay: .1s; }
+#app.enter-tab .rd:nth-child(4) { animation-delay: .14s; }
+#app.enter-tab .rd:nth-child(n+5) { animation-delay: .18s; }
+#app.enter-tab .dcs > li { animation: up .42s var(--e-out) both; }
+#app.enter-tab .dcs > li:nth-child(2) { animation-delay: .035s; }
+#app.enter-tab .dcs > li:nth-child(3) { animation-delay: .05s; }
+#app.enter-tab .dcs > li:nth-child(n+4) { animation-delay: .1s; }
+#app.enter-seg .seg-body > * { animation: up .36s var(--e-out) both; }
+#app.enter-seg .seg-body > :nth-child(2) { animation-delay: .03s; }
+#app.enter-seg .seg-body > :nth-child(3) { animation-delay: .06s; }
+#app.enter-seg .seg-body > :nth-child(n+4) { animation-delay: .08s; }
+#app.enter-tab .stats .stat, #app.enter-seg .stats .stat { animation: pop .42s var(--spring) both; }
+#app.enter-tab .stats .stat:nth-child(2), #app.enter-seg .stats .stat:nth-child(2) { animation-delay: .035s; }
+#app.enter-tab .stats .stat:nth-child(3), #app.enter-seg .stats .stat:nth-child(3) { animation-delay: .05s; }
+#app.enter-tab .stats .stat:nth-child(n+4), #app.enter-seg .stats .stat:nth-child(n+4) { animation-delay: .1s; }
 #app.enter-tab .week7 i b, #app.enter-seg .week7 i b { animation: grow-y .9s var(--e-out) .15s both; }
 #app.enter-tab .wk-bar i::after, #app.enter-tab .dc-bar i, #app.enter-tab .wk-d i::after { animation: grow-x .8s var(--e-out) .2s both; }
-#app.enter-tab .tiles .tile, #app.enter-seg .tiles .tile { animation: pop .5s var(--spring) both; }
-#app.enter-tab .tiles .tile:nth-child(2n), #app.enter-seg .tiles .tile:nth-child(2n) { animation-delay: .05s; }
-#app.enter-tab .tiles .tile:nth-child(n+3), #app.enter-seg .tiles .tile:nth-child(n+3) { animation-delay: .1s; }
-#app.enter-tab .tiles .tile:nth-child(n+5), #app.enter-seg .tiles .tile:nth-child(n+5) { animation-delay: .15s; }
+#app.enter-tab .tiles .tile, #app.enter-seg .tiles .tile { animation: pop .42s var(--spring) both; }
+#app.enter-tab .tiles .tile:nth-child(2n), #app.enter-seg .tiles .tile:nth-child(2n) { animation-delay: .035s; }
+#app.enter-tab .tiles .tile:nth-child(n+3), #app.enter-seg .tiles .tile:nth-child(n+3) { animation-delay: .05s; }
+#app.enter-tab .tiles .tile:nth-child(n+5), #app.enter-seg .tiles .tile:nth-child(n+5) { animation-delay: .1s; }
 @keyframes rise { from { transform: translateY(105%) skewX(-7deg); } to { transform: skewX(-7deg); } }
 @keyframes blade { from { transform: skewX(-28deg) scaleX(0); } to { transform: skewX(-28deg); } }
 @keyframes up { from { opacity: 0; transform: translateY(18px); } }

@@ -95,13 +95,47 @@ export function kneeAdvice(exId: string, lvl: number, days: LegDay[]): Advice | 
   return null;
 }
 
+/** A knee note: from a Leg Day (the worse of the session and the next morning) or after kicks at the bag or on pads. */
+export interface KneeNote {
+  date: string;
+  v: number;
+  from: 'legs' | 'kicks';
+}
+
+/** Every knee note, newest first (on the same date the worse one first). */
+export function kneeNotes(log: Entry[], knee: Record<string, KneeDay>): KneeNote[] {
+  const out: KneeNote[] = [];
+  for (const l of legDays(log, knee)) {
+    if (l.d !== undefined || l.m !== undefined) out.push({ date: l.date, v: Math.max(l.d ?? 0, l.m ?? 0), from: 'legs' });
+  }
+  for (const e of log) {
+    if (e.kind === 'rounds' && typeof e.data.knee === 'number') out.push({ date: e.date, v: Number(e.data.knee), from: 'kicks' });
+  }
+  return out.sort((a, b) => (a.date === b.date ? b.v - a.v : a.date < b.date ? 1 : -1));
+}
+
 /**
- * The last Leg Day, when its knee note was bad (5 of 10 or more) and it was in the last 7 days. The fighting rounds
- * then call boxing only: a roundhouse kick turns on the supporting knee, a teep and a knee load it on one leg.
+ * The newest knee note of the past 7 days, when it is bad (5 of 10 or more): the fighting rounds then call boxing
+ * only, since a roundhouse kick turns on the supporting knee and a teep or a knee loads it on one leg. A newer good
+ * note, given after a boxing-only session at the bag, brings the kicks back.
  */
-export function kneeSore(days: LegDay[], today: string): LegDay | null {
-  const l = days[0];
-  return l && kneeBad(l) && daysBetween(l.date, today) <= 7 ? l : null;
+export function kneeSore(notes: KneeNote[], today: string): KneeNote | null {
+  const n = notes.find((x) => x.date <= today && daysBetween(x.date, today) <= 7);
+  return n && n.v >= KNEE_BAD ? n : null;
+}
+
+/** Kick power in the first weeks of kicking: shins and knees adapt over weeks. 50 %, 65 %, 80 %, then all of it. */
+export const KICK_RAMP = [50, 65, 80];
+
+export const kickPower = (week: number): number => KICK_RAMP[week - 1] ?? 100;
+
+/** The week of kicking (1-based), from the first session with kicks; more than 4 weeks without them starts it again. */
+export function kickWeek(log: Entry[], today: string): number {
+  const days = [...new Set(log.filter((e) => e.kind === 'rounds' && e.data.kicks).map((e) => e.date))].filter((d) => d <= today).sort();
+  if (!days.length || daysBetween(days[days.length - 1], today) > 28) return 1;
+  let start = days[0];
+  for (let i = 1; i < days.length; i++) if (daysBetween(days[i - 1], days[i]) > 28) start = days[i];
+  return Math.floor(daysBetween(start, today) / 7) + 1;
 }
 
 /** The note still missing on Azi: today's session, or the morning after a Leg Day of the last two days. */

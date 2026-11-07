@@ -2,14 +2,15 @@
 // Every set is kept on the phone as it is ticked (a draft in localStorage), so a force-closed app loses nothing:
 // Azi and the next start of the same workout offer to carry on, or to save what was done.
 
-import { EMOM_GOAL, workoutById, type Exercise, type Workout } from '../../data/workouts.ts';
-import { advise, deloadOn, emomAdvice, emomNext, lastExercise, lighter, loadable, stalled, STALL_TEXT, ticked, type Advice, type LastEx } from '../../logic/progress.ts';
+import { EMOM_GOAL, RECORD_WIDS, recordable, workoutById, type Exercise, type Workout } from '../../data/workouts.ts';
+import { advise, bestSet, deloadOn, emomAdvice, emomNext, lastExercise, lighter, loadable, stalled, STALL_TEXT, ticked, type Advice, type LastEx } from '../../logic/progress.ts';
 import { Clock } from '../../logic/seq.ts';
 import { makeEntry, type SetLog } from '../../logic/store.ts';
 import { KNEE_STEPS, kneeAdvice, legDays } from '../../logic/knee.ts';
 import { dayKey, esc, mmss, shortDay } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
-import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, type Player } from '../ctx.ts';
+import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
+import { lite, slam } from '../fx.ts';
 import { howHtml } from '../how.ts';
 import { ic } from '../icons.ts';
 import { art } from '../art.ts';
@@ -35,6 +36,8 @@ interface XS {
   prev?: LastEx;
   kg: number;
   emom?: EmomState;
+  /** The best set of this session so far, for records. */
+  best?: number;
 }
 
 const unitOf = (ex: Exercise): SetLog['unit'] =>
@@ -119,6 +122,8 @@ class WorkoutPlayer implements Player {
   startTs = 0;
   /** Built only to save a draft, without a screen. */
   silent = false;
+  /** Records set in this session, for the done screen. */
+  recs: Array<{ name: string; v: number; prev: number; sec: boolean }> = [];
   /** Accepted lighter week: fewer sets, and nothing here moves the progression. */
   deload = deloadOn(ctx.S.deload, dayKey());
 
@@ -377,6 +382,7 @@ class WorkoutPlayer implements Player {
       this.w.name,
       `${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1>
       <p class="lead">${mmss((Date.now() - this.t0) / 1000)} de antrenament. ${this.saved ? 'Salvat în progres.' : ''}</p>
+      ${this.recs.length ? `<div class="advice"><b>${this.recs.length === 1 ? 'Record nou' : 'Recorduri noi'}:</b> ${this.recs.map((r) => `${esc(r.name)} ${r.v}${r.sec ? ' s' : ''} (înainte ${r.prev}${r.sec ? ' s' : ''})`).join(', ')}.</div>` : ''}
       <ul class="hist">${lines || '<li><span>Nicio serie bifată.</span></li>'}</ul>
       ${this.w.id === 'legs' && this.saved ? this.kneeHtml() : ''}
       <div style="height:16px"></div>
@@ -620,7 +626,29 @@ class WorkoutPlayer implements Player {
     }
   }
 
+  /** A set past the best ever on this variation (bodyweight sets of the strength days): RECORD, once per new best. */
+  checkRecord(k: number): void {
+    const x = this.x;
+    if (!RECORD_WIDS.includes(this.w.id) || !recordable(x.ex) || x.kg) return;
+    const v = x.vals[k];
+    const prev = bestSet(ctx.S.log, x.ex.id, x.lvl)?.v ?? 0;
+    const bar = Math.max(prev, x.best ?? 0);
+    x.best = Math.max(x.best ?? 0, v);
+    // the first time on a variation sets the mark; a record has to beat one
+    if (!prev || v <= bar) return;
+    const name = x.ex.vars[x.lvl];
+    const sec = isSec(x.ex);
+    const i = this.recs.findIndex((r) => r.name === name);
+    if (i >= 0) this.recs[i].v = v;
+    else this.recs.push({ name, v, prev, sec });
+    buzz([80, 60, 160]);
+    const what = `${name}: ${v}${sec ? ' s' : ''}`;
+    if (lite()) toast(`Record: ${what}`);
+    else slam('Record', what);
+  }
+
   afterSet(k: number): void {
+    this.checkRecord(k);
     const x = this.x;
     const allDone = x.done.every(Boolean);
     const lastEx = this.i === this.xs.length - 1;

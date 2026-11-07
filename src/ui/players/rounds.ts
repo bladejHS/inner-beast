@@ -3,7 +3,7 @@
 // boxing ones on a day the knee note says no kicks).
 
 import { BURST, BURST_SEC, WARMUP, WARMUP_SEC, type ComboFocus } from '../../data/plan.ts';
-import { focusCombos, LADDER_MOVES, ROPE_MOVES, FOCUS_LINE, roundThemes, type Combo, type RoundTheme } from '../../data/combos.ts';
+import { focusCombos, LADDER_MOVES, legStrike, ROPE_MOVES, FOCUS_LINE, roundThemes, type Combo, type RoundTheme } from '../../data/combos.ts';
 
 /** The e-book's focus line for each block, as printed on the plan page. */
 const BOOK_FOCUS: Record<string, string> = {
@@ -21,7 +21,7 @@ import { deloadOn, lighter } from '../../logic/progress.ts';
 import { makeEntry, type Entry } from '../../logic/store.ts';
 import { dayKey, esc, mmss } from '../../logic/util.ts';
 import { zone2, zoneHard } from '../../logic/runlog.ts';
-import { kneeSore, legDays, type LegDay } from '../../logic/knee.ts';
+import { kickPower, kickWeek, KNEE_STEPS, kneeNotes, kneeSore, type KneeNote } from '../../logic/knee.ts';
 import { buzz, say, sfx, unlock, hush } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
 import { slam } from '../fx.ts';
@@ -85,8 +85,10 @@ class RoundsPlayer implements Player {
   tip = '';
   saved = false;
   themes: RoundTheme[] = [];
-  /** The last Leg Day, when its knee note rules out kicks today. */
-  sore: LegDay | null = null;
+  /** The newest knee note, when it rules out kicks today. */
+  sore: KneeNote | null = null;
+  /** The week of kicking when this block calls kicks (0 when it doesn't): sets the kick power, see logic/knee.ts. */
+  kickW = 0;
   /** Sprint finish on the later rounds; on by default at the bag. */
   sprint: boolean;
   sprinting = false;
@@ -101,10 +103,11 @@ class RoundsPlayer implements Player {
     this.cfg = { ...cfg };
     if (this.deload) this.cfg.rounds = lighter(cfg.rounds);
     if (cfg.legSwap) this.cfg.name = ctx.S.set.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit';
-    // a bad knee note on the last Leg Day: boxing rounds today, no kicks (logic/knee.ts)
-    this.sore = cfg.focus && !isDrill(cfg.focus) && cfg.focus !== 'legs' ? kneeSore(legDays(ctx.S.log, ctx.S.knee), dayKey()) : null;
+    // a bad knee note in the past week: boxing rounds today, no kicks (logic/knee.ts)
+    this.sore = cfg.focus && !isDrill(cfg.focus) && cfg.focus !== 'legs' ? kneeSore(kneeNotes(ctx.S.log, ctx.S.knee), dayKey()) : null;
     this.calls = cfg.cardio || cfg.hiit || cfg.burstFrom === 1 ? [] : this.buildCalls();
     this.themes = cfg.rounds > 1 && !cfg.cardio && !cfg.hiit && cfg.burstFrom !== 1 ? roundThemes(cfg.focus, ctx.S.nut.h, !this.sore) : [];
+    this.kickW = !this.sore && this.calls.some((c) => c.seq.some(legStrike)) ? kickWeek(ctx.S.log, dayKey()) : 0;
     this.caller = this.calls.length > 0 && ctx.S.set.callEvery > 0;
     // Off by default: long all-out finishes wear technique down; the tested burst format is the punch-out.
     this.sprint = false;
@@ -147,7 +150,8 @@ class RoundsPlayer implements Player {
 
   get every(): number {
     const base = ctx.S.set.callEvery || 15;
-    return this.cfg.focus === 'slow' ? base * 2 : this.cfg.focus === 'power' ? base + 5 : base;
+    // the pads need time to move between calls
+    return this.cfg.focus === 'slow' ? base * 2 : this.cfg.focus === 'pads' ? base + 10 : this.cfg.focus === 'power' ? base + 5 : base;
   }
 
   render(): void {
@@ -174,7 +178,8 @@ class RoundsPlayer implements Player {
       ${c.focus && FOCUS_LINE[c.focus] && !c.cardio ? `<p class="pl-sub">${esc(FOCUS_LINE[c.focus])}</p>` : ''}
       ${burstBox}
       ${this.deload ? `<div class="advice">Săptămână ușoară: ${c.rounds} ${c.rounds === 1 ? 'rundă' : 'runde'}, fără să forțezi.</div>` : ''}
-      ${this.sore && this.calls.length ? `<div class="advice">Genunchiul: la ultimul Leg Day ai notat ${Math.max(this.sore.d ?? 0, this.sore.m ?? 0)} din 10. Azi îți strig doar combinații de box, fără kick-uri și genunchi.</div>` : ''}
+      ${this.sore && this.calls.length ? `<div class="advice">Genunchiul: ultima notă, ${this.sore.from === 'legs' ? 'de la Leg Day' : 'de după kick-uri'}, e ${this.sore.v} din 10. Azi îți strig doar combinații de box, fără kick-uri și genunchi.</div>` : ''}
+      ${this.kickW && kickPower(this.kickW) < 100 ? `<div class="advice">Kick-urile, săptămâna ${this.kickW} din 4: la ${kickPower(this.kickW)}% din putere. Tibia și genunchii se obișnuiesc în câteva săptămâni; din săptămâna 4 lovești din plin.</div>` : ''}
       ${c.cardio ? this.zoneHtml() : ''}
       ${c.hiit ? this.hardHtml(true) : ''}
       ${c.tip ? `<p class="dim">${esc(c.tip)}</p>` : ''}
@@ -253,6 +258,19 @@ class RoundsPlayer implements Player {
     return `<div class="call-box" aria-live="polite"><h4>${esc(h)}</h4><div class="c-name">${esc(c.name)}</div>${c.seq.length ? `<div class="seq">${c.seq.map((s) => `<span>${esc(s)}</span>`).join('')}</div>` : ''}${c.note ? `<p class="small" style="margin:0">${esc(c.note)}</p>` : ''}</div>`;
   }
 
+  /** After the bag or the pads: the knees, which decide whether the next rounds have kicks (logic/knee.ts). */
+  kneeAsk(): boolean {
+    const f = this.cfg.focus;
+    return !!this.entry && !!f && !isDrill(f) && f !== 'legs' && (f === 'pads' || /Heavy Bag/.test(this.cfg.name));
+  }
+
+  kneeHtml(): string {
+    const cur = this.entry?.data.knee;
+    return `<div class="knee-q"><p class="label">Genunchii, azi ${this.cfg.focus === 'pads' ? 'la pads' : 'la sac'}</p>
+      <div class="chips knee">${KNEE_STEPS.map(([v, l]) => `<button class="chip" aria-pressed="${cur === v}" data-a="p:kn" data-k="${v}">${l}</button>`).join('')}</div>
+      <p class="small dim">Dacă doare, rundele din următoarele 7 zile sunt doar de box, până când o notă nouă spune că genunchiul e bine.</p></div>`;
+  }
+
   /** Boxing sessions get two quick ratings for the progress score. */
   rateHtml(): string {
     const e = this.entry;
@@ -271,6 +289,7 @@ class RoundsPlayer implements Player {
       <p class="lead">${this.cfg.cardio ? `${esc(this.cfg.name)}: ${mmss(doneSec(this.phases, this.clock.t, 'work'))} în ritm ușor.` : `${esc(this.cfg.name)}: ${r} din ${this.cfg.rounds} ${this.cfg.rounds === 1 ? 'rundă' : 'runde'}, ${mmss(doneSec(this.phases, this.clock.t, 'work'))} de lucru.`}</p>
       <p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p>
       ${this.rateHtml()}
+      ${this.kneeAsk() ? this.kneeHtml() : ''}
       <button class="btn" data-a="p:close">Închide</button>`;
     return chrome(this.cfg.name, body, { center: true });
   }
@@ -427,7 +446,7 @@ class RoundsPlayer implements Player {
         ? { min: Math.round(work / 60), workDone: Math.round(work), ...(this.deload ? { deload: true } : {}) }
         : this.cfg.hiit
           ? { hiit: true, rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), ...(this.deload ? { deload: true } : {}) }
-        : { rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), focus: this.cfg.focus ?? '', called: this.called, ...(bursts ? { bursts } : {}) },
+        : { rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), focus: this.cfg.focus ?? '', called: this.called, ...(bursts ? { bursts } : {}), ...(this.kickW ? { kicks: true } : {}) },
     });
     addEntry(this.entry);
     this.saved = true;
@@ -441,6 +460,10 @@ class RoundsPlayer implements Player {
       case 'p:q':
       case 'p:rpe':
         if (this.entry) this.entry.data[a === 'p:q' ? 'q' : 'rpe'] = Number(el.dataset.k);
+        save();
+        return this.render();
+      case 'p:kn':
+        if (this.entry) this.entry.data.knee = Number(el.dataset.k);
         save();
         return this.render();
       case 'p:rounds':

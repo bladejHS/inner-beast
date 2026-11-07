@@ -305,6 +305,42 @@ export const HOW: Record<string, How> = {
     ],
     mistake: 'Să lovești cu laba sau cu glezna (oase mici, se rup ușor) și să pivotezi pe o talpă care se agață: genunchiul se răsucește. Lovești desculț, pe o suprafață pe care piciorul se poate roti. Dacă te dor încheieturile, tibia sau genunchiul, te oprești.',
   },
+  'Technical Sparring / Pads': {
+    steps: [
+      'Cel care ține: pernele ferm, cu coatele îndoite, aduse puțin în lovitură, nu ținute moale.',
+      'Pentru pumni: pernele la înălțimea feței, cu fața spre cel care lovește.',
+      'Pentru teep: ambele perne lipite pe burtă și un pas înapoi după lovitură.',
+      'Pentru low kick: o pernă verticală pe exteriorul coapsei din față, cotul lipit de corp. Pentru body kick: ambele perne pe lateral, la coaste.',
+      'Pentru genunchi: pernele ținute orizontal în fața burții. Când atacă el: lent, controlat, cu tibierele puse.',
+    ],
+    mistake: 'Pernele ținute moale sau departe de corp: lovitura alunecă, iar cotul sau încheietura celui care ține încasează.',
+  },
+  cph: {
+    steps: [
+      'Pe o parte, sprijinit pe antebraț, cotul sub umăr.',
+      'Pârghia scurtă: genunchiul piciorului de sus pe o bancă sau pe un scaun. Pârghia lungă: laba piciorului.',
+      'Ridici șoldul până când corpul e drept din cap până în genunchi (sau în călcâi) și ții. Piciorul de jos atârnă sau îl duci spre bancă.',
+      'Respiri normal. Apoi pe partea cealaltă.',
+    ],
+    mistake: 'Șoldul lăsat în jos sau dus în spate: munca trece din adductori în umăr.',
+  },
+  'sp-abd': {
+    steps: [
+      'Pe o parte, sprijinit pe antebraț, cotul sub umăr, picioarele unul peste altul.',
+      'Ridici șoldul până când corpul e drept din cap până în călcâie și ții.',
+      'La varianta grea ridici și piciorul de sus cât un pumn și îl ții acolo, fără să cadă șoldul.',
+    ],
+    mistake: 'Șoldul care cade încet spre sol sau trunchiul rotit spre podea.',
+  },
+  airplane: {
+    steps: [
+      'Pe un picior, genunchiul ușor îndoit, te apleci în față cu spatele drept, ca la Single-leg RDL.',
+      'Rotești bazinul încet în afară, deschizându-l spre lateral, apoi înapoi, cu piciorul de sprijin nemișcat.',
+      'Genunchiul de sprijin rămâne în linie cu degetele, nu fuge spre interior.',
+      'Varianta ușoară: o mână pe perete sau pe un scaun.',
+    ],
+    mistake: 'Să te rotești din spate în loc de șold sau să lași genunchiul să cadă spre interior.',
+  },
   // ---------- kickboxing techniques (Lupte → Combinații) ----------
   'Kickboxing Stance': {
     steps: [

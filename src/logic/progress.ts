@@ -1,7 +1,7 @@
 // "Progression is mandatory": what to do next time, streaks, weekly completion and totals.
 
 import type { Exercise } from '../data/workouts.ts';
-import { BW_SCHEMES, DB_MAX_KG, EMOM_GOAL } from '../data/workouts.ts';
+import { BW_SCHEMES, DB_MAX_KG, EMOM_GOAL, exerciseById, RECORD_WIDS, recordable } from '../data/workouts.ts';
 import type { CycleId, Day } from '../data/plan.ts';
 import type { Entry, Habit, SetLog } from './store.ts';
 import { addDays, daysBetween, inWeek, weekStart } from './util.ts';
@@ -23,6 +23,40 @@ export function lastExercise(log: Entry[], exId: string, beforeTs = Infinity): L
     if (hit) return { log: hit, lvl: hit.lvl ?? 0, date: e.date, ts: e.ts };
   }
   return undefined;
+}
+
+/** The best set ever on one variation of an exercise. */
+export interface Rec {
+  id: string;
+  lvl: number;
+  name: string;
+  v: number;
+  sec: boolean;
+  date: string;
+}
+
+/** The best set of every variation on the strength days (bodyweight sets, see recordable), newest record first. */
+export function allRecords(log: Entry[]): Rec[] {
+  const best = new Map<string, Rec>();
+  for (const e of log) {
+    if (e.kind !== 'workout' || !RECORD_WIDS.includes(String(e.data.wid))) continue;
+    for (const x of (e.data.ex as Array<SetLog & { lvl?: number }>) ?? []) {
+      const ex = exerciseById(x.id);
+      if (!ex || !recordable(ex) || x.kg || (x.unit !== 'reps' && x.unit !== 'sec')) continue;
+      const v = Math.max(0, ...x.sets.map((s) => s ?? 0));
+      if (!v) continue;
+      const lvl = x.lvl ?? 0;
+      const k = `${x.id}:${lvl}`;
+      const cur = best.get(k);
+      if (!cur || v > cur.v) best.set(k, { id: x.id, lvl, name: x.name, v, sec: x.unit === 'sec', date: e.date });
+    }
+  }
+  return [...best.values()].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+}
+
+/** The best set on one variation before a moment, or null. */
+export function bestSet(log: Entry[], exId: string, lvl: number, beforeTs = Infinity): Rec | null {
+  return allRecords(log.filter((e) => e.ts < beforeTs)).find((r) => r.id === exId && r.lvl === lvl) ?? null;
 }
 
 export interface Advice {

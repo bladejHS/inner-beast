@@ -41,7 +41,7 @@ export interface Exercise {
 }
 
 export interface Workout {
-  id: 'push' | 'pull' | 'legs' | 'upper' | 'knee';
+  id: 'push' | 'pull' | 'legs' | 'upper' | 'knee' | 'kick';
   name: string;
   /** About how long it takes, rests included. */
   min: number;
@@ -262,7 +262,37 @@ export const WORKOUTS: Workout[] = [
       },
     ],
   },
+  {
+    // Ten minutes for kicking, on Friday (approved 2026-11-07). The adductors take every kick and every check: a
+    // programme built on the Copenhagen adduction exercise cut groin problems by 41 % in footballers (Harøy 2019).
+    // The glute medius keeps the knee in line while the supporting foot pivots; the hip airplane trains that leg.
+    id: 'kick',
+    name: 'Kick Armor',
+    min: 10,
+    ex: [
+      {
+        id: 'cph', name: 'Copenhagen Plank', vars: ['Copenhagen Plank (Short Lever)', 'Copenhagen Plank (Long Lever)'], start: 0,
+        type: 'time', sets: 2, lo: 15, hi: 30, perSide: true, rest: 30, muscles: 'adductori',
+        cue: 'Pe o parte, pe antebraț. Pârghie scurtă: genunchiul de sus pe o bancă; lungă: laba piciorului. Ridici șoldul până corpul e drept și ții. Când ții 30 s curat pe ambele părți, treci la pârghia lungă.',
+      },
+      {
+        id: 'sp-abd', name: 'Side Plank Abduction', vars: ['Side Plank (Knees)', 'Side Plank', 'Side Plank + Leg Raise'], start: 1,
+        type: 'time', sets: 2, lo: 20, hi: 40, perSide: true, rest: 30, muscles: 'fesierul mijlociu, trunchiul lateral',
+        cue: 'Corpul drept din cap până în călcâie, șoldul sus. La varianta grea ții piciorul de sus ridicat cât un pumn, fără să cadă șoldul. Mușchiul ăsta ține genunchiul aliniat când pivotezi.',
+      },
+      {
+        id: 'airplane', name: 'Hip Airplane', vars: ['Supported Hip Airplane', 'Hip Airplane'], start: 0,
+        type: 'reps', sets: 2, lo: 5, hi: 8, perSide: true, rest: 30, muscles: 'piciorul de sprijin: șold, fesieri, gleznă',
+        cue: 'Pe un picior, aplecat în față cu spatele drept, ca la Single-leg RDL: rotești bazinul încet în afară și înapoi, fără ca genunchiul să fugă spre interior. Varianta ușoară: o mână pe perete.',
+      },
+    ],
+  },
 ];
+
+/** Where records count: the strength days, bodyweight sets only (reps or seconds, no dumbbells, no bar). */
+export const RECORD_WIDS = ['push', 'pull', 'legs', 'upper'];
+
+export const recordable = (ex: Exercise): boolean => (ex.type === 'reps' || ex.type === 'time' || ex.type === 'max') && !ex.load && !ex.bar;
 
 export function workoutById(id: string): Workout {
   return WORKOUTS.find((w) => w.id === id) ?? WORKOUTS[0];

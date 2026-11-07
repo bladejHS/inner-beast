@@ -11,7 +11,7 @@
 import { rowChallenge, rowTotal } from './row.ts';
 
 export type BlockKind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'shower' | 'wimhof' | 'breath' | 'row' | 'cardio';
-export type ComboFocus = 'jab' | 'move' | 'combo' | 'power' | 'slow' | 'distance' | 'rope' | 'ladder' | 'legs' | 'week';
+export type ComboFocus = 'jab' | 'move' | 'combo' | 'power' | 'slow' | 'distance' | 'rope' | 'ladder' | 'legs' | 'week' | 'pads';
 export type RestKey = 'r3' | 'r1' | 'none';
 /** The three emphases of the 12-week loop: strength + aerobic base, power + speed, capacity. */
 export type CycleId = 'A' | 'B' | 'C';
@@ -39,7 +39,7 @@ export interface Block {
   /** Fixed rest in seconds, for intervals the settings don't cover. */
   restSec?: number;
   focus?: ComboFocus;
-  workout?: 'push' | 'pull' | 'legs' | 'upper' | 'knee';
+  workout?: 'push' | 'pull' | 'legs' | 'upper' | 'knee' | 'kick';
   routine?: 'stretch-push' | 'stretch-pull' | 'mobility' | 'legwarm' | 'cooldown';
   min?: number;
   /** Quick-timer block: Wall Sit or Jumping Squats, as the user picks. */
@@ -109,6 +109,12 @@ const KNEE_ARMOR = (id: string): Block => ({
   id, kind: 'workout', name: 'Knee Armor', dose: '8 min', line: '8 min Knee Armor: Isometric Hold, Step-downs, Tibialis', workout: 'knee', min: 8,
   tip: 'Pentru genunchi: ținute izometrice, coborâri lente de pe treaptă și tibia. Durerea poate fi cel mult 3 din 10; dacă trece, cobori mai puțin.',
 });
+
+/** Ten minutes for kicking, on Friday: the adductors, the hip that keeps the knee in line, the supporting leg. */
+const KICK_ARMOR: Block = {
+  id: 'kick-fri', kind: 'workout', name: 'Kick Armor', dose: '10 min', line: '10 min Kick Armor: Copenhagen Plank, Side Plank, Hip Airplane', workout: 'kick', min: 10,
+  tip: 'Pentru kick-uri: adductorii, care lucrează la fiecare kick și check (un program construit pe Copenhagen Plank a scăzut cu 41% problemele inghinale la fotbaliști), fesierul mijlociu, care ține genunchiul aliniat când pivotezi, și piciorul de sprijin.',
+};
 
 /** Hard intervals on the rower: 4 × 4 min at 85–95 % of the maximum heart rate, 3 min easy between. */
 const ROWER_4X4: CycleVariant = {
@@ -183,6 +189,7 @@ export const WEEK: Day[] = [
     blocks: [
       { id: 'fri-stretch', kind: 'routine', name: 'Dynamic Warm-up', dose: '10 min', routine: 'stretch-pull', min: 10, tip: 'Încălzire în mișcare pentru umeri, omoplați și priză, înainte de tracțiuni.' },
       { id: 'fri-cal', kind: 'workout', name: 'Calisthenics: Back, Biceps, Shoulders', dose: '50 min', line: "50 min Calisthenics (Back, Biceps, Shoulders) + Farmer's Carry", workout: 'pull', min: 50, tip: 'Pull-ups (variante), ramat, umărul posterior, plus cărat greutăți pentru priză și trunchi.' },
+      KICK_ARMOR,
       { id: 'fri-easy', kind: 'rounds', name: 'Easy Shadow Kickboxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'distance', tip: 'Distance Work: controlul distanței e obiectivul principal. La 2 m, distanța lungă e a ta.',
         cues: ['Stai la capătul jabului și al teep-ului: tu ajungi la el, el nu ajunge la tine.', 'Pe pasul lui: teep sau low kick exact când pune piciorul jos.', 'Când te presează, ieși în cerc; înapoi în linie dreaptă ajungi la corzi.', 'Dacă ajunge aproape: genunchi, antebrațele pe umerii lui, apoi ieși.'] },
     ],
@@ -236,9 +243,9 @@ export function resolveBlock(b: Block, p: Picks): Block {
   }
   if (r.alt === 'partner' && p.thuPartner === 'spar') {
     return {
-      ...r, name: 'Technical Sparring / Pads', focus: undefined,
-      tip: 'Partea pe care niciun timer nu o înlocuiește: reacționezi la un om. Thai pads cu un antrenor sau sparring tehnic, controlat.',
-      cues: ['Sparring doar cu un antrenor de față, cu tibiere, cască, proteză și mănuși de sparring.', 'Tehnic, nu la KO: dacă ritmul crește, vă opriți și reluați.', 'Pe pads: teep la intrarea lui, check și contră, 1-2-low kick cu ieșire în unghi.'],
+      ...r, name: 'Technical Sparring / Pads', focus: 'pads',
+      tip: 'Partea pe care niciun timer nu o înlocuiește: reacționezi la un om. Thai pads: partenerul ține, tu lovești, iar în runda a treia atacă el, lent, și tu răspunzi. Aplicația vă strigă amândurora ce urmează. La sparring tehnic oprești combinațiile strigate.',
+      cues: ['Tibiere amândoi la exercițiile cu low kick și check; el atacă lent și controlat.', 'Pernele ținute ferm, cu cotul îndoit, aduse puțin în lovitură.', 'Sparring doar cu un antrenor de față, cu cască, proteză și mănuși de sparring.'],
     };
   }
   if (r.alt === 'aero' && (p.sunAero ?? 'row') === 'row') {

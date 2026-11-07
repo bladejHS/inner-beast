@@ -3,7 +3,7 @@
 
 import { WEEK } from '../../data/plan.ts';
 import { BW_SCHEMES, EMOM_GOAL, WORKOUTS } from '../../data/workouts.ts';
-import { activeStreak, amrapBest, amrapTrend, dayProgress, exerciseTrend, stalled, totals, variationPath, weekDone } from '../../logic/progress.ts';
+import { activeStreak, allRecords, amrapBest, amrapTrend, dayProgress, exerciseTrend, stalled, totals, variationPath, weekDone } from '../../logic/progress.ts';
 import { runAdvice, zone2 } from '../../logic/runlog.ts';
 import { KNEE_RUN, kneeStreak, legDays } from '../../logic/knee.ts';
 import type { Entry } from '../../logic/store.ts';
@@ -168,6 +168,14 @@ export function progressHtml(): string {
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }
 
+/** The best set on every variation, newest first: the RECORD the workout player shows, kept. */
+function recordsHtml(): string {
+  const recs = allRecords(ctx.S.log).slice(0, 10);
+  if (!recs.length) return '';
+  return `<h2 class="sec">Recorduri<small>Cea mai bună serie pe fiecare variantă, la exercițiile fără greutăți</small></h2>
+    <ul class="hist">${recs.map((r) => `<li><div><b>${esc(r.name)}</b><span>${r.v} ${r.sec ? 's' : 'repetări'}, ${shortDay(r.date)}</span></div></li>`).join('')}</ul>`;
+}
+
 /** Antrenament: boxing, calisthenics and the aerobic work. */
 function trainSeg(): string {
   const S = ctx.S;
@@ -207,6 +215,7 @@ function trainSeg(): string {
     <div class="ex-line"><div><b>Pull-up EMOM</b><span>Următoarea țintă: ${S.emom.min} min × ${S.emom.reps}. Spre ${EMOM_GOAL.min} × ${EMOM_GOAL.reps}: ${emomPct}%.</span></div><div class="bar" style="margin:0;--fill:${Math.min(1, emomPct / 100).toFixed(3)}"><i></i></div></div>
     ${amraps.length ? `<div class="ex-line"><div><b>Bodyweight Workout</b><span>Ultima dată ${amraps[amraps.length - 1].data.rounds} runde${amBest ? `, recordul la ${esc(BW_SCHEMES[sch].name)}: ${amBest.data.rounds} runde + ${amBest.data.extra}` : ''}</span></div>${spark(amrapTrend(S.log, sch))}</div>` : ''}
     ${exLines.join('') || '<p class="dim">După primul antrenament de push, pull sau picioare vezi aici fiecare exercițiu.</p>'}
+    ${recordsHtml()}
     ${kneeLine()}
 
     <h2 class="sec">Aerob<small>Alergarea de duminică și canotajul de marți, ușor</small></h2>

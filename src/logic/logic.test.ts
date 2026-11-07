@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { raceTime } from './util.ts';
 import { parseTime, readRun, runAdvice, zone2, zoneHard } from './runlog.ts';
-import { kneeAdvice, kneeAsk, kneeSore, kneeStreak, legDays } from './knee.ts';
+import { kickPower, kickWeek, kneeAdvice, kneeAsk, kneeNotes, kneeSore, kneeStreak, legDays } from './knee.ts';
 import { advance, back, bestTime, elapsed, newRun, pause, resume, segElapsed } from './race.ts';
 import { LEVEL_NAMES, RACES } from '../data/races.ts';
 import { angle, GuardTracker, RepCounter, type Pt } from './coach.ts';
@@ -11,7 +11,7 @@ import { CHALLENGES, challengeDays } from '../data/challenges.ts';
 import { addDays, dayKey, inWeek, mmss, num, paceStr, weekStart, weekdayIdx } from './util.ts';
 import { Clock, breath478Seq, burstAt, doneSec, locate, phaseStart, roundsSeq, showerSeq, totalSec } from './seq.ts';
 import { Track, haversine, routePath, simplify } from './geo.ts';
-import { activeStreak, advise, amrapBest, amrapUp, cycleAt, cycleStartFor, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, growMinutes, growPushups, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
+import { activeStreak, advise, allRecords, bestSet, amrapBest, amrapUp, cycleAt, cycleStartFor, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, growMinutes, growPushups, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
 import { defaultHabit, freshState, makeEntry, normalize, type Habit } from './store.ts';
 import { LAB, labSeq } from './breathlab.ts';
 import { roundThemes } from '../data/combos.ts';
@@ -24,6 +24,7 @@ import { WORKOUTS, exerciseById, workoutById } from '../data/workouts.ts';
 import { ROUTINES, routineSeconds } from '../data/routines.ts';
 import { COMBOS, INSIDE, focusCombos, learnOrder, usesLegs, weekCombos } from '../data/combos.ts';
 import { BOOK } from '../data/book.ts';
+import { testById } from '../data/tests.ts';
 
 test('dates: the program week starts on Monday', () => {
   assert.equal(weekdayIdx('2026-10-26'), 0); // Monday
@@ -305,7 +306,7 @@ test('thursday: rope/ladder and bag/row are alternatives for the same slot', () 
   const P: Picks = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a' };
   const [feet, shadow, power, main] = thu.blocks;
   const spar = resolveBlock(shadow, { ...P, thuPartner: 'spar' });
-  assert.deepEqual([spar.id, spar.name, spar.focus], ['thu-shadow', 'Technical Sparring / Pads', undefined]);
+  assert.deepEqual([spar.id, spar.name, spar.focus], ['thu-shadow', 'Technical Sparring / Pads', 'pads']);
   assert.equal(resolveBlock(power, { ...P, thuMain: 'row' }).name, 'Punch-out Shadow');
   assert.equal(resolveBlock(power, P).name, 'Punch-out');
   assert.equal(resolveBlock(feet, P).name, 'Jumping Rope');
@@ -363,13 +364,65 @@ test('combinations: a 200 cm fighter gets long-range kickboxing sets, a sore kne
   assert.ok(learnOrder(200).findIndex((c) => c.id === 'kb-body-high') > 20);
 });
 
-test('knee rule: a bad note on the last Leg Day of the past week means no kicks', () => {
-  const leg = (date: string, d?: number, m?: number) => ({ date, cmj: 0, d, m });
-  assert.equal(kneeSore([leg('2026-11-07', 6)], '2026-11-09')?.date, '2026-11-07');
-  assert.equal(kneeSore([leg('2026-11-07', 2, 5)], '2026-11-09')?.date, '2026-11-07');
-  assert.equal(kneeSore([leg('2026-11-07', 4)], '2026-11-09'), null);
-  assert.equal(kneeSore([leg('2026-10-30', 7)], '2026-11-09'), null);
+test('knee rule: the newest note of the past week decides the kicks, from Leg Day or from the bag', () => {
+  const legs = (date: string) => makeEntry({ kind: 'workout', name: 'Leg Day', dur: 3000, date, data: { wid: 'legs', ex: [] } });
+  const bag = (date: string, knee: number) => makeEntry({ kind: 'rounds', name: 'Heavy Bag Training', dur: 900, date, data: { rounds: 5, focus: 'move', knee, kicks: true } });
+  const log = [legs('2026-10-31'), bag('2026-11-02', 2), bag('2026-11-05', 6)];
+  const knee = { '2026-10-31': { d: 2 } };
+  const notes = kneeNotes(log, knee);
+  assert.deepEqual(notes.map((n) => [n.date, n.v, n.from]), [['2026-11-05', 6, 'kicks'], ['2026-11-02', 2, 'kicks'], ['2026-10-31', 2, 'legs']]);
+  assert.equal(kneeSore(notes, '2026-11-07')?.from, 'kicks');
+  // a newer good note, after a boxing-only session at the bag, brings the kicks back
+  log.push(bag('2026-11-06', 0));
+  assert.equal(kneeSore(kneeNotes(log, knee), '2026-11-07'), null);
+  // a bad Leg Day note counts too (the worse of the session and the next morning), and a week on it no longer does
+  const legBad = kneeNotes([legs('2026-11-07')], { '2026-11-07': { d: 2, m: 6 } });
+  assert.equal(kneeSore(legBad, '2026-11-09')?.from, 'legs');
+  assert.equal(kneeSore(kneeNotes([legs('2026-11-07')], { '2026-11-07': { d: 4 } }), '2026-11-09'), null);
+  assert.equal(kneeSore(legBad, '2026-11-15'), null);
   assert.equal(kneeSore([], '2026-11-09'), null);
+});
+
+test('kick power: 50, 65, 80 % in the first three weeks of kicking, all of it from the fourth, again after a long break', () => {
+  const kick = (date: string) => makeEntry({ kind: 'rounds', name: 'Shadow Kickboxing', dur: 900, date, data: { rounds: 5, focus: 'jab', kicks: true } });
+  assert.equal(kickWeek([], '2026-11-09'), 1);
+  const log = [kick('2026-11-09'), kick('2026-11-12'), kick('2026-11-16')];
+  assert.deepEqual(['2026-11-09', '2026-11-16', '2026-11-23', '2026-11-30'].map((d) => kickPower(kickWeek(log, d))), [50, 65, 80, 100]);
+  // five weeks without kicks: the ramp starts again
+  assert.equal(kickWeek(log, '2026-12-22'), 1);
+  log.push(kick('2026-12-22'));
+  assert.equal(kickWeek(log, '2026-12-29'), 2);
+});
+
+test('records: the best bodyweight set on each variation, not the loaded sets or the prehab', () => {
+  const day = (d: string) => new Date(`${d}T18:00:00`).getTime();
+  const w = (date: string, ex: unknown[], wid = 'push') => makeEntry({ kind: 'workout', name: 'Push', dur: 3000, ts: day(date), data: { wid, ex } });
+  const log = [
+    w('2026-11-03', [{ id: 'pushups', name: 'Push-ups', lvl: 1, unit: 'reps', sets: [20, 18, null] }]),
+    w('2026-11-10', [{ id: 'pushups', name: 'Push-ups', lvl: 1, unit: 'reps', sets: [22, 19, 17] }]),
+    w('2026-11-10', [{ id: 'knee-iso', name: 'Wall Sit Hold', lvl: 0, unit: 'sec', sets: [45, 45] }], 'knee'),
+    w('2026-11-14', [{ id: 'curls', name: 'Hammer Curls', lvl: 0, unit: 'reps', sets: [15], kg: 12.5 }], 'pull'),
+    w('2026-11-14', [{ id: 'hollow', name: 'Hollow Body Hold', lvl: 1, unit: 'sec', sets: [40, 35] }], 'push'),
+  ];
+  assert.deepEqual(allRecords(log).map((r) => [r.id, r.lvl, r.v, r.sec]), [['hollow', 1, 40, true], ['pushups', 1, 22, false]]);
+  assert.equal(bestSet(log, 'pushups', 1)?.v, 22);
+  assert.equal(bestSet(log, 'pushups', 1, log[1].ts)?.v, 20);
+  assert.equal(bestSet(log, 'pushups', 2), null);
+});
+
+test('program additions: Kick Armor on Friday, pad rounds for the partner slot, the Kick Height test', () => {
+  const fri = WEEK[4].blocks.map((b) => b.id);
+  assert.deepEqual(fri, ['fri-stretch', 'fri-cal', 'kick-fri', 'fri-easy']);
+  assert.equal(workoutById('kick').ex.length, 3);
+  const pads = resolveBlock(WEEK[3].blocks[1], { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', thuPartner: 'spar', rowCh: 'a' });
+  assert.equal(pads.focus, 'pads');
+  const themes = roundThemes('pads', 200);
+  assert.deepEqual(themes.map((t) => t.name), ['Arme lungi', 'Pumni, apoi piciorul', 'Atacă el, răspunzi tu']);
+  for (const t of themes) assert.ok(t.combos.length >= 3 && t.combos.every((c) => c.note.startsWith('Partenerul:')), t.name);
+  const sore = roundThemes('pads', 200, false);
+  assert.ok(sore.length === 1 && sore[0].combos.length >= 3 && !sore[0].combos.some(usesLegs));
+  assert.ok(focusCombos('pads', 200).length >= 12);
+  assert.equal(testById('kickh')?.unit, 'cm');
 });
 
 test('height: an unconfirmed nutrition profile takes the 200 cm default, a confirmed one keeps its own', () => {
@@ -715,7 +768,7 @@ test('Upper Strength: the second strength dose replaces the AMRAP on Monday in c
   assert.equal(resolveBlock(bw, P).kind, 'amrap');
   const up = workoutById('upper');
   assert.deepEqual(up.ex.map((x) => [x.id, x.sets, x.lo, x.hi, x.rest]), [['pull-str', 3, 3, 5, 150], ['dips-str', 3, 3, 5, 150]]);
-  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 45], ['pull', 50], ['legs', 60], ['upper', 15], ['knee', 8]]);
+  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 45], ['pull', 50], ['legs', 60], ['upper', 15], ['knee', 8], ['kick', 10]]);
 });
 
 test('knees: three clean Leg Days bring Box Jump, three more with Box Jump bring CMJ and Broad Jump', () => {

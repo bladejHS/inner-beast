@@ -63,6 +63,10 @@ export const TESTS: FitTest[] = [
     how: 'Atârnat de bară, cu palmele în față, cât poți. Doar în ziua de test: în antrenament te dai jos înainte de limită.',
   },
   {
+    id: 'kickh', name: 'Kick Height', what: 'Mobilitatea șoldului pentru kick-uri', unit: 'cm', higher: true, every: 'La 8 săptămâni',
+    how: 'Încălzit, lângă un perete sau un sac: un roundhouse controlat cu piciorul din spate, cu pivot, și atingi cu tibia punctul cel mai înalt la care ajungi curat, fără să cazi pe spate și fără săritură. Un partener marchează sau filmezi; măsori de la sol până la punct. Cel mai bun din 3. Dacă genunchiul e peste 3 din 10, îl amâni. Te compari doar cu tine: la 2 m, alt reper n-are sens.',
+  },
+  {
     id: 'run24', name: '2,4 km Run', what: 'Capacitate aerobă', unit: 'time', higher: false, every: 'La 8 săptămâni',
     how: 'Pe un traseu plat sau pe o buclă măsurată, după 10 minute de încălzire. Ritm constant, tot ce poți. Îl faci în locul alergării ușoare de duminică.',
     ref: 'Standarde de poliție după normele Cooper, bărbați 20–29 de ani: 13:16 la percentila 30, 10:59 la percentila 70.',

@@ -1,12 +1,12 @@
 // Pieces shared by the screens: header, page title, section switcher, the day's rounds, starting and checking off a block.
 
-import { focusCombos } from '../../data/combos.ts';
+import { focusCombos, usesLegs } from '../../data/combos.ts';
 import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks, type RestKey } from '../../data/plan.ts';
 import { ROW_CHALLENGES, rowChallenge } from '../../data/row.ts';
 import { activeStreak, cycleAt, deloadOn, growMinutes } from '../../logic/progress.ts';
 import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
 import { zone2, zoneHard } from '../../logic/runlog.ts';
-import { kneeSore, legDays, type LegDay } from '../../logic/knee.ts';
+import { kickPower, kickWeek, kneeNotes, kneeSore, type KneeNote } from '../../logic/knee.ts';
 import { dayKey, esc, inWeek, num, pad2, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { addEntry, ask, ctx, fresh, save, toast, type Tab } from '../ctx.ts';
 import { ic } from '../icons.ts';
@@ -38,9 +38,9 @@ export function top(back: boolean | Tab = false): string {
   return `<header class="top">${left}<div class="top-r">${run}<button class="icon-btn" data-a="settings" aria-label="Setări">${ic('gear')}</button></div></header>`;
 }
 
-/** The last Leg Day's knee note, when it rules out kicks in today's fighting rounds (logic/knee.ts). */
-export function soreKnee(): LegDay | null {
-  return kneeSore(legDays(ctx.S.log, ctx.S.knee), dayKey());
+/** The newest knee note, when it rules out kicks in today's fighting rounds (logic/knee.ts). */
+export function soreKnee(): KneeNote | null {
+  return kneeSore(kneeNotes(ctx.S.log, ctx.S.knee), dayKey());
 }
 
 /** The big slanted title of a tab, with one line under it. The title rises out of its own box on entry. */
@@ -165,7 +165,7 @@ const ICON_BY_ID: Record<string, string> = {
   'mon-bag': 'bag', 'thu-bag': 'bag', 'thu-power': 'bolt', 'thu-rope': 'rope', 'sun-legs': 'stretch', 'mon-bw': 'bolt',
   'tue-cal': 'fight', 'fri-cal': 'fight', 'sun-lunges': 'fight', 'tue-stretch': 'stretch', 'fri-stretch': 'stretch', 'tue-cool': 'stretch',
   'sat-mob': 'stretch', 'wed-walk': 'walk', 'wed-shower': 'drop', 'wed-med': 'wind', 'sat-med': 'wind',
-  'sat-breath': 'mind', 'sun-jog': 'run', 'tue-row': 'row', 'knee-tue': 'wall', 'knee-sat': 'wall',
+  'sat-breath': 'mind', 'sun-jog': 'run', 'tue-row': 'row', 'knee-tue': 'wall', 'knee-sat': 'wall', 'kick-fri': 'stretch',
 };
 
 export function blockIcon(raw: Block): string {
@@ -234,6 +234,8 @@ export function blockCard(raw: Block, n: number, today: string, next = false): s
     const sore = soreKnee();
     const cs = focusCombos(b.focus, ctx.S.nut.h, !sore);
     extra += `<p class="rd-calls"><b>${sore ? 'Doar box, cât genunchiul cere pauză de la kick-uri:' : 'Combinații strigate:'}</b> ${esc(cs.slice(0, 4).map((c) => c.name).join(', '))}${cs.length > 4 ? ` și încă ${cs.length - 4}` : ''}</p>`;
+    const kw = !sore && cs.some(usesLegs) ? kickWeek(ctx.S.log, dayKey()) : 0;
+    if (kw && kickPower(kw) < 100) extra += `<p class="rd-calls"><b>Kick-uri la ${kickPower(kw)}% din putere:</b> săptămâna ${kw} din 4 de kickboxing.</p>`;
   }
   const when = done ? doneWhen(entries[0].date, today) : '';
   const just = done && fresh.block === b.id && Date.now() < fresh.until;

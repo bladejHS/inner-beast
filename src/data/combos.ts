@@ -450,6 +450,35 @@ const BOX: Combo[] = [
 
 export const COMBOS: Combo[] = [...KB, ...BOX];
 
+/**
+ * Thai pads with a partner, Thursday's "Cu partener": the note says what the holder does, the sequence what you
+ * throw, and the call tells both. Round 1 the long weapons, round 2 punches then the kick, round 3 he attacks slowly
+ * and you answer, the tall fighter's defence. The punch-only drills are what's left on a no-kick day.
+ */
+export const PAD_DRILLS: Combo[] = [
+  { id: 'pad-jab-teep', name: 'Jab – Teep', seq: ['Jab', 'Lead Teep'], call: 'Jab, teep', cat: 'basics', note: 'Partenerul: o pernă sus pentru jab, apoi ambele perne lipite pe burtă pentru teep și un pas înapoi.' },
+  { id: 'pad-jab-inside', name: 'Double Jab – Inside Low Kick', seq: ['Jab', 'Jab', 'Lead Inside Low Kick'], call: 'Double jab, inside low kick', cat: 'basics', note: 'Partenerul: jaburile pe o pernă, apoi coboară perna pe interiorul coapsei din față, cu tibiera pusă.' },
+  { id: 'pad-teep-step', name: 'Teep on His Step', seq: ['Read his step', 'Lead Teep'], call: 'Step in. Teep', cat: 'defense', note: 'Partenerul: pășește spre tine cu pernele pe burtă; tu dai teep exact când pune piciorul jos. El alege momentul, nu tu.' },
+  { id: 'pad-12-low', name: 'Jab – Cross – Low Kick', seq: ['Jab', 'Cross', 'Rear Low Kick'], call: 'Jab, cross, low kick', cat: 'combo', note: 'Partenerul: pernele sus pentru 1-2, apoi o pernă verticală pe exteriorul coapsei din față, cu cotul lipit de corp.' },
+  { id: 'pad-123-low', name: 'Jab – Cross – Hook – Low Kick', seq: ['Jab', 'Cross', 'Lead Hook', 'Rear Low Kick'], call: 'Jab, cross, hook, low kick', cat: 'power', note: 'Partenerul: pernele sus pentru pumni, perna din dreapta întoarsă pentru croșeu, apoi perna pe coapsă pentru kick.' },
+  { id: 'pad-hook-body', name: 'Lead Hook – Body Kick', seq: ['Lead Hook', 'Rear Body Kick'], call: 'Hook, body kick', cat: 'power', note: 'Partenerul: o pernă la cap pentru croșeu, apoi ambele perne pe lateral, la coaste, prinse strâns, cu brațele îndoite.' },
+  { id: 'pad-cross-lbody', name: 'Cross – Lead Body Kick', seq: ['Cross', 'Lead Body Kick'], call: 'Cross, lead body kick', cat: 'power', note: 'Partenerul: o pernă sus pentru cross, apoi ambele perne pe cealaltă parte, la coaste. Fără săritură la kick.' },
+  { id: 'pad-check-cross', name: 'Check – Cross', seq: ['Check', 'Cross'], call: 'Low kick. Check, cross', cat: 'counter', note: 'Partenerul: un low kick lent și controlat (tibiere amândoi), apoi ridică o pernă pentru cross. Viteza crește doar dacă check-ul iese curat.' },
+  { id: 'pad-check-teep', name: 'Check – Teep', seq: ['Check', 'Lead Teep'], call: 'Low kick. Check, teep', cat: 'counter', note: 'Partenerul: un low kick lent, apoi pernele pe burtă pentru teep-ul tău.' },
+  { id: 'pad-knee-entry', name: 'Knee When He Comes In', seq: ['Read his step', 'Rear Knee'], call: 'Come in. Knee', cat: 'counter', note: 'Partenerul: intră aplecat, cu pernele ținute orizontal în fața burții; tu dai genunchiul în perne, stai drept și te lași puțin pe spate.' },
+  { id: 'pad-circle-teep', name: 'Circle Out – Teep', seq: ['Circle out', 'Lead Teep'], call: 'Push forward. Circle, teep', cat: 'footwork', note: 'Partenerul: te presează pas cu pas, cu pernele pe burtă; tu ieși în cerc, nu înapoi, și dai teep când te urmărește.' },
+  { id: 'pad-pull-cross', name: 'Pull Counter', seq: ['Lean back', 'Small step back', 'Right Cross'], call: 'Jab. Pull back, cross', cat: 'counter', note: 'Partenerul: un jab ușor cu perna spre fața ta; tu te lași pe piciorul din spate ca să treacă, apoi cross în perna pe care o ridică.' },
+  { id: 'pad-12', name: 'Jab – Cross', seq: ['Jab', 'Cross'], call: 'Jab, cross', cat: 'basics', note: 'Partenerul: pernele la înălțimea feței, cu fața spre tine, aduse puțin în lovitură.' },
+  { id: 'pad-123', name: 'Jab – Cross – Hook', seq: ['Jab', 'Cross', 'Lead Hook'], call: 'Jab, cross, hook', cat: 'basics', note: 'Partenerul: pernele sus pentru 1-2, apoi perna din dreapta întoarsă spre interior pentru croșeu.' },
+  { id: 'pad-check-hook', name: 'Check Hook', seq: ['Lead Hook', 'Pivot out'], call: 'Come in. Check hook', cat: 'counter', note: 'Partenerul: intră peste tine cu pernele sus; tu dai croșeul în perna lui și pivotezi în afara liniei.' },
+];
+
+const PAD_ROUNDS: Array<{ name: string; cue: string; ids: string[] }> = [
+  { name: 'Arme lungi', cue: 'Partenerul ține, tu lucrezi de la distanța ta: jab, teep, inside low kick.', ids: ['pad-jab-teep', 'pad-jab-inside', 'pad-teep-step'] },
+  { name: 'Pumni, apoi piciorul', cue: 'Partenerul mută pernele pe rând: sus pentru pumni, pe coapsă sau pe coaste pentru kick.', ids: ['pad-12-low', 'pad-123-low', 'pad-hook-body', 'pad-cross-lbody'] },
+  { name: 'Atacă el, răspunzi tu', cue: 'Partenerul atacă lent și controlat, tu răspunzi. Viteza crește doar când răspunsul iese curat.', ids: ['pad-check-cross', 'pad-check-teep', 'pad-knee-entry', 'pad-circle-teep', 'pad-pull-cross'] },
+];
+
 export const CAT_NAMES: Record<ComboCat, string> = {
   kicks: 'Picioare și genunchi',
   basics: 'Bazele',
@@ -691,6 +720,10 @@ function themesFrom(defs: Record<string, ThemeDef>, keys: string[], focus: strin
 export function roundThemes(focus: string | undefined, heightCm = 0, kicks = true): RoundTheme[] {
   const tall = heightCm >= TALL_CM;
   const f = focus ?? '';
+  if (f === 'pads') {
+    if (!kicks) return [{ name: 'Pumni pe perne', cue: 'Azi fără kick-uri: genunchiul are nevoie de pauză. Partenerul ține doar pentru pumni.', combos: PAD_DRILLS.filter((c) => !usesLegs(c)) }];
+    return PAD_ROUNDS.map((r) => ({ name: r.name, cue: r.cue, combos: r.ids.map((id) => PAD_DRILLS.find((c) => c.id === id)).filter((c): c is Combo => !!c) }));
+  }
   if (!kicks) {
     if (f === 'combo') return [{ name: 'Combinații de box', cue: 'Azi fără lovituri de picior: genunchiul are nevoie de pauză.', combos: focusCombos('combo', heightCm, false) }];
     const keys = BOX_THEMES_BY_FOCUS[f];
@@ -711,6 +744,7 @@ export function roundThemes(focus: string | undefined, heightCm = 0, kicks = tru
  */
 export function focusCombos(focus: string | undefined, heightCm = 0, kicks = true): Combo[] {
   const tall = heightCm >= TALL_CM;
+  if (focus === 'pads') return kicks ? PAD_DRILLS : PAD_DRILLS.filter((c) => !usesLegs(c));
   if (!kicks) return byIds((tall ? BOX_FOCUS_TALL : BOX_FOCUS)[focus === 'week' || !focus ? 'combo' : focus] ?? []);
   const week = weekCombos(learnWeek(), heightCm);
   if (focus === 'week') return week;
@@ -731,6 +765,7 @@ export const FOCUS_LINE: Record<string, string> = {
   power: 'Dutch Combinations & Power',
   slow: 'Slow, Clean Technique',
   distance: 'Distance Work',
+  pads: 'Thai Pads',
   rope: 'Joc de picioare ușor',
   ladder: 'Pași rapizi și preciși',
   legs: '',

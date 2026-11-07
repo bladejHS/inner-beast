@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#0d0b0a">
+<meta name="theme-color" content="#080606">
 <meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Unleash Your Inner Beast: planul zi de zi, timere de luptă, calistenie, Wim Hof și tracking.">
@@ -20,22 +20,22 @@
 <link rel="preload" href="fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/archivo-latin-ext-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script>
-// Theme before the first paint: the saved choice, otherwise the phone's setting.
+// Before the first paint: always dark (white was tiring on the eyes), and reduced animations if picked in Settings.
 (function () {
-  // always dark: white was tiring on the eyes
-  document.documentElement.dataset.theme = 'dark';
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0b0a');
+  var d = document.documentElement;
+  d.dataset.theme = 'dark';
+  try { if (localStorage.getItem('beast:motion') === 'lite') d.dataset.motion = 'lite'; } catch (e) { /* storage blocked */ }
 })();
 </script>
 <style>
 @font-face{font-family:'Archivo';font-style:normal;font-display:swap;font-weight:100 900;font-stretch:62% 125%;src:url(fonts/archivo-latin-wdth-normal.woff2) format('woff2-variations');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Archivo';font-style:normal;font-display:swap;font-weight:100 900;font-stretch:62% 125%;src:url(fonts/archivo-latin-ext-wdth-normal.woff2) format('woff2-variations');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-html{--sp-bg:#0d0b0a;--sp-fg:#f6f0ee}html[data-theme=dark]{--sp-bg:#0d0b0a;--sp-fg:#f6f0ee}
+html{--sp-bg:#080606;--sp-fg:#f7f0ec}html[data-theme=dark]{--sp-bg:#080606;--sp-fg:#f7f0ec}
 html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 /* BEAST AWAKENING, about 2.5 s. 0–.4 darkness, red smoke, slow dust; .4–.9 a crimson streak crosses and reveals the wolf;
    .9–1.5 the wolf comes up with one pulse and a metal sheen; 1.5–2 INNER BEAST and the tagline; 2–2.5 a red slash opens the app.
    Only transform, opacity and clip-path move, so the compositor can do the work. Scripted below. */
-#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#0d0b0a;color:#f6f0ee;animation:sp-guard 0s linear 9s forwards}
+#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#080606;color:#f7f0ec;animation:sp-guard 0s linear 9s forwards}
 @keyframes sp-guard{to{visibility:hidden;pointer-events:none}}
 .sp-smoke,.sp-dust,.sp-sparks,.sp-beam{position:absolute;inset:0;pointer-events:none}
 .sp-smoke{opacity:0}
@@ -144,7 +144,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 (function () {
   var sp = document.getElementById('splash'), slash = document.getElementById('sp-slash');
   if (!sp) return;
-  var VERSION = '2026-11-07', mode = 'auto', seen = false, known = '', boot = performance.now();
+  var VERSION = '2026-11-07b', mode = 'auto', seen = false, known = '', boot = performance.now();
   try { mode = localStorage.getItem('beast:opening') || 'auto'; known = localStorage.getItem('beast:opened-v') || ''; } catch (e) { /* storage blocked */ }
   try { seen = sessionStorage.getItem('beast:opened') === '1'; sessionStorage.setItem('beast:opened', '1'); } catch (e) { /* storage blocked */ }
   function drop() { sp.remove(); if (slash) slash.remove(); }
@@ -155,7 +155,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
     return;
   }
   try { localStorage.setItem('beast:opened-v', VERSION); } catch (e) { /* storage blocked */ }
-  var calm = mode === 'short' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var calm = mode === 'short' || matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'lite';
   var HOLD = calm ? 800 : 2000, LIMIT = 6000;
   var t0 = 0, started = false, leaving = false, broken = false;
   function ready() { var a = document.getElementById('app'); return !!a && a.children.length > 0; }

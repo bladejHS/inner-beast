@@ -1,4 +1,5 @@
-// "Minte": recovery tools, your why, the 28-day routine, the victory journal, the book and Alex's mindset.
+// "Minte" in three sections: Unelte (breathing, cold, mobility, discipline), Mental (your why, the 28-day routine,
+// the victory journal) and Cartea (the book). Also the chapter reader.
 
 import { BOOK, FORMULA, HABIT_STEPS, PRINCIPLES, type Chapter, type Para } from '../../data/book.ts';
 import { habitStreak } from '../../logic/progress.ts';
@@ -7,7 +8,7 @@ import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { ic } from '../icons.ts';
 import { habitCard } from './today.ts';
-import { top } from './shared.ts';
+import { pageHead, segBar, segOf, top } from './shared.ts';
 
 const TOOLS = [
   { k: 'lab', icon: 'wind', name: 'Breathwork Lab', sub: 'Reset, Tactical, Recovery, Advanced' },
@@ -57,21 +58,35 @@ function habitsBlock(): string {
     ${old.length ? `<p class="small dim" style="margin-top:12px">Obiceiuri construite: ${old.map((h) => esc(h.name)).join(', ')}.</p>` : ''}`;
 }
 
-export function mindHtml(): string {
-  return `${top()}
-    <h1 class="stack">Minte</h1>
-    <h2 class="sec" style="border-top:0;margin-top:8px;padding-top:0">Unelte</h2>
-    <div class="tiles">${TOOLS.map((t) => `<button class="tile" data-a="${SCREENS.has(t.k) ? 'tab' : 'tool'}" data-k="${t.k}">${ic(t.icon)}<b>${esc(t.name)}</b><span>${esc(t.sub)}</span></button>`).join('')}</div>
-    <h2 class="sec">De ce-ul tău<small>„Găsește-ți de ce-ul și îți vei găsi succesul.”</small></h2>
+export const MIND_SEGS: Array<[string, string]> = [['tools', 'Unelte'], ['mental', 'Mental'], ['book', 'Cartea']];
+
+function toolsSeg(): string {
+  return `<div class="tiles">${TOOLS.map((t) => `<button class="tile" data-a="${SCREENS.has(t.k) ? 'tab' : 'tool'}" data-k="${t.k}">${ic(t.icon)}<b>${esc(t.name)}</b><span>${esc(t.sub)}</span></button>`).join('')}</div>`;
+}
+
+function mentalSeg(): string {
+  return `<h2 class="sec first">De ce-ul tău<small>„Găsește-ți de ce-ul și îți vei găsi succesul.”</small></h2>
     ${whyBlock()}
     <h2 class="sec">Rutina de 28 de zile<small>Un singur lucru simplu, în fiecare zi. Nu te culci până nu e gata.</small></h2>
     ${habitsBlock()}
     <h2 class="sec">Jurnalul victoriilor<small>Privește înapoi la victoriile tale, mari și mici.</small></h2>
     ${winsBlock()}
-    <h2 class="sec">Cartea<small>Unleash Your Inner Beast, tot în afară de nutriție</small></h2>
-    <ul class="toc">${BOOK.map((c) => `<li class="${/^\d$/.test(c.num) ? 'sub' : ''}"><button data-a="chapter" data-id="${c.id}"><span class="n">${esc(c.num)}</span><span class="t">${esc(c.title)}</span></button></li>`).join('')}</ul>
-    <div class="card" style="margin-top:28px"><h3>Mentalitatea lui Alex</h3><p class="dim" style="margin:0 0 12px">Toate mesajele lui din video-uri sunt în tabul Alex.</p><button class="btn ghost sm" data-a="tab" data-k="alex">Deschide Alex</button></div>
+    <section class="card" style="margin-top:28px"><p class="label">Alex</p><h3>Mentalitatea lui Alex</h3><p class="dim" style="margin:0 0 12px">Toate mesajele lui din video-uri sunt în Lupte, la Alex.</p><button class="btn ghost sm" data-a="tab" data-k="alex">Deschide Alex</button></section>`;
+}
+
+function bookSeg(): string {
+  return `<p class="lead dim">Unleash Your Inner Beast, tot în afară de nutriție.</p>
+    <ul class="toc">${BOOK.map((c) => `<li class="${/^\d$/.test(c.num) ? 'sub' : ''}"><button data-a="chapter" data-id="${c.id}"><span class="n">${esc(c.num)}</span><span class="t">${esc(c.title)}</span>${ic('chev')}</button></li>`).join('')}</ul>
     <div class="sign">${art('trust')}</div>`;
+}
+
+export function mindHtml(): string {
+  const seg = segOf('mind', MIND_SEGS.map(([k]) => k));
+  const body = seg === 'mental' ? mentalSeg() : seg === 'book' ? bookSeg() : toolsSeg();
+  return `${top()}
+    ${pageHead('Minte', 'Respirație, frig, disciplină și de ce-ul tău.')}
+    ${segBar('Secțiuni Minte', MIND_SEGS, seg)}
+    <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }
 
 // ---------- reader ----------
@@ -145,8 +160,7 @@ export function chapterHtml(id: string): string {
   const prev = BOOK[i - 1];
   const next = BOOK[i + 1];
   return `${top(true)}
-    <p class="kicker">${esc(c.num)}</p>
-    <h1 class="stack mid">${esc(c.title)}</h1>
+    ${pageHead(c.title, '', `Capitolul ${esc(c.num)}`, 'sm')}
     <div class="reader">${c.body.map(para).join('')}</div>
     ${chapterTool(c)}
     <div class="btn-row" style="margin-top:28px">

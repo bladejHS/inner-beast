@@ -2,12 +2,11 @@
 
 import { DOPA_RULES, dopaBest, dopaClean, dopaStreak, MILESTONES, nextMilestone, nofapDays } from '../../logic/discipline.ts';
 import { addDays, dayKey, esc, RO_DAYS, weekdayIdx } from '../../logic/util.ts';
-import { art } from '../art.ts';
 import { ask, ctx, save, toast } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { CHALLENGES, challengeDays, CHALLENGE_DAYS } from '../../data/challenges.ts';
 import { daysBetween } from '../../logic/util.ts';
-import { top } from './shared.ts';
+import { pageHead, top } from './shared.ts';
 
 const zile = (n: number): string => `${n} ${n === 1 ? 'zi' : 'zile'}`;
 
@@ -69,8 +68,7 @@ function challengesHtml(today: string): string {
 
 export function disciplineHtml(): string {
   const today = dayKey();
-  return `${top('mind')}<div class="art-head">${art('jester')}<h1 class="stack mid">Discipline Challenges</h1></div>
-    <p class="dim" style="margin-top:-6px">Disciplina e un mușchi. Îl antrenezi zilnic, ca pe restul.</p>
+  return `${top('mind')}${pageHead('Discipline', 'Disciplina e un mușchi. Îl antrenezi zilnic, ca pe restul.', 'Challenges')}
     ${nofapCard(today)}
     ${dopaCard(today)}
     <h2 class="sec">Provocări de 30 de zile</h2>

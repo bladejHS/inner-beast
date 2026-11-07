@@ -25,9 +25,19 @@ export interface Player {
   destroy(): void;
 }
 
+/** The section last open in each tab (Lupte, Minte, Progres), kept for the browser session. */
+function loadSegs(): Record<string, string> {
+  try {
+    return JSON.parse(sessionStorage.getItem('beast:seg') || '{}') as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+
 export const ctx = {
   S: loadState() as State,
   tab: 'today' as Tab,
+  seg: loadSegs(),
   view: null as View,
   player: null as Player | null,
   render: (): void => {},

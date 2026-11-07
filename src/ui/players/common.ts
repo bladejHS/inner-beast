@@ -7,6 +7,7 @@ import { ctx } from '../ctx.ts';
 export function chrome(title: string, body: string, o: { cls?: string; ctrl?: string; center?: boolean } = {}): string {
   const snd = ctx.S.set.sound;
   return `<div class="pl ${o.cls ?? ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}">
+  <i class="pl-glow" aria-hidden="true"></i>
   <div class="pl-bar">
     <button class="icon-btn" data-a="p:close" aria-label="Închide">${ic('close')}</button>
     <div class="pl-title">${esc(title)}</div>
@@ -33,8 +34,15 @@ export function switchCtl(act: string, on: boolean, label: string): string {
   return `<label class="switch"><input type="checkbox" data-a="${act}" ${on ? 'checked' : ''} aria-label="${esc(label)}"><span></span></label>`;
 }
 
-/** Throttled DOM text update by id. */
+/** Throttled DOM text update by id. In the last seconds of a round (and in each punch-out burst) the big timer's
+ *  digits also take a beat on every new second. */
 export function setText(id: string, txt: string): void {
   const el = document.getElementById(id);
-  if (el && el.textContent !== txt) el.textContent = txt;
+  if (!el || el.textContent === txt) return;
+  el.textContent = txt;
+  if (id === 't' && el.closest('.ph-last, .ph-burst, [data-final]')) {
+    el.classList.remove('beat');
+    void el.offsetWidth;
+    el.classList.add('beat');
+  }
 }

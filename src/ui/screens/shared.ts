@@ -1,14 +1,12 @@
-// Pieces shared by the screens: header, program block cards, starting and checking off a block.
+// Pieces shared by the screens: header, page title, section switcher, the day's rounds, starting and checking off a block.
 
 import { focusCombos } from '../../data/combos.ts';
 import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks, type RestKey } from '../../data/plan.ts';
 import { ROW_CHALLENGES, rowChallenge } from '../../data/row.ts';
-import { cycleAt, deloadOn, growMinutes } from '../../logic/progress.ts';
+import { activeStreak, cycleAt, deloadOn, growMinutes } from '../../logic/progress.ts';
 import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
-import { dayKey, esc, inWeek, num, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
-import { art } from '../art.ts';
-import { rake } from '../claws.ts';
-import { addEntry, ask, ctx, fresh, save, toast } from '../ctx.ts';
+import { dayKey, esc, inWeek, num, pad2, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
+import { addEntry, ask, ctx, fresh, save, toast, type Tab } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { openAmrap } from '../players/amrap.ts';
 import { openBreath } from '../players/breath.ts';
@@ -20,33 +18,45 @@ import { openShower } from '../players/shower.ts';
 import { openWimHof } from '../players/wimhof.ts';
 import { openWorkout } from '../players/workout.ts';
 
-export function isDark(): boolean {
-  return document.documentElement.dataset.theme === 'dark';
-}
-
-/** Light or dark, remembered on this device. */
-export function setTheme(dark: boolean): void {
-  const t = dark ? 'dark' : 'light';
-  document.documentElement.dataset.theme = t;
-  try {
-    localStorage.setItem('beast:theme', t);
-  } catch {
-    /* ignore */
-  }
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#050404' : '#f3f1ec');
-}
+const BASE = import.meta.env.BASE_URL;
 
 const TAB_NAME: Record<string, string> = { today: 'Azi', plan: 'Plan', fight: 'Lupte', mind: 'Minte', progress: 'Progres' };
 
-/** The header: the brand, or a way back. `back` is true for views opened over a tab, or the tab a sub-screen belongs to. */
-export function top(back: boolean | string = false): string {
+/** The header. On the tab screens: the wolf and the streak. `true`: a way back for screens opened over a tab;
+ *  a tab name: a way back to that tab, for the screens that belong to it (Lab, Discipline, Provocări). */
+export function top(back: boolean | Tab = false): string {
+  const streak = back ? 0 : activeStreak(ctx.S.log, dayKey());
   const left =
     typeof back === 'string'
-      ? `<button class="icon-btn back-row" style="width:auto;padding-right:10px" data-a="tab" data-k="${back}" aria-label="Înapoi la ${esc(TAB_NAME[back] ?? back)}">${ic('back')}<span>${esc(TAB_NAME[back] ?? '')}</span></button>`
+      ? `<button class="back" data-a="tab" data-k="${back}" aria-label="Înapoi la ${esc(TAB_NAME[back] ?? back)}">${ic('back')}<span>${esc(TAB_NAME[back] ?? 'Înapoi')}</span></button>`
       : back
-        ? `<button class="icon-btn" data-a="back" aria-label="Înapoi">${ic('back')}</button>`
-        : `<div class="brand">${art('wolf')}<span>Inner Beast</span></div>`;
-  return `<header class="top">${left}<div class="top-r"><button class="icon-btn" data-a="settings" aria-label="Setări">${ic('gear')}</button></div></header>`;
+        ? `<button class="back" data-a="back" aria-label="Înapoi">${ic('back')}<span>Înapoi</span></button>`
+        : `<div class="brand"><i class="brand-wolf" style="--m:url(${BASE}art/wolf.webp)" aria-hidden="true"></i><span>Inner <b>Beast</b></span></div>`;
+  const run = streak > 1 ? `<button class="streak${streak >= 7 ? ' hot' : ''}" data-a="tab" data-k="progress" aria-label="${streak} zile active la rând">${ic('claw')}<b class="num">${streak}</b><span>zile</span></button>` : '';
+  return `<header class="top">${left}<div class="top-r">${run}<button class="icon-btn" data-a="settings" aria-label="Setări">${ic('gear')}</button></div></header>`;
+}
+
+/** The big slanted title of a tab, with one line under it. The title rises out of its own box on entry. */
+export function pageHead(title: string, sub = '', kicker = '', size: '' | 'sm' = ''): string {
+  return `<div class="ph${size ? ` ph-${size}` : ''}">${kicker ? `<p class="ph-k">${kicker}</p>` : ''}<h1 class="ph-t"><span>${esc(title)}</span></h1><i class="ph-blade" aria-hidden="true"></i>${sub ? `<p class="ph-s">${sub}</p>` : ''}</div>`;
+}
+
+/** The section switcher under a tab's title. The red blade under the current section slides (see main.ts). */
+export function segBar(label: string, segs: Array<[string, string]>, cur: string): string {
+  return `<nav class="seg" aria-label="${esc(label)}"><div class="seg-in">${segs
+    .map(([k, l]) => `<button class="seg-b" data-a="seg" data-k="${k}"${k === cur ? ' aria-current="true"' : ''}>${esc(l)}</button>`)
+    .join('')}<i class="seg-ink" aria-hidden="true"></i></div></nav>`;
+}
+
+/** The section of a tab now shown: the saved one if it still exists, else the first. */
+export function segOf(tab: string, keys: string[]): string {
+  const k = ctx.seg[tab];
+  return k && keys.includes(k) ? k : keys[0];
+}
+
+/** A progress ring: `f` from 0 to 1; `key` lets the ring move from its last value when the screen redraws. */
+export function gauge(f: number, inner: string, key = '', cls = ''): string {
+  return `<div class="gauge ${cls}"${key ? ` data-ring="${key}"` : ''} style="--f:${Math.max(0, Math.min(1, f)).toFixed(3)}"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="g-t" cx="32" cy="32" r="28"/><circle class="g-v" cx="32" cy="32" r="28"/></svg><div class="g-in">${inner}</div></div>`;
 }
 
 export function restFor(k: RestKey | undefined): number {
@@ -60,13 +70,25 @@ export function blockRest(b: Block): number {
   return b.restSec ?? restFor(b.rest);
 }
 
-/** The user's picks plus what this week decides: the emphasis of the loop and the minutes of the blocks that grow. */
+let picksKey = '';
+let picksVal: (Settings & Picks) | null = null;
+
+/** The user's picks plus what this week decides: the emphasis of the loop and the minutes of the blocks that grow.
+ *  A screen asks for it once per block, so the answer is kept until the log, the settings or the day change. */
 export function planPicks(today = dayKey()): Settings & Picks {
   const S = ctx.S;
+  const lastTs = S.log.length ? S.log[S.log.length - 1].ts : 0;
+  // a check can be undone without touching the log's length, so the checked entries are counted too
+  let marked = 0;
+  for (const e of S.log) if (e.block) marked++;
+  const key = `${today}|${S.log.length}|${lastTs}|${marked}|${S.cycle.start}|${S.deload.week}|${JSON.stringify(S.set)}`;
+  if (picksVal && key === picksKey) return picksVal;
   const grown: Record<string, number> = {};
   const light = deloadOn(S.deload, today);
   for (const b of ALL_BLOCKS) if (b.grow) grown[b.id] = light ? b.grow.base : growMinutes(S.log, b.id, S.cycle.start, b.grow);
-  return { ...S.set, cycle: cycleAt(S.cycle.start, today)?.id, grown };
+  picksKey = key;
+  picksVal = { ...S.set, cycle: cycleAt(S.cycle.start, today)?.id, grown };
+  return picksVal;
 }
 
 /** A block as it runs this week. */
@@ -169,16 +191,17 @@ function altPicker(b: Block): string {
         ? [['shadow', 'Singur', s.thuPartner !== 'spar'], ['spar', 'Cu partener', s.thuPartner === 'spar']]
         : [['bag', 'Heavy Bag', s.thuMain === 'bag'], ['row', 'Machine Row', s.thuMain === 'row']];
   const chips = (act: string, list: Array<[string, string, boolean]>, label: string) =>
-    `<div class="chips bk-alt" role="group" aria-label="${esc(label)}">${list.map(([v, l, on]) => `<button class="chip" aria-pressed="${on}" data-a="${act}" data-b="${b.id}" data-v="${v}">${esc(l)}</button>`).join('')}</div>`;
+    `<div class="chips rd-alt" role="group" aria-label="${esc(label)}">${list.map(([v, l, on]) => `<button class="chip" aria-pressed="${on}" data-a="${act}" data-b="${b.id}" data-v="${v}">${esc(l)}</button>`).join('')}</div>`;
   let html = chips('alt', opts, 'Alege activitatea');
   if (b.alt === 'main' && s.thuMain === 'row') {
     const cur = rowChallenge(s.rowCh);
-    html += chips('row-ch', ROW_CHALLENGES.map((c) => [c.id, `${c.id.toUpperCase()} · ${c.label}`, c.id === cur.id]), 'Alege provocarea');
+    html += chips('row-ch', ROW_CHALLENGES.map((c) => [c.id, `${c.id.toUpperCase()}: ${c.label}`, c.id === cur.id]), 'Alege provocarea');
   }
   return html;
 }
 
-export function blockCard(raw: Block, n: number, today: string): string {
+/** One round of the day's card: the number on the rail (tap to check off), what it is, and its start button. */
+export function blockCard(raw: Block, n: number, today: string, next = false): string {
   const b = liveBlock(raw);
   const entries = blockEntries(b, today);
   const done = entries.length > 0;
@@ -191,24 +214,22 @@ export function blockCard(raw: Block, n: number, today: string): string {
   if (b.kind === 'run') extra = `<button class="link" data-a="polar" data-b="${b.id}">Adaugă din Polar Flow</button>`;
   if (b.kind === 'rounds' && b.focus && b.burstFrom !== 1 && b.focus !== 'legs' && b.focus !== 'rope' && b.focus !== 'ladder') {
     const cs = focusCombos(b.focus, ctx.S.nut.h);
-    extra += `<p class="bk-calls"><b>Combinații:</b> ${esc(cs.slice(0, 4).map((c) => c.name).join(' · '))}${cs.length > 4 ? ` și încă ${cs.length - 4}` : ''}</p>`;
+    extra += `<p class="rd-calls"><b>Combinații strigate:</b> ${esc(cs.slice(0, 4).map((c) => c.name).join(', '))}${cs.length > 4 ? ` și încă ${cs.length - 4}` : ''}</p>`;
   }
   const when = done ? doneWhen(entries[0].date, today) : '';
   const just = done && fresh.block === b.id && Date.now() < fresh.until;
   if (just) fresh.block = '';
-  return `<li class="bk ${done ? 'done' : ''} ${just ? 'just' : ''}">
-    ${just ? rake('bk-rake') : ''}
-    <div class="bk-top">
-      <button class="bk-ic" data-a="mark" data-b="${b.id}" aria-label="${done ? 'Anulează bifa' : 'Bifează fără timer'}">${done ? ic('check') : ic(blockIcon(b))}</button>
-      <div class="bk-main">
-        <span class="bk-n">${String(n).padStart(2, '0')}${when ? ` <em>${esc(when)}</em>` : ''}</span>
-        <h3>${esc(name)}</h3>
-        <p class="bk-dose">${esc(b.dose)}</p>
-      </div>
-      <button class="bk-go" data-a="start" data-b="${b.id}" aria-label="${done ? 'Din nou' : 'Start'}: ${esc(name)}">${ic('play')}</button>
+  const state = done ? 'done' : next ? 'next' : '';
+  return `<li class="rd ${state}${just ? ' just' : ''}" style="--n:${n}">
+    <button class="rd-node" data-a="mark" data-b="${b.id}" aria-label="${done ? `Anulează bifa: ${esc(name)}` : `Bifează fără timer: ${esc(name)}`}">${done ? ic('check') : `<b>${pad2(n)}</b>`}</button>
+    <div class="rd-main">
+      <p class="rd-meta">${ic(blockIcon(b))}<span>${esc(b.dose)}</span>${when ? `<em>${esc(when)}</em>` : ''}</p>
+      <h3 class="rd-name">${esc(name)}</h3>
+      <p class="rd-tip">${esc(b.tip)}</p>
+      ${extra}
     </div>
-    <p class="bk-tip">${esc(b.tip)}</p>
-    ${extra}
+    <button class="rd-go" data-a="start" data-b="${b.id}" aria-label="${done ? 'Din nou' : 'Start'}: ${esc(name)}">${ic('play')}</button>
+    ${just ? '<i class="rd-slash" aria-hidden="true"><i></i><i></i><i></i></i>' : ''}
   </li>`;
 }
 

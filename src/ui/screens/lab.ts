@@ -2,19 +2,16 @@
 
 import { LAB } from '../../logic/breathlab.ts';
 import { esc } from '../../logic/util.ts';
-import { art } from '../art.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
-import { top } from './shared.ts';
+import { pageHead, top } from './shared.ts';
 
 export function labHtml(): string {
   const done = ctx.S.log.filter((e) => e.kind === 'breath' && e.data.lab);
   const min = Math.round(done.reduce((s, e) => s + e.dur, 0) / 60);
   return `${top('mind')}
-    <header class="lab-head">
-      <div class="art-head">${art('heart')}<h1 class="stack mid">Breathwork Lab</h1></div>
-      <div class="lab-sum"><span><b class="num">${done.length}</b> sesiuni</span><span><b class="num">${min}</b> min</span></div>
-    </header>
+    ${pageHead('Breathwork Lab', 'Patru moduri de respirație: control, focus, recuperare.')}
+    <div class="lab-sum"><span><b class="num">${done.length}</b> sesiuni</span><span><b class="num">${min}</b> min</span></div>
     <div class="lab-modes">${LAB.map((m) => {
       const n = done.filter((e) => e.data.lab === m.id).length;
       return `<button class="lab-mode" data-mode="${m.id}" data-a="lab" data-k="${m.id}">

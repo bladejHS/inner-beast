@@ -1,11 +1,14 @@
 // Line icons, 24 × 24, drawn with currentColor.
 
+// Shapes with class "f" fill in when their tab is the current one (see .nav in beast.css).
 const P: Record<string, string> = {
   today: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
-  plan: '<rect x="3.5" y="5" width="17" height="15.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M7.5 14h3M13.5 14h3M7.5 17h3"/>',
-  fight: '<path d="M7 10.5V7.8C7 5.7 8.7 4 10.8 4h3.6C17.5 4 20 6.5 20 9.6v2.9c0 2.5-1.6 4.7-4 5.5V20.5H8V17.6c-1.8-.9-3-2.8-3-4.8 0-1.3 1-2.3 2.3-2.3H11"/><path d="M8 20.5h8"/>',
-  mind: '<path d="M12 21c-3.9 0-7-2.8-7-6.6 0-2.9 1.8-4.6 3.2-6.1.7 1.4 1.7 2.2 2.7 2.4-.3-3.3 1.1-6 3.9-7.7-.2 2.6.9 4.4 2.3 6 1.4 1.5 2.9 3.2 2.9 5.6C20 18.2 16 21 12 21z"/><path d="M12 21c-1.7 0-3-1.3-3-3 0-1.6 1.1-2.5 1.9-3.4.3.8.9 1.2 1.5 1.3.1-1.5.7-2.6 1.8-3.5.1 1.6.8 2.4 1.4 3.2.4.6.4 1.3.4 1.9 0 1.9-1.6 3.5-4 3.5z"/>',
-  progress: '<path d="M4 20.5h16"/><rect x="5" y="12" width="3.4" height="8.5"/><rect x="10.3" y="7" width="3.4" height="13.5"/><rect x="15.6" y="3.5" width="3.4" height="17"/>',
+  plan: '<path class="f" d="M3.5 6.5h17v14h-17z"/><path d="M3.5 10.5h17M8 3.5v5M16 3.5v5"/><path d="M8 15.4l2.6 2.4 5.3-5.2"/>',
+  fight: '<path class="f" d="M6.8 20.5h9.4v-3.2c2.4-1.3 3.8-3.7 3.8-6.4V8.3c0-2.9-2.3-5.1-5.2-5.1h-4.3C7.6 3.2 5.3 5.5 5.3 8.4v4.9c0 1.7.5 3.2 1.5 4.3z"/><path d="M6.8 17.3h9.4"/><path d="M5.3 10.6c1.6-.6 3.2-.2 4.1 1 .6.8.8 1.8.5 2.8"/><path d="M11 7.2c1.6-.5 3.3-.5 4.9 0"/>',
+  mind: '<path class="f" d="M12 21c-3.9 0-7-2.8-7-6.6 0-2.9 1.8-4.6 3.2-6.1.7 1.4 1.7 2.2 2.7 2.4-.3-3.3 1.1-6 3.9-7.7-.2 2.6.9 4.4 2.3 6 1.4 1.5 2.9 3.2 2.9 5.6C20 18.2 16 21 12 21z"/><path d="M12 21c-1.7 0-3-1.3-3-3 0-1.6 1.1-2.5 1.9-3.4.3.8.9 1.2 1.5 1.3.1-1.5.7-2.6 1.8-3.5.1 1.6.8 2.4 1.4 3.2.4.6.4 1.3.4 1.9 0 1.9-1.6 3.5-4 3.5z"/>',
+  progress: '<path d="M3 20.5h18"/><path class="f" d="M5 14.5h3.6v6H5zM10.2 10.5h3.6v10h-3.6zM15.4 5.5H19v15h-3.6z"/>',
+  /** Three claw gashes: the streak, the "done" marks. */
+  claw: '<path d="M9.4 2.6c-.8 6.2-2.6 12.6-5.7 18.9 4-5.5 6.4-11.9 7.3-18.9z" fill="currentColor" stroke="none"/><path d="M14.5 2.1c-.9 6.5-2.8 13.1-5.9 19.8 4.1-5.8 6.6-12.5 7.5-19.8z" fill="currentColor" stroke="none"/><path d="M19.6 2.6c-.8 6.2-2.6 12.6-5.7 18.9 4-5.5 6.4-11.9 7.3-18.9z" fill="currentColor" stroke="none"/>',
   gear: '<circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M21.2 12h-2.6M5.4 12H2.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8M18.5 18.5l-1.8-1.8M7.3 7.3L5.5 5.5"/><circle cx="12" cy="12" r="6.6"/>',
   play: '<path d="M7 4.5v15l12.5-7.5z" fill="currentColor" stroke="none"/>',
   pause: '<rect x="6" y="4.5" width="4" height="15" fill="currentColor" stroke="none"/><rect x="14" y="4.5" width="4" height="15" fill="currentColor" stroke="none"/>',

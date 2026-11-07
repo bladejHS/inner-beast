@@ -1,4 +1,5 @@
-// "Progres": the week, totals, calisthenics, runs, Wim Hof, sleep, steps and the full history.
+// "Progres" in four sections: Săptămâna (the week, totals, sleep, steps), Antrenament (box, calisthenics, aerobic),
+// Teste (the test battery and the challenges) and Istoric (the latest entries; the full list opens on its own screen).
 
 import { WEEK } from '../../data/plan.ts';
 import { BW_SCHEMES, EMOM_GOAL, WORKOUTS } from '../../data/workouts.ts';
@@ -10,7 +11,7 @@ import { bars, spark } from '../charts.ts';
 import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { ic } from '../icons.ts';
-import { top } from './shared.ts';
+import { pageHead, segBar, segOf, top } from './shared.ts';
 import { boxCycle, boxScore, boxStats } from '../../logic/boxstats.ts';
 import { COMBOS } from '../../data/combos.ts';
 import { bestOf, TESTS, UNIT_LABEL, type FitTest } from '../../data/tests.ts';
@@ -31,7 +32,7 @@ function testsHtml(): string {
       : `${t.what}. ${t.every}`;
     return `<li class="test-row"><div><b>${esc(t.name)}</b><span>${esc(info)}</span></div><button class="btn ghost sm" data-a="test" data-k="${t.id}" aria-label="Notează ${esc(t.name)}">Notează</button></li>`;
   });
-  return `<h2 class="sec" id="tests">Teste<small>În săptămâna ușoară, odihnit: puterea întâi, alergarea la final</small></h2><ul class="hist tests">${rows.join('')}</ul>`;
+  return `<h2 class="sec first" id="tests">Teste<small>În săptămâna ușoară, odihnit: puterea întâi, alergarea la final</small></h2><ul class="hist tests">${rows.join('')}</ul>`;
 }
 
 function entryLine(e: Entry, del = false): string {
@@ -93,12 +94,12 @@ function entryLine(e: Entry, del = false): string {
 
 function boxHtml(today: string): string {
   const b = boxStats(ctx.S.log, today);
-  if (!b.rounds && !b.punches) return '<h2 class="sec">Box</h2><p class="dim">După primele runde vezi aici statisticile.</p>';
+  if (!b.rounds && !b.punches) return '<h2 class="sec first">Box</h2><p class="dim">După primele runde vezi aici statisticile.</p>';
   const diff = Math.round(b.min30 - b.minPrev30);
   const known = learned();
   const cy = boxCycle(ctx.S.log, today);
   const rare = COMBOS.filter((c) => known.has(c.id)).sort((x, y) => (b.called[x.name] ?? 0) - (b.called[y.name] ?? 0)).slice(0, 3);
-  return `<h2 class="sec">Box<small>Ultimele 30 de zile: ${Math.round(b.min30)} min, ${diff >= 0 ? '+' : '−'}${Math.abs(diff)} față de cele 30 dinainte</small></h2>
+  return `<h2 class="sec first">Box<small>Ultimele 30 de zile: ${Math.round(b.min30)} min, ${diff >= 0 ? '+' : '−'}${Math.abs(diff)} față de cele 30 dinainte</small></h2>
     <div class="stats">
       <div class="stat"><b>${b.rounds}</b><span>runde în total</span></div>
       <div class="stat"><b>${Math.round(b.bagMin)}</b><span>minute la sac</span></div>
@@ -113,18 +114,67 @@ function boxHtml(today: string): string {
     ${rare.length ? `<p class="small dim">Exersate cel mai rar dintre cele învățate: ${rare.map((c) => esc(c.name)).join(', ')}.</p>` : ''}`;
 }
 
-export function progressHtml(): string {
+export const PROGRESS_SEGS: Array<[string, string]> = [['week', 'Săptămâna'], ['train', 'Antrenament'], ['tests', 'Teste'], ['log', 'Istoric']];
+
+/** Săptămâna: the week, the totals, sleep and steps. */
+function weekSeg(): string {
   const S = ctx.S;
   const today = dayKey();
-  const mon = weekStart(today);
-  const done = weekDone(S.log, mon);
+  const done = weekDone(S.log, weekStart(today));
   const t = totals(S.log);
   const streak = activeStreak(S.log, today);
   const week = WEEK.map((d) => {
     const n = dayProgress(d, done);
-    return `<div class="${weekdayIdx(today) === d.idx ? 'today' : ''}"><i><b style="height:${((n / d.blocks.length) * 100).toFixed(0)}%"></b></i><span>${RO_DAYS[d.idx].slice(0, 2)}</span></div>`;
+    return `<div class="${weekdayIdx(today) === d.idx ? 'today' : ''}"><i style="--f:${(n / d.blocks.length).toFixed(3)}"><b></b></i><span>${RO_DAYS[d.idx].slice(0, 2)}</span></div>`;
   }).join('');
   const full = WEEK.filter((d) => dayProgress(d, done) === d.blocks.length).length;
+  const last7 = Array.from({ length: 7 }, (_, i) => addDays(today, i - 6));
+  const sleepVals = last7.map((d) => S.sleep[d] ?? 0);
+  const slept = sleepVals.filter((v) => v > 0);
+  const avgSleep = slept.length ? slept.reduce((a, b) => a + b, 0) / slept.length : 0;
+  const stepsVals = last7.map((d) => S.steps[d] ?? 0);
+  const stat = (v: number, label: string, cls = '', shown = String(v)) => `<div class="stat ${cls}"><b class="num" data-count="${Math.round(v)}">${shown}</b><span>${label}</span></div>`;
+  return `<h2 class="sec first">Săptămâna asta<small>${full} din 7 zile complete</small></h2>
+    <div class="week7">${week}</div>
+    <div class="stats">
+      ${stat(streak, streak === 1 ? 'zi activă la rând' : 'zile active la rând', 'hot')}
+      ${stat(t.sessions, 'sesiuni în total')}
+      ${stat(Math.round(t.boxingMin), 'minute de runde')}
+      <div class="stat"><b class="num">${t.runKm.toFixed(1).replace('.', ',')}</b><span>km alergați</span></div>
+      ${stat(Math.round(t.coldMin), 'minute la rece')}
+      ${stat(Math.round(t.breathMin), 'minute de respirație')}
+    </div>
+    <h2 class="sec">Somn<small>${avgSleep ? `Media pe 7 zile: ${avgSleep.toFixed(1).replace('.', ',')} h` : 'Notează-l pe ecranul Azi'}</small></h2>
+    ${bars(last7.map((d, i) => ({ v: sleepVals[i], label: RO_DAYS[weekdayIdx(d)].slice(0, 2) })), 7)}
+    <h2 class="sec">Pași<small>Ținta: 10.000</small></h2>
+    ${bars(last7.map((d, i) => ({ v: stepsVals[i], label: RO_DAYS[weekdayIdx(d)].slice(0, 2) })), 10000)}`;
+}
+
+/** Istoric: the latest entries, then the whole list on its own screen. */
+function logSeg(): string {
+  const recent = [...ctx.S.log].reverse().slice(0, 20);
+  return recent.length
+    ? `<ul class="hist">${recent.map((e) => entryLine(e)).join('')}</ul><button class="btn ghost sm" data-a="history" style="margin-top:14px">Tot istoricul</button>`
+    : `<div class="empty">${art('peek')}<p>Tot ce faci apare aici.</p></div>`;
+}
+
+export function progressHtml(): string {
+  const seg = segOf('progress', PROGRESS_SEGS.map(([k]) => k));
+  const body = seg === 'train' ? trainSeg() : seg === 'tests' ? `${testsHtml()}${challengeLink()}` : seg === 'log' ? logSeg() : weekSeg();
+  return `${top()}
+    ${pageHead('Progres', 'Ce ai construit, săptămână de săptămână.')}
+    ${segBar('Secțiuni Progres', PROGRESS_SEGS, seg)}
+    <div class="seg-body" data-seg="${seg}">${body}</div>`;
+}
+
+function challengeLink(): string {
+  return `<button class="row-link big" data-a="tab" data-k="challenge"><span class="rl-ic">${ic('trophy')}</span><span class="rl-t"><b>Provocări</b><span>Curse simulate (Hyrox, Murph, Fight Night și altele) și provocări de 30 de zile</span></span>${ic('chev')}</button>`;
+}
+
+/** Antrenament: boxing, calisthenics and the aerobic work. */
+function trainSeg(): string {
+  const S = ctx.S;
+  const today = dayKey();
 
   // calisthenics
   const exLines: string[] = [];
@@ -154,52 +204,16 @@ export function progressHtml(): string {
   const aerobic = S.log.filter((e) => e.kind === 'run' || e.kind === 'cardio');
   const paces = runs.map((e) => Number(e.data.pace) || 0).filter((p) => p > 0).slice(-12);
 
-  // sleep & steps
-  const last7 = Array.from({ length: 7 }, (_, i) => addDays(today, i - 6));
-  const sleepVals = last7.map((d) => S.sleep[d] ?? 0);
-  const slept = sleepVals.filter((v) => v > 0);
-  const avgSleep = slept.length ? slept.reduce((a, b) => a + b, 0) / slept.length : 0;
-  const stepsVals = last7.map((d) => S.steps[d] ?? 0);
-
-  const recent = [...S.log].reverse().slice(0, 12);
-
-  return `${top()}
-    <h1 class="stack">Progres</h1>
-    <h2 class="sec" style="border-top:0;margin-top:8px;padding-top:0">Săptămâna asta<small>${full} din 7 zile complete</small></h2>
-    <div class="week7">${week}</div>
-    <div class="stats" style="margin-top:14px">
-      <div class="stat"><b>${streak}</b><span>${streak === 1 ? 'zi activă la rând' : 'zile active la rând'}</span></div>
-      <div class="stat"><b>${t.sessions}</b><span>sesiuni în total</span></div>
-      <div class="stat"><b>${Math.round(t.boxingMin)}</b><span>minute de runde</span></div>
-      <div class="stat"><b>${t.runKm.toFixed(1).replace('.', ',')}</b><span>km alergați</span></div>
-      <div class="stat"><b>${Math.round(t.coldMin)}</b><span>minute la rece</span></div>
-      <div class="stat"><b>${Math.round(t.breathMin)}</b><span>minute de respirație</span></div>
-    </div>
-
-    ${testsHtml()}
-    <nav class="sub-links" aria-label="Provocări">
-      <button class="timer-row" data-a="tab" data-k="challenge"><div><b>Provocări</b><span>Curse simulate (Hyrox, Murph, Fight Night și altele) și provocări de 30 de zile</span></div>${ic('chev')}</button>
-    </nav>
-
-    ${boxHtml(today)}
+  return `${boxHtml(today)}
 
     <h2 class="sec">Calistenie<small>Totalul de repetări pe sesiune, la varianta curentă</small></h2>
-    <div class="ex-line"><div><b>Pull-up EMOM</b><span>Următoarea țintă: ${S.emom.min} min × ${S.emom.reps}. Spre ${EMOM_GOAL.min} × ${EMOM_GOAL.reps}: ${emomPct}%.</span></div><div class="bar" style="margin:0"><i style="width:${Math.min(100, emomPct)}%"></i></div></div>
+    <div class="ex-line"><div><b>Pull-up EMOM</b><span>Următoarea țintă: ${S.emom.min} min × ${S.emom.reps}. Spre ${EMOM_GOAL.min} × ${EMOM_GOAL.reps}: ${emomPct}%.</span></div><div class="bar" style="margin:0;--fill:${Math.min(1, emomPct / 100).toFixed(3)}"><i></i></div></div>
     ${amraps.length ? `<div class="ex-line"><div><b>Bodyweight Workout</b><span>Ultima dată ${amraps[amraps.length - 1].data.rounds} runde${amBest ? `, recordul la ${esc(BW_SCHEMES[sch].name)}: ${amBest.data.rounds} runde + ${amBest.data.extra}` : ''}</span></div>${spark(amrapTrend(S.log, sch))}</div>` : ''}
     ${exLines.join('') || '<p class="dim">După primul antrenament de push, pull sau picioare vezi aici fiecare exercițiu.</p>'}
 
     <h2 class="sec">Aerob<small>Alergarea de duminică și canotajul de marți, ușor</small></h2>
     ${runAdvice(S.log) ? `<p class="small dim">${esc(runAdvice(S.log))}</p>` : ''}
-    ${aerobic.length ? `${paces.length > 1 ? `<p class="small dim" style="margin:0">Ritmul mediu la alergare (mai jos e mai rapid)</p>${spark(paces, true)}` : ''}<ul class="hist">${aerobic.slice(-6).reverse().map((e) => entryLine(e)).join('')}</ul>` : '<p class="dim">Duminică: alergare ușoară, de la 20 la 30 de minute. Marți: canotaj ușor.</p>'}
-
-    <h2 class="sec">Somn<small>${avgSleep ? `Media pe 7 zile: ${avgSleep.toFixed(1).replace('.', ',')} h` : 'Notează-l pe ecranul Azi'}</small></h2>
-    ${bars(last7.map((d, i) => ({ v: sleepVals[i], label: RO_DAYS[weekdayIdx(d)].slice(0, 2) })), 7)}
-
-    <h2 class="sec">Pași<small>Ținta: 10.000</small></h2>
-    ${bars(last7.map((d, i) => ({ v: stepsVals[i], label: RO_DAYS[weekdayIdx(d)].slice(0, 2) })), 10000)}
-
-    <h2 class="sec">Istoric</h2>
-    ${recent.length ? `<ul class="hist">${recent.map((e) => entryLine(e)).join('')}</ul><button class="btn ghost sm" data-a="history" style="margin-top:12px">Tot istoricul</button>` : `<div class="empty">${art('peek')}<p>Tot ce faci apare aici.</p></div>`}`;
+    ${aerobic.length ? `${paces.length > 1 ? `<p class="small dim" style="margin:0">Ritmul mediu la alergare (mai jos e mai rapid)</p>${spark(paces, true)}` : ''}<ul class="hist">${aerobic.slice(-6).reverse().map((e) => entryLine(e)).join('')}</ul>` : '<p class="dim">Duminică: alergare ușoară, de la 20 la 30 de minute. Marți: canotaj ușor.</p>'}`;
 }
 
 export function historyHtml(): string {
@@ -209,6 +223,6 @@ export function historyHtml(): string {
     g.push(e);
     groups.set(e.date, g);
   }
-  const html = [...groups.entries()].map(([d, es]) => `<h2 class="sec" style="font-size:19px;margin:24px 0 6px">${esc(prettyDay(d))}</h2><ul class="hist">${es.map((e) => entryLine(e, true)).join('')}</ul>`).join('');
-  return `${top(true)}<h1 class="stack mid">Istoric</h1>${html || `<div class="empty">${art('peek')}<p>Gol deocamdată.</p></div>`}`;
+  const html = [...groups.entries()].map(([d, es]) => `<h2 class="sec day-h">${esc(prettyDay(d))}</h2><ul class="hist">${es.map((e) => entryLine(e, true)).join('')}</ul>`).join('');
+  return `${top(true)}${pageHead('Istoric', `${ctx.S.log.length} ${ctx.S.log.length === 1 ? 'înregistrare' : 'înregistrări'}`)}${html || `<div class="empty">${art('peek')}<p>Gol deocamdată.</p></div>`}`;
 }

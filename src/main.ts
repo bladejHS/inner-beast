@@ -1,5 +1,4 @@
-import './styles.css';
-import './design.css';
+import './beast.css';
 import { publishPlan } from './logic/bridge.ts';
 import { blockById, WEEK, type Block } from './data/plan.ts';
 import { rowChallenge } from './data/row.ts';
@@ -14,7 +13,7 @@ import { jogTarget, openPolar } from './ui/players/run.ts';
 import { openShower } from './ui/players/shower.ts';
 import { openWimHof } from './ui/players/wimhof.ts';
 import { fightHtml, setComboCat, startQuick } from './ui/screens/fight.ts';
-import { alexHtml, toggleLearned } from './ui/screens/alex.ts';
+import { toggleLearned } from './ui/screens/alex.ts';
 import { chapterHtml, mindHtml } from './ui/screens/mind.ts';
 import { planHtml } from './ui/screens/plan.ts';
 import { historyHtml, progressHtml, testValue } from './ui/screens/progress.ts';
@@ -28,22 +27,29 @@ import { discAct, disciplineHtml } from './ui/screens/discipline.ts';
 import { labHtml } from './ui/screens/lab.ts';
 import { openLab } from './ui/players/lab.ts';
 import { icsExport } from './ui/ics.ts';
-import { isDark, liveBlock, planPicks, saveSteps, setTheme, startBlock, toggleMark } from './ui/screens/shared.ts';
+import { liveBlock, planPicks, saveSteps, startBlock, toggleMark } from './ui/screens/shared.ts';
 import { dayViewHtml, todayHtml } from './ui/screens/today.ts';
+import { clawSwipe, countUp, lite } from './ui/fx.ts';
 
 initAudio(() => ctx.S.set);
 
-// Five places, labels always on, nothing hidden behind "More". Settings live only behind the gear.
-const TABS: Array<[Tab, string, string]> = [
-  ['today', 'Azi', 'today'],
+const BASE = import.meta.env.BASE_URL;
+
+// Five places with labels always on, nothing behind "More"; Settings only behind the gear. Azi sits in the middle,
+// under the thumb, as the wolf. The order left to right is also the direction the claw swipe takes between tabs.
+const ORDER: Array<[Tab, string, string]> = [
   ['plan', 'Plan', 'plan'],
   ['fight', 'Lupte', 'fight'],
+  ['today', 'Azi', ''],
   ['mind', 'Minte', 'mind'],
   ['progress', 'Progres', 'progress'],
 ];
 
 /** Screens that open from a tab: the bar keeps their tab marked, and their back button returns there. */
 export const PARENT: Partial<Record<Tab, Tab>> = { alex: 'fight', lab: 'mind', disc: 'mind', challenge: 'progress' };
+
+/** Links into a section of a tab (data-to): the section that holds the anchor. */
+const ANCHOR_SEG: Record<string, [Tab, string]> = { tests: ['progress', 'tests'], why: ['mind', 'mental'], wins: ['mind', 'mental'] };
 
 const views: View[] = [];
 const scrollMem: Partial<Record<Tab, number>> = {};
@@ -60,9 +66,8 @@ function screenHtml(): string {
     case 'plan':
       return planHtml();
     case 'fight':
-      return fightHtml();
     case 'alex':
-      return alexHtml();
+      return fightHtml();
     case 'mind':
       return mindHtml();
     case 'disc':
@@ -78,28 +83,121 @@ function screenHtml(): string {
   }
 }
 
-function navHtml(): string {
+// ---------- the tab bar: built once, outside #app, so its blade can slide between tabs ----------
+const nav = document.createElement('nav');
+nav.id = 'nav';
+nav.className = 'nav';
+nav.setAttribute('aria-label', 'Secțiuni');
+nav.innerHTML = `<div class="nav-plate" aria-hidden="true"></div><i class="nav-blade" aria-hidden="true"></i>${ORDER.map(([k, label, icon]) =>
+  k === 'today'
+    ? `<button class="nav-b nav-wolf" data-a="tab" data-k="today"><span class="nw" aria-hidden="true"><i class="nw-ring"></i><span class="nw-hex"><img src="${BASE}ui/wolf-badge.webp" alt="" width="168" height="198" decoding="async"></span></span><span class="nav-l">${label}</span></button>`
+    : `<button class="nav-b" data-a="tab" data-k="${k}">${ic(icon)}<span class="nav-l">${label}</span></button>`,
+).join('')}`;
+document.body.appendChild(nav);
+
+// the claw marks that rip across the screen between tabs (see fx.ts)
+const swipe = document.createElement('div');
+swipe.id = 'swipe';
+swipe.setAttribute('aria-hidden', 'true');
+swipe.innerHTML = '<b></b><i></i><i></i><i></i>';
+document.body.appendChild(swipe);
+
+let navOn = '';
+function syncNav(): void {
   const cur = PARENT[ctx.tab] ?? ctx.tab;
-  return `<nav class="tabs" aria-label="Secțiuni">${TABS.map(([k, label, icon]) => `<button data-a="tab" data-k="${k}" ${cur === k && !views.length ? 'aria-current="page"' : ''}>${ic(icon)}<span>${label}</span></button>`).join('')}</nav>`;
+  const i = ORDER.findIndex(([k]) => k === cur);
+  nav.style.setProperty('--i', String(Math.max(0, i)));
+  for (const b of nav.querySelectorAll<HTMLElement>('.nav-b')) {
+    if (b.dataset.k === cur) b.setAttribute('aria-current', 'page');
+    else b.removeAttribute('aria-current');
+  }
+  if (cur !== navOn) {
+    nav.dataset.on = cur;
+    // the wolf roars when Azi is picked again
+    if (cur === 'today' && navOn) {
+      const w = nav.querySelector('.nav-wolf');
+      w?.classList.remove('roar');
+      void (w as HTMLElement | null)?.offsetWidth;
+      w?.classList.add('roar');
+    }
+    navOn = cur;
+  }
 }
 
-function render(): void {
+// ---------- render ----------
+type Enter = 'tab' | 'seg' | '';
+let enterTimer = 0;
+const rings = new Map<string, number>();
+let segInk: { tab: string; x: number; w: number } | null = null;
+
+function render(enter: Enter = ''): void {
   const app = document.getElementById('app');
   if (!app) return;
   const active = document.activeElement as HTMLElement | null;
   const keepId = active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT') ? active.id : '';
   publishPlan(planPicks());
-  app.innerHTML = screenHtml() + navHtml();
+  // the entry plays only on navigation; any other redraw shows the screen at once
+  app.classList.remove('enter-tab', 'enter-seg');
+  if (enter) {
+    void app.offsetWidth;
+    app.classList.add(`enter-${enter}`);
+    clearTimeout(enterTimer);
+    enterTimer = window.setTimeout(() => app.classList.remove('enter-tab', 'enter-seg'), 1100);
+  }
+  app.innerHTML = screenHtml();
+  syncNav();
+  placeSegInk(enter === 'seg');
+  moveRings(app, !!enter);
+  if (enter) for (const el of app.querySelectorAll<HTMLElement>('[data-count]')) countUp(el, 0, Number(el.dataset.count) || 0, 800);
   if (keepId) {
     const el = document.getElementById(keepId) as HTMLInputElement | null;
     el?.focus({ preventScroll: true });
   }
 }
-ctx.render = render;
+ctx.render = () => render();
+
+/** The red blade under the current section: slides from the section that was open before. */
+function placeSegInk(slide: boolean): void {
+  const bar = document.querySelector<HTMLElement>('#app .seg-in');
+  if (!bar) {
+    segInk = null;
+    return;
+  }
+  const cur = bar.querySelector<HTMLElement>('.seg-b[aria-current]');
+  const ink = bar.querySelector<HTMLElement>('.seg-ink');
+  if (!cur || !ink) return;
+  const x = cur.offsetLeft;
+  const w = cur.offsetWidth;
+  const to = `translateX(${x}px) scaleX(${w / 100})`;
+  if (slide && segInk && segInk.tab === ctx.tab && !lite()) {
+    ink.style.transition = 'none';
+    ink.style.transform = `translateX(${segInk.x}px) scaleX(${segInk.w / 100})`;
+    void ink.offsetWidth;
+    ink.style.transition = '';
+  }
+  ink.style.transform = to;
+  segInk = { tab: ctx.tab, x, w };
+  if (bar.scrollWidth > bar.clientWidth) bar.scrollTo({ left: Math.max(0, x - (bar.clientWidth - w) / 2), behavior: slide && !lite() ? 'smooth' : 'auto' });
+}
+
+/** Progress rings move from the value they showed last time (or from zero when a screen opens). */
+function moveRings(app: HTMLElement, fromZero: boolean): void {
+  for (const g of app.querySelectorAll<HTMLElement>('.gauge[data-ring]')) {
+    const k = g.dataset.ring ?? '';
+    const f = parseFloat(g.style.getPropertyValue('--f')) || 0;
+    const from = rings.has(k) && !fromZero ? rings.get(k)! : 0;
+    rings.set(k, f);
+    if (from === f || lite()) continue;
+    g.style.setProperty('--f', String(from));
+    const v = g.querySelector('.g-v');
+    if (v) void getComputedStyle(v).strokeDashoffset;
+    requestAnimationFrame(() => g.style.setProperty('--f', String(f)));
+  }
+}
 
 function go(fn: () => void, top = true): void {
   fn();
-  render();
+  render('tab');
   if (top) window.scrollTo(0, 0);
 }
 
@@ -112,8 +210,19 @@ function pushView(v: View): void {
 
 function popView(): void {
   views.pop();
-  render();
+  render('tab');
   window.scrollTo(0, views.length ? 0 : scrollMem[ctx.tab] ?? 0);
+}
+
+/** Position of a tab in the bar, for the direction of the swipe. */
+const tabPos = (t: Tab): number => ORDER.findIndex(([k]) => k === (PARENT[t] ?? t));
+
+function saveSegs(): void {
+  try {
+    sessionStorage.setItem('beast:seg', JSON.stringify(ctx.seg));
+  } catch {
+    /* storage blocked: sections reset on reload */
+  }
 }
 
 /** Today's plan block of a given kind, so tools opened from other tabs still check it off. */
@@ -246,15 +355,41 @@ function act(a: string, el: HTMLElement): void {
   const today = dayKey();
   switch (a) {
     case 'tab': {
-      const k = (el.dataset.k as Tab) || 'today';
+      let k = (el.dataset.k as Tab) || 'today';
+      // Alex lives in Lupte now, as its third section
+      if (k === 'alex') {
+        k = 'fight';
+        ctx.seg.fight = 'alex';
+        saveSegs();
+      }
+      const to = el.dataset.to;
+      const anchor = to ? ANCHOR_SEG[to] : undefined;
+      if (anchor) {
+        ctx.seg[anchor[0]] = anchor[1];
+        saveSegs();
+      }
       if (!views.length) scrollMem[ctx.tab] = window.scrollY;
       const same = ctx.tab === k && !views.length;
+      const from = ctx.tab;
       views.length = 0;
       ctx.tab = k;
-      render();
-      const to = el.dataset.to;
+      if (!same) clawSwipe(tabPos(k) - tabPos(from));
+      render(same && !to ? '' : 'tab');
       if (to) document.getElementById(to)?.scrollIntoView({ block: 'start' });
       else window.scrollTo(0, same ? 0 : scrollMem[k] ?? 0);
+      return;
+    }
+    case 'seg': {
+      const k = el.dataset.k || '';
+      if (!k || ctx.seg[ctx.tab] === k) return;
+      // keep the switcher where it is: if the page is scrolled past it, the new section starts right under it
+      const ph = document.querySelector<HTMLElement>('#app .ph');
+      const head = document.querySelector<HTMLElement>('#app .top');
+      const stick = ph ? ph.getBoundingClientRect().bottom + window.scrollY - (head?.offsetHeight ?? 0) : 0;
+      ctx.seg[ctx.tab] = k;
+      saveSegs();
+      render('seg');
+      if (window.scrollY > stick) window.scrollTo(0, stick);
       return;
     }
     case 'start': {
@@ -290,9 +425,6 @@ function act(a: string, el: HTMLElement): void {
       return;
     case 'settings':
       return pushView({ t: 'settings' });
-    case 'theme':
-      setTheme(!isDark());
-      return render();
     case 'history':
       return pushView({ t: 'history' });
     case 'ics': {
@@ -403,6 +535,17 @@ function act(a: string, el: HTMLElement): void {
         /* storage blocked: the intro stays on */
       }
       return render();
+    case 'set-motion': {
+      const v = el.dataset.v === 'lite' ? 'lite' : 'full';
+      try {
+        localStorage.setItem('beast:motion', v);
+      } catch {
+        /* storage blocked: the choice lasts until the app closes */
+      }
+      if (v === 'lite') document.documentElement.dataset.motion = 'lite';
+      else delete document.documentElement.dataset.motion;
+      return render();
+    }
     case 'set-leg':
       S.set.legMode = el.dataset.v === 'jump' ? 'jump' : 'wall';
       save();
@@ -443,10 +586,6 @@ function onChange(el: HTMLElement): void {
     return;
   }
   if (a === 'import') return importData(el as HTMLInputElement);
-  if (a === 'set-theme') {
-    setTheme((el as HTMLInputElement).checked);
-    return render();
-  }
   if (a === 'steps') {
     saveSteps(parseInt((el as HTMLInputElement).value, 10) || 0);
     return render();

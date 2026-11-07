@@ -3,7 +3,7 @@
 import { esc } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
-import { top } from './shared.ts';
+import { pageHead, top } from './shared.ts';
 
 const sw = (k: string, on: boolean, label: string): string =>
   `<label class="switch"><input type="checkbox" data-a="set-bool" data-k="${k}" ${on ? 'checked' : ''} aria-label="${esc(label)}"><span></span></label>`;
@@ -22,18 +22,29 @@ function openingMode(): string {
   }
 }
 
+/** Animations on this device: all of them, or reduced (no claw swipes, slams, embers or count-ups). */
+export function motionMode(): 'full' | 'lite' {
+  try {
+    return localStorage.getItem('beast:motion') === 'lite' ? 'lite' : 'full';
+  } catch {
+    return 'full';
+  }
+}
+
 export function settingsHtml(): string {
   const s = ctx.S.set;
   const op = openingMode();
+  const mo = motionMode();
   const mm = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
   return `${top(true)}
-    <h1 class="stack mid">Setări</h1>
-    <h2 class="sec">Sunet și ecran</h2>
+    ${pageHead('Setări', 'Sunet, runde, memento-uri și datele tale.')}
+    <h2 class="sec first">Sunet și ecran</h2>
     ${row('Sunete', 'Gong, bipuri, semnale', sw('sound', s.sound, 'Sunete'))}
     ${row('Voce', 'Combinațiile strigate în engleză, indicațiile în română', sw('voice', s.voice, 'Voce'))}
     ${row('Vibrații', 'La schimbarea rundelor; pe iPhone browserul nu le permite', sw('vibrate', s.vibrate, 'Vibrații'))}
     ${row('Gongul trece de modul silențios', 'iPhone: sună și cu butonul de silențios pornit, dar poate opri muzica din alte aplicații', sw('bellThroughMute', s.bellThroughMute, 'Gongul trece de modul silențios'))}
     ${row('Ecranul rămâne aprins', 'Cât timp rulează un timer', sw('wake', s.wake, 'Ecran aprins'))}
+    ${row('Animații', mo === 'lite' ? 'Reduse: fără zgârieturi între ecrane, fără explozii la runde' : 'Complete: zgârieturi între ecrane, runde care lovesc, scântei la final', `<div class="chips">${[['full', 'Complete'], ['lite', 'Reduse']].map(([v, l]) => `<button class="chip" aria-pressed="${mo === v}" data-a="set-motion" data-v="${v}">${l}</button>`).join('')}</div>`)}
     ${row('Intro la pornire', 'Automat: complet la prima pornire și după o versiune nouă, altfel doar lupul, o clipă', `<div class="chips">${[['auto', 'Automat'], ['full', 'Mereu'], ['short', 'Scurt'], ['off', 'Oprit']].map(([v, l]) => `<button class="chip" aria-pressed="${op === v}" data-a="set-opening" data-v="${v}">${l}</button>`).join('')}</div>`)}
     <h2 class="sec">Runde</h2>
     ${row('Combinații strigate', 'În rundele de shadow boxing, sac și coardă', `<div class="chips">${[0, 10, 15, 20, 30].map((v) => `<button class="chip" aria-pressed="${s.callEvery === v}" data-a="set-call" data-v="${v}">${v ? `${v} s` : 'Oprit'}</button>`).join('')}</div>`)}
@@ -59,5 +70,5 @@ export function settingsHtml(): string {
       <li>Combinațiile, rutina de spate, mobilitatea și sfaturile: canalul lui Alex Hanma, <a href="https://www.tiktok.com/@alexhanma___" target="_blank" rel="noopener">TikTok @alexhanma___</a> și <a href="https://www.instagram.com/alexhanma_/" target="_blank" rel="noopener">Instagram @alexhanma_</a>.</li>
       <li>Meditația: metoda de respirație Wim Hof. Respirația 4-7-8: metoda din carte.</li>
     </ul>
-    <p class="small dim" style="text-align:center">Inner Beast 2.0</p>`;
+    <p class="small dim" style="text-align:center;margin-top:28px">Inner Beast 3.0</p>`;
 }

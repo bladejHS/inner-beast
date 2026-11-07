@@ -576,6 +576,34 @@ test('progression: weight is noted on the hardest variation and goes up by 2.5 k
   assert.equal(advise(dips, lastOf('dips', [8, 8, 7], 3, 10), 3).kg, undefined);
 });
 
+test('equipment: dumbbells stop at 30 kg, then the variation or the tempo moves', () => {
+  const bss = exerciseById('splitsq')!;
+  assert.equal(advise(bss, lastOf('splitsq', [8, 8, 8, 8], 2, 27.5), 2).kg, 30);
+  assert.equal(advise(bss, lastOf('splitsq', [8, 8, 8, 8], 2, 28), 2).kg, 30);
+  const top = advise(bss, lastOf('splitsq', [8, 8, 8, 8], 2, 30), 2);
+  assert.deepEqual([top.kind, top.kg], ['top', undefined]);
+  assert.match(top.text, /cele mai grele gantere/);
+  const carry = advise(exerciseById('carry')!, { log: { id: 'carry', name: 'c', sets: [45, 45, 45, 45], unit: 'sec' as const, kg: 30 }, lvl: 0, date: 'x' }, 0);
+  assert.deepEqual([carry.kind, carry.lvl], ['up', 1]);
+  const rdl = exerciseById('rdl')!;
+  assert.equal(rdl.bar, true);
+  assert.equal(advise(rdl, lastOf('rdl', [8, 8, 8], 0, 100), 0).kg, 102.5);
+});
+
+test('knees: Leg Day and the warm-ups start without landings, the jumps come back as later variations', () => {
+  const legs = workoutById('legs').ex;
+  for (const e of legs) assert.doesNotMatch(e.vars[e.start]!, /Jump|Hop/, e.id);
+  assert.deepEqual(exerciseById('cmj')!.vars, ['Medicine Ball Scoop Toss', 'Box Jump', 'Countermovement Jump']);
+  assert.ok(exerciseById('broad')!.vars.includes('Broad Jump'));
+  assert.equal(exerciseById('sprint')!.vars[0], 'Hill Sprints (8–10 s)');
+  const order = legs.map((e) => e.id);
+  assert.ok(order.indexOf('cmj') < order.indexOf('splitsq') && order.indexOf('splitsq') < order.indexOf('rdl'));
+  for (const id of ['legwarm', 'stretch-push', 'stretch-pull']) {
+    const moves = ROUTINES.find((r) => r.id === id)!.moves.map((m) => m.name);
+    assert.ok(!moves.some((m) => /Jump|Hop|Skip/.test(m)), `${id}: ${moves.join(', ')}`);
+  }
+});
+
 test('stalling: three sessions that do not beat the one before them', () => {
   const log = [session('pushups', [10, 10], 1, '2026-10-01'), session('pushups', [10, 9], 1, '2026-10-08'), session('pushups', [10, 10], 1, '2026-10-15')];
   assert.equal(stalled(log, 'pushups', 1), false);

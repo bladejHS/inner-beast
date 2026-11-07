@@ -157,7 +157,7 @@ export const BOOK: Chapter[] = [
     body: [
       { hl: 'Planul de antrenament care l-a ajutat pe Alex nu doar spre performanța fizică maximă, ci și spre o minte și un caracter de nerecunoscut.' },
       'Îl găsești în aplicație, zi cu zi, cu timere și cu tot ce faci notat automat.',
-      { note: 'Planul din carte e baza. Aplicația l-a refăcut pentru un atlet complet: ordinea blocurilor (viteza și puterea înaintea oboselii), forță de picioare de două ori pe săptămână, sprinturi, sărituri și cărat, punch-out în loc de 10 runde lungi la sac, alergare ușoară care crește treptat și o săptămână ușoară cu teste la fiecare 4 săptămâni.' },
+      { note: 'Planul din carte e baza. Aplicația l-a refăcut pentru un atlet complet: ordinea blocurilor (viteza și puterea înaintea oboselii), forță de picioare de două ori pe săptămână, sprinturi, aruncări explozive (săriturile, când genunchii le permit) și cărat, punch-out în loc de 10 runde lungi la sac, alergare ușoară care crește treptat și o săptămână ușoară cu teste la fiecare 4 săptămâni.' },
     ],
   },
   {

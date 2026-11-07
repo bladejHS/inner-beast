@@ -1,6 +1,7 @@
 // The test battery for an all-round athlete, run alone with a phone, a tape and a timer.
 // Done early in the lighter week (the 4th of every emphasis), power first and aerobic last.
-// Only three tests have published reference values here; the rest are measured against your own baseline.
+// Only three tests have published reference values here (men 20–29, the user is 23); the rest are measured against
+// your own baseline. The jump tests wait until the jumps are back in Leg Day; the throw stands in for them until then.
 
 export type TestUnit = 'cm' | 'reps' | 's' | 'time' | 'punches';
 
@@ -20,13 +21,17 @@ export interface FitTest {
 
 export const TESTS: FitTest[] = [
   {
+    id: 'scoop', name: 'Medicine Ball Scoop Toss', what: 'Putere de șold, fără aterizare', unit: 'cm', higher: true, every: 'În săptămâna ușoară',
+    how: 'Afară, cu aceeași minge de fiecare dată: 3 aruncări din șold, înainte și în sus, cu pauză completă. Măsori de la linia de start până unde atinge mingea prima dată solul și notezi cea mai lungă.',
+  },
+  {
     id: 'cmj', name: 'Countermovement Jump', what: 'Putere de picioare', unit: 'cm', higher: true, every: 'În săptămâna ușoară',
-    how: 'Cu o aplicație de măsurat săritura (de exemplu My Jump): 3 sărituri cu mâinile pe șolduri, la 30 de secunde una de alta. Notezi media.',
+    how: 'Doar după ce săriturile au revenit în Leg Day. Cu o aplicație de măsurat săritura (de exemplu My Jump): 3 sărituri cu mâinile pe șolduri, la 30 de secunde una de alta. Notezi media.',
     ref: 'Boxeri antrenați: 32–37 cm (Pinto 2026, Han 2025).',
   },
   {
     id: 'broad', name: 'Broad Jump', what: 'Putere pe orizontală', unit: 'cm', higher: true, every: 'În săptămâna ușoară',
-    how: '3 sărituri în lungime cu aterizare fixă. Notezi cea mai lungă, de la linia de start la călcâiul din spate.',
+    how: 'Doar după ce săriturile au revenit în Leg Day. 3 sărituri în lungime cu aterizare fixă. Notezi cea mai lungă, de la linia de start la călcâiul din spate.',
   },
   {
     id: 'pushups', name: 'Max Push-ups', what: 'Rezistența mușchilor de împins', unit: 'reps', higher: true, every: 'În săptămâna ușoară',

@@ -1,9 +1,15 @@
 // Strength sessions for PUSH (Tue), PULL (Fri), LEGS (Sat) and the 10-minute bodyweight block (Mon).
 // Base from the e-book (push-up variations + dips, pull-up variations, legs), filled out with Alex Hanma's own training
 // (pull-up EMOM, rear shoulders, explosive work) and reworked on 2026-11-07 after the research: explosive work first,
-// strength sets 1-3 reps short of failure, longer rests on heavy moves, a second leg dose on Tuesday, sprints, jumps,
+// strength sets 1-3 reps short of failure, longer rests on heavy moves, a second leg dose on Tuesday, sprints,
 // throws and loaded single-leg work on Saturday, carries on Friday.
+// Fitted to the user on 2026-11-07: jumps hurt the knees at the current body weight, so Saturday's power work starts
+// with medicine ball throws and hill sprints, and the jumps come back as later variations. Equipment: an Olympic bar
+// (no squats with it), dumbbells up to 30 kg, a medicine ball, a partner now and then.
 // Exercise names stay in English; cues are Romanian.
+
+/** The heaviest dumbbells the user owns: past this the weight can't go up, the variation or the tempo does. */
+export const DB_MAX_KG = 30;
 
 /** reps / time: logged numbers. max: one all-out set. emom: the pull-up clock. ytw and done: sets you tick off. */
 export type ExType = 'reps' | 'time' | 'max' | 'emom' | 'ytw' | 'done';
@@ -24,8 +30,10 @@ export interface Exercise {
   cue: string;
   alex?: string;
   opt?: boolean;
-  /** Weight is noted on every variation, not only the hardest (dumbbell work). */
+  /** Weight is noted on every variation, not only the hardest: kg of one dumbbell, capped at DB_MAX_KG. */
   load?: boolean;
+  /** Loaded with the barbell: kg include the bar, and there is no dumbbell ceiling. */
+  bar?: boolean;
   /** For sets you tick off: what one set is. */
   label?: string;
 }
@@ -146,39 +154,44 @@ export const WORKOUTS: Workout[] = [
     name: 'Leg Day',
     ex: [
       {
-        id: 'sprint', name: 'Accelerations', vars: ['Accelerations (10–20 m)', 'Hill Sprints (8–10 s)'], start: 0,
+        id: 'sprint', name: 'Sprints', vars: ['Hill Sprints (8–10 s)', 'Accelerations (10–20 m)'], start: 0,
         type: 'done', sets: 4, label: '1 sprint la ~85%', rest: 90, muscles: 'viteză, ischiogambieri',
-        cue: 'Pornești din picioare și accelerezi progresiv pe 10–20 m, apoi te întorci mergând. Efortul urcă de la o săptămână la alta: 85%, 90%, 95%.',
+        cue: 'În pantă impactul și frânarea sunt mai mici decât pe plat, așa că genunchii primesc mai puțin. Urci 8–10 s, cobori mergând. Fără pantă: accelerări de 10–15 m pe iarbă. Efortul urcă de la o săptămână la alta: 85%, 90%, 95%.',
       },
       {
-        id: 'cmj', name: 'Countermovement Jump', vars: ['Countermovement Jump'], start: 0,
-        type: 'done', sets: 3, label: '3 sărituri, pauză completă', rest: 75, muscles: 'putere',
-        cue: 'Mâinile pe șolduri sau libere, cobori scurt și sari cât de sus poți. Aterizezi moale și te reașezi înainte de următoarea.',
+        id: 'cmj', name: 'Lower-body Power', vars: ['Medicine Ball Scoop Toss', 'Box Jump', 'Countermovement Jump'], start: 0,
+        type: 'done', sets: 3, label: '3 repetări maxime, pauză completă', rest: 75, muscles: 'putere, șolduri',
+        cue: 'Puterea vine din șold, ca la săritură, dar fără aterizare pe genunchi. Săriturile revin pe rând: Box Jump după 3 săptămâni de Leg Day fără durere de genunchi (sub 3 din 10, nici a doua zi), Countermovement Jump după încă 3 săptămâni la fel.',
       },
       {
-        id: 'broad', name: 'Broad Jump', vars: ['Broad Jump'], start: 0,
-        type: 'done', sets: 2, label: '3 sărituri, aterizare fixă', rest: 75, muscles: 'putere',
-        cue: 'Sari în lungime cu brațele, aterizezi pe ambele picioare și ții poziția o secundă. Fiecare săritură e maximă.',
+        id: 'broad', name: 'Total-body Power', vars: ['Medicine Ball Slam', 'Broad Jump'], start: 0,
+        type: 'done', sets: 2, label: '3 repetări maxime, pauză completă', rest: 75, muscles: 'putere, trunchi',
+        cue: 'Tot corpul trimite mingea în sol, cât de tare poți: te întinzi pe vârfuri cu ea sus, apoi abdomenul și dorsalii o aruncă. Broad Jump revine odată cu Countermovement Jump.',
       },
       {
-        id: 'rot', name: 'Rotational Throws', vars: ['Band Rotational Punches', 'Rotational Med Ball Throws'], start: 0,
+        id: 'rot', name: 'Rotational Throws', vars: ['Band Rotational Punches', 'Rotational Med Ball Throws'], start: 1,
         type: 'reps', sets: 3, lo: 5, hi: 8, perSide: true, rest: 60, muscles: 'rotație, trunchi, putere',
         cue: 'Rotația pornește din piciorul din spate și din șold, brațele doar o termină. Fiecare repetare la viteză maximă.',
       },
       {
         id: 'splitsq', name: 'Bulgarian Split Squat', vars: ['Split Squats', 'Bulgarian Split Squats', 'Dumbbell Bulgarian Split Squats'], start: 2,
         type: 'reps', sets: 4, lo: 5, hi: 8, perSide: true, rest: 180, load: true, muscles: 'cvadricepși, fesieri',
-        cue: 'Cele mai grele gantere pe care le poți controla. Cobori până când genunchiul din spate aproape atinge solul, trunchiul ușor înainte. Te oprești cu 1–2 repetări înainte de limită.',
+        cue: 'Cele mai grele gantere pe care le poți controla. Cobori până când genunchiul din spate aproape atinge solul, trunchiul ușor înainte. Te oprești cu 1–2 repetări înainte de limită. Genunchiul din față: până la 3 din 10 durere e acceptabil dacă a doua zi nu e mai rău; altfel alegi varianta mai ușoară.',
+      },
+      {
+        id: 'rdl', name: 'Romanian Deadlift', vars: ['Barbell Romanian Deadlift'], start: 0,
+        type: 'reps', sets: 3, lo: 5, hi: 8, rest: 150, load: true, bar: true, muscles: 'ischiogambieri, fesieri, spate',
+        cue: 'Cu bara olimpică: șoldul pleacă înapoi, bara alunecă pe coapse până sub genunchi, spatele rămâne drept. Genunchii stau ușor îndoiți și aproape nemișcați, de aceea îi încarcă puțin. Te oprești cu 1–2 repetări înainte de limită.',
       },
       {
         id: 'sldl', name: 'Single-leg Romanian Deadlift', vars: ['Single-leg RDL (bodyweight)', 'Dumbbell Single-leg RDL'], start: 1,
-        type: 'reps', sets: 3, lo: 6, hi: 10, perSide: true, rest: 120, load: true, muscles: 'ischiogambieri, fesieri',
-        cue: 'Împingi șoldul înapoi, spatele drept, piciorul liber urcă în linie cu trunchiul. Simți întinderea în spatele coapsei.',
+        type: 'reps', sets: 2, lo: 6, hi: 10, perSide: true, rest: 90, load: true, opt: true, muscles: 'ischiogambieri, fesieri, echilibru',
+        cue: 'Opțional, după Romanian Deadlift: echilibru pe un picior. Împingi șoldul înapoi, spatele drept, piciorul liber urcă în linie cu trunchiul.',
       },
       {
         id: 'latlunge', name: 'Lateral Lunge', vars: ['Lateral Lunge', 'Dumbbell Lateral Lunge'], start: 1,
         type: 'reps', sets: 3, lo: 6, hi: 10, perSide: true, rest: 90, load: true, muscles: 'adductori, fesieri, lateral',
-        cue: 'Pas larg lateral, te așezi pe piciorul care pășește, celălalt rămâne întins. Forța laterală de care ai nevoie în ring.',
+        cue: 'Pas larg lateral, te așezi pe piciorul care pășește, celălalt rămâne întins. Forța laterală de care ai nevoie în ring. Cobori doar cât genunchiul nu protestează.',
       },
       {
         id: 'calf', name: 'Calf Raises', vars: ['Calf Raises', 'Single-leg Calf Raises'], start: 1,
@@ -188,13 +201,13 @@ export const WORKOUTS: Workout[] = [
       {
         id: 'cossack', name: 'Cossack Squats', vars: ['Assisted Cossack Squats', 'Cossack Squats'], start: 0,
         type: 'reps', sets: 2, lo: 6, hi: 8, perSide: true, rest: 45, opt: true, muscles: 'șolduri, adductori',
-        cue: 'Te muți de pe un picior pe altul, cu piciorul întins pe vârf.',
+        cue: 'Te muți de pe un picior pe altul, cu piciorul întins pe vârf. Doar cât de jos merge fără durere de genunchi.',
         alex: 'Mobilitate de șold ca în rutina lui „Dagestan”.',
       },
       {
         id: 'wallsit', name: 'Wall Sit', vars: ['Wall Sit'], start: 0,
         type: 'time', sets: 2, lo: 45, hi: 60, rest: 60, opt: true, muscles: 'cvadricepși',
-        cue: 'Opțional, la final. Spatele lipit de perete, genunchii la 90°, respiri calm.',
+        cue: 'Opțional, la final. Spatele lipit de perete, genunchii la 90°, respiri calm. Ținutele fără mișcare sunt de obicei bine tolerate de genunchi.',
       },
     ],
   },

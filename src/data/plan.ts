@@ -1,6 +1,7 @@
 // The weekly plan. Built on "Unleash Your Inner Beast" (pages 15-16) and reworked on 2026-11-07 for an all-round
 // athlete (strength, power, speed, endurance, mobility and fighting), after the research in research_notes/.
 // Inside a day: skill and power first, then strength, then conditioning, and long static stretching last.
+// While jumps hurt the user's knees (2026-11-07), the power work has no landings: see the legs workout.
 // Session and exercise names stay in English, as in the e-book; tips are in Romanian.
 // Block ids are stable keys in saved logs and in Beast Nutrition, so they do not name the weekday:
 // sun-legs and sun-lunges are on Saturday, sat-mob, sat-med and sat-breath on Sunday.
@@ -133,7 +134,7 @@ export const WEEK: Day[] = [
     idx: 3,
     title: 'Combat Training II',
     blocks: [
-      { id: 'thu-rope', kind: 'rounds', name: 'Jumping Rope', dose: '3 × 3 min', rounds: 3, work: 180, rest: 'r3', focus: 'rope', alt: 'feet', warmup: true, tip: 'Încălzire pentru picioare: joc ușor, pe vârfuri. Puterea vine după, cât ești proaspăt.' },
+      { id: 'thu-rope', kind: 'rounds', name: 'Jumping Rope', dose: '3 × 3 min', rounds: 3, work: 180, rest: 'r3', focus: 'rope', alt: 'feet', warmup: true, tip: 'Încălzire pentru picioare: joc ușor, pe vârfuri, sărituri de 1–2 cm pe o suprafață care amortizează. Dacă simți genunchii, alege Agility Ladder.' },
       { id: 'thu-shadow', kind: 'rounds', name: 'Shadow Boxing', dose: '3 × 3 min', rounds: 3, work: 180, rest: 'r3', focus: 'combo', alt: 'partner', tip: 'Combinations: combinații cu pregătire, ordine clară și ieșire controlată.',
         cues: ['Fiecare combinație are un scop: o pregătești cu jabul sau o fentă.', 'Loviturile curg una din alta, fără pauze, fără să pierzi echilibrul.', 'Lucrezi și de la distanță lungă, și combinații care se termină într-un unghi nou.', 'Garda rămâne sus: nu arunca pumni izolați, fără sens.'] },
       { id: 'thu-power', kind: 'rounds', name: 'Punch-out', dose: '3 × 14 × 3 s', line: '3 runde punch-out: 14 × 3 s la maxim, 10 s ușor', rounds: 3, work: BURST_SEC, restSec: 60, focus: 'power', burstFrom: 1, bagOnly: true,
@@ -158,15 +159,15 @@ export const WEEK: Day[] = [
     idx: 5,
     title: 'Leg Day',
     blocks: [
-      { id: 'sun-legs', kind: 'routine', name: 'Leg Day Warm-up', dose: '10 min', routine: 'legwarm', min: 10, tip: 'Ridici pulsul, mobilizezi șoldurile și termini cu accelerări progresive, ca să fii gata de sprint și sărituri.' },
-      { id: 'sun-lunges', kind: 'workout', name: 'Speed, Power & Leg Strength', dose: '60 min', line: '60 min Sprints, Jumps, Throws, Leg Strength', workout: 'legs', min: 60, tip: 'Viteza și săriturile primele, cât ești proaspăt, apoi forța cu greutate. Forța de picioare e legată cel mai direct de impactul pumnului.' },
+      { id: 'sun-legs', kind: 'routine', name: 'Leg Day Warm-up', dose: '10 min', routine: 'legwarm', min: 10, tip: 'Ridici pulsul, mobilizezi șoldurile și termini cu accelerări progresive, ca să fii gata de sprinturi și aruncări. Fără sărituri.' },
+      { id: 'sun-lunges', kind: 'workout', name: 'Speed, Power & Leg Strength', dose: '60 min', line: '60 min Sprints, Med Ball Power, Leg Strength', workout: 'legs', min: 60, tip: 'Viteza și puterea primele, cât ești proaspăt: sprinturi în pantă și aruncări cu mingea medicinală, fără aterizări pe genunchi. Apoi forța: Bulgarian Split Squat cu gantere și Romanian Deadlift cu bara. Forța de picioare e legată cel mai direct de impactul pumnului.' },
     ],
   },
   {
     idx: 6,
     title: 'Mobility & Meditation Day',
     blocks: [
-      { id: 'sun-jog', kind: 'run', name: 'Jogging', dose: '20 min', min: 20, grow: { base: 20, step: 2, cap: 30 }, tip: 'Ritm de conversație, fără țintă de ritm. Crește cu 2 minute la fiecare alergare făcută, până la 30.' },
+      { id: 'sun-jog', kind: 'run', name: 'Jogging', dose: '20 min', min: 20, grow: { base: 20, step: 2, cap: 30 }, tip: 'Ritm de conversație, fără țintă de ritm. Crește cu 2 minute la fiecare alergare făcută, până la 30. Dacă genunchii se plâng după alergare, faci același timp pe bicicletă, la vâslit sau mers alert în pantă.' },
       { id: 'sat-mob', kind: 'routine', name: 'Mobility Training', dose: '30 min', routine: 'mobility', min: 30, tip: 'Stretching pentru picioare, șolduri și partea de sus a corpului. Crește amplitudinea, nu viteza recuperării.' },
       { id: 'sat-med', kind: 'wimhof', name: 'Meditation', dose: '10 min', min: 10, tip: 'Respirația Wim Hof, așezat sau întins, apoi liniște.' },
       { id: 'sat-breath', kind: 'breath', name: 'Breathing Exercises', dose: '10 min', min: 10, tip: 'Metoda de respirație 4-7-8.' },

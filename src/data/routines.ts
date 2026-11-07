@@ -20,7 +20,7 @@ export interface Routine {
 function warmUp(kind: 'push' | 'pull'): Move[] {
   const push = kind === 'push';
   return [
-    { name: 'Jumping Jacks', sec: 45, cue: 'Ridici pulsul și temperatura corpului.' },
+    { name: 'Step Jacks', sec: 45, cue: 'Ca Jumping Jacks, dar fără săritură: un picior iese lateral și brațele urcă. Pulsul crește fără impact pe genunchi.' },
     { name: 'Arm Circles', sec: 60, cue: '30 de secunde înainte, 30 înapoi. Cercuri mari, relaxate.', alex: true },
     { name: 'Shoulder Dislocates', sec: 60, cue: 'Cu un prosop sau o bandă: brațele întinse trec peste cap, în spate, și revin. Fără să forțezi.' },
     { name: 'Band External Rotation', sec: 60, sides: true, cue: 'Cotul lipit de corp, la 90°: rotești antebrațul în afară cu banda, lent, și revii.' },
@@ -56,16 +56,16 @@ export const ROUTINES: Routine[] = [
   {
     id: 'legwarm',
     name: 'Leg Day Warm-up',
-    intro: '10 minute: pulsul sus, șoldurile mobile și trei accelerări progresive. Abia apoi sprinturi și sărituri la maxim.',
+    intro: '10 minute: pulsul sus, șoldurile mobile și trei accelerări progresive. Abia apoi sprinturi și aruncări la maxim. Fără sărituri, cât timp genunchii le simt.',
     moves: [
       { name: 'Easy Jog or Row', sec: 180, cue: '3 minute ușor: pe loc, afară sau la aparatul de canotaj.' },
       { name: 'Leg Swings (front-back)', sec: 60, sides: true, cue: 'Te ții de perete și balansezi piciorul înainte-înapoi, tot mai larg.' },
       { name: 'Leg Swings (side)', sec: 60, sides: true, cue: 'Balans lateral, prin fața corpului.' },
       { name: 'Hip Circles', sec: 45, cue: 'Mâinile pe șolduri, cercuri mari în ambele sensuri.' },
       { name: 'Walking Lunges', sec: 60, cue: 'Fandări mergând, cu trunchiul drept, fără greutate.' },
-      { name: 'A-Skips', sec: 45, cue: 'Țopăi ritmic, genunchiul urcă la nivelul șoldului, brațele lucrează opus.' },
+      { name: 'A-Marches', sec: 45, cue: 'Mers cu genunchiul sus, la nivelul șoldului, pe vârful piciorului de sprijin; brațele lucrează opus. Fără țopăit.' },
       { name: 'Lateral Shuffles', sec: 45, cue: 'Pași laterali rapizi, joși, fără să încrucișezi picioarele.' },
-      { name: 'Pogo Hops', sec: 30, cue: 'Sărituri mici și elastice din glezne, genunchii aproape întinși.' },
+      { name: 'Glute Bridges', sec: 30, cue: 'Pe spate, tălpile pe sol: ridici șoldul strângând fesierii și ții o secundă sus.' },
       { name: 'Build-up Runs', sec: 75, cue: 'Trei accelerări de 20 de metri, la 60, 70 și 80%, cu mers înapoi între ele.' },
     ],
   },

@@ -1,7 +1,7 @@
 // "Progression is mandatory": what to do next time, streaks, weekly completion and totals.
 
 import type { Exercise } from '../data/workouts.ts';
-import { BW_SCHEMES, EMOM_GOAL } from '../data/workouts.ts';
+import { BW_SCHEMES, DB_MAX_KG, EMOM_GOAL } from '../data/workouts.ts';
 import type { CycleId, Day } from '../data/plan.ts';
 import type { Entry, Habit, SetLog } from './store.ts';
 import { addDays, daysBetween, inWeek, weekStart } from './util.ts';
@@ -78,7 +78,16 @@ export function advise(ex: Exercise, last: LastEx | undefined, lvl: number, prev
   };
   if (atTop(last)) {
     const lkg = last.log.kg;
-    if (ex.load && lkg) return { kind: 'top', kg: lkg + KG_STEP, text: `Ai atins ${hi} la toate seriile cu ${kgStr(lkg)} kg. Mergi pe ${kgStr(lkg + KG_STEP)} kg și pornești din nou de la ${lo}.` };
+    if (ex.load && lkg) {
+      // Dumbbells stop at DB_MAX_KG: past that, a harder variation or a slower tempo takes over.
+      const next = ex.bar ? lkg + KG_STEP : Math.min(lkg + KG_STEP, DB_MAX_KG);
+      if (next <= lkg) {
+        const heaviest = `Ai atins ${hi}${ex.type === 'time' ? ' s' : ''} la toate seriile cu ${kgStr(lkg)} kg, cele mai grele gantere.`;
+        if (lvl < ex.vars.length - 1) return { kind: 'up', lvl: lvl + 1, text: `${heaviest} Treci la ${ex.vars[lvl + 1]}.` };
+        return { kind: 'top', text: `${heaviest} De aici crești altfel: cobori în 3 secunde și ții o secundă jos, la aceleași repetări.` };
+      }
+      return { kind: 'top', kg: next, text: `Ai atins ${hi} la toate seriile cu ${kgStr(lkg)} kg. Mergi pe ${kgStr(next)} kg și pornești din nou de la ${lo}.` };
+    }
     if (lvl < ex.vars.length - 1) {
       if (lo === hi && !(prev && prev.lvl === lvl && atTop(prev))) return { kind: 'stay', text: `Ai făcut ${ex.sets} × ${hi}. Încă o sesiune completă și treci la ${ex.vars[lvl + 1]}.` };
       return { kind: 'up', lvl: lvl + 1, text: `Ai atins ${hi} la toate seriile. Treci la ${ex.vars[lvl + 1]}.` };
@@ -182,7 +191,7 @@ export const CYCLE_WEEKS = 4;
 
 export const CYCLES: Array<{ id: CycleId; name: string; what: string }> = [
   { id: 'A', name: 'Forță și bază aerobă', what: 'Greutatea crește la split squat și dips, EMOM-ul urcă, alergarea și canotajul se lungesc.' },
-  { id: 'B', name: 'Putere și viteză', what: 'Mai multe sărituri și sprinturi, punch-out și luni, forța se menține cu aceeași greutate.' },
+  { id: 'B', name: 'Putere și viteză', what: 'Sprinturi și aruncări explozive (sărituri, când genunchii le permit), punch-out și luni, forța se menține cu aceeași greutate.' },
   { id: 'C', name: 'Capacitate', what: 'Punch-out luni și joi, 8 runde la sac joi, AMRAP-ul și EMOM-ul urcă.' },
 ];
 

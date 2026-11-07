@@ -171,11 +171,20 @@ export const HOW: Record<string, How> = {
   sprint: {
     steps: [
       'Încălzirea completă înainte, cu accelerările progresive.',
-      'Pornești din picioare, înclinat ușor înainte, și accelerezi progresiv pe 10–20 m (sau 8–10 s în pantă).',
-      'Brațele lucrează opus picioarelor, pașii sunt sub corp, nu în fața lui.',
-      'Te întorci mergând la start și pornești din nou când respiri normal.',
+      'O pantă ușoară sau moderată, pe care urci 8–10 secunde. Fără pantă: 10–15 m pe iarbă, pe plat.',
+      'Pornești din picioare, înclinat ușor înainte, și urci în viteză; brațele lucrează opus picioarelor, pașii sunt sub corp, nu în fața lui.',
+      'Cobori mergând la start și pornești din nou când respiri normal.',
     ],
     mistake: 'Să sprintezi la maxim din prima săptămână. Fără Nordic Curls, ischiogambierii se obișnuiesc treptat: 85%, apoi 90%, apoi 95%.',
+  },
+  rdl: {
+    steps: [
+      'Bara pe suporturi sau ridicată de pe sol cu spatele drept; priza puțin mai largă decât șoldurile, picioarele la lățimea șoldurilor.',
+      'Genunchii ușor îndoiți și ficși. Împingi șoldul înapoi, iar bara alunecă pe coapse spre genunchi.',
+      'Cobori până simți întinderea în spatele coapselor, de obicei puțin sub genunchi, cu spatele drept.',
+      'Strângi fesierii și împingi șoldul înainte până stai drept. Bara rămâne lipită de corp tot drumul.',
+    ],
+    mistake: 'Să rotunjești spatele ca să cobori mai jos sau să transformi mișcarea într-o genuflexiune, îndoind genunchii.',
   },
   cmj: {
     steps: [
@@ -414,6 +423,9 @@ export const HOW: Record<string, How> = {
   'Easy Jog or Row': { steps: ['Alergare ușoară pe loc sau afară, ori canotaj ușor.', 'Ritm la care poți vorbi.', 'Doar ca să crească pulsul și temperatura.'] },
   'Walking Lunges': { steps: ['Pas lung înainte, cobori până când genunchiul din spate aproape atinge solul.', 'Împingi din piciorul din față și aduci piciorul din spate direct în pasul următor.', 'Trunchiul drept, fără greutate.'] },
   'A-Skips': { steps: ['Țopăi ritmic pe loc sau înaintând.', 'Genunchiul urcă la nivelul șoldului, laba piciorului vine sub corp.', 'Brațele lucrează opus picioarelor, ca la sprint.'] },
+  'A-Marches': { steps: ['Mergi înainte sau pe loc, pe vârful piciorului de sprijin.', 'Genunchiul celuilalt picior urcă la nivelul șoldului, cu laba piciorului trasă în sus.', 'Brațele lucrează opus picioarelor, ca la sprint. Fără țopăit.'] },
+  'Glute Bridges': { steps: ['Pe spate, genunchii îndoiți, tălpile pe sol la lățimea șoldurilor.', 'Strângi fesierii și ridici șoldul până când umerii, șoldul și genunchii sunt pe o linie.', 'Ții o secundă sus și cobori controlat.'] },
+  'Step Jacks': { steps: ['Pășești lateral cu un picior și ridici brațele deasupra capului.', 'Revii la mijloc cu brațele jos, apoi pășești cu celălalt picior.', 'Ritm vioi, fără să sari.'] },
   'Lateral Shuffles': { steps: ['Poziție joasă, genunchii îndoiți, garda sus.', 'Pași laterali rapizi, fără să încrucișezi picioarele.', 'Câțiva metri într-o parte, apoi înapoi.'] },
   'Pogo Hops': { steps: ['Sărituri mici pe loc, din glezne.', 'Genunchii aproape întinși, contact scurt cu solul.', 'Elastic și ușor, nu înalt.'] },
   'Build-up Runs': { steps: ['Trei alergări de 20 de metri.', 'Prima la 60%, a doua la 70%, a treia la 80% din viteza ta.', 'Te întorci mergând între ele.'] },
@@ -559,6 +571,39 @@ export const HOW: Record<string, How> = {
       'Lateral: piciorul dinspre direcția de mers pleacă primul. Nu încrucișezi niciodată picioarele.',
       'Pași mici, pe vârfuri, distanța dintre tălpi rămâne aceeași.',
     ],
+  },
+};
+
+/**
+ * Full steps for a variation that is a different movement from its exercise: the throws that stand in for the jumps
+ * while the knees don't take landings. The jump variations fall back to the exercise's own steps (cmj, broad).
+ */
+export const VAR_HOW: Record<string, How> = {
+  'Medicine Ball Scoop Toss': {
+    steps: [
+      'Afară sau în fața unui perete solid, cu mingea ținută cu ambele mâini și brațele întinse.',
+      'Picioarele puțin mai late decât șoldurile: împingi șoldul înapoi și cobori mingea între genunchi, ca la începutul unei sărituri.',
+      'Explodezi din șold și din picioare și arunci mingea înainte și în sus, cât de departe poți. Brațele doar o conduc; ajungi pe vârfuri, fără să sari.',
+      'Iei mingea, te reașezi și repeți. Fiecare aruncare e maximă, cu pauză completă între serii.',
+    ],
+    mistake: 'Să arunci din brațe și din spate, cu șoldul blocat. Puterea vine din întinderea șoldului, ca la săritură.',
+  },
+  'Medicine Ball Slam': {
+    steps: [
+      'Doar cu o minge care nu sare (slam ball) sau pe o suprafață care o oprește. O minge de cauciuc care sare poate reveni în față: atunci faci Scoop Toss și la acest exercițiu.',
+      'Picioarele la lățimea umerilor, mingea deasupra capului, te întinzi pe vârfuri.',
+      'Arunci mingea în sol, în fața picioarelor, cât de tare poți, cu abdomenul și dorsalii. Șoldul merge înapoi, genunchii se îndoaie puțin.',
+      'O ridici cu spatele drept și repeți. Fiecare repetare e maximă.',
+    ],
+    mistake: 'Să arunci doar din brațe sau să ridici mingea cu spatele rotunjit.',
+  },
+  'Box Jump': {
+    steps: [
+      'O cutie sau o bancă stabilă, de 30–50 cm, la un pas în fața ta.',
+      'Cobori scurt, balansezi brațele și sari pe cutie. Aterizezi moale, pe toată talpa, cu genunchii în linie cu vârfurile.',
+      'Te ridici drept pe cutie, apoi cobori cu pasul, nu sărind înapoi. Așa dispare aterizarea grea de la sol.',
+    ],
+    mistake: 'Cutia prea înaltă: dacă aterizezi în genuflexiune adâncă, ai urcat mult și ai sărit puțin. Înălțimea crește abia când aterizarea e liniștită.',
   },
 };
 

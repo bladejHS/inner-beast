@@ -38,15 +38,17 @@ initAudio(() => ctx.S.set);
 const BASE = import.meta.env.BASE_URL;
 
 // Six places with labels always on, nothing behind "More"; Settings only behind the gear (the user asked on
-// 2026-11-07 for Provocări in the bar). Training on the left of the wolf (Azi), mind and progress on the right.
-// The order left to right is also the direction the claw swipe takes between tabs.
+// 2026-11-07 for Provocări in the bar). Five places can't sit evenly around a wolf in the middle (it ended up
+// off-centre, three on one side and two on the other), so the five tabs share the bar evenly and the wolf (Azi) is
+// the anchor at the trailing end: under a right thumb, where Material puts its main button, and on the diagonal from
+// the logo at the top left. The order left to right is also the direction the claw swipe takes between tabs.
 const ORDER: Array<[Tab, string, string]> = [
   ['plan', 'Plan', 'plan'],
   ['fight', 'Lupte', 'fight'],
   ['challenge', 'Provocări', 'cup'],
-  ['today', 'Azi', ''],
   ['mind', 'Minte', 'mind'],
   ['progress', 'Progres', 'progress'],
+  ['today', 'Azi', ''],
 ];
 
 /** Screens that open from a tab: the bar keeps their tab marked, and their back button returns there. */

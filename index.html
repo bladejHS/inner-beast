@@ -191,7 +191,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
   var t0 = 0, started = false, leaving = false, broken = false;
   addEventListener('error', function (e) { if (e.error || (e.target && e.target.tagName === 'SCRIPT')) broken = true; }, true);
   function say(name) { try { dispatchEvent(new Event(name)); } catch (e) { /* old browser */ } }
-  // the wolf flies to where it lives: the middle of the tab bar
+  // the wolf flies to where it lives: its hexagon at the end of the tab bar
   function land() {
     var st = sp.querySelector('.sp-stage'), home = document.querySelector('#nav .nw-hex img');
     if (!st || !home) return;

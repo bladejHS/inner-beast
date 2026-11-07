@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { raceTime } from './util.ts';
-import { parseTime, readRun, runAdvice } from './runlog.ts';
+import { parseTime, readRun, runAdvice, zone2 } from './runlog.ts';
+import { kneeAdvice, kneeAsk, kneeStreak, legDays } from './knee.ts';
 import { advance, back, bestTime, elapsed, newRun, pause, resume, segElapsed } from './race.ts';
 import { LEVEL_NAMES, RACES } from '../data/races.ts';
 import { angle, GuardTracker, RepCounter, type Pt } from './coach.ts';
@@ -677,4 +678,59 @@ test('run advice: no pace target, pulse at the same pace, a check every 4th run'
   assert.match(runAdvice([run(360, 150), run(340, 150)]), /Mai rapid cu 20 s\/km/);
   assert.match(runAdvice([run(360, 150), run(358, 158)]), /8 bpm mai mare/);
   assert.match(runAdvice([run(360, 150), run(358, 152), run(362, 149)]), /verificarea.*6:00 \/km/);
+});
+
+test('Upper Strength: the second strength dose replaces the AMRAP on Monday in cycle A only', () => {
+  const bw = WEEK[0].blocks.find((b) => b.id === 'mon-bw')!;
+  const P: Picks = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a' };
+  const a = resolveBlock(bw, { ...P, cycle: 'A' });
+  assert.deepEqual([a.id, a.kind, a.workout, a.name, a.min], ['mon-bw', 'workout', 'upper', 'Upper Strength', 15]);
+  assert.equal(resolveBlock(bw, { ...P, cycle: 'B' }).kind, 'amrap');
+  assert.equal(resolveBlock(bw, { ...P, cycle: 'C' }).kind, 'amrap');
+  assert.equal(resolveBlock(bw, P).kind, 'amrap');
+  const up = workoutById('upper');
+  assert.deepEqual(up.ex.map((x) => [x.id, x.sets, x.lo, x.hi, x.rest]), [['pull-str', 3, 3, 5, 150], ['dips-str', 3, 3, 5, 150]]);
+  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 45], ['pull', 50], ['legs', 60], ['upper', 15]]);
+});
+
+test('knees: three clean Leg Days bring Box Jump, three more with Box Jump bring CMJ and Broad Jump', () => {
+  const leg = (date: string, cmj: number) => makeEntry({ kind: 'workout', name: 'Leg Day', dur: 3600, date, ts: Date.parse(date), data: { wid: 'legs', ex: [{ id: 'cmj', name: 'x', unit: 'done', sets: [1, 1, 1], lvl: cmj }] } });
+  const log = [leg('2026-11-07', 0), leg('2026-11-14', 0), leg('2026-11-21', 0)];
+  const none = legDays(log, {});
+  assert.match(kneeAdvice('cmj', 0, none)!.text, /notezi cât te-au durut/);
+  assert.equal(kneeAdvice('bss', 0, none), null);
+  const two = legDays(log, { '2026-11-14': { d: 2, m: 0 }, '2026-11-21': { d: 0 } });
+  assert.deepEqual(kneeStreak(two), { clean: 2, jump: 0 });
+  assert.equal(kneeAdvice('cmj', 0, two)!.kind, 'stay');
+  const three = legDays(log, { '2026-11-07': { d: 0, m: 2 }, '2026-11-14': { d: 2, m: 0 }, '2026-11-21': { d: 0 } });
+  assert.deepEqual([kneeAdvice('cmj', 0, three)!.kind, kneeAdvice('cmj', 0, three)!.lvl], ['up', 1]);
+  assert.equal(kneeAdvice('broad', 0, three)!.kind, 'stay');
+  // a morning at 4 breaks the run; a session at 6 sends the jumps back to the throws
+  const broke = legDays(log, { '2026-11-07': { d: 0 }, '2026-11-14': { d: 0, m: 4 }, '2026-11-21': { d: 0 } });
+  assert.deepEqual(kneeStreak(broke), { clean: 1, jump: 0 });
+  const hurt = legDays([...log, leg('2026-11-28', 1)], { '2026-11-28': { d: 6 } });
+  assert.deepEqual([kneeAdvice('cmj', 1, hurt)!.kind, kneeAdvice('cmj', 1, hurt)!.lvl], ['down', 0]);
+  const jumps = [leg('2026-12-05', 1), leg('2026-12-12', 1), leg('2026-12-19', 1)];
+  const ok = legDays(jumps, { '2026-12-05': { d: 0, m: 0 }, '2026-12-12': { d: 2, m: 2 }, '2026-12-19': { d: 0, m: 0 } });
+  assert.deepEqual([kneeAdvice('cmj', 1, ok)!.lvl, kneeAdvice('broad', 0, ok)!.lvl], [2, 1]);
+});
+
+test('knees: Azi asks for the session note, then for the next morning, for two days', () => {
+  const leg = (date: string) => makeEntry({ kind: 'workout', name: 'Leg Day', dur: 3600, date, ts: Date.parse(date), data: { wid: 'legs', ex: [] } });
+  const days = (knee: Record<string, { d?: number; m?: number }>) => legDays([leg('2026-11-07')], knee);
+  assert.deepEqual(kneeAsk(days({}), '2026-11-07'), { date: '2026-11-07', field: 'd' });
+  assert.equal(kneeAsk(days({ '2026-11-07': { d: 2 } }), '2026-11-07'), null);
+  assert.deepEqual(kneeAsk(days({ '2026-11-07': { d: 2 } }), '2026-11-08'), { date: '2026-11-07', field: 'm' });
+  assert.equal(kneeAsk(days({ '2026-11-07': { d: 2, m: 0 } }), '2026-11-08'), null);
+  assert.equal(kneeAsk(days({ '2026-11-07': { d: 2 } }), '2026-11-10'), null);
+  assert.deepEqual(normalize({}).knee, {});
+  assert.equal(normalize({}).set.hrMax, 192);
+});
+
+test('pulse: zone 2 is 60-70 % of the maximum, and an easy run above it is called out', () => {
+  assert.deepEqual(zone2(192), [115, 134]);
+  const run = (pace: number, hrAvg?: number) => makeEntry({ kind: 'run', name: 'x', dur: 1200, data: { pace, hrAvg } });
+  assert.match(runAdvice([run(400)], zone2(192)), /zona 2: 115–134 bpm/);
+  assert.match(runAdvice([run(400, 152)], zone2(192)), /152 bpm, peste zona 2/);
+  assert.doesNotMatch(runAdvice([run(400, 130)], zone2(192)), /peste zona 2/);
 });

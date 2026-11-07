@@ -12,6 +12,7 @@ import { openRoutine } from './ui/players/routine.ts';
 import { jogTarget, openPolar } from './ui/players/run.ts';
 import { openShower } from './ui/players/shower.ts';
 import { openWimHof } from './ui/players/wimhof.ts';
+import { dropWorkoutDraft, resumeWorkout, saveWorkoutDraft } from './ui/players/workout.ts';
 import { fightHtml, setComboCat, startQuick } from './ui/screens/fight.ts';
 import { toggleLearned } from './ui/screens/alex.ts';
 import { chapterHtml, mindHtml } from './ui/screens/mind.ts';
@@ -465,6 +466,30 @@ function act(a: string, el: HTMLElement): void {
     case 'tool':
       unlock();
       return openTool(el.dataset.k || '');
+    case 'draft-go':
+      unlock();
+      return resumeWorkout();
+    case 'draft-save':
+      if (saveWorkoutDraft()) toast('Salvat în progres.');
+      return render();
+    case 'draft-drop':
+      ask('Renunți la antrenament?', 'Seriile bifate în el nu se mai salvează.', 'Renunță la el', () => {
+        dropWorkoutDraft();
+        render();
+      }, 'Păstrează', true);
+      return;
+    case 'knee': {
+      const day = el.dataset.d || today;
+      const f = el.dataset.f === 'm' ? 'm' : 'd';
+      S.knee[day] = { ...(S.knee[day] ?? {}), [f]: Number(el.dataset.v) || 0 };
+      save();
+      toast(Number(el.dataset.v) >= 5 ? 'Notat. Săriturile mai așteaptă; dacă durerea rămâne, mergi la un medic.' : 'Notat.');
+      return render();
+    }
+    case 'set-hr':
+      S.set.hrMax = Math.max(150, Math.min(220, S.set.hrMax + (Number(el.dataset.d) || 0)));
+      save();
+      return render();
     case 'intro-ok':
       try {
         localStorage.setItem('beast:intro', '1');

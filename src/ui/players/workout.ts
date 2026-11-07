@@ -1,9 +1,12 @@
 // Calisthenics workout player: variations, sets with last-time numbers, rest timer, hold timer and the pull-up EMOM.
+// Every set is kept on the phone as it is ticked (a draft in localStorage), so a force-closed app loses nothing:
+// Azi and the next start of the same workout offer to carry on, or to save what was done.
 
 import { EMOM_GOAL, workoutById, type Exercise, type Workout } from '../../data/workouts.ts';
 import { advise, deloadOn, emomAdvice, emomNext, lastExercise, lighter, loadable, stalled, STALL_TEXT, ticked, type Advice, type LastEx } from '../../logic/progress.ts';
 import { Clock } from '../../logic/seq.ts';
 import { makeEntry, type SetLog } from '../../logic/store.ts';
+import { KNEE_STEPS, kneeAdvice, legDays } from '../../logic/knee.ts';
 import { dayKey, esc, mmss, shortDay } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, type Player } from '../ctx.ts';
@@ -49,6 +52,56 @@ function targetLine(ex: Exercise): string {
   return `${ex.sets} × ${r}${ex.type === 'time' ? ' s' : ''}${ex.perSide ? ' pe parte' : ''}`;
 }
 
+// ---------- the draft: the session as it stands, kept after every change ----------
+const DRAFT_KEY = 'beast:draft:v1';
+
+interface DraftX {
+  id: string;
+  lvl: number;
+  vals: number[];
+  done: boolean[];
+  kg: number;
+  emom?: { min: number; reps: number; marks: boolean[]; st: EmomState['st'] };
+}
+
+export interface WorkoutDraft {
+  wid: string;
+  block?: string;
+  name: string;
+  /** When the session started (ms), and the seconds it had run when last kept. */
+  start: number;
+  elapsed: number;
+  i: number;
+  xs: DraftX[];
+}
+
+export function workoutDraft(): WorkoutDraft | null {
+  try {
+    const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null') as WorkoutDraft | null;
+    return d && typeof d.wid === 'string' && Array.isArray(d.xs) ? d : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeDraft(d: WorkoutDraft | null): void {
+  try {
+    if (d) localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+    else localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    /* storage full or blocked: the session still saves at the end */
+  }
+}
+
+export function dropWorkoutDraft(): void {
+  writeDraft(null);
+}
+
+/** Sets ticked (and EMOM minutes marked) in a draft: nothing to offer when it is zero. */
+export function draftSets(d: WorkoutDraft): number {
+  return d.xs.reduce((s, x) => s + x.done.filter(Boolean).length + (x.emom ? x.emom.marks.filter(Boolean).length : 0), 0);
+}
+
 class WorkoutPlayer implements Player {
   st: 'ready' | 'ex' | 'done' = 'ready';
   w: Workout;
@@ -62,14 +115,58 @@ class WorkoutPlayer implements Player {
   lastRestSec = -1;
   saved = false;
   savedEntry: SetLog[] = [];
+  /** When the session began; a draft carried over from another day is saved on its own date. */
+  startTs = 0;
+  /** Built only to save a draft, without a screen. */
+  silent = false;
   /** Accepted lighter week: fewer sets, and nothing here moves the progression. */
   deload = deloadOn(ctx.S.deload, dayKey());
 
-  constructor(wid: string, block?: string) {
+  constructor(wid: string, block?: string, draft?: WorkoutDraft, silent = false) {
     this.w = workoutById(wid);
     this.block = block;
+    this.silent = silent;
     this.xs = this.w.ex.map((ex) => this.initX(this.deload ? { ...ex, sets: lighter(ex.sets) } : ex, ctx.S.lvl[ex.id] ?? ex.start));
-    this.render();
+    if (draft) this.apply(draft);
+    if (!silent) this.render();
+  }
+
+  /** Puts a kept session back: variations, numbers, ticks, weights, the exercise it was on and the elapsed time. */
+  apply(d: WorkoutDraft): void {
+    for (const dx of d.xs) {
+      const k = this.xs.findIndex((x) => x.ex.id === dx.id);
+      if (k < 0) continue;
+      const x = this.initX(this.xs[k].ex, dx.lvl);
+      x.vals = x.vals.map((v, j) => (typeof dx.vals[j] === 'number' ? dx.vals[j] : v));
+      x.done = x.done.map((_, j) => !!dx.done[j]);
+      x.kg = dx.kg || x.kg;
+      // a running EMOM cannot pick up its clock again: it keeps the minutes marked and counts as finished
+      if (x.emom && dx.emom) x.emom = { ...x.emom, min: dx.emom.min, reps: dx.emom.reps, marks: dx.emom.marks, st: dx.emom.st === 'setup' ? 'setup' : 'done' };
+      this.xs[k] = x;
+    }
+    this.block = d.block ?? this.block;
+    this.i = Math.max(0, Math.min(this.xs.length - 1, d.i));
+    this.startTs = d.start;
+    this.t0 = Date.now() - d.elapsed * 1000;
+    this.st = 'ex';
+    if (!this.silent) {
+      window.clearInterval(this.timer);
+      this.timer = window.setInterval(() => this.tick(), 250);
+    }
+  }
+
+  /** Keeps the session as it stands, after every change. */
+  persist(): void {
+    if (this.st !== 'ex' || this.saved || this.silent) return;
+    writeDraft({
+      wid: this.w.id,
+      block: this.block,
+      name: this.w.name,
+      start: this.startTs || this.t0,
+      elapsed: Math.round((Date.now() - this.t0) / 1000),
+      i: this.i,
+      xs: this.xs.map((x) => ({ id: x.ex.id, lvl: x.lvl, vals: [...x.vals], done: [...x.done], kg: x.kg, ...(x.emom ? { emom: { min: x.emom.min, reps: x.emom.reps, marks: [...x.emom.marks], st: x.emom.st } } : {}) })),
+    });
   }
 
   initX(ex: Exercise, lvl: number): XS {
@@ -114,12 +211,24 @@ class WorkoutPlayer implements Player {
     return chrome(
       this.w.name,
       `<h1 class="pl-h">${esc(this.w.name)}</h1>
-      <p class="pl-sub">${this.xs.filter((x) => !x.ex.opt).length} exerciții${this.xs.some((x) => x.ex.opt) ? ` și ${this.xs.filter((x) => x.ex.opt).length} opționale` : ''}, aproximativ ${this.w.id === 'legs' ? 60 : this.w.id === 'pull' ? 50 : 45} de minute cu pauze</p>
+      <p class="pl-sub">${this.xs.filter((x) => !x.ex.opt).length} exerciții${this.xs.some((x) => x.ex.opt) ? ` și ${this.xs.filter((x) => x.ex.opt).length} opționale` : ''}, aproximativ ${this.w.min} de minute cu pauze</p>
+      ${this.resumeHtml()}
       <p class="dim">La fiecare exercițiu alegi varianta potrivită. Seriile de forță se opresc cu 1–3 repetări înainte de limită. Când atingi capătul intervalului la toate seriile, aplicația îți propune pasul următor: altă variantă sau mai multă greutate.</p>
       ${this.deload ? '<div class="advice">Săptămână ușoară: mai puține serii, fără să forțezi. Sesiunea nu se numără la progres.</div>' : ''}
       <ul class="hist" style="margin:8px 0 18px">${rows}</ul>
       <button class="btn" data-a="p:begin">Start</button>`,
     );
+  }
+
+  /** A kept session of this same workout: carry on from it (Start begins a new one and drops it). */
+  resumeHtml(): string {
+    const d = workoutDraft();
+    if (!d || d.wid !== this.w.id || !draftSets(d)) return '';
+    const when = new Date(d.start);
+    const time = `${String(when.getHours()).padStart(2, '0')}:${String(when.getMinutes()).padStart(2, '0')}`;
+    const day = dayKey(when) === dayKey() ? `azi la ${time}` : `${shortDay(dayKey(when))}, ${time}`;
+    const n = draftSets(d);
+    return `<div class="advice up">Ai ${n} ${n === 1 ? 'serie bifată' : 'serii bifate'} dintr-o sesiune începută ${day}. <button class="link" style="color:inherit;padding:0" data-a="p:resume">Continuă de unde ai rămas</button></div>`;
   }
 
   dots(): string {
@@ -161,6 +270,8 @@ class WorkoutPlayer implements Player {
 
   advice(x: XS): Advice {
     if (this.deload) return { kind: 'stay', text: '' };
+    const kn = kneeAdvice(x.ex.id, x.lvl, legDays(ctx.S.log, ctx.S.knee));
+    if (kn) return kn;
     const adv = advise(x.ex, x.last, x.lvl, x.prev);
     return adv.kind === 'stay' && adv.text && !ticked(x.ex) && stalled(ctx.S.log, x.ex.id, x.lvl, x.kg) ? { ...adv, text: STALL_TEXT } : adv;
   }
@@ -267,9 +378,23 @@ class WorkoutPlayer implements Player {
       `${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1>
       <p class="lead">${mmss((Date.now() - this.t0) / 1000)} de antrenament. ${this.saved ? 'Salvat în progres.' : ''}</p>
       <ul class="hist">${lines || '<li><span>Nicio serie bifată.</span></li>'}</ul>
+      ${this.w.id === 'legs' && this.saved ? this.kneeHtml() : ''}
       <div style="height:16px"></div>
       <button class="btn" data-a="p:close">Închide</button>`,
     );
+  }
+
+  /** After Leg Day: how the knees felt during the session (the next morning is asked on Azi). */
+  kneeHtml(): string {
+    const cur = ctx.S.knee[this.sessionDate()]?.d;
+    return `<div class="knee-q"><p class="label">Genunchii, azi la antrenament</p>
+      <div class="chips knee">${KNEE_STEPS.map(([v, l]) => `<button class="chip" aria-pressed="${cur === v}" data-a="p:knee" data-k="${v}">${l}</button>`).join('')}</div>
+      <p class="small dim">Mâine dimineață te întreb din nou, pe ecranul Azi. Trei Leg Day-uri la rând fără durere și săriturile încep să revină.</p></div>`;
+  }
+
+  /** The day the session belongs to: the day it started. */
+  sessionDate(): string {
+    return dayKey(new Date(this.startTs || this.t0 || Date.now()));
   }
 
   // ---------- timing ----------
@@ -305,6 +430,7 @@ class WorkoutPlayer implements Player {
       const s = Math.ceil(60 - (t - m * 60));
       if (m !== e.lastMin) {
         e.lastMin = m;
+        this.persist();
         if (m > 0) {
           sfx.go();
           buzz(300);
@@ -335,16 +461,37 @@ class WorkoutPlayer implements Player {
 
   // ---------- actions ----------
   act(a: string, el: HTMLElement): void {
+    this.doAct(a, el);
+    this.persist();
+  }
+
+  doAct(a: string, el: HTMLElement): void {
     const x = this.x;
     const k = Number(el.dataset.k ?? -1);
     const d = Number(el.dataset.d ?? 0);
     switch (a) {
       case 'p:begin':
         unlock();
+        dropWorkoutDraft();
         this.st = 'ex';
         this.t0 = Date.now();
+        this.startTs = this.t0;
         this.timer = window.setInterval(() => this.tick(), 250);
         return this.render();
+      case 'p:resume': {
+        const d = workoutDraft();
+        if (!d || d.wid !== this.w.id) return;
+        unlock();
+        this.apply(d);
+        return this.render();
+      }
+      case 'p:knee': {
+        const v = Number(el.dataset.k);
+        const day = this.sessionDate();
+        ctx.S.knee[day] = { ...(ctx.S.knee[day] ?? {}), d: v };
+        save();
+        return this.render();
+      }
       case 'p:lvl': {
         const nx = this.initX(x.ex, k);
         nx.done = x.done.map(() => false);
@@ -460,6 +607,7 @@ class WorkoutPlayer implements Player {
   input(el: HTMLElement): void {
     if (el.dataset.a === 'p:vin') this.typeReps(Number(el.dataset.k), (el as HTMLInputElement).value);
     if (el.dataset.a === 'p:kg') this.x.kg = Math.max(0, Math.min(300, parseFloat((el as HTMLInputElement).value) || 0));
+    this.persist();
   }
 
   typeReps(k: number, raw: string): void {
@@ -508,26 +656,36 @@ class WorkoutPlayer implements Player {
       // Progression is mandatory: the next session opens on the harder variation (the chips can still go back).
       ctx.S.lvl[x.ex.id] = adv.kind === 'up' && adv.lvl !== undefined && !this.deload ? adv.lvl : x.lvl;
     }
-    if (!ex.length) return;
+    if (!ex.length) {
+      dropWorkoutDraft();
+      return;
+    }
     const core = this.xs.filter((x) => !x.ex.opt);
     const doneCore = core.filter((x) => ex.some((e) => e.id === x.ex.id)).length;
+    // a session carried over from an earlier day is saved on that day
+    const other = this.startTs && dayKey(new Date(this.startTs)) !== dayKey();
     addEntry(
       makeEntry({
         kind: 'workout',
         block: doneCore * 2 >= core.length ? this.block : undefined,
         name: this.w.name,
-        dur: (Date.now() - this.t0) / 1000,
+        dur: Math.min((Date.now() - this.t0) / 1000, 4 * 3600),
         data: { wid: this.w.id, ex, ...(this.deload ? { deload: true } : {}) },
+        ...(other ? { ts: this.startTs } : {}),
       }),
     );
     save();
     this.saved = true;
+    dropWorkoutDraft();
   }
 
   close(): boolean {
     if (this.st !== 'ex') return true;
     const any = this.xs.some((x) => x.done.some(Boolean) || (x.emom && x.emom.st !== 'setup'));
-    if (!any) return true;
+    if (!any) {
+      dropWorkoutDraft();
+      return true;
+    }
     ask('Te oprești?', 'Salvez seriile bifate până acum?', 'Salvează și ieși', () => {
       this.saveEntry();
       closePlayer(true);
@@ -542,4 +700,20 @@ class WorkoutPlayer implements Player {
 
 export function openWorkout(wid: string, block?: string): void {
   mountPlayer(new WorkoutPlayer(wid, block));
+}
+
+/** Opens the kept session where it stopped. */
+export function resumeWorkout(): void {
+  const d = workoutDraft();
+  if (d) mountPlayer(new WorkoutPlayer(d.wid, d.block, d));
+}
+
+/** Saves the kept session as it is, without opening it. */
+export function saveWorkoutDraft(): boolean {
+  const d = workoutDraft();
+  if (!d) return false;
+  const p = new WorkoutPlayer(d.wid, d.block, d, true);
+  p.saveEntry();
+  dropWorkoutDraft();
+  return p.saved;
 }

@@ -68,6 +68,8 @@ export interface Settings {
   whSafety: boolean;
   /** iPhone: the bell rings with the silent switch on (it may pause music). */
   bellThroughMute: boolean;
+  /** Maximum heart rate, for the easy zone (zone 2 = 60–70 %). Default: 208 − 0.7 × 23 years. */
+  hrMax: number;
 }
 
 /** A logged meal: name, kcal, protein, carbs, fat (g); pl = which plan meal it was ("t2"). */
@@ -172,6 +174,8 @@ export interface State {
   cycle: { start: string };
   /** Test results by test id, oldest first. */
   tests: Record<string, Array<{ d: string; v: number }>>;
+  /** Knee pain by Leg Day date, 0–10: d during the session, m the next morning. Decides when the jumps come back. */
+  knee: Record<string, { d?: number; m?: number }>;
 }
 
 export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 200, startW: 80, goalW: 75, act: 1.55 };
@@ -199,6 +203,7 @@ export const DEFAULT_SETTINGS: Settings = {
   bwScheme: 1,
   whSafety: false,
   bellThroughMute: false,
+  hrMax: 192,
 };
 
 export function defaultHabit(today: string): Habit {
@@ -234,6 +239,7 @@ export function freshState(today: string = dayKey()): State {
     deload: { last: '', week: '' },
     cycle: { start: cycleStartFor(today) },
     tests: {},
+    knee: {},
   };
 }
 
@@ -278,6 +284,7 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     deload: { ...base.deload, ...(isObj(r.deload) ? r.deload : {}) },
     cycle: isObj(r.cycle) && typeof r.cycle.start === 'string' && r.cycle.start ? { start: r.cycle.start } : base.cycle,
     tests: isObj(r.tests) ? (r.tests as State['tests']) : {},
+    knee: isObj(r.knee) ? (r.knee as State['knee']) : {},
   };
 }
 

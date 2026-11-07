@@ -1,4 +1,4 @@
-// Strength sessions for PUSH (Tue), PULL (Fri), LEGS (Sat) and the 10-minute bodyweight block (Mon).
+// Strength sessions for PUSH (Tue), PULL (Fri), LEGS (Sat), UPPER (Mon in cycle A) and the 10-minute bodyweight block (Mon).
 // Base from the e-book (push-up variations + dips, pull-up variations, legs), filled out with Alex Hanma's own training
 // (pull-up EMOM, rear shoulders, explosive work) and reworked on 2026-11-07 after the research: explosive work first,
 // strength sets 1-3 reps short of failure, longer rests on heavy moves, a second leg dose on Tuesday, sprints,
@@ -6,6 +6,8 @@
 // Fitted to the user on 2026-11-07: jumps hurt the knees at the current body weight, so Saturday's power work starts
 // with medicine ball throws and hill sprints, and the jumps come back as later variations. Equipment: an Olympic bar
 // (no squats with it), dumbbells up to 30 kg, a medicine ball, a partner now and then.
+// The user approved on 2026-11-07 a second strength dose for pulling and pressing: in the strength emphasis (cycle A)
+// Monday's AMRAP becomes Upper Strength, short heavy sets of pull-ups and dips.
 // Exercise names stay in English; cues are Romanian.
 
 /** The heaviest dumbbells the user owns: past this the weight can't go up, the variation or the tempo does. */
@@ -39,8 +41,10 @@ export interface Exercise {
 }
 
 export interface Workout {
-  id: 'push' | 'pull' | 'legs';
+  id: 'push' | 'pull' | 'legs' | 'upper';
   name: string;
+  /** About how long it takes, rests included. */
+  min: number;
   ex: Exercise[];
 }
 
@@ -48,6 +52,7 @@ export const WORKOUTS: Workout[] = [
   {
     id: 'push',
     name: 'Push Training',
+    min: 45,
     ex: [
       {
         id: 'explosive', name: 'Explosive Push-ups', vars: ['Incline Explosive Push-ups', 'Explosive Push-ups', 'Clap Push-ups', 'Superman Push-ups'], start: 0,
@@ -96,6 +101,7 @@ export const WORKOUTS: Workout[] = [
   {
     id: 'pull',
     name: 'Pull Training',
+    min: 50,
     ex: [
       {
         id: 'emom', name: 'Pull-up EMOM', vars: ['Negative Pull-ups', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 2,
@@ -152,6 +158,7 @@ export const WORKOUTS: Workout[] = [
   {
     id: 'legs',
     name: 'Leg Day',
+    min: 60,
     ex: [
       {
         id: 'sprint', name: 'Sprints', vars: ['Hill Sprints (8–10 s)', 'Accelerations (10–20 m)'], start: 0,
@@ -208,6 +215,25 @@ export const WORKOUTS: Workout[] = [
         id: 'wallsit', name: 'Wall Sit', vars: ['Wall Sit'], start: 0,
         type: 'time', sets: 2, lo: 45, hi: 60, rest: 60, opt: true, muscles: 'cvadricepși',
         cue: 'Opțional, la final. Spatele lipit de perete, genunchii la 90°, respiri calm. Ținutele fără mișcare sunt de obicei bine tolerate de genunchi.',
+      },
+    ],
+  },
+  {
+    // The second strength dose of the week for pulling and pressing, on Monday in the strength emphasis (cycle A):
+    // strength grows better with two sessions a week than with one. Short heavy sets, 2 reps in reserve.
+    id: 'upper',
+    name: 'Upper Strength',
+    min: 15,
+    ex: [
+      {
+        id: 'pull-str', name: 'Pull-ups', vars: ['Negative Pull-ups', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 2,
+        type: 'reps', sets: 3, lo: 3, hi: 5, rest: 150, muscles: 'spate, biceps',
+        cue: 'Serii scurte și grele, cu 2 repetări în rezervă: nu e EMOM-ul de vineri, e forță. Când faci 3 × 5 curat, treci la Weighted Pull-ups, cu un rucsac sau o ganteră între picioare.',
+      },
+      {
+        id: 'dips-str', name: 'Dips', vars: ['Negative Dips', 'Parallel Bar Dips', 'Weighted Dips'], start: 1,
+        type: 'reps', sets: 3, lo: 3, hi: 5, rest: 150, muscles: 'piept, triceps',
+        cue: 'La fel: serii scurte, grele, cu 2 repetări în rezervă. Umerii jos, cotul la 90°. La 3 × 5 curat adaugi greutate.',
       },
     ],
   },

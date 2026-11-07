@@ -56,6 +56,7 @@ const P: Record<string, string> = {
   refresh: '<path d="M19.5 12a7.5 7.5 0 11-2.2-5.3M19.5 4v4h-4"/>',
   pill: '<rect x="3.6" y="8.6" width="16.8" height="6.8" rx="3.4" transform="rotate(-40 12 12)"/><path d="M9.5 9l5 5" transform="rotate(5 12 12)"/>',
   info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.5v.5"/>',
+  pulse: '<path d="M2.5 12.5h4l2.2-5.5 4 11 2.6-7 1.7 1.5h4.5"/>',
   more: '<circle cx="5.5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="18.5" cy="12" r="1.6" fill="currentColor"/>',
   alert: '<path d="M12 3.5l9 16H3z"/><path d="M12 10v4.5M12 17v.5"/>',
 };

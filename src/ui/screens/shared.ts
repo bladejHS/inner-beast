@@ -5,6 +5,7 @@ import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks
 import { ROW_CHALLENGES, rowChallenge } from '../../data/row.ts';
 import { activeStreak, cycleAt, deloadOn, growMinutes } from '../../logic/progress.ts';
 import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
+import { zone2 } from '../../logic/runlog.ts';
 import { dayKey, esc, inWeek, num, pad2, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { addEntry, ask, ctx, fresh, save, toast, type Tab } from '../ctx.ts';
 import { ic } from '../icons.ts';
@@ -211,7 +212,11 @@ export function blockCard(raw: Block, n: number, today: string, next = false): s
     const st = ctx.S.steps[today] ?? 0;
     extra = `<div class="steps-in"><label class="sr" for="steps-in">Pași azi</label><input id="steps-in" type="number" inputmode="numeric" min="0" max="100000" data-a="steps" value="${st || ''}" placeholder="Pași azi"><span>din 10.000</span></div>`;
   }
-  if (b.kind === 'run') extra = `<button class="link" data-a="polar" data-b="${b.id}">Adaugă din Polar Flow</button>`;
+  if (b.kind === 'run' || b.kind === 'cardio') {
+    const [lo, hi] = zone2(ctx.S.set.hrMax);
+    extra = `<p class="rd-hr">${ic('pulse')}<span>Zona 2: <b>${lo}–${hi}</b> bpm</span></p>`;
+  }
+  if (b.kind === 'run') extra += `<button class="link" data-a="polar" data-b="${b.id}">Adaugă din Polar Flow</button>`;
   if (b.kind === 'rounds' && b.focus && b.burstFrom !== 1 && b.focus !== 'legs' && b.focus !== 'rope' && b.focus !== 'ladder') {
     const cs = focusCombos(b.focus, ctx.S.nut.h);
     extra += `<p class="rd-calls"><b>Combinații strigate:</b> ${esc(cs.slice(0, 4).map((c) => c.name).join(', '))}${cs.length > 4 ? ` și încă ${cs.length - 4}` : ''}</p>`;

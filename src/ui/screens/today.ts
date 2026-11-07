@@ -9,6 +9,8 @@ import { ic } from '../icons.ts';
 import { dayPhoto } from '../art.ts';
 import { rake } from '../claws.ts';
 import { blockCard, blockMinutes, gauge, liveBlock, top } from './shared.ts';
+import { draftSets, workoutDraft } from '../players/workout.ts';
+import { KNEE_STEPS, kneeAsk, legDays } from '../../logic/knee.ts';
 import { weekCard } from './alex.ts';
 
 /** Monday–Sunday strip: how much of each day is done this week. */
@@ -146,6 +148,30 @@ function deloadCard(today: string): string {
   return `<section class="card lime"><p class="label">Săptămâna 4</p><h3>Ușoară și cu teste</h3><p class="small">Închei trei săptămâni de ${esc((c?.name ?? '').toLowerCase())}. Propun o săptămână cu aceleași blocuri, dar cu aproximativ 2/3 din serii și runde, plus testele, ca să vezi ce ai câștigat și să pornești odihnit în ciclul următor.</p><div class="btn-row"><button class="btn sm" data-a="deload" data-k="1">Accept</button><button class="btn ghost sm" data-a="deload" data-k="0">Nu acum</button></div></section>`;
 }
 
+/** A workout the phone closed mid-way: every ticked set was kept, so it can go on or be saved. */
+function draftCard(): string {
+  const d = workoutDraft();
+  if (!d || !draftSets(d)) return '';
+  const n = draftSets(d);
+  const when = new Date(d.start);
+  const day = dayKey(when) === dayKey() ? 'azi' : RO_DAYS[weekdayIdx(dayKey(when))].toLowerCase();
+  return `<section class="card lime" aria-label="Antrenament neterminat"><p class="label">Antrenament neterminat</p><h3>${esc(d.name)}</h3>
+    <p class="small dim">${n} ${n === 1 ? 'serie bifată' : 'serii bifate'}, început ${day}. Fiecare serie s-a păstrat pe telefon.</p>
+    <div class="btn-row"><button class="btn sm" data-a="draft-go">Continuă</button><button class="btn ghost sm" data-a="draft-save">Salvează ce am făcut</button></div>
+    <button class="link" data-a="draft-drop">Renunță la el</button></section>`;
+}
+
+/** The knee note after Leg Day: during the session (if it was skipped at the end) and the next morning. */
+function kneeCard(today: string): string {
+  const ask = kneeAsk(legDays(ctx.S.log, ctx.S.knee), today);
+  if (!ask) return '';
+  const day = ask.date === today ? 'azi' : RO_DAYS[weekdayIdx(ask.date)].toLowerCase();
+  const q = ask.field === 'm' ? `Genunchii azi-dimineață, după Leg Day-ul de ${day}` : `Genunchii la Leg Day-ul de ${day}`;
+  return `<section class="card knee-card" aria-label="Genunchii"><p class="label">5 secunde</p><h3>${esc(q)}</h3>
+    <div class="chips knee">${KNEE_STEPS.map(([v, l]) => `<button class="chip" data-a="knee" data-d="${ask.date}" data-f="${ask.field}" data-v="${v}">${l}</button>`).join('')}</div>
+    <p class="small dim" style="margin:10px 0 0">Din notele astea aplicația știe când pot reveni săriturile: Box Jump după trei Leg Day-uri la rând fără durere.</p></section>`;
+}
+
 function introCard(): string {
   let seen = false;
   try {
@@ -162,6 +188,8 @@ export function todayHtml(): string {
   const idx = weekdayIdx(today);
   const day = WEEK[idx];
   return `${top()}
+    ${draftCard()}
+    ${kneeCard(today)}
     ${introCard()}
     ${deloadCard(today)}
     ${dayBody(day, today, prettyDay(today))}

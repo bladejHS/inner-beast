@@ -1,6 +1,7 @@
 // Settings: sound, voice, rest times, data backup and the sources.
 
 import { esc } from '../../logic/util.ts';
+import { zone2 } from '../../logic/runlog.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { pageHead, top } from './shared.ts';
@@ -50,6 +51,8 @@ export function settingsHtml(): string {
     ${row('Combinații strigate', 'În rundele de shadow boxing, sac și coardă', `<div class="chips">${[0, 10, 15, 20, 30].map((v) => `<button class="chip" aria-pressed="${s.callEvery === v}" data-a="set-call" data-v="${v}">${v ? `${v} s` : 'Oprit'}</button>`).join('')}</div>`)}
     ${row('Pauză la rundele de 3 minute', 'Cartea nu o precizează; standardul în box e 1 minut', step('rest3', mm(s.rest3), 'Pauză 3 minute'))}
     ${row('Pauză la intervalele de 1 minut', 'Timerul rapid de Wall Sit / Jumping Squats', step('rest1', mm(s.rest1), 'Pauză 1 minut'))}
+    <h2 class="sec">Puls<small>Pentru vâslitul de marți și alergarea de duminică, cu centura de puls.</small></h2>
+    ${row('Pulsul maxim', `Zona 2, ușor: ${zone2(s.hrMax)[0]}–${zone2(s.hrMax)[1]} bpm. Estimat pentru 23 de ani (208 − 0,7 × vârsta); dacă centura ți-a arătat un maxim mai mare, pune-l pe acela.`, `<div class="stepper" role="group" aria-label="Pulsul maxim"><button data-a="set-hr" data-d="-1" aria-label="Scade">−</button><output>${s.hrMax}</output><button data-a="set-hr" data-d="1" aria-label="Crește">+</button></div>`)}
     <h2 class="sec">Memento-uri în calendar<small>O aplicație web nu poate trimite notificări programate, mai ales pe iPhone. Pune următoarele 4 săptămâni din plan și zilele pozelor de progres în calendarul telefonului, cu alarmă.</small></h2>
     <div class="ics">
       <label class="nfld"><span>Ora antrenamentului</span><input id="icsT" type="time" value="18:00"></label>

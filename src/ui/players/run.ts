@@ -2,12 +2,13 @@
 
 import { Track, routePath, simplify, MAX_ACC, type Fix } from '../../logic/geo.ts';
 import { Clock } from '../../logic/seq.ts';
-import { readRun, runAdvice, type RunInput } from '../../logic/runlog.ts';
+import { readRun, runAdvice, zone2, type RunInput } from '../../logic/runlog.ts';
 import { makeEntry } from '../../logic/store.ts';
 import { dayKey, esc, km, mmss, num, paceStr, raceTime } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, closeSheet, ctx, mountPlayer, openSheet, ovEl, save, toast, type Player } from '../ctx.ts';
 import { ring } from '../charts.ts';
+import { ic } from '../icons.ts';
 import { howHtml } from '../how.ts';
 import { art } from '../art.ts';
 import { chrome, ctrlBtn, setText } from './common.ts';
@@ -190,8 +191,9 @@ class RunPlayer implements Player {
         this.name,
         `<h1 class="pl-h">${this.name}</h1>
         <p class="pl-sub">${c.mode === 'run' ? `${Math.round((c.target ?? 1200) / 60)} de minute` : '10.000 de pași, prin natură'}</p>
-        <p class="dim">${c.mode === 'run' ? 'Ritm de conversație de la început până la sfârșit, fără țintă de viteză. Progresul se vede în timp: același ritm, puls mai mic.' : 'Mergi prin natură. Pașii îi iei din telefon sau îi estimez din distanță.'}</p>
-        ${c.mode === 'run' && runAdvice(ctx.S.log) ? `<div class="advice">${esc(runAdvice(ctx.S.log))}</div>` : ''}
+        <p class="dim">${c.mode === 'run' ? 'Ritm de conversație de la început până la sfârșit, fără țintă de viteză: te ghidezi după puls. Progresul se vede în timp: același ritm, puls mai mic.' : 'Mergi prin natură. Pașii îi iei din telefon sau îi estimez din distanță.'}</p>
+        ${c.mode === 'run' ? `<div class="call-box"><h4>Puls, zona 2</h4><div class="c-name">${zone2(ctx.S.set.hrMax)[0]}–${zone2(ctx.S.set.hrMax)[1]} bpm</div><p class="small" style="margin:0">Dacă trece de ${zone2(ctx.S.set.hrMax)[1]}, încetinești sau mergi până coboară.</p></div>` : ''}
+        ${c.mode === 'run' && runAdvice(ctx.S.log, zone2(ctx.S.set.hrMax)) ? `<div class="advice">${esc(runAdvice(ctx.S.log, zone2(ctx.S.set.hrMax)))}</div>` : ''}
         ${howHtml(c.mode === 'run' ? 'Jogging' : 'Walk (10K Steps)', undefined, { open: true })}
         <p>${this.gpsHtml()}</p>
         <p class="small dim">Ecranul rămâne aprins cât timp alergi. Dacă îl blochezi, unele telefoane opresc GPS-ul din browser.</p>
@@ -211,6 +213,7 @@ class RunPlayer implements Player {
         this.name,
         `${c.mode === 'run' && target ? ring(t / target, timeHtml, 6) : `<div style="text-align:center;margin:14px 0">${timeHtml}</div>`}
         <p class="coach" id="coach">${esc(this.coach)}</p>
+        ${c.mode === 'run' ? `<p class="rd-hr">${ic('pulse')}<span>Zona 2: <b>${zone2(ctx.S.set.hrMax)[0]}–${zone2(ctx.S.set.hrMax)[1]}</b> bpm</span></p>` : ''}
         <div class="run-stats">
           <div><b id="dk">${km(this.track.m)}</b><span>km</span></div>
           <div><b id="pn">${paceStr(this.track.pace())}</b><span>ritm acum, min/km</span></div>

@@ -4,7 +4,8 @@
 import { WEEK } from '../../data/plan.ts';
 import { BW_SCHEMES, EMOM_GOAL, WORKOUTS } from '../../data/workouts.ts';
 import { activeStreak, amrapBest, amrapTrend, dayProgress, exerciseTrend, stalled, totals, variationPath, weekDone } from '../../logic/progress.ts';
-import { runAdvice } from '../../logic/runlog.ts';
+import { runAdvice, zone2 } from '../../logic/runlog.ts';
+import { KNEE_RUN, kneeStreak, legDays } from '../../logic/knee.ts';
 import type { Entry } from '../../logic/store.ts';
 import { addDays, dayKey, esc, km, mmss, raceTime, num, paceStr, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { bars, spark } from '../charts.ts';
@@ -210,10 +211,23 @@ function trainSeg(): string {
     <div class="ex-line"><div><b>Pull-up EMOM</b><span>Următoarea țintă: ${S.emom.min} min × ${S.emom.reps}. Spre ${EMOM_GOAL.min} × ${EMOM_GOAL.reps}: ${emomPct}%.</span></div><div class="bar" style="margin:0;--fill:${Math.min(1, emomPct / 100).toFixed(3)}"><i></i></div></div>
     ${amraps.length ? `<div class="ex-line"><div><b>Bodyweight Workout</b><span>Ultima dată ${amraps[amraps.length - 1].data.rounds} runde${amBest ? `, recordul la ${esc(BW_SCHEMES[sch].name)}: ${amBest.data.rounds} runde + ${amBest.data.extra}` : ''}</span></div>${spark(amrapTrend(S.log, sch))}</div>` : ''}
     ${exLines.join('') || '<p class="dim">După primul antrenament de push, pull sau picioare vezi aici fiecare exercițiu.</p>'}
+    ${kneeLine()}
 
     <h2 class="sec">Aerob<small>Alergarea de duminică și canotajul de marți, ușor</small></h2>
-    ${runAdvice(S.log) ? `<p class="small dim">${esc(runAdvice(S.log))}</p>` : ''}
+    ${runAdvice(S.log, zone2(S.set.hrMax)) ? `<p class="small dim">${esc(runAdvice(S.log, zone2(S.set.hrMax)))}</p>` : ''}
     ${aerobic.length ? `${paces.length > 1 ? `<p class="small dim" style="margin:0">Ritmul mediu la alergare (mai jos e mai rapid)</p>${spark(paces, true)}` : ''}<ul class="hist">${aerobic.slice(-6).reverse().map((e) => entryLine(e)).join('')}</ul>` : '<p class="dim">Duminică: alergare ușoară, de la 20 la 30 de minute. Marți: canotaj ușor.</p>'}`;
+}
+
+/** The knees after Leg Day: the last notes and how far the jumps are. */
+function kneeLine(): string {
+  const days = legDays(ctx.S.log, ctx.S.knee);
+  const noted = days.filter((l) => l.d !== undefined).slice(0, 6);
+  if (!noted.length) return '';
+  const { clean, jump } = kneeStreak(days);
+  const lvl = ctx.S.lvl.cmj ?? 0;
+  const next = lvl === 0 ? `Box Jump: ${Math.min(clean, KNEE_RUN)} din ${KNEE_RUN} Leg Day-uri la rând fără durere` : lvl === 1 ? `Countermovement Jump: ${Math.min(jump, KNEE_RUN)} din ${KNEE_RUN} cu Box Jump fără durere` : 'Săriturile sunt înapoi';
+  const notes = noted.map((l) => `${shortDay(l.date)}: ${l.d}/10${l.m !== undefined ? `, dimineața ${l.m}/10` : ''}`).join('; ');
+  return `<div class="ex-line"><div><b>Genunchii după Leg Day</b><span>${esc(next)}. ${esc(notes)}.</span></div>${spark([...noted].reverse().map((l) => Math.max(l.d ?? 0, l.m ?? 0)), true)}</div>`;
 }
 
 export function historyHtml(): string {

@@ -19,7 +19,7 @@ export const BURST = { on: 3, off: 10, reps: 14 };
 export const BURST_SEC = BURST.reps * (BURST.on + BURST.off);
 
 /** What a block becomes in one emphasis of the loop. */
-type CycleVariant = Partial<Pick<Block, 'dose' | 'line' | 'rounds' | 'burstFrom' | 'tip'>>;
+type CycleVariant = Partial<Pick<Block, 'dose' | 'line' | 'rounds' | 'burstFrom' | 'tip' | 'kind' | 'name' | 'workout' | 'min'>>;
 
 export interface Block {
   id: string;
@@ -37,7 +37,7 @@ export interface Block {
   /** Fixed rest in seconds, for intervals the settings don't cover. */
   restSec?: number;
   focus?: ComboFocus;
-  workout?: 'push' | 'pull' | 'legs';
+  workout?: 'push' | 'pull' | 'legs' | 'upper';
   routine?: 'stretch-push' | 'stretch-pull' | 'mobility' | 'legwarm' | 'cooldown';
   min?: number;
   /** Quick-timer block: Wall Sit or Jumping Squats, as the user picks. */
@@ -105,7 +105,11 @@ export const WEEK: Day[] = [
           B: { dose: '2 × 3 min + 3 punch-out', line: '5 runde Heavy Bag: 2 × 3 min, apoi 3 runde punch-out', burstFrom: 3 },
           C: { dose: '2 × 3 min + 3 punch-out', line: '5 runde Heavy Bag: 2 × 3 min, apoi 3 runde punch-out', burstFrom: 3 },
         } },
-      { id: 'mon-bw', kind: 'amrap', name: 'Bodyweight Workout', dose: '10 min', min: 10, tip: 'La final, după box, ca oboseala să nu strice tehnica. Pull-ups, push-ups și squats, cât mai multe runde în 10 minute.' },
+      { id: 'mon-bw', kind: 'amrap', name: 'Bodyweight Workout', dose: '10 min', min: 10, tip: 'La final, după box, ca oboseala să nu strice tehnica. Pull-ups, push-ups și squats, cât mai multe runde în 10 minute.',
+        cycle: {
+          // the second strength dose for pulling and pressing, in the strength emphasis (approved by the user on 2026-11-07)
+          A: { kind: 'workout', workout: 'upper', name: 'Upper Strength', dose: '15 min', line: '15 min Upper Strength: Pull-ups, Dips', min: 15, tip: 'A doua doză de forță a săptămânii pentru tras și împins: tracțiuni și dips, 3 × 3–5 grele, cu 2 repetări în rezervă și 150 s pauză. La final, după box.' },
+        } },
     ],
   },
   {
@@ -116,8 +120,8 @@ export const WEEK: Day[] = [
       { id: 'tue-cal', kind: 'workout', name: 'Calisthenics: Chest, Shoulders, Triceps', dose: '45 min', line: '45 min Calisthenics (Chest, Shoulders, Triceps) + Split Squat', workout: 'push', min: 45, tip: 'Push-ups (variante) și dips, cu explozivele primele, plus a doua doză de picioare a săptămânii.' },
       { id: 'tue-easy', kind: 'rounds', name: 'Easy Shadow Boxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'slow', tip: 'Slow, Clean Strikes: fiecare lovitură lentă, precisă, deliberată.',
         cues: ['Calitatea bate viteza, volumul și puterea. Nu grăbi combinațiile.', 'Aliniere corectă: pumnul, cotul și umărul pe aceeași linie, brațul întins complet.', 'Greutatea se mută controlat, din picior și șold; rămâi în echilibru.', 'Mâna revine la bărbie după fiecare lovitură, garda nu cade.'] },
-      { id: 'tue-row', kind: 'cardio', name: 'Easy Row', dose: '20 min', min: 20, grow: { base: 20, step: 5, cap: 30 }, tip: 'Aerob ușor, în ritm de conversație. Fără aparat: bicicletă sau alergare ușoară. Crește cu 5 minute la fiecare sesiune făcută, până la 30.',
-        cues: ['Poți vorbi în propoziții tot timpul. Dacă nu, încetinește.', 'Împingi din picioare, apoi spatele, apoi brațele; revii în ordine inversă.', 'Vine după forță, nu înainte.'] },
+      { id: 'tue-row', kind: 'cardio', name: 'Easy Row', dose: '20 min', min: 20, grow: { base: 20, step: 5, cap: 30 }, tip: 'Aerob ușor pe vâslitor, în zona 2 de puls: ritm de conversație. Crește cu 5 minute la fiecare sesiune făcută, până la 30.',
+        cues: ['Ții pulsul în zona 2 de pe centură; dacă trece de ea, tragi mai ușor.', 'Împingi din picioare, apoi spatele, apoi brațele; revii în ordine inversă.', 'Vine după forță, nu înainte.'] },
       { id: 'tue-cool', kind: 'routine', name: 'Cool-down Stretch', dose: '5 min', routine: 'cooldown', min: 5, tip: 'A doua zi de flexibilitate a săptămânii: piept, dorsali și flexorii șoldului, câte 60 de secunde.' },
     ],
   },
@@ -167,7 +171,7 @@ export const WEEK: Day[] = [
     idx: 6,
     title: 'Mobility & Meditation Day',
     blocks: [
-      { id: 'sun-jog', kind: 'run', name: 'Jogging', dose: '20 min', min: 20, grow: { base: 20, step: 2, cap: 30 }, tip: 'Ritm de conversație, fără țintă de ritm. Crește cu 2 minute la fiecare alergare făcută, până la 30. Dacă genunchii se plâng după alergare, faci același timp pe bicicletă, la vâslit sau mers alert în pantă.' },
+      { id: 'sun-jog', kind: 'run', name: 'Jogging', dose: '20 min', min: 20, grow: { base: 20, step: 2, cap: 30 }, tip: 'Ritm de conversație, în zona 2 de puls, fără țintă de ritm: dacă pulsul trece de zonă, încetinești sau mergi până coboară. Crește cu 2 minute la fiecare alergare făcută, până la 30. Dacă genunchii se plâng după alergare, faci același timp pe vâslitor.' },
       { id: 'sat-mob', kind: 'routine', name: 'Mobility Training', dose: '30 min', routine: 'mobility', min: 30, tip: 'Stretching pentru picioare, șolduri și partea de sus a corpului. Crește amplitudinea, nu viteza recuperării.' },
       { id: 'sat-med', kind: 'wimhof', name: 'Meditation', dose: '10 min', min: 10, tip: 'Respirația Wim Hof, așezat sau întins, apoi liniște.' },
       { id: 'sat-breath', kind: 'breath', name: 'Breathing Exercises', dose: '10 min', min: 10, tip: 'Metoda de respirație 4-7-8.' },

@@ -374,6 +374,19 @@ input[type='date'] { flex: none; width: 160px; min-height: 48px; padding: 8px 10
 .rd.just .rd-node::before { animation: stamp .6s var(--spring-hard) both; }
 @keyframes stamp { 0% { opacity: 0; transform: rotate(45deg) scale(2.3); } 50% { opacity: 1; } 100% { transform: rotate(45deg) scale(1); } }
 
+/* the pulse window on the easy aerobic blocks */
+.rd-hr { display: inline-flex; align-items: center; gap: 8px; margin: 10px 0 0; padding: 7px 10px; border: 1px solid rgba(255, 59, 48, .4); background: rgba(126, 10, 17, .22); color: var(--ink-2); font: 650 normal 13.5px/1.2 var(--font); }
+.rd-hr svg { width: 18px; height: 18px; flex: none; color: var(--red-hot); }
+.rd-hr b { color: var(--ink); font: 850 condensed 18px/1 var(--font); }
+.rd .rd-hr + .link { display: flex; }
+
+/* the knee note after Leg Day: four steps, big enough for a tired thumb */
+.chips.knee { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.chips.knee .chip { justify-content: center; min-height: 50px; font-weight: 700; }
+.knee-q { margin: 18px 0 0; padding: 14px; border: 1px solid var(--n4); background: var(--n1); text-align: left; }
+.knee-q .small { margin: 10px 0 0; }
+.knee-card h3 { font-size: 22px; }
+
 /* daily cards */
 .habit-count { margin: 6px 0 0; font: 900 condensed 58px/1 var(--font); }
 .habit-count small { font: 750 condensed 22px/1 var(--font); color: var(--mute); }

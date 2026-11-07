@@ -19,6 +19,7 @@ import { burstAt, Clock, doneSec, locate, phaseStart, roundsSeq, type Phase } fr
 import { deloadOn, lighter } from '../../logic/progress.ts';
 import { makeEntry, type Entry } from '../../logic/store.ts';
 import { dayKey, esc, mmss } from '../../logic/util.ts';
+import { zone2 } from '../../logic/runlog.ts';
 import { buzz, say, sfx, unlock, hush } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
 import { slam } from '../fx.ts';
@@ -165,6 +166,7 @@ class RoundsPlayer implements Player {
       ${c.focus && FOCUS_LINE[c.focus] && !c.cardio ? `<p class="pl-sub">${esc(FOCUS_LINE[c.focus])}</p>` : ''}
       ${burstBox}
       ${this.deload ? `<div class="advice">Săptămână ușoară: ${c.rounds} ${c.rounds === 1 ? 'rundă' : 'runde'}, fără să forțezi.</div>` : ''}
+      ${c.cardio ? this.zoneHtml() : ''}
       ${c.tip ? `<p class="dim">${esc(c.tip)}</p>` : ''}
       ${c.cues?.length ? `<ul class="ticks small">${c.cues.map((q) => `<li>${esc(q)}</li>`).join('')}</ul>` : ''}
       ${c.legSwap ? `<p class="dim">${esc(LEG_CUES[ctx.S.set.legMode])}</p>` : ''}
@@ -197,6 +199,7 @@ class RoundsPlayer implements Player {
     else if (p.kind === 'move') panel = `<div class="call-box"><h4>${esc(p.label)}</h4><p style="margin:0;font-weight:600">${esc(WARMUP[p.move ?? 0]?.cue ?? '')}</p></div>`;
     else if (p.kind === 'work' && this.sprinting) panel = '<div class="call-box"><h4>Sprint</h4><div class="c-name">Lovituri drepte, viteză maximă</div><p class="small" style="margin:0">Jab-cross non-stop, pe toată distanța. Garda revine la fiecare pumn.</p></div>';
     else if (p.kind === 'work' && this.call && this.caller) panel = this.callHtml(theme ? theme.name : 'Acum');
+    else if (p.kind === 'work' && this.cfg.cardio) panel = this.zoneHtml();
     else if (p.kind === 'work' && this.cfg.legSwap) panel = `<div class="call-box"><h4>Formă</h4><p style="margin:0">${esc(LEG_CUES[ctx.S.set.legMode])}</p></div>`;
     else if (p.kind === 'rest' && this.tip) panel = `<div class="call-box"><h4>Sfat de la Alex</h4><p style="margin:0;font-weight:600">${esc(this.tip)}</p></div>`;
     else if (p.kind === 'rest') panel = `<div class="call-box"><h4>Urmează</h4><p style="margin:0;font-weight:600">Runda ${(p.round ?? 0) + 1} din ${p.rounds}. Respiră adânc.</p></div>`;
@@ -217,6 +220,12 @@ class RoundsPlayer implements Player {
       ctrlBtn('p:skip', 'next', 'Sari') +
       (this.caller && p.kind === 'work' ? ctrlBtn('p:combo', 'bolt', 'Altă combinație') : '');
     return chrome(this.cfg.name, body, { cls, ctrl, center: true });
+  }
+
+  /** Easy aerobic work is steered by the heart-rate strap: zone 2. */
+  zoneHtml(): string {
+    const [lo, hi] = zone2(ctx.S.set.hrMax);
+    return `<div class="call-box"><h4>Puls, zona 2</h4><div class="c-name">${lo}–${hi} bpm</div><p class="small" style="margin:0">Dacă trece de ${hi}, tragi mai ușor până coboară. Trebuie să poți vorbi în propoziții.</p></div>`;
   }
 
   callHtml(h: string): string {

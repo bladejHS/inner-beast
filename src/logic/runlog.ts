@@ -66,7 +66,12 @@ export function readRun(v: RunInput): RunStats | string {
  * What the last runs say about the next easy one. There is never a pace target: the effort comes from the talk test,
  * and progress shows as a lower pulse at the same pace, checked on every 4th run on the same route.
  */
-export function runAdvice(log: Entry[]): string {
+/** The easy zone (zone 2, as Polar counts it): 60–70 % of the maximum heart rate. */
+export function zone2(hrMax: number): [number, number] {
+  return [Math.round(hrMax * 0.6), Math.round(hrMax * 0.7)];
+}
+
+export function runAdvice(log: Entry[], zone?: [number, number]): string {
   const runs = log.filter((e) => e.kind === 'run' && Number(e.data.pace) > 0);
   if (!runs.length) return '';
   const pace = (e: Entry): number => Number(e.data.pace);
@@ -74,7 +79,11 @@ export function runAdvice(log: Entry[]): string {
   const usual = [...runs.slice(-3).map(pace)].sort((a, b) => a - b)[Math.floor(Math.min(3, runs.length) / 2)];
   if ((runs.length + 1) % 4 === 0) return `Alergarea de azi e verificarea: același traseu, ritmul obișnuit (în jur de ${paceStr(usual)} /km), și notezi HR Avg. Același ritm cu puls mai mic înseamnă progres.`;
   const beat = runs.filter((e) => hr(e) > 0).slice(-2);
-  const easy = 'Ritm de conversație, fără țintă de ritm: dacă nu poți vorbi în propoziții, încetinește.';
+  const easy = zone
+    ? `Ritm de conversație, în zona 2: ${zone[0]}–${zone[1]} bpm pe centură. Dacă pulsul trece de ${zone[1]}, încetinești sau mergi până coboară.`
+    : 'Ritm de conversație, fără țintă de ritm: dacă nu poți vorbi în propoziții, încetinește.';
+  const lastHr = beat.length ? hr(beat[beat.length - 1]) : 0;
+  if (zone && lastHr > zone[1] + 2) return `Data trecută pulsul mediu a fost ${lastHr} bpm, peste zona 2 (${zone[0]}–${zone[1]}). Azi mai încet, chiar cu porțiuni de mers: baza aerobă crește tocmai în zona asta.`;
   if (beat.length < 2) return `${easy} Notează HR Avg ca să vezi în timp dacă același ritm te costă mai puțin.`;
   const dp = pace(beat[1]) - pace(beat[0]);
   const dh = hr(beat[1]) - hr(beat[0]);

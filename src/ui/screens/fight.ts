@@ -5,12 +5,11 @@ import { CAT_NAMES, COMBOS, tiktokUrl, type ComboCat } from '../../data/combos.t
 import { WEEK, blockName, type Block } from '../../data/plan.ts';
 import { dayKey, esc, weekdayIdx } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
-import { art } from '../art.ts';
 import { howHtml } from '../how.ts';
 import { weekCard } from './alex.ts';
 import { ic } from '../icons.ts';
 import { openRounds } from '../players/rounds.ts';
-import { restFor, top } from './shared.ts';
+import { blockRest, liveBlock, restFor, top } from './shared.ts';
 
 let cat: ComboCat | 'all' = 'all';
 export function setComboCat(c: string): void {
@@ -29,7 +28,7 @@ const QUICK: Quick[] = [
   { k: 'shadow', name: 'Shadow Boxing', icon: 'shadow', match: (b) => b.name === 'Shadow Boxing', def: { rounds: 3, work: 180, rest: 'r3', focus: 'combo' } },
   { k: 'bag', name: 'Heavy Bag Training', icon: 'bag', match: (b) => b.name === 'Heavy Bag Training', def: { rounds: 5, work: 180, rest: 'r3', focus: 'power' } },
   { k: 'rope', name: 'Jumping Rope', icon: 'rope', match: (b) => b.name === 'Jumping Rope', def: { rounds: 5, work: 180, rest: 'r3', focus: 'rope' } },
-  { k: 'legs', name: 'Wall Sit', icon: 'wall', match: (b) => !!b.legSwap, def: { rounds: 10, work: 60, rest: 'r1', focus: 'legs' } },
+  { k: 'legs', name: 'Wall Sit', icon: 'wall', match: (b) => !!b.legSwap, def: { rounds: 5, work: 60, rest: 'r1', focus: 'legs' } },
 ];
 
 /** A quick timer uses today's plan block when today has one of the same kind, so it gets checked off too. */
@@ -39,8 +38,11 @@ export function startQuick(k: string): void {
   const q = QUICK.find((x) => x.k === k);
   if (!q) return;
   const today = WEEK[weekdayIdx(dayKey())];
-  const b = today.blocks.find(q.match);
-  if (b) return openRounds({ name: blockName(b, ctx.S.set), rounds: b.rounds ?? 1, work: b.work ?? 180, rest: restFor(b.rest), focus: b.focus, block: b.id, tip: b.tip, cues: b.cues, legSwap: b.legSwap });
+  const raw = today.blocks.find(q.match);
+  if (raw) {
+    const b = liveBlock(raw);
+    return openRounds({ name: b.name, rounds: b.rounds ?? 1, work: b.work ?? 180, rest: blockRest(b), focus: b.focus, block: b.id, tip: b.tip, cues: b.cues, legSwap: b.legSwap, burstFrom: b.burstFrom });
+  }
   openRounds({ name: q.k === 'legs' ? blockName({ legSwap: true } as Block, ctx.S.set) : q.name, rounds: q.def.rounds, work: q.def.work, rest: restFor(q.def.rest), focus: q.def.focus, legSwap: q.k === 'legs' });
 }
 
@@ -48,7 +50,7 @@ function quickRow(q: Quick): string {
   const today = WEEK[weekdayIdx(dayKey())];
   const b = today.blocks.find(q.match);
   const name = q.k === 'legs' ? (ctx.S.set.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit') : q.name;
-  const sub = b ? `Azi în plan: ${b.dose}` : q.k === 'legs' ? '10 × 1 min' : 'Runde de 3 minute';
+  const sub = b ? `Azi în plan: ${liveBlock(b).dose}` : q.k === 'legs' ? '5 × 1 min' : 'Runde de 3 minute';
   return `<button class="timer-row" data-a="qt" data-k="${q.k}"><div><b>${esc(name)}</b><span>${esc(sub)}</span></div>${ic(q.icon)}</button>`;
 }
 
@@ -78,7 +80,10 @@ export function fightHtml(): string {
     )
     .join('');
   return `${top()}
-    <div class="fight-art"><div class="title-art"><h1>Lupte</h1>${art('fighter')}</div></div>
+    <h1 class="stack">Lupte</h1>
+    <nav class="sub-links" aria-label="Mai mult în Lupte">
+      <button class="timer-row" data-a="tab" data-k="alex"><div><b>Alex</b><span>Combinațiile săptămânii, rutinele, antrenamentele și sfaturile lui</span></div>${ic('chev')}</button>
+    </nav>
     ${weekCard(false)}
     <h2 class="sec">Timere</h2>
     <div class="timer-list">${QUICK.map(quickRow).join('')}
@@ -92,5 +97,8 @@ export function fightHtml(): string {
     <h2 class="sec">Combinații de la Alex<small>Citite cadru cu cadru din video-urile lui de pe TikTok. Le auzi și în timpul rundelor de shadow boxing și sac.</small></h2>
     <div class="chips" role="group" aria-label="Filtru" style="margin-bottom:14px">${cats.map((c) => `<button class="chip" aria-pressed="${cat === c}" data-a="ccat" data-k="${c}">${c === 'all' ? 'Toate' : esc(CAT_NAMES[c])}</button>`).join('')}</div>
     ${combos}
-    <div class="card" style="margin-top:28px"><h3>Mai mult de la Alex</h3><p class="dim" style="margin:0 0 12px">Combinațiile săptămânii, rutinele, antrenamentele, tehnica și mentalitatea lui sunt în tabul Alex.</p><button class="btn ghost sm" data-a="tab" data-k="alex">Deschide Alex</button></div>`;
+    <section class="card" style="margin-top:28px"><h3>Ce nu poți antrena singur</h3>
+      <p class="dim">Shadow boxing-ul, sacul și timerele construiesc tehnica și condiția. Reacția la un om, distanța reală și apărarea sub presiune se învață doar cu cineva în față: mănuși cu un antrenor sau sparring tehnic, controlat, cu protecție.</p>
+      <p class="dim" style="margin:0">O singură sesiune pe săptămână cu un antrenor schimbă cel mai mult. Joi poți alege „Cu partener” în locul shadow boxing-ului.</p>
+    </section>`;
 }

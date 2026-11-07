@@ -2,7 +2,6 @@
 
 import { Track, routePath, simplify, MAX_ACC, type Fix } from '../../logic/geo.ts';
 import { Clock } from '../../logic/seq.ts';
-import { deloadOn, lighter } from '../../logic/progress.ts';
 import { readRun, runAdvice, type RunInput } from '../../logic/runlog.ts';
 import { makeEntry } from '../../logic/store.ts';
 import { dayKey, esc, km, mmss, num, paceStr, raceTime } from '../../logic/util.ts';
@@ -23,10 +22,10 @@ export interface RunCfg {
 const STRIDE_M = 0.75;
 const RUN_CUES: Array<[number, string]> = [
   [0, 'Începe încet. Respiră calm.'],
-  [300, 'Respirația e calmă? Crește puțin ritmul.'],
-  [600, 'Jumătate. Crește încet și constant.'],
-  [900, 'Ultimele cinci minute. Puțin mai repede, controlat.'],
-  [1200, 'Douăzeci de minute. Gata, sau continui ușor.'],
+  [300, 'Poți vorbi în propoziții? Dacă nu, încetinește.'],
+  [600, 'Același ritm ușor. Umerii relaxați.'],
+  [1200, 'Douăzeci de minute. Rămâi în ritmul de conversație.'],
+  [1800, 'Treizeci de minute. Gata.'],
 ];
 
 const RUN_FIELDS: Array<[keyof RunInput, string, string, string]> = [
@@ -67,9 +66,9 @@ function runInput(): RunInput {
   return { dur: read('dur'), km: read('km'), hrAvg: read('hrAvg'), kcal: read('kcal'), hrMax: read('hrMax'), paceAvg: read('paceAvg'), paceMax: read('paceMax') };
 }
 
-/** A jog's target for today, shorter in a lighter week. */
+/** A jog's target for today. The plan already gives the lighter week its base minutes, so nothing is cut twice. */
 export function jogTarget(target: number): number {
-  return deloadOn(ctx.S.deload, dayKey()) ? lighter(target) : target;
+  return target;
 }
 
 /** Types in a jog from Polar Flow, also for an earlier day. */
@@ -191,7 +190,7 @@ class RunPlayer implements Player {
         this.name,
         `<h1 class="pl-h">${this.name}</h1>
         <p class="pl-sub">${c.mode === 'run' ? `${Math.round((c.target ?? 1200) / 60)} de minute` : '10.000 de pași, prin natură'}</p>
-        <p class="dim">${c.mode === 'run' ? 'Începe încet, respiră calm, crește viteza încet și constant.' : 'Mergi prin natură. Pașii îi iei din telefon sau îi estimez din distanță.'}</p>
+        <p class="dim">${c.mode === 'run' ? 'Ritm de conversație de la început până la sfârșit, fără țintă de viteză. Progresul se vede în timp: același ritm, puls mai mic.' : 'Mergi prin natură. Pașii îi iei din telefon sau îi estimez din distanță.'}</p>
         ${c.mode === 'run' && runAdvice(ctx.S.log) ? `<div class="advice">${esc(runAdvice(ctx.S.log))}</div>` : ''}
         ${howHtml(c.mode === 'run' ? 'Jogging' : 'Walk (10K Steps)', undefined, { open: true })}
         <p>${this.gpsHtml()}</p>

@@ -1,10 +1,10 @@
 // Monday's 10-minute bodyweight workout: squats, push-ups and pull-ups, as many rounds as possible.
 
 import { BW_MOVES, BW_SCHEMES } from '../../data/workouts.ts';
-import { amrapBest, amrapUp } from '../../logic/progress.ts';
+import { amrapBest, amrapUp, deloadOn, lighter } from '../../logic/progress.ts';
 import { Clock } from '../../logic/seq.ts';
 import { makeEntry } from '../../logic/store.ts';
-import { esc, mmss, shortDay } from '../../logic/util.ts';
+import { dayKey, esc, mmss, shortDay } from '../../logic/util.ts';
 import { buzz, sfx, unlock } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, type Player } from '../ctx.ts';
 import { howHtml } from '../how.ts';
@@ -24,10 +24,12 @@ class AmrapPlayer implements Player {
   started = false;
   saved = false;
   block?: string;
+  /** Lighter week: a shorter block that counts for neither the records nor the next scheme. */
+  deload = deloadOn(ctx.S.deload, dayKey());
 
   constructor(block?: string, min = 10) {
     this.block = block;
-    this.min = min;
+    this.min = this.deload ? lighter(min) : min;
     this.scheme = ctx.S.set.bwScheme;
     this.render();
   }
@@ -39,7 +41,7 @@ class AmrapPlayer implements Player {
   last(): { rounds: number; extra: number; date: string; scheme: number } | null {
     for (let i = ctx.S.log.length - 1; i >= 0; i--) {
       const e = ctx.S.log[i];
-      if (e.kind === 'amrap') return { rounds: Number(e.data.rounds) || 0, extra: Number(e.data.extra) || 0, date: e.date, scheme: Number(e.data.scheme) || 0 };
+      if (e.kind === 'amrap' && !e.data.deload) return { rounds: Number(e.data.rounds) || 0, extra: Number(e.data.extra) || 0, date: e.date, scheme: Number(e.data.scheme) || 0 };
     }
     return null;
   }
@@ -57,6 +59,7 @@ class AmrapPlayer implements Player {
         `<h1 class="pl-h">Bodyweight Workout</h1>
         <p class="pl-sub">${this.min} minute, cât mai multe runde</p>
         <p class="dim">O rundă înseamnă toate trei exercițiile, în ordine. Numeri rundele, apoi repetările din runda neterminată.</p>
+        ${this.deload ? '<div class="advice">Săptămână ușoară: mai scurt și fără să forțezi. Sesiunea nu se numără la recorduri.</div>' : ''}
         <div class="chips" style="margin:14px 0 4px">${BW_SCHEMES.map((s, i) => `<button class="chip" aria-pressed="${i === this.scheme}" data-a="p:scheme" data-i="${i}">${esc(s.name)} ${s.reps.join('-')}</button>`).join('')}</div>
         ${moves(true)}
         ${BW_MOVES.map((m) => howHtml(m, undefined, { title: `Cum se face: ${m}` })).join('')}
@@ -147,7 +150,7 @@ class AmrapPlayer implements Player {
         block: worked >= this.min * 60 - 1 ? this.block : undefined,
         name: 'Bodyweight Workout',
         dur: worked,
-        data: { rounds: this.rounds, extra: this.extra, scheme: this.scheme, reps: this.reps, min: this.min },
+        data: { rounds: this.rounds, extra: this.extra, scheme: this.scheme, reps: this.reps, min: this.min, ...(this.deload ? { deload: true } : {}) },
       }),
     );
     this.saved = true;

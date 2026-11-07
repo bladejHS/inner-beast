@@ -1,82 +1,10 @@
-// Show pieces: cards revealed on scroll, numbers that count up, the hero drawing's parallax,
-// the round slam with a gong ring, and the full-screen "day done" celebration.
+// Show pieces: the short round-start cut and the full-screen "day done" celebration.
 // Everything is skipped when the phone asks for reduced motion.
 
 import { CLAWS, rake } from './claws.ts';
 
 const reduced = (): boolean => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const BASE = import.meta.env.BASE_URL;
-
-let io: IntersectionObserver | null = null;
-
-/** After a new screen opens: cards below the fold slide in as you scroll to them. */
-export function revealBelowFold(root: HTMLElement): void {
-  if (reduced() || !('IntersectionObserver' in window)) return;
-  io?.disconnect();
-  io = new IntersectionObserver(
-    (entries) => {
-      for (const e of entries) {
-        if (!e.isIntersecting) continue;
-        e.target.classList.add('rv-in');
-        io?.unobserve(e.target);
-      }
-    },
-    { rootMargin: '0px 0px -8% 0px' },
-  );
-  const h = innerHeight;
-  root.querySelectorAll<HTMLElement>('.card, .tip-card, .combo, .dc, .bk, .tile, .timer-row, .sec, .stat, .how, .pr, .ex-line, .hist li, .sign').forEach((el, i) => {
-    if (el.getBoundingClientRect().top < h * 0.92) return;
-    el.classList.add('rv');
-    el.style.setProperty('--rv-d', `${(i % 3) * 60}ms`);
-    io?.observe(el);
-  });
-}
-
-/** Big numbers count up from zero when a screen opens. */
-export function countUp(root: HTMLElement): void {
-  if (reduced()) return;
-  root.querySelectorAll<HTMLElement>('.stat b, .hero-meta b, .habit-count').forEach((el) => {
-    const node = [...el.childNodes].find((n) => n.nodeType === 3 && /\d/.test(n.textContent ?? ''));
-    if (!node) return;
-    const m = (node.textContent ?? '').match(/^(\D*)(\d[\d.]*)(.*)$/s);
-    if (!m) return;
-    const target = Number(m[2].replace(/\./g, ''));
-    if (!target || target > 99999) return;
-    const fmt = (n: number) => (m[2].includes('.') ? n.toLocaleString('ro-RO') : String(n));
-    const t0 = performance.now();
-    const dur = 700;
-    const stepFn = (t: number) => {
-      const k = Math.min(1, (t - t0) / dur);
-      const e = 1 - Math.pow(1 - k, 3);
-      node.textContent = `${m[1]}${fmt(Math.round(target * e))}${m[3]}`;
-      if (k < 1) requestAnimationFrame(stepFn);
-    };
-    requestAnimationFrame(stepFn);
-  });
-}
-
-/** The drawing in the hero drifts slower than the page. */
-export function initParallax(): void {
-  let ticking = false;
-  addEventListener(
-    'scroll',
-    () => {
-      if (ticking || reduced()) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        ticking = false;
-        const y = scrollY;
-        document.querySelectorAll<HTMLElement>('.hero-art').forEach((el) => {
-          el.style.transform = `translateY(${Math.min(120, y * 0.28)}px)`;
-        });
-        document.querySelectorAll<HTMLElement>('.hero-claws').forEach((el) => {
-          el.style.translate = `0 ${Math.min(160, y * 0.4)}px`;
-        });
-      });
-    },
-    { passive: true },
-  );
-}
 
 /** "RUNDA 2": slams onto the timer with a gong ring. */
 export function slam(text: string, sub = ''): void {

@@ -13,14 +13,24 @@ export interface Phase {
   move?: number;
 }
 
-export function roundsSeq(rounds: number, work: number, rest: number, prep = 5): Phase[] {
+/** `workOf` gives a round its own length (punch-out rounds last 182 s, the others `work`). */
+export function roundsSeq(rounds: number, work: number, rest: number, prep = 5, workOf?: (round: number) => number): Phase[] {
   const out: Phase[] = [];
   if (prep > 0) out.push({ kind: 'prep', sec: prep, label: 'Pregătește-te' });
   for (let r = 1; r <= rounds; r++) {
-    out.push({ kind: 'work', sec: work, label: 'Lucru', round: r, rounds });
+    out.push({ kind: 'work', sec: workOf ? workOf(r) : work, label: 'Lucru', round: r, rounds });
     if (r < rounds && rest > 0) out.push({ kind: 'rest', sec: rest, label: 'Pauză', round: r, rounds });
   }
   return out;
+}
+
+/** Inside a punch-out round, `into` seconds in: which burst (1-based), whether it is the all-out part, and the seconds left in that part. */
+export function burstAt(into: number, on = 3, off = 10, reps = 14): { n: number; on: boolean; left: number } {
+  const cycle = on + off;
+  const k = Math.max(0, Math.min(reps - 1, Math.floor(into / cycle)));
+  const within = into - k * cycle;
+  const isOn = within < on;
+  return { n: k + 1, on: isOn, left: isOn ? on - within : Math.max(0, cycle - within) };
 }
 
 /** "1 min cold, 1 min warm", repeated; optionally one more cold minute at the end. */

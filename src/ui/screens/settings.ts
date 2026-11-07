@@ -16,9 +16,9 @@ const row = (label: string, hint: string, ctl: string): string =>
 
 function openingMode(): string {
   try {
-    return localStorage.getItem('beast:opening') || 'full';
+    return localStorage.getItem('beast:opening') || 'auto';
   } catch {
-    return 'full';
+    return 'auto';
   }
 }
 
@@ -33,12 +33,11 @@ export function settingsHtml(): string {
     ${row('Voce', 'Combinațiile strigate în engleză, indicațiile în română', sw('voice', s.voice, 'Voce'))}
     ${row('Vibrații', 'La schimbarea rundelor', sw('vibrate', s.vibrate, 'Vibrații'))}
     ${row('Ecranul rămâne aprins', 'Cât timp rulează un timer', sw('wake', s.wake, 'Ecran aprins'))}
-    ${row('Intro la pornire', 'Beast Awakening, doar la deschiderea aplicației', `<div class="chips">${[['full', 'Complet'], ['short', 'Scurt'], ['off', 'Oprit']].map(([v, l]) => `<button class="chip" aria-pressed="${op === v}" data-a="set-opening" data-v="${v}">${l}</button>`).join('')}</div>`)}
+    ${row('Intro la pornire', 'Automat: complet la prima pornire și după o versiune nouă, altfel doar lupul, o clipă', `<div class="chips">${[['auto', 'Automat'], ['full', 'Mereu'], ['short', 'Scurt'], ['off', 'Oprit']].map(([v, l]) => `<button class="chip" aria-pressed="${op === v}" data-a="set-opening" data-v="${v}">${l}</button>`).join('')}</div>`)}
     <h2 class="sec">Runde</h2>
     ${row('Combinații strigate', 'În rundele de shadow boxing, sac și coardă', `<div class="chips">${[0, 10, 15, 20, 30].map((v) => `<button class="chip" aria-pressed="${s.callEvery === v}" data-a="set-call" data-v="${v}">${v ? `${v} s` : 'Oprit'}</button>`).join('')}</div>`)}
     ${row('Pauză la rundele de 3 minute', 'Cartea nu o precizează; standardul în box e 1 minut', step('rest3', mm(s.rest3), 'Pauză 3 minute'))}
-    ${row('Pauză la intervalele de 1 minut', 'Wall Sit / Jumping Squats', step('rest1', mm(s.rest1), 'Pauză 1 minut'))}
-    ${row('Duminică', 'Treci la Jumping Squats când ești pregătit', `<div class="chips"><button class="chip" aria-pressed="${s.legMode === 'wall'}" data-a="set-leg" data-v="wall">Wall Sit</button><button class="chip" aria-pressed="${s.legMode === 'jump'}" data-a="set-leg" data-v="jump">Jumping Squats</button></div>`)}
+    ${row('Pauză la intervalele de 1 minut', 'Timerul rapid de Wall Sit / Jumping Squats', step('rest1', mm(s.rest1), 'Pauză 1 minut'))}
     <h2 class="sec">Memento-uri în calendar<small>O aplicație web nu poate trimite notificări programate, mai ales pe iPhone. Pune următoarele 4 săptămâni din plan și zilele pozelor de progres în calendarul telefonului, cu alarmă.</small></h2>
     <div class="ics">
       <label class="nfld"><span>Ora antrenamentului</span><input id="icsT" type="time" value="18:00"></label>
@@ -54,7 +53,8 @@ export function settingsHtml(): string {
     </div>
     <h2 class="sec">Surse</h2>
     <ul class="ticks small">
-      <li>Programul, planul săptămânal și capitolele: e-book-ul „Unleash Your Inner Beast” de Alex. Nutriția nu e inclusă.</li>
+      <li>Programul și capitolele: e-book-ul „Unleash Your Inner Beast” de Alex. Nutriția nu e inclusă.</li>
+      <li>Planul săptămânal pornește de la carte și a fost refăcut pe 7 noiembrie 2026 pentru un atlet complet, după studii: ordinea blocurilor, forța de picioare, sprinturile, săriturile, punch-out-ul, aerobul ușor, ciclurile de 4 săptămâni și testele. Unde cartea și studiile se contrazic, aplicația spune ce spun studiile.</li>
       <li>Combinațiile, rutina de spate, mobilitatea și sfaturile: canalul lui Alex Hanma, <a href="https://www.tiktok.com/@alexhanma___" target="_blank" rel="noopener">TikTok @alexhanma___</a> și <a href="https://www.instagram.com/alexhanma_/" target="_blank" rel="noopener">Instagram @alexhanma_</a>.</li>
       <li>Meditația: metoda de respirație Wim Hof. Respirația 4-7-8: metoda din carte.</li>
     </ul>

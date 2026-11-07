@@ -1,7 +1,7 @@
-// Round timer for Shadow Boxing, Heavy Bag, Jumping Rope / Agility Ladder and Wall Sit / Jumping Squats,
-// with Alex Hanma's combinations called out during the rounds.
+// Round timer for Shadow Boxing, Heavy Bag, punch-outs, Jumping Rope / Agility Ladder, easy cardio and the
+// Wall Sit / Jumping Squats quick timer, with Alex Hanma's combinations called out during the rounds.
 
-import { WARMUP, type ComboFocus } from '../../data/plan.ts';
+import { BURST, BURST_SEC, WARMUP, type ComboFocus } from '../../data/plan.ts';
 import { focusCombos, LADDER_MOVES, ROPE_MOVES, FOCUS_LINE, roundThemes, type Combo, type RoundTheme } from '../../data/combos.ts';
 
 /** The e-book's focus line for each block, as printed on the plan page. */
@@ -15,7 +15,7 @@ const BOOK_FOCUS: Record<string, string> = {
   rope: '„Focus on light footwork”',
 };
 import { REST_TIPS } from '../../data/alex.ts';
-import { Clock, doneSec, locate, phaseStart, roundsSeq, type Phase } from '../../logic/seq.ts';
+import { burstAt, Clock, doneSec, locate, phaseStart, roundsSeq, type Phase } from '../../logic/seq.ts';
 import { deloadOn, lighter } from '../../logic/progress.ts';
 import { makeEntry, type Entry } from '../../logic/store.ts';
 import { dayKey, esc, mmss } from '../../logic/util.ts';
@@ -38,6 +38,10 @@ export interface RoundsCfg {
   legSwap?: boolean;
   /** Offer the 6-minute warm-up before round 1. */
   warmup?: boolean;
+  /** From this round on (1-based), rounds are punch-outs: 14 × 3 s all-out, 10 s easy. */
+  burstFrom?: number;
+  /** Easy aerobic work (row, bike, jog) on one long round: saved as cardio, never as boxing. */
+  cardio?: boolean;
 }
 
 /** Last seconds of a round that turn into a straight-punch sprint (second half of the rounds). */
@@ -83,15 +87,18 @@ class RoundsPlayer implements Player {
   /** The saved session, rated on the final screen. */
   entry: Entry | null = null;
   deload = deloadOn(ctx.S.deload, dayKey());
+  /** Inside a punch-out round: the burst now running, and whether it is the all-out part. */
+  lastBurst = '';
 
   constructor(cfg: RoundsCfg) {
     this.cfg = { ...cfg };
     if (this.deload) this.cfg.rounds = lighter(cfg.rounds);
     if (cfg.legSwap) this.cfg.name = ctx.S.set.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit';
-    this.calls = this.buildCalls();
-    this.themes = cfg.rounds > 1 ? roundThemes(cfg.focus, ctx.S.nut.h) : [];
+    this.calls = cfg.cardio || cfg.burstFrom === 1 ? [] : this.buildCalls();
+    this.themes = cfg.rounds > 1 && !cfg.cardio && cfg.burstFrom !== 1 ? roundThemes(cfg.focus, ctx.S.nut.h) : [];
     this.caller = this.calls.length > 0 && ctx.S.set.callEvery > 0;
-    this.sprint = cfg.focus === 'move' || cfg.focus === 'power';
+    // Off by default: long all-out finishes wear technique down; the tested burst format is the punch-out.
+    this.sprint = false;
     this.warm = !!cfg.warmup;
     this.render();
   }
@@ -101,8 +108,12 @@ class RoundsPlayer implements Player {
     return round && this.themes.length ? this.themes[(round - 1) % this.themes.length] : null;
   }
 
+  isBurst(round: number | undefined): boolean {
+    return !!round && !!this.cfg.burstFrom && round >= this.cfg.burstFrom;
+  }
+
   sprintRound(round: number | undefined): boolean {
-    return this.sprint && !!round && round > Math.floor(this.cfg.rounds / 2) && this.cfg.work >= 90;
+    return this.sprint && !!round && !this.isBurst(round) && round > Math.floor(this.cfg.rounds / 2) && this.cfg.work >= 90;
   }
 
   buildCalls(): Call[] {
@@ -145,9 +156,14 @@ class RoundsPlayer implements Player {
     const callerRow = this.calls.length
       ? field(isDrill(c.focus) ? 'Mișcări strigate' : 'Combinații strigate', switchCtl('p:caller', this.caller, 'Combinații strigate'), `La fiecare ${this.every} s, cu voce`)
       : '';
+    const bursts = c.burstFrom ? Math.max(0, c.rounds - c.burstFrom + 1) : 0;
+    const burstBox = bursts
+      ? `<div class="call-box"><h4>Punch-out</h4><p style="margin:0">${bursts === c.rounds ? `Toate cele ${c.rounds} runde` : `Rundele ${c.burstFrom}–${c.rounds}`}: ${BURST.reps} explozii de ${BURST.on} s la maxim, cu ${BURST.off} s ușor între ele. Îți semnalez fiecare explozie cu un gong scurt și o vibrație.</p></div>`
+      : '';
     const body = `
       <h1 class="pl-h">${esc(c.name)}</h1>
-      ${c.focus && FOCUS_LINE[c.focus] ? `<p class="pl-sub">${esc(FOCUS_LINE[c.focus])}</p>` : ''}
+      ${c.focus && FOCUS_LINE[c.focus] && !c.cardio ? `<p class="pl-sub">${esc(FOCUS_LINE[c.focus])}</p>` : ''}
+      ${burstBox}
       ${this.deload ? `<div class="advice">Săptămână ușoară: ${c.rounds} ${c.rounds === 1 ? 'rundă' : 'runde'}, fără să forțezi.</div>` : ''}
       ${c.tip ? `<p class="dim">${esc(c.tip)}</p>` : ''}
       ${c.cues?.length ? `<ul class="ticks small">${c.cues.map((q) => `<li>${esc(q)}</li>`).join('')}</ul>` : ''}
@@ -158,10 +174,10 @@ class RoundsPlayer implements Player {
       <div class="setup">
         ${legs}
         ${c.warmup ? field('Încălzire', switchCtl('p:warm', this.warm, 'Încălzire'), `${WARMUP.length} mișcări, 6 min, înainte de runda 1`) : ''}
-        ${this.calls.length && !isDrill(c.focus) && c.rounds > 1 && c.work >= 90 ? field('Sprint final', switchCtl('p:sprint', this.sprint, 'Sprint final'), `Ultimele ${SPRINT} s din a doua jumătate a rundelor`) : ''}
-        ${field('Runde', stepper('p:rounds', String(c.rounds), 'Runde'))}
-        ${field('Lucru', stepper('p:work', mmss(c.work), 'Lucru'))}
-        ${c.rounds > 1 ? field('Pauză', stepper('p:rest', mmss(c.rest), 'Pauză'), 'Cartea nu dă pauza; 1 minut e standardul din box') : ''}
+        ${this.calls.length && !isDrill(c.focus) && c.rounds > 1 && c.work >= 90 && !bursts ? field('Sprint final', switchCtl('p:sprint', this.sprint, 'Sprint final'), `Ultimele ${SPRINT} s din a doua jumătate a rundelor`) : ''}
+        ${c.cardio ? '' : field('Runde', stepper('p:rounds', String(c.rounds), 'Runde'))}
+        ${c.burstFrom === 1 ? '' : field(c.cardio ? 'Durată' : 'Lucru', stepper('p:work', mmss(c.work), c.cardio ? 'Durată' : 'Lucru'))}
+        ${c.rounds > 1 ? field('Pauză', stepper('p:rest', mmss(c.rest), 'Pauză'), bursts === c.rounds ? 'Un minut între runde, ca în protocolul testat' : 'Cartea nu dă pauza; 1 minut e standardul din box') : ''}
         ${callerRow}
       </div>
       <button class="btn" data-a="p:start">Start</button>`;
@@ -171,12 +187,14 @@ class RoundsPlayer implements Player {
   runHtml(): string {
     const L = locate(this.phases, this.clock.t);
     const p = this.phases[L.i];
-    const last = p.kind === 'work' && (L.left <= 10 || this.sprinting) && this.cfg.work > 20;
-    const cls = p.kind === 'work' ? (last ? 'ph-last' : 'ph-work') : p.kind === 'prep' || p.kind === 'move' ? 'ph-prep' : 'ph-rest';
-    const roundTxt = p.kind === 'move' ? `Încălzire ${p.round} din ${p.rounds}` : p.round ? `Runda ${p.round} din ${p.rounds}` : '';
-    const theme = p.kind === 'work' ? this.themeOf(p.round) : null;
+    const burst = p.kind === 'work' && this.isBurst(p.round) ? burstAt(L.into, BURST.on, BURST.off, BURST.reps) : null;
+    const last = !burst && p.kind === 'work' && (L.left <= 10 || this.sprinting) && this.cfg.work > 20 && !this.cfg.cardio;
+    const cls = burst ? (burst.on ? 'ph-burst' : 'ph-work') : p.kind === 'work' ? (last ? 'ph-last' : this.cfg.cardio ? 'ph-easy' : 'ph-work') : p.kind === 'prep' || p.kind === 'move' ? 'ph-prep' : 'ph-rest';
+    const roundTxt = p.kind === 'move' ? `Încălzire ${p.round} din ${p.rounds}` : p.round && (p.rounds ?? 0) > 1 ? (burst ? `Runda ${p.round}/${p.rounds} · explozia ${burst.n}/${BURST.reps}` : `Runda ${p.round} din ${p.rounds}`) : burst ? `Explozia ${burst.n} din ${BURST.reps}` : '';
+    const theme = p.kind === 'work' && !burst ? this.themeOf(p.round) : null;
     let panel = '';
-    if (p.kind === 'move') panel = `<div class="call-box"><h4>${esc(p.label)}</h4><p style="margin:0;font-weight:600">${esc(WARMUP[p.move ?? 0]?.cue ?? '')}</p></div>`;
+    if (burst) panel = `<div class="call-box"><h4>${burst.on ? 'Maxim' : 'Ușor'}</h4><div class="c-name">${burst.on ? (this.cfg.name.includes('Shadow') ? 'Drepte, cât de rapid poți' : 'Lovește prin sac') : 'Respiră, mișcă-te'}</div></div>`;
+    else if (p.kind === 'move') panel = `<div class="call-box"><h4>${esc(p.label)}</h4><p style="margin:0;font-weight:600">${esc(WARMUP[p.move ?? 0]?.cue ?? '')}</p></div>`;
     else if (p.kind === 'work' && this.sprinting) panel = '<div class="call-box"><h4>Sprint</h4><div class="c-name">Lovituri drepte, viteză maximă</div><p class="small" style="margin:0">Jab-cross non-stop, pe toată distanța. Garda revine la fiecare pumn.</p></div>';
     else if (p.kind === 'work' && this.call && this.caller) panel = this.callHtml(theme ? theme.name : 'Acum');
     else if (p.kind === 'work' && this.cfg.legSwap) panel = `<div class="call-box"><h4>Formă</h4><p style="margin:0">${esc(LEG_CUES[ctx.S.set.legMode])}</p></div>`;
@@ -184,9 +202,11 @@ class RoundsPlayer implements Player {
     else if (p.kind === 'rest') panel = `<div class="call-box"><h4>Urmează</h4><p style="margin:0;font-weight:600">Runda ${(p.round ?? 0) + 1} din ${p.rounds}. Respiră adânc.</p></div>`;
     else if (p.kind === 'prep') panel = this.cfg.tip ? `<div class="call-box"><h4>Focus</h4><p style="margin:0;font-weight:600">${esc(this.cfg.tip)}</p></div>` : '';
     const body = `
-      <p class="phase-lbl" id="ph">${esc(p.kind === 'work' ? (this.sprinting ? 'Sprint' : theme?.name || (this.cfg.focus && FOCUS_LINE[this.cfg.focus]) || 'Lucru') : p.kind === 'move' ? 'Încălzire' : p.label)}</p>
-      <div class="big-time" id="t">${mmss(Math.ceil(L.left))}</div>
-      <p class="round-lbl" id="rd">${esc(roundTxt)}</p>
+      <p class="phase-lbl" id="ph">${esc(burst ? (burst.on ? 'Maxim' : 'Ușor') : p.kind === 'work' ? (this.sprinting ? 'Sprint' : theme?.name || (this.cfg.focus && FOCUS_LINE[this.cfg.focus]) || (this.cfg.cardio ? 'Ușor, în ritm de conversație' : 'Lucru')) : p.kind === 'move' ? 'Încălzire' : p.label)}</p>
+      <div class="big-time" id="t">${burst ? Math.ceil(burst.left) : mmss(Math.ceil(L.left))}</div>
+      ${p.kind === 'rest' && p.round && (p.rounds ?? 0) > 1
+        ? `<p class="round-lbl" id="rd">Urmează runda</p><div class="rd-big" aria-label="Runda ${p.round + 1} din ${p.rounds}">${p.round + 1}<small>/${p.rounds}</small></div>`
+        : `<p class="round-lbl" id="rd">${esc(roundTxt)}</p>`}
       ${p.round && (p.rounds ?? 0) > 1 ? `<div class="rd-dots" aria-hidden="true">${Array.from({ length: p.rounds ?? 0 }, (_, i) => `<i class="${i + 1 < p.round! ? 'ok' : i + 1 === p.round ? (p.kind === 'work' ? 'on' : 'ok') : ''}"></i>`).join('')}</div>` : ''}
       ${panel}`;
     const paused = !this.clock.running;
@@ -219,7 +239,7 @@ class RoundsPlayer implements Player {
     const r = this.roundsDone();
     const body = `
       ${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1>
-      <p class="lead">${esc(this.cfg.name)}: ${r} din ${this.cfg.rounds} ${this.cfg.rounds === 1 ? 'rundă' : 'runde'}, ${mmss(doneSec(this.phases, this.clock.t, 'work'))} de lucru.</p>
+      <p class="lead">${this.cfg.cardio ? `${esc(this.cfg.name)}: ${mmss(doneSec(this.phases, this.clock.t, 'work'))} în ritm ușor.` : `${esc(this.cfg.name)}: ${r} din ${this.cfg.rounds} ${this.cfg.rounds === 1 ? 'rundă' : 'runde'}, ${mmss(doneSec(this.phases, this.clock.t, 'work'))} de lucru.`}</p>
       <p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p>
       ${this.rateHtml()}
       <button class="btn" data-a="p:close">Închide</button>`;
@@ -234,7 +254,7 @@ class RoundsPlayer implements Player {
   start(): void {
     unlock();
     const c = this.cfg;
-    const rounds = roundsSeq(c.rounds, c.work, c.rounds > 1 ? c.rest : 0, 5);
+    const rounds = roundsSeq(c.rounds, c.work, c.rounds > 1 ? c.rest : 0, 5, (r) => (this.isBurst(r) ? BURST_SEC : c.work));
     // Warm-up first: its moves, then a short "get ready" before round 1.
     this.phases = this.warm
       ? [rounds[0], ...WARMUP.map((m, i): Phase => ({ kind: 'move', sec: m.sec, label: m.name, move: i, round: i + 1, rounds: WARMUP.length })), { kind: 'prep', sec: 10, label: 'Gata de runda 1' }, ...rounds.slice(1)]
@@ -277,6 +297,24 @@ class RoundsPlayer implements Player {
       if (!first || p.kind !== 'prep') this.onPhase(p);
       this.render();
     }
+    if (p.kind === 'work' && this.isBurst(p.round)) {
+      const b = burstAt(L.into, BURST.on, BURST.off, BURST.reps);
+      const key = `${L.i}:${b.n}:${b.on ? 1 : 0}`;
+      if (key !== this.lastBurst) {
+        // the round's bell already marks the first burst
+        const fresh = !this.lastBurst.startsWith(`${L.i}:`);
+        this.lastBurst = key;
+        if (b.on && !fresh) {
+          sfx.go();
+          buzz(220);
+        } else if (!b.on) {
+          sfx.beep();
+          buzz(60);
+        }
+        this.render();
+      } else setText('t', String(Math.ceil(b.left)));
+      return;
+    }
     const sec = Math.ceil(L.left);
     if (sec !== this.lastSec) {
       this.lastSec = sec;
@@ -312,12 +350,14 @@ class RoundsPlayer implements Player {
       return;
     }
     if (p.kind === 'work') {
-      if (p.round && p.rounds && p.rounds > 1) slam(p.round === p.rounds ? 'Ultima rundă' : `Runda ${p.round}`, `din ${p.rounds}`);
+      const burst = this.isBurst(p.round);
+      if (burst) slam('Punch-out', p.rounds && p.rounds > 1 ? `Runda ${p.round} din ${p.rounds}` : `${BURST.reps} explozii`);
+      else if (p.round && p.rounds && p.rounds > 1) slam(p.round === p.rounds ? 'Ultima rundă' : `Runda ${p.round}`, `din ${p.rounds}`);
       else slam('Start');
       sfx.bell(1);
       buzz(350);
       const th = this.themeOf(p.round);
-      if (this.caller) {
+      if (this.caller && !burst) {
         this.nextCall(false);
         if (th) window.setTimeout(() => this.clock.running && say(th.name, 'ro'), 300);
         window.setTimeout(() => this.call && this.clock.running && say(this.call.say, 'en'), 900);
@@ -346,13 +386,17 @@ class RoundsPlayer implements Player {
     const r = this.roundsDone();
     const work = doneSec(this.phases, this.clock.t, 'work');
     if (work < 30) return;
-    const full = r >= Math.ceil(this.cfg.rounds * 0.8);
+    const planned = this.phases.filter((p) => p.kind === 'work').reduce((s, p) => s + p.sec, 0);
+    const full = this.cfg.rounds === 1 ? work >= planned * 0.8 : r >= Math.ceil(this.cfg.rounds * 0.8);
+    const bursts = this.cfg.burstFrom ? this.phases.filter((p) => p.kind === 'work' && this.isBurst(p.round) && p.round! <= r).length : 0;
     this.entry = makeEntry({
-      kind: 'rounds',
+      kind: this.cfg.cardio ? 'cardio' : 'rounds',
       block: full ? this.cfg.block : undefined,
       name: this.cfg.name,
       dur: this.clock.t,
-      data: { rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), focus: this.cfg.focus ?? '', called: this.called },
+      data: this.cfg.cardio
+        ? { min: Math.round(work / 60), workDone: Math.round(work), ...(this.deload ? { deload: true } : {}) }
+        : { rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), focus: this.cfg.focus ?? '', called: this.called, ...(bursts ? { bursts } : {}) },
     });
     addEntry(this.entry);
     this.saved = true;
@@ -372,7 +416,7 @@ class RoundsPlayer implements Player {
         c.rounds = Math.max(1, Math.min(30, c.rounds + d));
         return this.render();
       case 'p:work':
-        c.work = Math.max(30, Math.min(1800, c.work + d * (c.work >= 120 ? 30 : 15)));
+        c.work = Math.max(15, Math.min(3600, c.work + d * (c.work >= 600 ? 60 : c.work >= 120 ? 30 : 15)));
         return this.render();
       case 'p:rest':
         c.rest = Math.max(0, Math.min(300, c.rest + d * 15));

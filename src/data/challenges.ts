@@ -11,7 +11,7 @@ export interface Challenge {
 }
 
 export const CHALLENGES: Challenge[] = [
-  { id: 'box', name: '30 Days of Rounds', sub: 'Cel puțin o sesiune de runde pe zi', hit: (e) => e.kind === 'rounds' },
+  { id: 'box', name: '30 Days of Rounds', sub: 'O sesiune de runde pe zi; în zilele ușoare ajung 10 minute de shadow lent', hit: (e) => e.kind === 'rounds' },
   { id: 'mob', name: '30 Days of Mobility', sub: 'O rutină în fiecare zi', hit: (e) => e.kind === 'routine' },
   { id: 'cold', name: '30 Cold Showers', sub: 'Duș alternativ zilnic', hit: (e) => e.kind === 'shower' },
   { id: 'breath', name: '30 Days of Breath', sub: 'Wim Hof sau 4-7-8 zilnic', hit: (e) => e.kind === 'wimhof' || e.kind === 'breath' },

@@ -1,10 +1,12 @@
 // "Unleash Your Inner Beast" — every chapter except nutrition (VI), retold in Romanian.
 
+/** `note`: what the research says about the claim above it (added by the app, not in the book). */
 export type Para =
   | string
   | { hl: string }
   | { list: string[] }
-  | { steps: Array<[string, string]> };
+  | { steps: Array<[string, string]> }
+  | { note: string };
 
 export interface Chapter {
   id: string;
@@ -82,6 +84,7 @@ export const BOOK: Chapter[] = [
         ],
       },
       { hl: 'Cu fiecare obicei bun, subconștientul tău înțelege că devii tot mai disciplinat. Îți schimbi caracterul în bine.' },
+      { note: 'Un obicei se formează de obicei în mai mult de 21–28 de zile: în studiile adunate de Singh și colegii săi (2024), mediana e de 59–66 de zile, cu variații mari între oameni. Dacă după 28 de zile încă îți cere efort, e normal. Nu renunța.' },
     ],
   },
   {
@@ -100,6 +103,7 @@ export const BOOK: Chapter[] = [
       'Problema celor 99% care nu sunt unde își doresc e că se tem de durere, o evită cu orice preț și astfel se ascund de propriul succes.',
       'Dacă nu doare, nu ești pe drumul dominației. Cum să meriți să domini viața dacă nu ești dispus să înduri puțină durere?',
       { hl: 'Dacă accepți durerea, te face mai puternic. Dacă o iubești, devine cea mai puternică armă a ta.' },
+      { note: 'Durerea de efort (arsura din mușchi, respirația grea) e normală și trece. Durerea ascuțită, în articulație sau tendon, care persistă sau crește de la o sesiune la alta, e un semnal de oprire, nu de „îmbrățișat”. Toate exercițiile din aplicație se fac fără durere de acest fel.' },
     ],
   },
   {
@@ -151,8 +155,9 @@ export const BOOK: Chapter[] = [
   {
     id: 'plan', num: 'IV', title: 'Planul exact', tool: 'plan',
     body: [
-      { hl: 'Planul de antrenament care l-a dus pe Alex nu doar la performanța fizică maximă, ci și la o minte și un caracter de nerecunoscut.' },
+      { hl: 'Planul de antrenament care l-a ajutat pe Alex nu doar spre performanța fizică maximă, ci și spre o minte și un caracter de nerecunoscut.' },
       'Îl găsești în aplicație, zi cu zi, cu timere și cu tot ce faci notat automat.',
+      { note: 'Planul din carte e baza. Aplicația l-a refăcut pentru un atlet complet: ordinea blocurilor (viteza și puterea înaintea oboselii), forță de picioare de două ori pe săptămână, sprinturi, sărituri și cărat, punch-out în loc de 10 runde lungi la sac, alergare ușoară care crește treptat și o săptămână ușoară cu teste la fiecare 4 săptămâni.' },
     ],
   },
   {
@@ -186,6 +191,7 @@ export const BOOK: Chapter[] = [
           ['Meditație și mindfulness', 'Mintea e la fel de importantă. Meditația înseamnă control asupra minții. Găsește momente de liniște, vizualizează victoriile, fii stăpânul universului tău.'],
         ],
       },
+      { note: 'Somnul e cel mai solid punct: cu 6 ore sau mai puțin, îndemânarea și forța scad măsurabil (Craven 2022). Băile de gheață imediat după forță reduc creșterea musculară (Piñero 2024), așa că le ții departe de zilele de forță. Stretchingul crește amplitudinea, dar nu grăbește recuperarea (Afonso 2021). Masajul ajută mai ales la febră musculară și la cum te simți (Davis 2020).' },
     ],
   },
   {
@@ -200,10 +206,11 @@ export const BOOK: Chapter[] = [
   },
 ];
 
+/** The book's three principles, and what the research says about each (`note`, added by the app). */
 export const PRINCIPLES = [
-  { title: 'Intensitate peste durată', text: 'Antrenamentele intense sunt mai eficiente decât orele întregi de antrenament.' },
-  { title: 'Variația e cheia', text: 'Eviți plictiseala schimbând regulat exercițiile.' },
-  { title: 'Progresia e obligatorie', text: 'Te îmbunătățești la fiecare antrenament: prin greutate, repetări sau dificultate.' },
+  { title: 'Intensitate peste durată', text: 'Antrenamentele intense sunt mai eficiente decât orele întregi de antrenament.', note: 'Parțial adevărat: intensitatea contează, dar boxul e în mare parte aerob (aproximativ 3/4 din energie), așa că ai nevoie și de minute ușoare. De aceea planul are și alergare și canotaj ușor.' },
+  { title: 'Variația e cheia', text: 'Eviți plictiseala schimbând regulat exercițiile.', note: 'Variația planificată ajută; schimbarea la întâmplare poate încetini progresul (Kassiano 2022). Aplicația ține exercițiile fixe și schimbă emfaza la 4 săptămâni.' },
+  { title: 'Progresia e obligatorie', text: 'Te îmbunătățești la fiecare antrenament: prin greutate, repetări sau dificultate.', note: 'Adevărat pe termen de săptămâni, nu la fiecare antrenament. Platourile sunt normale; de aceea există săptămâna ușoară și testele.' },
 ];
 
 export const FORMULA = ['Gânduri', 'Convingeri', 'Acțiuni', 'Schimbări', 'Imaginea de sine'];

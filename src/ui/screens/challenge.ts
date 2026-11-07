@@ -27,7 +27,7 @@ export function challengeHtml(): string {
   const run = ctx.S.race;
   const cur = run ? raceById(run.ev) : undefined;
   const done = ctx.S.log.filter((e) => e.kind === 'race').slice(-6).reverse();
-  return `${top()}<div class="art-head">${art('norisk')}<h1 class="stack mid">Challenge</h1></div>
+  return `${top('progress')}<div class="art-head">${art('norisk')}<h1 class="stack mid">Provocări</h1></div>
     <p class="dim" style="margin-top:-6px">Simulări de concurs pe cinci niveluri. Alege nivelul care te provoacă, nu pe cel mai mare.</p>
     ${run && cur ? `<section class="card lime"><div class="row"><div class="row-l"><h3>${esc(cur.name)}</h3><p class="small dim" style="margin:0">${esc(cur.levels[run.lvl].name)} e în desfășurare</p></div><button class="btn sm" data-a="ch:resume">Continuă</button></div></section>` : ''}
     <div class="missions">${RACES.map(raceCard).join('')}</div>

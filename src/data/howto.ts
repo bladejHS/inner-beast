@@ -147,7 +147,103 @@ export const HOW: Record<string, How> = {
     ],
   },
 
+  // ---------- Push day extras, carries ----------
+  pallof: {
+    steps: [
+      'Banda prinsă lateral, la înălțimea pieptului; stai cu lateralul spre ea, la o distanță la care trage.',
+      'Ții mânerul la piept cu ambele mâini, picioarele la lățimea umerilor, abdomenul strâns.',
+      'Împingi mâinile drept în față și ții o secundă fără să lași trunchiul să se rotească spre bandă.',
+      'Aduci mâinile înapoi la piept, controlat. Apoi cu cealaltă parte spre bandă.',
+    ],
+    mistake: 'Să te răsucești după bandă sau să-ți arcuiești spatele. Dacă nu poți ține drept, ia o bandă mai ușoară.',
+  },
+  carry: {
+    steps: [
+      'Ridici ganterele de pe sol cu spatele drept, ca la un deadlift.',
+      'Stai drept, umerii trași în jos și înapoi, brațele întinse pe lângă corp.',
+      'Mergi cu pași scurți și controlați, respirând constant, timpul cerut.',
+      'Le pui jos la fel de controlat cum le-ai ridicat.',
+    ],
+    mistake: 'Să te apleci într-o parte sau să lași umerii să cadă spre urechi.',
+  },
+
   // ---------- Leg Day ----------
+  sprint: {
+    steps: [
+      'Încălzirea completă înainte, cu accelerările progresive.',
+      'Pornești din picioare, înclinat ușor înainte, și accelerezi progresiv pe 10–20 m (sau 8–10 s în pantă).',
+      'Brațele lucrează opus picioarelor, pașii sunt sub corp, nu în fața lui.',
+      'Te întorci mergând la start și pornești din nou când respiri normal.',
+    ],
+    mistake: 'Să sprintezi la maxim din prima săptămână. Fără Nordic Curls, ischiogambierii se obișnuiesc treptat: 85%, apoi 90%, apoi 95%.',
+  },
+  cmj: {
+    steps: [
+      'Picioarele la lățimea șoldurilor, mâinile pe șolduri (sau libere, dacă nu măsori).',
+      'Cobori scurt și rapid, până la un sfert de genuflexiune.',
+      'Sari cât de sus poți, cu picioarele întinse în aer.',
+      'Aterizezi moale, pe ambele picioare, cu genunchii în linie cu vârfurile. Te reașezi înainte de următoarea.',
+    ],
+    mistake: 'Să legi săriturile una de alta. Fiecare e separată și maximă.',
+  },
+  broad: {
+    steps: [
+      'Vârfurile la linia de start, picioarele la lățimea șoldurilor.',
+      'Balansezi brațele înapoi, cobori și sari cât de departe poți, aruncând brațele înainte.',
+      'Aterizezi pe ambele picioare și ții poziția o secundă, fără să cazi înainte sau înapoi.',
+    ],
+    mistake: 'Aterizarea cu genunchii căzuți spre interior sau cu picioarele întinse.',
+  },
+  rot: {
+    steps: [
+      'Lateral față de perete (cu mingea) sau cu banda prinsă la spate, în poziție de luptă.',
+      'Încarci pe piciorul din spate și rotești șoldul primul, apoi trunchiul.',
+      'Brațele doar termină mișcarea: arunci mingea în perete sau lovești înainte cu banda, cât de rapid poți.',
+      'Prinzi, te reașezi și repeți. Apoi cealaltă parte.',
+    ],
+    mistake: 'Să arunci din brațe, cu șoldul blocat.',
+  },
+  'splitsq-tue': {
+    steps: [
+      'Laba piciorului din spate pe o bancă sau un scaun, piciorul din față la un pas mare în față.',
+      'Ganterele în mâini, trunchiul ușor aplecat înainte.',
+      'Cobori până când genunchiul din spate aproape atinge solul și împingi prin toată talpa din față.',
+      'Toate repetările pe un picior, apoi pe celălalt.',
+    ],
+    mistake: 'Piciorul din față prea aproape de bancă: genunchiul alunecă mult în față și se ridică călcâiul.',
+  },
+  splitsq: {
+    steps: [
+      'Laba piciorului din spate pe o bancă sau un scaun, piciorul din față la un pas mare în față.',
+      'Ganterele în mâini, trunchiul ușor aplecat înainte.',
+      'Cobori până când genunchiul din spate aproape atinge solul și împingi prin toată talpa din față.',
+      'Toate repetările pe un picior, apoi pe celălalt. Te oprești cu 1–2 repetări înainte de limită.',
+    ],
+    mistake: 'Piciorul din față prea aproape de bancă: genunchiul alunecă mult în față și se ridică călcâiul.',
+  },
+  sldl: {
+    steps: [
+      'Stai pe un picior, cu genunchiul ușor îndoit, gantera în mâna opusă.',
+      'Împingi șoldul înapoi și cobori trunchiul, cu spatele drept; piciorul liber urcă în spate, în linie cu trunchiul.',
+      'Cobori până simți întinderea în spatele coapsei, apoi revii strângând fesierul.',
+    ],
+    mistake: 'Să rotunjești spatele sau să deschizi șoldul piciorului din spate spre lateral.',
+  },
+  latlunge: {
+    steps: [
+      'Picioarele apropiate, gantera la piept (sau fără greutate).',
+      'Pas larg lateral, te așezi pe piciorul care a pășit, cu șoldul împins înapoi; celălalt picior rămâne întins.',
+      'Împingi din talpa piciorului îndoit și revii la mijloc. Toate repetările pe o parte, apoi pe cealaltă.',
+    ],
+    mistake: 'Genunchiul care cade spre interior sau călcâiul care se ridică.',
+  },
+  wallsit: {
+    steps: [
+      'Spatele lipit de perete, picioarele la un pas în fața peretelui, la lățimea șoldurilor.',
+      'Aluneci în jos până când genunchii fac 90°, coapsele paralele cu solul.',
+      'Ții poziția și respiri constant.',
+    ],
+  },
   lunges: {
     steps: [
       'Stai drept, picioarele la lățimea șoldurilor, mâinile pe șolduri sau în gardă.',
@@ -192,12 +288,30 @@ export const HOW: Record<string, How> = {
   },
   'Heavy Bag Training': {
     steps: [
-      'Bandaje și mănuși. Te așezi la o lungime de braț de sac, în gardă.',
+      'Bandaje și mănuși grele (14–16 oz la un om înalt și greu). Te așezi la o lungime de braț de sac, în gardă.',
       'Lovești cu tot corpul: împingi din picior, rotești șoldul și umărul, pumnul strâns doar la impact.',
       'După fiecare combinație ieși din linie sau schimbi unghiul, nu rămâi în fața sacului.',
       'Expiri scurt la fiecare lovitură și aduci mâna înapoi la bărbie.',
     ],
-    mistake: 'Să împingi sacul în loc să-l pocnești și să lași garda jos după pumn.',
+    mistake: 'Să împingi sacul în loc să-l pocnești și să lași garda jos după pumn. Dacă te dor încheietura sau încheieturile degetelor, te oprești: mâna e cea mai accidentată zonă la boxeri.',
+  },
+  'Punch-out': {
+    steps: [
+      'Bandaje și mănuși, în gardă, la distanța de lovit.',
+      'La gong: 3 secunde de lovituri drepte la maxim, prin sac, cu tot corpul.',
+      'La bip: 10 secunde ușor, te miști și respiri. De 14 ori într-o rundă.',
+      'Un minut pauză între runde.',
+    ],
+    mistake: 'Să lovești din brațe când obosești. Dacă exploziile încetinesc mult, oprește runda: e lucru de calitate, nu de supraviețuire.',
+  },
+  'Easy Row': {
+    steps: [
+      'Picioarele prinse în chingi, spatele drept, brațele întinse.',
+      'Împingi întâi din picioare, apoi lași spatele puțin înapoi, apoi tragi mânerul spre piept.',
+      'Revii în ordine inversă: brațele, spatele, apoi genunchii.',
+      'Ritm ușor, la care poți vorbi în propoziții.',
+    ],
+    mistake: 'Să tragi din brațe și să vâslești tare. Aici efortul rămâne ușor de la început până la sfârșit.',
   },
   'Jumping Rope': {
     steps: [
@@ -292,6 +406,17 @@ export const HOW: Record<string, How> = {
 
   // ---------- routines ----------
   'Jumping Jacks': { steps: ['Sari depărtând picioarele și ridicând brațele deasupra capului.', 'Sari înapoi cu picioarele apropiate și brațele pe lângă corp.', 'Ritm constant, pe vârfuri.'] },
+  'Band External Rotation': { steps: ['Banda prinsă la înălțimea cotului, lateral față de tine.', 'Cotul lipit de corp, îndoit la 90°, antebrațul în fața abdomenului.', 'Rotești antebrațul în afară, fără să desprinzi cotul, și revii lent. La jumătate schimbi brațul.'] },
+  'Bodyweight Squats': { steps: ['Picioarele la lățimea umerilor, vârfurile ușor în afară.', 'Cobori cu șoldurile înapoi și în jos, pieptul sus, călcâiele pe sol.', 'Urci controlat. Ritm lent, ca încălzire.'] },
+  'Band Pull-Aparts': { steps: ['Ții banda cu brațele întinse în față, la nivelul umerilor.', 'Desfaci banda până aproape de piept, strângând omoplații.', 'Revii lent, fără să ridici umerii.'] },
+  'Active Hang': { steps: ['Atârni cu brațele întinse.', 'Tragi umerii în jos, departe de urechi, fără să îndoi coatele.', 'Ții câteva secunde, te lași ușor și reiei.'] },
+  'Incline Push-ups': { steps: ['Mâinile pe o bancă sau pe pervaz, corpul drept.', 'Cobori pieptul spre margine și împingi înapoi.', 'Ca încălzire: la jumătate din ce poți.'] },
+  'Easy Jog or Row': { steps: ['Alergare ușoară pe loc sau afară, ori canotaj ușor.', 'Ritm la care poți vorbi.', 'Doar ca să crească pulsul și temperatura.'] },
+  'Walking Lunges': { steps: ['Pas lung înainte, cobori până când genunchiul din spate aproape atinge solul.', 'Împingi din piciorul din față și aduci piciorul din spate direct în pasul următor.', 'Trunchiul drept, fără greutate.'] },
+  'A-Skips': { steps: ['Țopăi ritmic pe loc sau înaintând.', 'Genunchiul urcă la nivelul șoldului, laba piciorului vine sub corp.', 'Brațele lucrează opus picioarelor, ca la sprint.'] },
+  'Lateral Shuffles': { steps: ['Poziție joasă, genunchii îndoiți, garda sus.', 'Pași laterali rapizi, fără să încrucișezi picioarele.', 'Câțiva metri într-o parte, apoi înapoi.'] },
+  'Pogo Hops': { steps: ['Sărituri mici pe loc, din glezne.', 'Genunchii aproape întinși, contact scurt cu solul.', 'Elastic și ușor, nu înalt.'] },
+  'Build-up Runs': { steps: ['Trei alergări de 20 de metri.', 'Prima la 60%, a doua la 70%, a treia la 80% din viteza ta.', 'Te întorci mergând între ele.'] },
   'Arm Circles': { steps: ['Brațele întinse lateral, relaxate.', 'Cercuri mici care cresc treptat până la cercuri mari.', 'Jumătate din timp înainte, jumătate înapoi.'] },
   'Shoulder Rolls': { steps: ['Brațele atârnă relaxat pe lângă corp.', 'Ridici umerii spre urechi, îi duci înapoi și îi cobori într-un cerc amplu.', 'Apoi schimbi sensul.'] },
   'Shoulder Dislocates': { steps: ['Ții un prosop sau o bandă cu mâinile foarte depărtate, brațele întinse în față.', 'Ridici brațele întinse peste cap și le duci în spate cât merge fără durere.', 'Revii pe același drum. Cu timpul apropii mâinile.'], mistake: 'Să îndoi coatele ca să treci. Mai bine depărtezi mâinile.' },

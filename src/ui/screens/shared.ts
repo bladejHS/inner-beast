@@ -1,9 +1,10 @@
 // Pieces shared by the screens: header, program block cards, starting and checking off a block.
 
 import { focusCombos } from '../../data/combos.ts';
-import { resolveBlock, WARMUP_SEC, type Block, type RestKey } from '../../data/plan.ts';
+import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks, type RestKey } from '../../data/plan.ts';
 import { ROW_CHALLENGES, rowChallenge } from '../../data/row.ts';
-import { makeEntry, type Kind } from '../../logic/store.ts';
+import { cycleAt, deloadOn, growMinutes } from '../../logic/progress.ts';
+import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
 import { dayKey, esc, inWeek, num, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { art } from '../art.ts';
 import { rake } from '../claws.ts';
@@ -35,12 +36,17 @@ export function setTheme(dark: boolean): void {
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#050404' : '#f3f1ec');
 }
 
-export function top(back = false): string {
-  return `<header class="top">${
-    back
-      ? `<button class="icon-btn" data-a="back" aria-label="Înapoi">${ic('back')}</button>`
-      : `<div class="brand">${art('wolf')}<span>Inner Beast</span></div>`
-  }<div class="top-r"><button class="icon-btn" data-a="settings" aria-label="Setări">${ic('gear')}</button></div></header>`;
+const TAB_NAME: Record<string, string> = { today: 'Azi', plan: 'Plan', fight: 'Lupte', mind: 'Minte', progress: 'Progres' };
+
+/** The header: the brand, or a way back. `back` is true for views opened over a tab, or the tab a sub-screen belongs to. */
+export function top(back: boolean | string = false): string {
+  const left =
+    typeof back === 'string'
+      ? `<button class="icon-btn back-row" style="width:auto;padding-right:10px" data-a="tab" data-k="${back}" aria-label="Înapoi la ${esc(TAB_NAME[back] ?? back)}">${ic('back')}<span>${esc(TAB_NAME[back] ?? '')}</span></button>`
+      : back
+        ? `<button class="icon-btn" data-a="back" aria-label="Înapoi">${ic('back')}</button>`
+        : `<div class="brand">${art('wolf')}<span>Inner Beast</span></div>`;
+  return `<header class="top">${left}<div class="top-r"><button class="icon-btn" data-a="settings" aria-label="Setări">${ic('gear')}</button></div></header>`;
 }
 
 export function restFor(k: RestKey | undefined): number {
@@ -49,11 +55,32 @@ export function restFor(k: RestKey | undefined): number {
   return 0;
 }
 
+/** Rest between rounds of a block: its own fixed rest, or the one from the settings. */
+export function blockRest(b: Block): number {
+  return b.restSec ?? restFor(b.rest);
+}
+
+/** The user's picks plus what this week decides: the emphasis of the loop and the minutes of the blocks that grow. */
+export function planPicks(today = dayKey()): Settings & Picks {
+  const S = ctx.S;
+  const grown: Record<string, number> = {};
+  const light = deloadOn(S.deload, today);
+  for (const b of ALL_BLOCKS) if (b.grow) grown[b.id] = light ? b.grow.base : growMinutes(S.log, b.id, S.cycle.start, b.grow);
+  return { ...S.set, cycle: cycleAt(S.cycle.start, today)?.id, grown };
+}
+
+/** A block as it runs this week. */
+export function liveBlock(raw: Block): Block {
+  return resolveBlock(raw, planPicks());
+}
+
 export function startBlock(raw: Block): void {
-  const b = resolveBlock(raw, ctx.S.set);
+  const b = liveBlock(raw);
   switch (b.kind) {
     case 'rounds':
-      return openRounds({ name: b.name, rounds: b.rounds ?? 1, work: b.work ?? 180, rest: restFor(b.rest), focus: b.focus, block: b.id, tip: b.tip, cues: b.cues, legSwap: b.legSwap, warmup: b.warmup });
+      return openRounds({ name: b.name, rounds: b.rounds ?? 1, work: b.work ?? 180, rest: blockRest(b), focus: b.focus, block: b.id, tip: b.tip, cues: b.cues, legSwap: b.legSwap, warmup: b.warmup, burstFrom: b.burstFrom });
+    case 'cardio':
+      return openRounds({ name: b.name, rounds: 1, work: (b.min ?? 20) * 60, rest: 0, block: b.id, tip: b.tip, cues: b.cues, cardio: true });
     case 'row':
       return openRow(b.id);
     case 'amrap':
@@ -75,7 +102,7 @@ export function startBlock(raw: Block): void {
   }
 }
 
-const KIND_OF: Record<string, Kind> = { row: 'row', rounds: 'rounds', amrap: 'amrap', workout: 'workout', routine: 'routine', run: 'run', walk: 'walk', shower: 'shower', wimhof: 'wimhof', breath: 'breath' };
+const KIND_OF: Record<string, Kind> = { row: 'row', rounds: 'rounds', amrap: 'amrap', workout: 'workout', routine: 'routine', run: 'run', walk: 'walk', shower: 'shower', wimhof: 'wimhof', breath: 'breath', cardio: 'cardio' };
 
 /** Entries of this block in the current week, newest first. */
 export function blockEntries(b: Block, today = dayKey()): typeof ctx.S.log {
@@ -85,7 +112,7 @@ export function blockEntries(b: Block, today = dayKey()): typeof ctx.S.log {
 
 /** Tap on the block number: check off without the timer, or undo the check. */
 export function toggleMark(raw: Block): void {
-  const b = resolveBlock(raw, ctx.S.set);
+  const b = liveBlock(raw);
   const name = b.name;
   const done = blockEntries(b);
   if (done.length) {
@@ -105,14 +132,14 @@ export function toggleMark(raw: Block): void {
 
 const ICON_BY_ID: Record<string, string> = {
   'mon-shadow': 'shadow', 'thu-shadow': 'shadow', 'tue-easy': 'shadow', 'fri-easy': 'shadow',
-  'mon-bag': 'bag', 'thu-bag': 'bag', 'thu-rope': 'rope', 'sun-legs': 'wall', 'mon-bw': 'bolt',
-  'tue-cal': 'fight', 'fri-cal': 'fight', 'sun-lunges': 'fight', 'tue-stretch': 'stretch', 'fri-stretch': 'stretch',
+  'mon-bag': 'bag', 'thu-bag': 'bag', 'thu-power': 'bolt', 'thu-rope': 'rope', 'sun-legs': 'stretch', 'mon-bw': 'bolt',
+  'tue-cal': 'fight', 'fri-cal': 'fight', 'sun-lunges': 'fight', 'tue-stretch': 'stretch', 'fri-stretch': 'stretch', 'tue-cool': 'stretch',
   'sat-mob': 'stretch', 'wed-walk': 'walk', 'wed-shower': 'drop', 'wed-med': 'wind', 'sat-med': 'wind',
-  'sat-breath': 'mind', 'sun-jog': 'run',
+  'sat-breath': 'mind', 'sun-jog': 'run', 'tue-row': 'row',
 };
 
 export function blockIcon(raw: Block): string {
-  const b = resolveBlock(raw, ctx.S.set);
+  const b = liveBlock(raw);
   if (b.focus === 'ladder') return 'ladder';
   if (b.kind === 'row') return 'row';
   return ICON_BY_ID[b.id] ?? 'timer';
@@ -120,15 +147,15 @@ export function blockIcon(raw: Block): string {
 
 /** Rough minutes a block takes, for the day's total. */
 export function blockMinutes(raw: Block): number {
-  const b = resolveBlock(raw, ctx.S.set);
+  const b = liveBlock(raw);
   if (b.kind === 'rounds') {
     const r = b.rounds ?? 1;
-    return Math.round((r * (b.work ?? 0) + (r - 1) * restFor(b.rest) + (b.warmup ? WARMUP_SEC : 0)) / 60);
+    const work = Array.from({ length: r }, (_, i) => (b.burstFrom && i + 1 >= b.burstFrom ? BURST_SEC : b.work ?? 0)).reduce((s, x) => s + x, 0);
+    return Math.round((work + (r - 1) * blockRest(b) + (b.warmup ? WARMUP_SEC : 0)) / 60);
   }
   if (b.kind === 'shower') return ctx.S.set.showerRounds * 2 + (ctx.S.set.showerEndCold ? 1 : 0);
   if (b.kind === 'walk') return 75;
   if (b.kind === 'wimhof' && !b.min) return 12;
-  if (b.kind === 'workout' && b.workout === 'legs') return 15;
   return b.min ?? 10;
 }
 
@@ -138,7 +165,9 @@ function altPicker(b: Block): string {
   const opts: Array<[string, string, boolean]> =
     b.alt === 'feet'
       ? [['rope', 'Jumping Rope', s.thuFeet === 'rope'], ['ladder', 'Agility Ladder', s.thuFeet === 'ladder']]
-      : [['bag', 'Heavy Bag', s.thuMain === 'bag'], ['row', 'Machine Row', s.thuMain === 'row']];
+      : b.alt === 'partner'
+        ? [['shadow', 'Singur', s.thuPartner !== 'spar'], ['spar', 'Cu partener', s.thuPartner === 'spar']]
+        : [['bag', 'Heavy Bag', s.thuMain === 'bag'], ['row', 'Machine Row', s.thuMain === 'row']];
   const chips = (act: string, list: Array<[string, string, boolean]>, label: string) =>
     `<div class="chips bk-alt" role="group" aria-label="${esc(label)}">${list.map(([v, l, on]) => `<button class="chip" aria-pressed="${on}" data-a="${act}" data-b="${b.id}" data-v="${v}">${esc(l)}</button>`).join('')}</div>`;
   let html = chips('alt', opts, 'Alege activitatea');
@@ -150,7 +179,7 @@ function altPicker(b: Block): string {
 }
 
 export function blockCard(raw: Block, n: number, today: string): string {
-  const b = resolveBlock(raw, ctx.S.set);
+  const b = liveBlock(raw);
   const entries = blockEntries(b, today);
   const done = entries.length > 0;
   const name = b.name;
@@ -160,7 +189,7 @@ export function blockCard(raw: Block, n: number, today: string): string {
     extra = `<div class="steps-in"><label class="sr" for="steps-in">Pași azi</label><input id="steps-in" type="number" inputmode="numeric" min="0" max="100000" data-a="steps" value="${st || ''}" placeholder="Pași azi"><span>din 10.000</span></div>`;
   }
   if (b.kind === 'run') extra = `<button class="link" data-a="polar" data-b="${b.id}">Adaugă din Polar Flow</button>`;
-  if (b.kind === 'rounds' && b.focus && b.focus !== 'legs' && b.focus !== 'rope' && b.focus !== 'ladder') {
+  if (b.kind === 'rounds' && b.focus && b.burstFrom !== 1 && b.focus !== 'legs' && b.focus !== 'rope' && b.focus !== 'ladder') {
     const cs = focusCombos(b.focus, ctx.S.nut.h);
     extra += `<p class="bk-calls"><b>Combinații:</b> ${esc(cs.slice(0, 4).map((c) => c.name).join(' · '))}${cs.length > 4 ? ` și încă ${cs.length - 4}` : ''}</p>`;
   }

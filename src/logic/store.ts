@@ -1,18 +1,19 @@
 // App state, persisted in localStorage. Everything the user logs lives here.
 
-import { EMOM_START } from '../data/workouts.ts';
+import { EMOM_GOAL, EMOM_START } from '../data/workouts.ts';
 import { dayKey, uid } from './util.ts';
 import { freshDiscipline, type Discipline } from './discipline.ts';
 import type { RaceRun } from './race.ts';
+import { cycleStartFor } from './progress.ts';
 
-export type Kind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'wimhof' | 'breath' | 'shower' | 'row' | 'coach' | 'race';
+export type Kind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'wimhof' | 'breath' | 'shower' | 'row' | 'coach' | 'race' | 'cardio';
 
 export interface SetLog {
   id: string;
   name: string;
-  /** Reps (or seconds for holds); null = set not done. YTW sets store 1/0. */
+  /** Reps (or seconds for holds); null = set not done. Ticked sets (Y-T-W, sprints, jumps) store 1. */
   sets: Array<number | null>;
-  unit: 'reps' | 'sec' | 'ytw' | 'emom';
+  unit: 'reps' | 'sec' | 'ytw' | 'emom' | 'done';
   emom?: { min: number; reps: number; done: number };
   /** Added weight, on the hardest variation. */
   kg?: number;
@@ -51,6 +52,8 @@ export interface Settings {
   thuFeet: 'rope' | 'ladder';
   /** Thursday's last slot: Heavy Bag or Machine Row, and the rowing challenge. */
   thuMain: 'bag' | 'row';
+  /** Thursday's shadow slot: alone, or technical sparring / pads with a partner. */
+  thuPartner: 'shadow' | 'spar';
   rowCh: 'a' | 'b' | 'c' | 'd';
   rest3: number;
   rest1: number;
@@ -161,8 +164,12 @@ export interface State {
   chal: Record<string, string>;
   /** The race simulation running now. */
   race: RaceRun | null;
-  /** Lighter weeks: the Monday the six-week count restarted, and the Monday of the lighter week now on. */
+  /** Lighter weeks: the Monday the proposal was last answered, and the Monday of the lighter week now on. */
   deload: { last: string; week: string };
+  /** The 12-week loop of emphases (A, B, C), from the Monday it started. */
+  cycle: { start: string };
+  /** Test results by test id, oldest first. */
+  tests: Record<string, Array<{ d: string; v: number }>>;
 }
 
 export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 200, startW: 80, goalW: 75, act: 1.55 };
@@ -176,6 +183,7 @@ export const DEFAULT_SETTINGS: Settings = {
   legMode: 'wall',
   thuFeet: 'rope',
   thuMain: 'bag',
+  thuPartner: 'shadow',
   rowCh: 'a',
   rest3: 60,
   rest1: 60,
@@ -221,6 +229,8 @@ export function freshState(today: string = dayKey()): State {
     chal: {},
     race: null,
     deload: { last: '', week: '' },
+    cycle: { start: cycleStartFor(today) },
+    tests: {},
   };
 }
 
@@ -237,7 +247,8 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     set,
     log: Array.isArray(r.log) ? r.log.filter((e) => isObj(e) && typeof e.date === 'string' && typeof e.kind === 'string') : [],
     lvl: isObj(r.lvl) ? (r.lvl as Record<string, number>) : {},
-    emom: isObj(r.emom) && typeof r.emom.min === 'number' && typeof r.emom.reps === 'number' ? r.emom : base.emom,
+    // The climb now stops at EMOM_GOAL: a target from the old 30 × 10 ladder comes back down to it.
+    emom: isObj(r.emom) && typeof r.emom.min === 'number' && typeof r.emom.reps === 'number' ? { min: Math.min(r.emom.min, EMOM_GOAL.min), reps: Math.min(r.emom.reps, EMOM_GOAL.reps) } : base.emom,
     habits: Array.isArray(r.habits) && r.habits.length ? r.habits : base.habits,
     wins: Array.isArray(r.wins) ? r.wins : [],
     why: { ...base.why, ...(isObj(r.why) ? r.why : {}) },
@@ -262,6 +273,8 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     chal: isObj(r.chal) ? (r.chal as Record<string, string>) : {},
     race: isObj(r.race) && typeof r.race.ev === 'string' && Array.isArray(r.race.splits) ? (r.race as unknown as RaceRun) : null,
     deload: { ...base.deload, ...(isObj(r.deload) ? r.deload : {}) },
+    cycle: isObj(r.cycle) && typeof r.cycle.start === 'string' && r.cycle.start ? { start: r.cycle.start } : base.cycle,
+    tests: isObj(r.tests) ? (r.tests as State['tests']) : {},
   };
 }
 

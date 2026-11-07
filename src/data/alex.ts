@@ -75,7 +75,7 @@ export const ALEX_FIGHT: TipCard[] = [
       '40 de Superman Push-ups: împingi atât de tare încât mâinile și picioarele se desprind de sol.',
       '150 de Clap Push-ups, împărțite în câte serii ai nevoie.',
       'Aterizezi moale, cu coatele ușor îndoite, ca să-ți protejezi încheieturile.',
-      'Variantele explozive le găsești în ziua de push, la Explosive Push-ups.',
+      'E un antrenament de demonstrație, nu de copiat dintr-odată: 150 de flotări explozive cer luni de pregătire. Variantele explozive le găsești în ziua de push, la Explosive Push-ups, câte 3–5 pe serie.',
     ],
   },
   {
@@ -158,7 +158,7 @@ export const ALEX_FIGHT: TipCard[] = [
     id: 'shadow-fix', title: 'Shadow boxing corect', src: '7640175509539720480', srcTitle: 'Schattenboxen korrigiert',
     points: [
       'Combinațiile sălbatice te lasă pe linia adversarului: așa ajungi KO.',
-      'Stai curat: bărbia jos, mâna din față întinsă spre el, relaxat. De la lejer la tare.',
+      'Stai curat: bărbia jos, mâna din față întinsă spre el ca să găsești distanța, relaxat, fără să i-o ții în față. De la lejer la tare.',
       'Întâi lovituri simple: jab și revii cu mâna sus.',
       'După cross ieși din linia loviturii, apoi croșeu și ieși din nou. Capul nu stă niciodată pe loc.',
     ],
@@ -166,7 +166,7 @@ export const ALEX_FIGHT: TipCard[] = [
   {
     id: 'shoulders', title: 'Niciodată umeri obosiți', src: '7638703811749481760', srcTitle: 'Nie wieder müde Schultern',
     points: [
-      'Nu face shadow boxing cu gantere sau benzi: te învață lovituri pe jumătate sau pe trei sferturi.',
+      'Nu face shadow boxing cu gantere: te învață lovituri pe jumătate sau pe trei sferturi. (La benzile elastice regula e prea strictă: două studii au găsit pumni mai rapizi după antrenament cu bandă.)',
       'Mobilitatea e cheia.',
       'Lucrează bazele: garda sus, bărbia jos, distanțe lungi și curate.',
       'Nu tot timpul tare: învață să fii relaxat, apoi tare. Mâinile sus devin un obicei.',
@@ -193,7 +193,7 @@ export const ALEX_FIGHT: TipCard[] = [
     points: [
       'Alex avea o accidentare la două săptămâni: capsulă ruptă, deget fisurat, nasul spart.',
       'Când a trecut pe sparring tehnic, a progresat enorm.',
-      'Regula profesioniștilor: o zi la 80%, o zi la 60%. Așa rămâi sănătos pe termen lung.',
+      'Pentru sparring există trepte, ca la federațiile de box: întâi tehnic, apoi condiționat (cu reguli și lovituri limitate), abia apoi liber, mereu cu un antrenor de față. Nicio sursă nu dă o doză sigură; ține-l rar și controlat.',
       'Antrenează-te tare, dar inteligent și tehnic.',
     ],
   },
@@ -259,7 +259,7 @@ export const ALEX_WORKOUTS: TipCard[] = [
   },
   {
     id: 'w-challenges', title: 'Provocările lui Alex la flotări', src: '7238310144264785178', srcTitle: 'Give me 800 push ups',
-    points: ['„Give me 75 / 87 push-ups”: provocarea pe care o trimiți și unui prieten, ca să-l faci mai puternic.', '800 de flotări „la micul dejun”: 350, apoi 200, apoi 150, apoi ultimele 100.', 'După 12 runde de box, 400 de flotări în serii de câte 50.', 'Provocarea pe niveluri: 11 variante de flotări, de la cele ușoare până la flotări în stând pe mâini. Vezi la ce nivel ești.', 'Nu sunt pentru început: crește treptat.'],
+    points: ['„Give me 75 / 87 push-ups”: provocarea pe care o trimiți și unui prieten, ca să-l faci mai puternic.', '800 de flotări „la micul dejun”: 350, apoi 200, apoi 150, apoi ultimele 100.', 'După 12 runde de box, 400 de flotări în serii de câte 50.', 'Provocarea pe niveluri: 11 variante de flotări, de la cele ușoare până la flotări în stând pe mâini. Vezi la ce nivel ești.', 'Nu sunt antrenamente, ci provocări rare. Volume de felul ăsta, făcute dintr-odată de cineva neobișnuit cu ele, au dus la rabdomioliză (o leziune musculară care afectează rinichii). Crești treptat, pe săptămâni.'],
   },
   {
     id: 'w-outdoor', title: 'Box afară', src: '7348839246762921248', srcTitle: 'Box Training für draußen',
@@ -388,7 +388,7 @@ export const ALEX_MIND: TipCard[] = [
     id: 'rule40', title: 'Regula de 40%', src: '7493216412970913046', srcTitle: 'Disziplin halten',
     points: [
       'Totul e obicei. Observă-te: când ajungi acasă și te pui jos, corpul intră în modul de odihnă.',
-      'Când simți că nu mai ai chef, ești abia la 40%. Mai ai mult potențial.',
+      'Când simți că nu mai ai chef, ești abia la 40%. Mai ai mult potențial. (E o poveste motivațională din armata americană, nu o măsurătoare: nu există un „40%” fiziologic. Ce e adevărat: lipsa de chef nu înseamnă oboseală.)',
       'Nu-ți da timp să te gândești: pleacă direct la antrenament și adună momentum.',
       'Emoțiile nu contează în momentul ăla. Exact atunci te ridici și dai tot.',
     ],

@@ -1,9 +1,8 @@
 // "Minte": recovery tools, your why, the 28-day routine, the victory journal, the book and Alex's mindset.
 
 import { BOOK, FORMULA, HABIT_STEPS, PRINCIPLES, type Chapter, type Para } from '../../data/book.ts';
-import { holdStats } from '../../logic/wimhof.ts';
 import { habitStreak } from '../../logic/progress.ts';
-import { dayKey, esc, mmss, shortDay } from '../../logic/util.ts';
+import { dayKey, esc, shortDay } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { ic } from '../icons.ts';
@@ -12,13 +11,15 @@ import { top } from './shared.ts';
 
 const TOOLS = [
   { k: 'lab', icon: 'wind', name: 'Breathwork Lab', sub: 'Reset, Tactical, Recovery, Advanced' },
-  { k: 'wimhof', icon: 'wind', name: 'Wim Hof', sub: 'Meditație cu respirație și retenție' },
+  { k: 'wimhof', icon: 'wind', name: 'Wim Hof', sub: 'Așezat sau întins, niciodată în apă' },
   { k: 'breath', icon: 'mind', name: '4-7-8', sub: 'Sesiunea de breathing' },
   { k: 'shower', icon: 'drop', name: 'Shower', sub: '1 min rece, 1 min cald' },
   { k: 'mobility', icon: 'stretch', name: 'Mobility', sub: '30 min, picioare, șolduri, umeri' },
   { k: 'daily', icon: 'bolt', name: 'Daily Mobility', sub: '10 min, rutina lui Alex' },
-  { k: 'stretch-push', icon: 'timer', name: 'Stretching', sub: '15 min, încălzirea umerilor' },
+  { k: 'disc', icon: 'flag', name: 'Discipline', sub: 'No Fap, Dopamine Discipline' },
+  { k: 'stretch-push', icon: 'timer', name: 'Dynamic Warm-up', sub: '10 min, umeri și șolduri' },
 ];
+const SCREENS = new Set(['lab', 'disc']);
 
 function whyBlock(): string {
   const w = ctx.S.why;
@@ -57,12 +58,10 @@ function habitsBlock(): string {
 }
 
 export function mindHtml(): string {
-  const hs = holdStats(ctx.S.log);
   return `${top()}
     <h1 class="stack">Minte</h1>
-    ${art('eyes', 'mind-eyes')}
-    <h2 class="sec">Unelte</h2>
-    <div class="tiles">${TOOLS.map((t) => `<button class="tile" data-a="${t.k === 'lab' ? 'tab' : 'tool'}" data-k="${t.k}">${ic(t.icon)}<b>${esc(t.name)}</b><span>${esc(t.k === 'wimhof' && hs.best ? `Record: ${mmss(hs.best)}` : t.sub)}</span></button>`).join('')}</div>
+    <h2 class="sec" style="border-top:0;margin-top:8px;padding-top:0">Unelte</h2>
+    <div class="tiles">${TOOLS.map((t) => `<button class="tile" data-a="${SCREENS.has(t.k) ? 'tab' : 'tool'}" data-k="${t.k}">${ic(t.icon)}<b>${esc(t.name)}</b><span>${esc(t.sub)}</span></button>`).join('')}</div>
     <h2 class="sec">De ce-ul tău<small>„Găsește-ți de ce-ul și îți vei găsi succesul.”</small></h2>
     ${whyBlock()}
     <h2 class="sec">Rutina de 28 de zile<small>Un singur lucru simplu, în fiecare zi. Nu te culci până nu e gata.</small></h2>
@@ -80,6 +79,7 @@ function para(p: Para): string {
   if (typeof p === 'string') return `<p>${esc(p)}</p>`;
   if ('hl' in p) return `<p class="hl-p">${esc(p.hl)}</p>`;
   if ('list' in p) return `<ul class="ticks">${p.list.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`;
+  if ('note' in p) return `<aside class="check-note"><b>Ce spun studiile</b><p>${esc(p.note)}</p></aside>`;
   return `<ol class="steps">${p.steps.map(([a, b]) => `<li><b>${esc(a)}</b>${esc(b)}</li>`).join('')}</ol>`;
 }
 
@@ -101,7 +101,7 @@ function formulaSvg(): string {
     const text = lines
       .map((l, k) => `<tspan x="${tx.toFixed(2)}" dy="${k === 0 ? (-(lines.length - 1) * 2).toFixed(1) : '4.2'}">${esc(l)}</tspan>`)
       .join('');
-    return `<path d="M${p(a0, R)} A${R} ${R} 0 0 1 ${p(a1, R)} L${p(tip, (R + r) / 2)} L${p(a1, r)} A${r} ${r} 0 0 0 ${p(a0, r)} L${p(a0 + 0.09, (R + r) / 2)} Z" fill="#fff"/><text x="${tx.toFixed(2)}" y="${ty.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="League Spartan, sans-serif" font-weight="800" font-size="3.5" fill="#000">${text}</text>`;
+    return `<path d="M${p(a0, R)} A${R} ${R} 0 0 1 ${p(a1, R)} L${p(tip, (R + r) / 2)} L${p(a1, r)} A${r} ${r} 0 0 0 ${p(a0, r)} L${p(a0 + 0.09, (R + r) / 2)} Z" fill="#fff"/><text x="${tx.toFixed(2)}" y="${ty.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-family="Archivo, sans-serif" font-weight="800" font-stretch="condensed" font-size="3.5" fill="#000">${text}</text>`;
   }).join('');
   return `<div class="formula"><svg viewBox="0 0 100 100" role="img" aria-label="${esc(FORMULA.join(', apoi '))}">${segs}</svg></div>`;
 }

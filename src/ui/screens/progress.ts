@@ -13,7 +13,26 @@ import { ic } from '../icons.ts';
 import { top } from './shared.ts';
 import { boxCycle, boxScore, boxStats } from '../../logic/boxstats.ts';
 import { COMBOS } from '../../data/combos.ts';
+import { bestOf, TESTS, UNIT_LABEL, type FitTest } from '../../data/tests.ts';
 import { learned } from './alex.ts';
+
+/** A test result in its unit: 10:59, 34 cm, 41 repetări. */
+export function testValue(t: FitTest, v: number): string {
+  return t.unit === 'time' ? mmss(v) : `${String(v).replace('.', ',')} ${UNIT_LABEL[t.unit]}`;
+}
+
+function testsHtml(): string {
+  const rows = TESTS.map((t) => {
+    const r = ctx.S.tests[t.id] ?? [];
+    const last = r[r.length - 1];
+    const best = bestOf(t, r);
+    const info = last
+      ? `Ultima: ${testValue(t, last.v)}, ${shortDay(last.d)}${r.length > 1 && best !== undefined ? `. Cel mai bun: ${testValue(t, best)}` : ''}`
+      : `${t.what}. ${t.every}`;
+    return `<li class="test-row"><div><b>${esc(t.name)}</b><span>${esc(info)}</span></div><button class="btn ghost sm" data-a="test" data-k="${t.id}" aria-label="Notează ${esc(t.name)}">Notează</button></li>`;
+  });
+  return `<h2 class="sec" id="tests">Teste<small>În săptămâna ușoară, odihnit: puterea întâi, alergarea la final</small></h2><ul class="hist tests">${rows.join('')}</ul>`;
+}
 
 function entryLine(e: Entry, del = false): string {
   const d = e.data as Record<string, unknown>;
@@ -64,6 +83,9 @@ function entryLine(e: Entry, del = false): string {
     case 'row':
       what = `${d.challenge}: ${num(Number(d.meters) || 0)} m${d.reps && Number(d.reps) > 1 ? `, ${d.intervals} din ${d.reps} intervale` : ''} în ${mmss(e.dur)}`;
       break;
+    case 'cardio':
+      what = `${mmss(Number(d.workDone) || e.dur)} ușor`;
+      break;
   }
   if (d.manual && e.kind !== 'run' && e.kind !== 'walk') what = 'bifat manual';
   return `<li><div><b>${esc(e.name)}</b><span>${shortDay(e.date)}${what ? `, ${esc(what)}` : ''}${e.block ? '' : ', în afara planului'}</span></div>${del ? `<button class="icon-btn" data-a="hist-del" data-id="${e.id}" aria-label="Șterge">${ic('trash')}</button>` : ''}</li>`;
@@ -108,7 +130,7 @@ export function progressHtml(): string {
   const exLines: string[] = [];
   for (const w of WORKOUTS) {
     for (const ex of w.ex) {
-      if (ex.type === 'emom') continue;
+      if (ex.type === 'emom' || ex.type === 'done') continue;
       const tr = exerciseTrend(S.log, ex.id, 12);
       if (!tr.length) continue;
       const last = tr[tr.length - 1];
@@ -127,12 +149,10 @@ export function progressHtml(): string {
   const sch = S.set.bwScheme;
   const amBest = amrapBest(S.log, sch);
 
-  // runs
+  // runs and easy cardio
   const runs = S.log.filter((e) => e.kind === 'run');
+  const aerobic = S.log.filter((e) => e.kind === 'run' || e.kind === 'cardio');
   const paces = runs.map((e) => Number(e.data.pace) || 0).filter((p) => p > 0).slice(-12);
-
-  // wim hof
-  const wh = S.log.filter((e) => e.kind === 'wimhof').slice(-10);
 
   // sleep & steps
   const last7 = Array.from({ length: 7 }, (_, i) => addDays(today, i - 6));
@@ -144,8 +164,8 @@ export function progressHtml(): string {
   const recent = [...S.log].reverse().slice(0, 12);
 
   return `${top()}
-    <div class="title-art"><h1>Progres</h1>${art('strength')}</div>
-    <h2 class="sec">Săptămâna asta<small>${full} din 7 zile complete</small></h2>
+    <h1 class="stack">Progres</h1>
+    <h2 class="sec" style="border-top:0;margin-top:8px;padding-top:0">Săptămâna asta<small>${full} din 7 zile complete</small></h2>
     <div class="week7">${week}</div>
     <div class="stats" style="margin-top:14px">
       <div class="stat"><b>${streak}</b><span>${streak === 1 ? 'zi activă la rând' : 'zile active la rând'}</span></div>
@@ -153,22 +173,24 @@ export function progressHtml(): string {
       <div class="stat"><b>${Math.round(t.boxingMin)}</b><span>minute de runde</span></div>
       <div class="stat"><b>${t.runKm.toFixed(1).replace('.', ',')}</b><span>km alergați</span></div>
       <div class="stat"><b>${Math.round(t.coldMin)}</b><span>minute la rece</span></div>
-      <div class="stat"><b>${t.bestHold ? mmss(t.bestHold) : '–'}</b><span>retenție record</span></div>
+      <div class="stat"><b>${Math.round(t.breathMin)}</b><span>minute de respirație</span></div>
     </div>
+
+    ${testsHtml()}
+    <nav class="sub-links" aria-label="Provocări">
+      <button class="timer-row" data-a="tab" data-k="challenge"><div><b>Provocări</b><span>Curse simulate (Hyrox, Murph, Fight Night și altele) și provocări de 30 de zile</span></div>${ic('chev')}</button>
+    </nav>
 
     ${boxHtml(today)}
 
     <h2 class="sec">Calistenie<small>Totalul de repetări pe sesiune, la varianta curentă</small></h2>
-    <div class="ex-line"><div><b>Pull-up EMOM</b><span>Următoarea țintă: ${S.emom.min} min × ${S.emom.reps}. Spre 30 × 10: ${emomPct}%.</span></div><div class="bar" style="margin:0"><i style="width:${Math.min(100, emomPct)}%"></i></div></div>
+    <div class="ex-line"><div><b>Pull-up EMOM</b><span>Următoarea țintă: ${S.emom.min} min × ${S.emom.reps}. Spre ${EMOM_GOAL.min} × ${EMOM_GOAL.reps}: ${emomPct}%.</span></div><div class="bar" style="margin:0"><i style="width:${Math.min(100, emomPct)}%"></i></div></div>
     ${amraps.length ? `<div class="ex-line"><div><b>Bodyweight Workout</b><span>Ultima dată ${amraps[amraps.length - 1].data.rounds} runde${amBest ? `, recordul la ${esc(BW_SCHEMES[sch].name)}: ${amBest.data.rounds} runde + ${amBest.data.extra}` : ''}</span></div>${spark(amrapTrend(S.log, sch))}</div>` : ''}
     ${exLines.join('') || '<p class="dim">După primul antrenament de push, pull sau picioare vezi aici fiecare exercițiu.</p>'}
 
-    <h2 class="sec">Alergare</h2>
+    <h2 class="sec">Aerob<small>Alergarea de duminică și canotajul de marți, ușor</small></h2>
     ${runAdvice(S.log) ? `<p class="small dim">${esc(runAdvice(S.log))}</p>` : ''}
-    ${runs.length ? `${paces.length > 1 ? `<p class="small dim" style="margin:0">Ritmul mediu (mai jos e mai rapid)</p>${spark(paces, true)}` : ''}<ul class="hist">${runs.slice(-6).reverse().map((e) => entryLine(e)).join('')}</ul>` : '<p class="dim">Duminică: 20 de minute de jogging, cu GPS.</p>'}
-
-    <h2 class="sec">Wim Hof<small>Cea mai lungă retenție din fiecare sesiune</small></h2>
-    ${wh.length ? bars(wh.map((e) => ({ v: Math.max(...((e.data.holds as number[]) || [0])), label: shortDay(e.date).split(' ')[0] })), undefined, 120) : '<p class="dim">Fără sesiuni încă.</p>'}
+    ${aerobic.length ? `${paces.length > 1 ? `<p class="small dim" style="margin:0">Ritmul mediu la alergare (mai jos e mai rapid)</p>${spark(paces, true)}` : ''}<ul class="hist">${aerobic.slice(-6).reverse().map((e) => entryLine(e)).join('')}</ul>` : '<p class="dim">Duminică: alergare ușoară, de la 20 la 30 de minute. Marți: canotaj ușor.</p>'}
 
     <h2 class="sec">Somn<small>${avgSleep ? `Media pe 7 zile: ${avgSleep.toFixed(1).replace('.', ',')} h` : 'Notează-l pe ecranul Azi'}</small></h2>
     ${bars(last7.map((d, i) => ({ v: sleepVals[i], label: RO_DAYS[weekdayIdx(d)].slice(0, 2) })), 7)}

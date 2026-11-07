@@ -62,18 +62,23 @@ export function readRun(v: RunInput): RunStats | string {
   return { dur, m, pace, paceMax, hrAvg, hrMax, kcal };
 }
 
-/** Compares the last runs with a pulse, and sets a pace for the next one: 5 s faster than the best of the last four. */
+/**
+ * What the last runs say about the next easy one. There is never a pace target: the effort comes from the talk test,
+ * and progress shows as a lower pulse at the same pace, checked on every 4th run on the same route.
+ */
 export function runAdvice(log: Entry[]): string {
   const runs = log.filter((e) => e.kind === 'run' && Number(e.data.pace) > 0);
   if (!runs.length) return '';
   const pace = (e: Entry): number => Number(e.data.pace);
   const hr = (e: Entry): number => Number(e.data.hrAvg) || 0;
-  const target = paceStr(Math.min(...runs.slice(-4).map(pace)) - 5);
+  const usual = [...runs.slice(-3).map(pace)].sort((a, b) => a - b)[Math.floor(Math.min(3, runs.length) / 2)];
+  if ((runs.length + 1) % 4 === 0) return `Alergarea de azi e verificarea: același traseu, ritmul obișnuit (în jur de ${paceStr(usual)} /km), și notezi HR Avg. Același ritm cu puls mai mic înseamnă progres.`;
   const beat = runs.filter((e) => hr(e) > 0).slice(-2);
-  if (beat.length < 2) return `Ținta de azi: ${target} /km. Notează HR Avg ca să vezi dacă același ritm te costă mai puțin.`;
+  const easy = 'Ritm de conversație, fără țintă de ritm: dacă nu poți vorbi în propoziții, încetinește.';
+  if (beat.length < 2) return `${easy} Notează HR Avg ca să vezi în timp dacă același ritm te costă mai puțin.`;
   const dp = pace(beat[1]) - pace(beat[0]);
   const dh = hr(beat[1]) - hr(beat[0]);
-  if (Math.abs(dp) <= 10 && dh >= 5) return `Puls cu ${dh} bpm mai mare la același ritm. Poate fi oboseală: azi rămâi la ${paceStr(pace(beat[1]))} /km și urmărește pulsul.`;
+  if (Math.abs(dp) <= 10 && dh >= 5) return `Puls cu ${dh} bpm mai mare la același ritm. Poate fi oboseală sau somn puțin: azi mergi mai ușor.`;
   const note = Math.abs(dp) <= 10 && dh <= -3 ? `Același ritm cu ${-dh} bpm mai puțin: rezistența crește. ` : dp <= -10 && dh <= 3 ? `Mai rapid cu ${-dp} s/km la același puls: formă mai bună. ` : '';
-  return `${note}Ținta de azi: ${target} /km sau același ritm cu puls mai mic.`;
+  return `${note}${easy}`;
 }

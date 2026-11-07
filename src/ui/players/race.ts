@@ -143,8 +143,13 @@ export function startRace(ev: string, lvl: number): void {
     save();
     mountPlayer(new RacePlayer(ctx.S.race));
   };
-  if (ctx.S.race) return ask('Ai o cursă începută', 'Dacă pornești alta, cea de acum se pierde.', 'Pornește', go, 'Renunță', true);
-  go();
+  // The two top levels are real race distances: the physical load is real even if the race is a simulation.
+  const gate = (): void =>
+    lvl >= 3
+      ? ask(`${name}: distanță reală de concurs`, 'Nivelurile Pro și Elită cer luni de pregătire specifică. Pornește doar dacă ai făcut deja, în ultimele săptămâni, sesiuni de cel puțin trei sferturi din distanța asta, fără dureri. Planifică apă, mâncare și o zi liberă după.', 'Am pregătirea, pornesc', go, 'Renunță')
+      : go();
+  if (ctx.S.race) return ask('Ai o cursă începută', 'Dacă pornești alta, cea de acum se pierde.', 'Pornește', gate, 'Renunță', true);
+  gate();
 }
 
 export function resumeRace(): void {

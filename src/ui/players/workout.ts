@@ -1,7 +1,7 @@
 // Calisthenics workout player: variations, sets with last-time numbers, rest timer, hold timer and the pull-up EMOM.
 
 import { EMOM_GOAL, workoutById, type Exercise, type Workout } from '../../data/workouts.ts';
-import { advise, deloadOn, emomAdvice, emomNext, lastExercise, lighter, loadable, stalled, STALL_TEXT, type Advice, type LastEx } from '../../logic/progress.ts';
+import { advise, deloadOn, emomAdvice, emomNext, lastExercise, lighter, loadable, stalled, STALL_TEXT, ticked, type Advice, type LastEx } from '../../logic/progress.ts';
 import { Clock } from '../../logic/seq.ts';
 import { makeEntry, type SetLog } from '../../logic/store.ts';
 import { dayKey, esc, mmss, shortDay } from '../../logic/util.ts';
@@ -35,12 +35,15 @@ interface XS {
 }
 
 const unitOf = (ex: Exercise): SetLog['unit'] =>
-  ex.type === 'emom' ? 'emom' : ex.type === 'ytw' ? 'ytw' : ex.type === 'time' || ex.id === 'hang' ? 'sec' : 'reps';
+  ex.type === 'emom' ? 'emom' : ex.type === 'ytw' ? 'ytw' : ex.type === 'done' ? 'done' : ex.type === 'time' || ex.id === 'hang' ? 'sec' : 'reps';
 const isSec = (ex: Exercise): boolean => unitOf(ex) === 'sec';
+/** What a ticked set is: 5-5-5 for Y-T-W, the exercise's own label otherwise. */
+const tickLabel = (ex: Exercise): string => (ex.type === 'ytw' ? '5 Y, 5 T, 5 W' : ex.label ?? 'O serie');
 
 function targetLine(ex: Exercise): string {
   if (ex.type === 'emom') return 'EMOM';
   if (ex.type === 'ytw') return `${ex.sets} × 5-5-5`;
+  if (ex.type === 'done') return `${ex.sets} × ${ex.label ?? 'serie'}`;
   if (ex.type === 'max') return ex.sets > 1 ? `${ex.sets} × maxim` : '1 × maxim';
   const r = ex.lo === ex.hi ? `${ex.lo}` : `${ex.lo}–${ex.hi}`;
   return `${ex.sets} × ${r}${ex.type === 'time' ? ' s' : ''}${ex.perSide ? ' pe parte' : ''}`;
@@ -104,15 +107,15 @@ class WorkoutPlayer implements Player {
     const rows = this.xs
       .map((x) => {
         const l = x.last;
-        const prev = !l ? 'Prima dată' : x.ex.type === 'ytw' ? `Data trecută: ${l.log.sets.filter((v) => v).length} serii` : `Data trecută: ${l.log.sets.filter((v) => v !== null && v > 0).join(', ')}${isSec(x.ex) ? ' s' : ''}`;
+        const prev = !l ? 'Prima dată' : ticked(x.ex) ? `Data trecută: ${l.log.sets.filter((v) => v).length} serii` : `Data trecută: ${l.log.sets.filter((v) => v !== null && v > 0).join(', ')}${isSec(x.ex) ? ' s' : ''}${l.log.kg ? ` cu ${String(l.log.kg).replace('.', ',')} kg` : ''}`;
         return `<li class="ex-line" style="grid-template-columns:1fr auto"><div><b>${esc(x.ex.vars[x.lvl])}</b><span>${esc(targetLine(x.ex))}${x.ex.opt ? ', opțional' : ''}. ${esc(prev)}</span></div></li>`;
       })
       .join('');
     return chrome(
       this.w.name,
       `<h1 class="pl-h">${esc(this.w.name)}</h1>
-      <p class="pl-sub">${this.xs.length} exerciții${this.w.id === 'legs' ? '' : ', aproximativ 50–60 de minute cu pauze'}</p>
-      <p class="dim">La fiecare exercițiu alegi varianta potrivită. Când atingi capătul intervalului la toate seriile, aplicația îți propune varianta următoare: progresia e obligatorie.</p>
+      <p class="pl-sub">${this.xs.filter((x) => !x.ex.opt).length} exerciții${this.xs.some((x) => x.ex.opt) ? ` și ${this.xs.filter((x) => x.ex.opt).length} opționale` : ''}, aproximativ ${this.w.id === 'legs' ? 60 : this.w.id === 'pull' ? 50 : 45} de minute cu pauze</p>
+      <p class="dim">La fiecare exercițiu alegi varianta potrivită. Seriile de forță se opresc cu 1–3 repetări înainte de limită. Când atingi capătul intervalului la toate seriile, aplicația îți propune pasul următor: altă variantă sau mai multă greutate.</p>
       ${this.deload ? '<div class="advice">Săptămână ușoară: mai puține serii, fără să forțezi. Sesiunea nu se numără la progres.</div>' : ''}
       <ul class="hist" style="margin:8px 0 18px">${rows}</ul>
       <button class="btn" data-a="p:begin">Start</button>`,
@@ -136,7 +139,7 @@ class WorkoutPlayer implements Player {
         : '';
     const adv = this.advice(x);
     const advHtml = adv.text ? `<div class="advice ${adv.kind === 'up' ? 'up' : ''}">${esc(adv.text)}${adv.lvl !== undefined && adv.lvl !== x.lvl ? ` <button class="link" style="color:inherit;padding:0" data-a="p:lvl" data-k="${adv.lvl}">Alege</button>` : ''}</div>` : '';
-    const lastVals = x.last ? (ex.type === 'ytw' ? `${x.last.log.sets.filter((v) => v).length} serii` : `${x.last.log.sets.filter((v) => v !== null && v > 0).join(', ')}${isSec(ex) ? ' s' : ''}`) : '';
+    const lastVals = x.last ? (ticked(ex) ? `${x.last.log.sets.filter((v) => v).length} serii` : `${x.last.log.sets.filter((v) => v !== null && v > 0).join(', ')}${isSec(ex) ? ' s' : ''}${x.last.log.kg ? ` cu ${String(x.last.log.kg).replace('.', ',')} kg` : ''}`) : '';
     const lastLine = x.last && ex.type !== 'emom' ? `<p class="prev">Data trecută (${shortDay(x.last.date)}, ${esc(ex.vars[x.last.lvl] ?? '')}): ${lastVals}</p>` : '';
     const isLast = this.i === this.xs.length - 1;
     const body = `
@@ -159,7 +162,7 @@ class WorkoutPlayer implements Player {
   advice(x: XS): Advice {
     if (this.deload) return { kind: 'stay', text: '' };
     const adv = advise(x.ex, x.last, x.lvl, x.prev);
-    return adv.kind === 'stay' && adv.text && x.ex.type !== 'ytw' && stalled(ctx.S.log, x.ex.id, x.lvl, x.kg) ? { ...adv, text: STALL_TEXT } : adv;
+    return adv.kind === 'stay' && adv.text && !ticked(x.ex) && stalled(ctx.S.log, x.ex.id, x.lvl, x.kg) ? { ...adv, text: STALL_TEXT } : adv;
   }
 
   kgHtml(x: XS): string {
@@ -173,8 +176,8 @@ class WorkoutPlayer implements Player {
       .map((v, k) => {
         const d = x.done[k];
         const ctl =
-          ex.type === 'ytw'
-            ? `<span class="dim" style="font-weight:600">5 Y, 5 T, 5 W</span>`
+          ticked(ex)
+            ? `<span class="dim" style="font-weight:600">${esc(tickLabel(ex))}</span>`
             : `<div class="stepper" role="group" aria-label="Seria ${k + 1}"><button data-a="p:v" data-k="${k}" data-d="-1" aria-label="Scade">−</button>${isSec(ex) ? `<output>${v} s</output>` : `<input type="number" inputmode="numeric" pattern="[0-9]*" min="0" max="999" value="${v}" data-a="p:vin" data-k="${k}" aria-label="Repetări, seria ${k + 1}">`}<button data-a="p:v" data-k="${k}" data-d="1" aria-label="Crește">+</button></div>`;
         const okLabel = d ? 'Anulează seria' : isSec(ex) && !d ? 'Pornește cronometrul' : 'Bifează seria';
         return `<div class="set ${d ? 'done' : ''}"><span class="sn">Seria ${k + 1}</span>${ctl}<button class="ok" data-a="p:set" data-k="${k}" aria-label="${okLabel}">${ic(isSec(ex) && !d ? 'play' : 'check')}</button></div>`;
@@ -196,7 +199,7 @@ class WorkoutPlayer implements Player {
           <div class="field"><div class="field-l">Minute</div><div class="stepper"><button data-a="p:emin" data-d="-1" aria-label="Scade">−</button><output>${e.min}</output><button data-a="p:emin" data-d="1" aria-label="Crește">+</button></div></div>
           <div class="field"><div class="field-l">Tracțiuni pe minut</div><div class="stepper"><button data-a="p:ereps" data-d="-1" aria-label="Scade">−</button><output>${e.reps}</output><button data-a="p:ereps" data-d="1" aria-label="Crește">+</button></div></div>
         </div>
-        <p class="small dim">Azi: ${e.min * e.reps} tracțiuni. Drumul spre 30 × 10 al lui Alex: ${toGoal}%.</p>
+        <p class="small dim">Azi: ${e.min * e.reps} tracțiuni. Drumul spre ${EMOM_GOAL.min} × ${EMOM_GOAL.reps}: ${toGoal}%. Ținta crește după două sesiuni complete la rând.</p>
         <div class="bar"><i style="width:${Math.min(100, toGoal)}%"></i></div>
         <button class="btn" data-a="p:estart">Start EMOM</button>`;
     }
@@ -213,8 +216,13 @@ class WorkoutPlayer implements Player {
         <p class="small dim" style="margin-top:10px">Minute făcute: ${e.marks.filter(Boolean).length}. <button class="link" data-a="p:estop">Oprește EMOM-ul</button></p>`;
     }
     const n = e.marks.filter(Boolean).length;
-    const nx = emomNext({ min: e.min, reps: e.reps }, n);
+    const nx = this.nextEmom(e, n);
     return `<div class="advice ${n >= e.min && !this.deload ? 'up' : ''}">${n} din ${e.min} minute făcute.${this.deload ? '' : ` Data viitoare: ${nx.min} × ${nx.reps}.`}</div>`;
+  }
+
+  /** Once saved, this session is in the log and the next target is already set. */
+  nextEmom(e: EmomState, done: number): { min: number; reps: number } {
+    return this.saved ? ctx.S.emom : emomNext({ min: e.min, reps: e.reps }, done, ctx.S.log);
   }
 
   restHtml(): string {
@@ -243,13 +251,13 @@ class WorkoutPlayer implements Player {
         if (x.ex.type === 'emom') {
           const e = x.emom!;
           const n = e.marks.filter(Boolean).length;
-          const nx = emomNext({ min: e.min, reps: e.reps }, n);
+          const nx = this.nextEmom(e, n);
           return `<li><div><b>${esc(x.ex.vars[x.lvl])}</b><span>${n} din ${e.min} minute × ${e.reps}.${this.deload ? '' : ` Data viitoare: ${nx.min} × ${nx.reps}.`}</span></div></li>`;
         }
         const sets = x.vals.map((v, k) => (x.done[k] ? v : null));
         const adv = this.advise(x, sets);
         const tip = this.deload ? '' : adv.kind === 'up' ? ` ${adv.text} Data viitoare pornești direct de acolo.` : adv.kind === 'down' || adv.kind === 'top' ? ` ${adv.text}` : '';
-        const vals = x.ex.type === 'ytw' ? `${sets.filter((v) => v !== null).length} × 5-5-5` : `${sets.filter((v) => v !== null).join(', ')}${isSec(x.ex) ? ' s' : ''}`;
+        const vals = ticked(x.ex) ? `${sets.filter((v) => v !== null).length} serii` : `${sets.filter((v) => v !== null).join(', ')}${isSec(x.ex) ? ' s' : ''}${x.kg ? ` cu ${String(x.kg).replace('.', ',')} kg` : ''}`;
         return `<li><div><b>${esc(x.ex.vars[x.lvl])}</b><span>${vals}${tip ? '.' : ''}${esc(tip)}</span></div></li>`;
       })
       .join('');
@@ -371,9 +379,9 @@ class WorkoutPlayer implements Player {
           sfx.go();
           return this.render();
         }
-        if (x.ex.type !== 'ytw' && x.vals[k] <= 0) return;
+        if (!ticked(x.ex) && x.vals[k] <= 0) return;
         x.done[k] = true;
-        if (x.ex.type === 'ytw') x.vals[k] = 1;
+        if (ticked(x.ex)) x.vals[k] = 1;
         sfx.beep();
         buzz(60);
         this.afterSet(k);
@@ -488,7 +496,7 @@ class WorkoutPlayer implements Player {
         if (e.st === 'setup') continue;
         const n = e.marks.filter(Boolean).length;
         ex.push({ id: x.ex.id, name: x.ex.vars[x.lvl], lvl: x.lvl, unit: 'emom', sets: e.marks.map((m) => (m ? e.reps : null)), emom: { min: e.min, reps: e.reps, done: n }, ...(x.kg ? { kg: x.kg } : {}) });
-        if (!this.deload) ctx.S.emom = emomNext({ min: e.min, reps: e.reps }, n);
+        if (!this.deload) ctx.S.emom = emomNext({ min: e.min, reps: e.reps }, n, ctx.S.log);
         ctx.S.lvl[x.ex.id] = x.lvl;
         continue;
       }

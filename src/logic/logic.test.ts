@@ -8,18 +8,18 @@ import { angle, GuardTracker, RepCounter, type Pt } from './coach.ts';
 import { boxCycle, boxScore, boxStats } from './boxstats.ts';
 import { CHALLENGES, challengeDays } from '../data/challenges.ts';
 import { addDays, dayKey, inWeek, mmss, num, paceStr, weekStart, weekdayIdx } from './util.ts';
-import { Clock, breath478Seq, doneSec, locate, phaseStart, roundsSeq, showerSeq, totalSec } from './seq.ts';
+import { Clock, breath478Seq, burstAt, doneSec, locate, phaseStart, roundsSeq, showerSeq, totalSec } from './seq.ts';
 import { Track, haversine, routePath, simplify } from './geo.ts';
-import { activeStreak, advise, amrapBest, amrapUp, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, habitMilestone, habitStreak, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
+import { activeStreak, advise, amrapBest, amrapUp, cycleAt, cycleStartFor, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, growMinutes, habitMilestone, habitStreak, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
 import { freshState, makeEntry, normalize } from './store.ts';
 import { LAB, labSeq } from './breathlab.ts';
 import { roundThemes } from '../data/combos.ts';
 import { WARMUP_SEC } from '../data/plan.ts';
 import { DOPA_RULES, dopaBest, dopaStreak, nextMilestone, nofapDays } from './discipline.ts';
 import { breathPos, holdStats } from './wimhof.ts';
-import { WEEK, blockName, blockLine, resolveBlock, type Picks } from '../data/plan.ts';
+import { BURST_SEC, WEEK, blockName, blockLine, resolveBlock, type Picks } from '../data/plan.ts';
 import { ROW_CHALLENGES, rowChallenge, rowRests, rowTotal } from '../data/row.ts';
-import { WORKOUTS, exerciseById } from '../data/workouts.ts';
+import { WORKOUTS, exerciseById, workoutById } from '../data/workouts.ts';
 import { ROUTINES, routineSeconds } from '../data/routines.ts';
 import { COMBOS, INSIDE, focusCombos } from '../data/combos.ts';
 import { BOOK } from '../data/book.ts';
@@ -43,33 +43,81 @@ test('formatting', () => {
   assert.equal(num(10000), '10.000');
 });
 
-test('the plan matches the e-book', () => {
+test('the week keeps the days of the book, reordered for an all-round athlete', () => {
   assert.equal(WEEK.length, 7);
-  assert.deepEqual(WEEK.map((d) => d.title), ['Combat Training', 'Push Training', 'Off Day', 'Combat Training II', 'Pull Training', 'Mobility & Meditation Day', 'Leg Day']);
+  assert.deepEqual(WEEK.map((d) => d.title), ['Combat Training', 'Push Training', 'Off Day', 'Combat Training II', 'Pull Training', 'Leg Day', 'Mobility & Meditation Day']);
   const r = (id: string) => WEEK.flatMap((d) => d.blocks).find((b) => b.id === id)!;
+  assert.deepEqual(WEEK[0].blocks.map((b) => b.id), ['mon-shadow', 'mon-bag', 'mon-bw']); // the AMRAP after the boxing
   assert.equal(r('mon-shadow').rounds, 5);
-  assert.equal(r('thu-bag').rounds, 10);
-  assert.equal(r('thu-shadow').rounds, 3);
-  assert.equal(r('thu-rope').work, 180);
+  assert.deepEqual(WEEK[3].blocks.map((b) => b.id), ['thu-rope', 'thu-shadow', 'thu-power', 'thu-bag']);
+  assert.equal(r('thu-rope').rounds, 3);
+  assert.deepEqual([r('thu-power').rounds, r('thu-power').work, r('thu-power').burstFrom, r('thu-power').restSec], [3, 182, 1, 60]);
+  assert.equal(r('thu-bag').rounds, 6);
   assert.equal(r('tue-easy').work, 600);
-  assert.equal(r('sun-legs').rounds, 10);
-  assert.equal(r('sun-legs').work, 60);
+  assert.equal(r('tue-row').kind, 'cardio');
+  assert.deepEqual(WEEK[5].blocks.map((b) => b.id), ['sun-legs', 'sun-lunges']); // legs two days before Monday
+  assert.equal(WEEK[6].blocks[0].id, 'sun-jog');
+  assert.deepEqual(r('sun-jog').grow, { base: 20, step: 2, cap: 30 });
   const P: Picks = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a' };
-  assert.equal(blockName(r('sun-legs'), P), 'Wall Sit');
-  assert.equal(blockName(r('sun-legs'), { ...P, legMode: 'jump' }), 'Jumping Squats');
-  assert.equal(exerciseById('lunges')!.lo, 15);
-  assert.equal(exerciseById('lunges')!.sets, 4);
-  assert.ok(WEEK.every((d) => d.blocks.length === 3));
+  assert.equal(blockName(r('sun-lunges'), P), 'Speed, Power & Leg Strength');
   const ids = WEEK.flatMap((d) => d.blocks.map((b) => b.id));
   assert.equal(new Set(ids).size, ids.length);
 });
 
+test('strength days: power first, then strength; no failure sets in the plan', () => {
+  const order = (w: 'push' | 'pull' | 'legs') => workoutById(w).ex.map((e) => e.id);
+  const legs = order('legs');
+  assert.ok(legs.indexOf('sprint') < legs.indexOf('cmj') && legs.indexOf('cmj') < legs.indexOf('splitsq') && legs.indexOf('rot') < legs.indexOf('splitsq'));
+  assert.equal(order('push')[0], 'explosive');
+  assert.ok(order('push').includes('splitsq-tue'));
+  assert.ok(!order('push').includes('burnout'));
+  assert.ok(order('pull').includes('carry'));
+  assert.equal(exerciseById('dips')!.rest, 165);
+  assert.equal(exerciseById('splitsq')!.load, true);
+  assert.equal(exerciseById('wallsit')!.opt, true);
+});
+
 test('routines last as long as the plan says', () => {
   const sec = (id: string) => routineSeconds(ROUTINES.find((x) => x.id === id)!);
-  assert.equal(sec('stretch-push'), 15 * 60);
-  assert.equal(sec('stretch-pull'), 15 * 60);
+  assert.equal(sec('stretch-push'), 10 * 60);
+  assert.equal(sec('stretch-pull'), 10 * 60);
+  assert.equal(sec('legwarm'), 10 * 60);
+  assert.equal(sec('cooldown'), 5 * 60);
   assert.equal(sec('mobility'), 30 * 60);
   assert.equal(sec('daily'), 10 * 60);
+});
+
+test('the loop: three emphases of four weeks, the 4th lighter, and blocks that follow it', () => {
+  const start = '2026-11-09';
+  assert.equal(cycleAt(start, '2026-11-08'), null);
+  assert.deepEqual([cycleAt(start, '2026-11-09')!.id, cycleAt(start, '2026-11-15')!.week], ['A', 1]);
+  assert.ok(cycleAt(start, '2026-11-30')!.lighter);
+  assert.deepEqual([cycleAt(start, '2026-12-07')!.id, cycleAt(start, '2026-12-07')!.week], ['B', 1]);
+  assert.equal(cycleAt(start, '2027-01-04')!.id, 'C');
+  assert.equal(cycleAt(start, '2027-02-01')!.id, 'A');
+  assert.equal(cycleStartFor('2026-11-07'), '2026-11-09');
+  assert.equal(cycleStartFor('2026-11-04'), '2026-11-02');
+  const r = (id: string) => WEEK.flatMap((d) => d.blocks).find((b) => b.id === id)!;
+  const P: Picks = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a' };
+  assert.equal(resolveBlock(r('mon-bag'), { ...P, cycle: 'A' }).burstFrom, undefined);
+  assert.equal(resolveBlock(r('mon-bag'), { ...P, cycle: 'B' }).burstFrom, 3);
+  assert.equal(resolveBlock(r('thu-bag'), { ...P, cycle: 'C' }).rounds, 8);
+  assert.equal(resolveBlock(r('sun-jog'), { ...P, grown: { 'sun-jog': 26 } }).dose, '26 min');
+  assert.equal(resolveBlock(r('sun-jog'), { ...P, grown: { 'sun-jog': 26 } }).min, 26);
+  const jog = (date: string) => makeEntry({ kind: 'run', block: 'sun-jog', name: 'Jogging', dur: 1200, data: {}, date });
+  const g = { base: 20, step: 2, cap: 30 };
+  assert.equal(growMinutes([], 'sun-jog', start, g), 20);
+  assert.equal(growMinutes([jog('2026-11-01'), jog('2026-11-15'), jog('2026-11-22')], 'sun-jog', start, g), 24);
+  assert.equal(growMinutes(Array.from({ length: 9 }, (_, i) => jog(addDays(start, 7 * i + 6))), 'sun-jog', start, g), 30);
+});
+
+test('punch-out rounds: 14 bursts of 3 s with 10 s easy', () => {
+  assert.equal(BURST_SEC, 182);
+  assert.deepEqual(burstAt(0), { n: 1, on: true, left: 3 });
+  assert.deepEqual(burstAt(4), { n: 1, on: false, left: 9 });
+  assert.deepEqual(burstAt(13), { n: 2, on: true, left: 3 });
+  assert.equal(burstAt(181.5).n, 14);
+  assert.equal(totalSec(roundsSeq(3, 180, 60, 0, (r) => (r >= 2 ? 182 : 180))), 180 + 182 + 182 + 120);
 });
 
 test('content: no nutrition, combos link to the channel, workouts are complete', () => {
@@ -173,11 +221,15 @@ test('progression: move up, stay or step back', () => {
   assert.equal(advise(ytw, { log: { id: 'ytw', name: 'Y-T-W Raises', sets: [1, 1, 1, 1], unit: 'ytw' }, lvl: 0, date: 'x' }, 0).kind, 'up');
 });
 
-test('emom climbs to 30 × 10', () => {
-  assert.deepEqual(emomNext({ min: 10, reps: 3 }, 10), { min: 10, reps: 4 });
-  assert.deepEqual(emomNext({ min: 10, reps: 3 }, 8), { min: 10, reps: 3 });
-  assert.deepEqual(emomNext({ min: 10, reps: 10 }, 10), { min: 12, reps: 10 });
-  assert.deepEqual(emomNext({ min: 30, reps: 10 }, 30), { min: 30, reps: 10 });
+test('emom: the target moves only after two full sessions in a row, and stops at 15 × 8', () => {
+  const run = (min: number, reps: number, done: number) => makeEntry({ kind: 'workout', name: 'x', dur: 60, data: { ex: [{ id: 'emom', name: 'e', unit: 'emom', sets: [], lvl: 2, emom: { min, reps, done } }] } });
+  assert.deepEqual(emomNext({ min: 10, reps: 3 }, 10), { min: 10, reps: 3 });
+  assert.deepEqual(emomNext({ min: 10, reps: 3 }, 10, [run(10, 3, 10)]), { min: 10, reps: 4 });
+  assert.deepEqual(emomNext({ min: 10, reps: 3 }, 8, [run(10, 3, 10)]), { min: 10, reps: 3 });
+  assert.deepEqual(emomNext({ min: 10, reps: 3 }, 10, [run(10, 3, 9)]), { min: 10, reps: 3 });
+  assert.deepEqual(emomNext({ min: 10, reps: 8 }, 10, [run(10, 8, 10)]), { min: 11, reps: 8 });
+  assert.deepEqual(emomNext({ min: 15, reps: 8 }, 15, [run(15, 8, 15)]), { min: 15, reps: 8 });
+  assert.deepEqual(normalize({ emom: { min: 30, reps: 10 } }).emom, { min: 15, reps: 8 });
 });
 
 test('weekly completion, streaks and habit milestones', () => {
@@ -250,7 +302,11 @@ test('day focus: each boxing block carries the requested focus', () => {
 test('thursday: rope/ladder and bag/row are alternatives for the same slot', () => {
   const thu = WEEK[3];
   const P: Picks = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a' };
-  const [feet, , main] = thu.blocks;
+  const [feet, shadow, power, main] = thu.blocks;
+  const spar = resolveBlock(shadow, { ...P, thuPartner: 'spar' });
+  assert.deepEqual([spar.id, spar.name, spar.focus], ['thu-shadow', 'Technical Sparring / Pads', undefined]);
+  assert.equal(resolveBlock(power, { ...P, thuMain: 'row' }).name, 'Punch-out Shadow');
+  assert.equal(resolveBlock(power, P).name, 'Punch-out');
   assert.equal(resolveBlock(feet, P).name, 'Jumping Rope');
   assert.equal(resolveBlock(feet, P).focus, 'rope');
   const ladder = resolveBlock(feet, { ...P, thuFeet: 'ladder' });
@@ -264,7 +320,7 @@ test('thursday: rope/ladder and bag/row are alternatives for the same slot', () 
   assert.equal(row.id, 'thu-bag');
   assert.equal(row.focus, undefined);
   assert.match(blockLine(main, { ...P, thuMain: 'row', rowCh: 'd' }), /250 m × 8/);
-  assert.equal(thu.blocks.length, 3);
+  assert.equal(thu.blocks.length, 4);
   // other days don't change with the Thursday picks
   for (const d of WEEK.filter((x) => x.idx !== 3)) for (const b of d.blocks) assert.equal(resolveBlock(b, { ...P, thuFeet: 'ladder', thuMain: 'row' }).name, resolveBlock(b, P).name);
 });
@@ -483,7 +539,10 @@ test('the plan published for Beast Nutrition follows the real week and the user 
   assert.equal(week.length, 7);
   const bag = week[0]!.find((s) => s.id === 'mon-bag')!;
   assert.deepEqual([bag.kind, bag.min, bag.focus], ['rounds', 19, 'move']);
-  assert.equal(week[6]!.find((s) => s.id === 'sun-legs')!.name, 'Wall Sit');
+  assert.equal(week[5]!.find((s) => s.id === 'sun-lunges')!.kind, 'workout');
+  assert.equal(week[1]!.find((s) => s.id === 'tue-row')!.kind, 'run'); // easy cardio counts as a run in Beast Nutrition
+  assert.equal(planSnapshot({ ...base, grown: { 'sun-jog': 28 } })[6]!.find((s) => s.id === 'sun-jog')!.min, 28);
+  assert.equal(week[3]!.find((s) => s.id === 'thu-power')!.min, 11);
   const row = planSnapshot({ ...base, thuMain: 'row' })[3]!.find((s) => s.id === 'thu-bag')!;
   assert.equal(row.kind, 'row');
 });
@@ -492,20 +551,21 @@ const lastOf = (id: string, sets: number[], lvl: number, kg?: number) => ({ log:
 const session = (id: string, sets: number[], lvl: number, date: string, kg?: number, extra = {}) => makeEntry({ kind: 'workout', name: 'x', dur: 60, date, ts: Date.parse(date), data: { ex: [{ id, name: id, unit: 'reps', sets, lvl, kg }], ...extra } });
 
 test('progression: a fixed target has to be met twice before moving up', () => {
-  const lunges = exerciseById('lunges')!;
-  assert.equal(advise(lunges, lastOf('lunges', [15, 15, 15, 15], 0), 0).kind, 'stay');
-  assert.equal(advise(lunges, lastOf('lunges', [15, 15, 15, 15], 0), 0, lastOf('lunges', [15, 15, 15, 12], 0)).kind, 'stay');
-  assert.equal(advise(lunges, lastOf('lunges', [15, 15, 15, 15], 0), 0, lastOf('lunges', [15, 15, 15, 15], 0)).kind, 'up');
+  const bss = exerciseById('splitsq-tue')!;
+  assert.equal(advise(bss, lastOf('splitsq-tue', [5, 5, 5], 1), 1).kind, 'stay');
+  assert.equal(advise(bss, lastOf('splitsq-tue', [5, 5, 5], 1), 1, lastOf('splitsq-tue', [5, 5, 4], 1)).kind, 'stay');
+  assert.equal(advise(bss, lastOf('splitsq-tue', [5, 5, 5], 1), 1, lastOf('splitsq-tue', [5, 5, 5], 1)).kind, 'up');
+  const heavy = advise(exerciseById('splitsq')!, lastOf('splitsq', [8, 8, 8, 8], 1, 12), 1);
+  assert.deepEqual([heavy.kind, heavy.kg], ['top', 14.5]);
   const push = exerciseById('pushups')!;
   assert.equal(advise(push, lastOf('pushups', [15, 15, 15, 15], 1), 1).kind, 'up');
 });
 
-test('progression: Dead Hang moves up at 60 s on every set', () => {
+test('progression: Dead Hang moves up at 40 s on every set, short of grip failure', () => {
   const hang = exerciseById('hang')!;
-  assert.equal(advise(hang, lastOf('hang', [60, 62], 0), 0).kind, 'up');
-  assert.equal(advise(hang, lastOf('hang', [60, 50], 0), 0).kind, 'stay');
-  assert.equal(advise(hang, lastOf('hang', [70, 70], 2), 2).kind, 'stay');
-  assert.match(advise(hang, lastOf('hang', [70, 70], 0), 1).text, /Variantă nouă/);
+  assert.equal(advise(hang, lastOf('hang', [40, 42], 0), 0).kind, 'up');
+  assert.equal(advise(hang, lastOf('hang', [40, 30], 0), 0).kind, 'stay');
+  assert.match(advise(hang, lastOf('hang', [45, 45], 0), 1).text, /Variantă nouă/);
 });
 
 test('progression: weight is noted on the hardest variation and goes up by 2.5 kg', () => {
@@ -513,7 +573,7 @@ test('progression: weight is noted on the hardest variation and goes up by 2.5 k
   assert.deepEqual([loadable(dips, 3), loadable(dips, 2), loadable(exerciseById('hollow')!, 2), loadable(exerciseById('emom')!, 3)], [true, false, false, true]);
   assert.equal(advise(dips, lastOf('dips', [12, 12, 12, 12], 3, 10), 3).kg, 12.5);
   assert.equal(advise(dips, lastOf('dips', [12, 12, 12, 12], 3), 3).kg, undefined);
-  assert.equal(advise(dips, lastOf('dips', [12, 12, 12, 9], 3, 10), 3).kg, undefined);
+  assert.equal(advise(dips, lastOf('dips', [8, 8, 7], 3, 10), 3).kg, undefined);
 });
 
 test('stalling: three sessions that do not beat the one before them', () => {
@@ -561,13 +621,17 @@ test('box score and its eight-week targets', () => {
   assert.equal(boxCycle(log, '2026-11-03')!.week, 1);
 });
 
-test('lighter week: proposed after six active weeks, and it does not count for progress', () => {
-  const log = Array.from({ length: 42 }, (_, i) => makeEntry({ kind: 'walk', name: 'x', dur: 60, date: addDays('2026-08-03', i), data: {} }));
+test('lighter week: proposed in the 4th week of every emphasis, and it does not count for progress', () => {
+  const start = '2026-08-24';
   const mon = '2026-09-14';
-  assert.equal(deloadDue(log, { last: '', week: '' }, addDays(mon, -7)), false);
-  assert.equal(deloadDue(log, { last: '', week: '' }, mon), true);
-  assert.equal(deloadDue(log.filter((_, i) => i % 7 === 0), { last: '', week: '' }, mon), false);
-  assert.equal(deloadDue(log, { last: mon, week: mon }, addDays(mon, 3)), false);
+  assert.equal(deloadDue({ last: '', week: '' }, start, addDays(mon, -7)), false);
+  assert.equal(deloadDue({ last: '', week: '' }, start, mon), true);
+  assert.equal(deloadDue({ last: '', week: '' }, '', mon), false);
+  assert.equal(deloadDue({ last: mon, week: mon }, start, addDays(mon, 3)), false);
+  assert.equal(deloadDue({ last: mon, week: '' }, start, addDays(mon, 2)), false);
+  assert.equal(deloadDue({ last: mon, week: '' }, start, addDays(mon, 28)), true);
+  const am = makeEntry({ kind: 'amrap', name: 'x', dur: 420, data: { rounds: 12, extra: 0, scheme: 1, deload: true } });
+  assert.equal(amrapBest([am], 1), undefined);
   assert.deepEqual([deloadOn({ week: mon }, addDays(mon, 6)), deloadOn({ week: mon }, addDays(mon, 7))], [true, false]);
   assert.deepEqual([lighter(5), lighter(3), lighter(10), lighter(4), lighter(1)], [4, 2, 7, 3, 1]);
   const light = [session('pushups', [10, 10], 1, '2026-10-01'), session('pushups', [5], 1, '2026-10-08', undefined, { deload: true })];
@@ -576,11 +640,13 @@ test('lighter week: proposed after six active weeks, and it does not count for p
   assert.deepEqual(normalize({}).deload, { last: '', week: '' });
 });
 
-test('run advice compares pulse and pace, and sets a target', () => {
+test('run advice: no pace target, pulse at the same pace, a check every 4th run', () => {
   const run = (pace: number, hrAvg?: number) => makeEntry({ kind: 'run', name: 'x', dur: 1200, data: { pace, hrAvg } });
   assert.equal(runAdvice([]), '');
-  assert.match(runAdvice([run(360)]), /5:55 \/km\. Notează HR Avg/);
+  assert.match(runAdvice([run(360)]), /Ritm de conversație/);
+  assert.doesNotMatch(runAdvice([run(360)]), /Ținta/);
   assert.match(runAdvice([run(360, 150), run(362, 145)]), /5 bpm mai puțin/);
   assert.match(runAdvice([run(360, 150), run(340, 150)]), /Mai rapid cu 20 s\/km/);
   assert.match(runAdvice([run(360, 150), run(358, 158)]), /8 bpm mai mare/);
+  assert.match(runAdvice([run(360, 150), run(358, 152), run(362, 149)]), /verificarea.*6:00 \/km/);
 });

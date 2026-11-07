@@ -69,7 +69,7 @@ function challengesHtml(today: string): string {
 
 export function disciplineHtml(): string {
   const today = dayKey();
-  return `${top()}<div class="art-head">${art('jester')}<h1 class="stack mid">Discipline Challenges</h1></div>
+  return `${top('mind')}<div class="art-head">${art('jester')}<h1 class="stack mid">Discipline Challenges</h1></div>
     <p class="dim" style="margin-top:-6px">Disciplina e un mușchi. Îl antrenezi zilnic, ca pe restul.</p>
     ${nofapCard(today)}
     ${dopaCard(today)}

@@ -1,14 +1,14 @@
 // "Azi": today's session from the plan, the 28-day routine, sleep and your why.
 
 import { HABIT_STEPS } from '../../data/book.ts';
-import { WEEK, blockName, type Day } from '../../data/plan.ts';
-import { dayProgress, deloadDue, deloadOn, DELOAD_WEEKS, habitDone, habitMilestone, habitStreak, weekDone } from '../../logic/progress.ts';
+import { WEEK, type Day } from '../../data/plan.ts';
+import { cycleAt, dayProgress, deloadDue, deloadOn, habitDone, habitMilestone, habitStreak, weekDone } from '../../logic/progress.ts';
 import { dayKey, esc, prettyDay, RO_DAYS, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { art, dayPhoto } from '../art.ts';
 import { rake } from '../claws.ts';
-import { blockCard, blockMinutes, top } from './shared.ts';
+import { blockCard, blockMinutes, liveBlock, top } from './shared.ts';
 import { weekCard } from './alex.ts';
 
 /** Monday–Sunday strip: how much of each day is done this week. */
@@ -36,9 +36,9 @@ export function dayBody(day: Day, today: string, kicker: string): string {
       <h1 class="hero-t">${esc(day.title)}</h1>
       <div class="mission-m"><div><b>${n}/${total}</b><span>blocuri</span></div><div><b>~${mins}</b><span>minute</span></div></div>
       <div class="segs" role="img" aria-label="${n} din ${total} blocuri făcute">${day.blocks.map((b, i) => `<i class="${done.has(b.id) ? 'on' : b === next ? 'next' : ''}" style="--i:${i}"></i>`).join('')}</div>
-      ${next ? `<button class="btn hero-go" data-a="start" data-b="${next.id}">${ic('play')}Începe: ${esc(blockName(next, ctx.S.set))}</button>` : '<p class="hero-done">Misiune încheiată.</p>'}
+      ${next ? `<button class="btn hero-go" data-a="start" data-b="${next.id}">${ic('play')}Începe: ${esc(liveBlock(next).name)}</button>` : '<p class="hero-done">Misiune încheiată.</p>'}
     </section>
-    ${overview(today)}
+    ${weekHead(today)}
     ${weekStrip(today, day.idx)}
     <ol class="bks">${day.blocks.map((b, i) => blockCard(b, i + 1, today)).join('')}</ol>`;
 }
@@ -54,19 +54,19 @@ function fuelToday(today: string): number | null {
   }
 }
 
-/** The week at a glance, only from saved data. */
-function overview(today: string): string {
+/** One line above the week strip: where the week and the loop stand. */
+function weekHead(today: string): string {
   const done = weekDone(ctx.S.log, weekStart(today));
   const total = WEEK.reduce((s, d) => s + d.blocks.length, 0);
-  const sleep = ctx.S.sleep[today];
-  const active = Object.keys(ctx.S.chal).length + (ctx.S.race ? 1 : 0);
+  const c = cycleAt(ctx.S.cycle.start, today);
+  return `<div class="wk-head"><span class="label">Săptămâna${c ? ` · ciclul ${c.id}, ${c.lighter ? 'săptămâna ușoară' : `săptămâna ${c.week} din 4`}` : ''}</span><span class="small dim">${done.size} din ${total} blocuri</span></div>`;
+}
+
+/** Today's calories from Beast Nutrition, as a link to that app, when it holds any. */
+function fuelRow(today: string): string {
   const fuel = fuelToday(today);
-  return `<section class="ov" aria-label="Săptămâna ta">
-    <div class="metric wide"><b>${done.size}<small>/${total}</small></b><span>Blocuri săptămâna asta</span></div>
-    <button class="metric" data-a="tab" data-k="challenge"><b>${active}</b><span>Provocări active</span></button>
-    <div class="metric"><b>${sleep === undefined ? '–' : String(sleep).replace('.', ',')}<small>h</small></b><span>Somn</span></div>
-    ${fuel === null ? '' : `<a class="metric" href="../beast-nutrition/"><b>${fuel.toLocaleString('ro-RO')}</b><span>kcal azi, Fuel</span></a>`}
-  </section>`;
+  if (fuel === null) return '';
+  return `<nav class="sub-links"><a class="timer-row" href="../beast-nutrition/" style="text-decoration:none"><div><b>Fuel</b><span>${fuel.toLocaleString('ro-RO')} kcal azi în Beast Nutrition</span></div>${ic('ext')}</a></nav>`;
 }
 
 export function habitCard(compact = false): string {
@@ -119,11 +119,12 @@ function dailyCard(): string {
   return `<section class="card"><div class="row"><div class="row-l"><h3>Mobilitate zilnică</h3><p class="small dim" style="margin:0">10 minute, opțional. Alex face mobilitate în fiecare zi ca să rămână rapid.</p></div><button class="bk-go" data-a="tool" data-k="daily" aria-label="Start mobilitate zilnică">${ic('play')}</button></div></section>`;
 }
 
-/** The six-week proposal, and the reminder while a lighter week is on. The plan itself never changes. */
+/** The 4th week of every emphasis: the lighter week with the tests, proposed; and the reminder while it is on. */
 function deloadCard(today: string): string {
-  if (deloadOn(ctx.S.deload, today)) return '<section class="card"><h3>Săptămână ușoară</h3><p class="small dim" style="margin:0">Aceleași blocuri, cu aproximativ 2/3 din serii, runde și timp. Antrenamentele nu se numără la progres. Revii normal de luni.</p></section>';
-  if (!deloadDue(ctx.S.log, ctx.S.deload, today)) return '';
-  return `<section class="card lime"><h3>Săptămână ușoară?</h3><p class="small">Ai ${DELOAD_WEEKS} săptămâni de muncă în spate. Propun o săptămână cu aceleași blocuri, dar cu aproximativ 2/3 din serii, runde și timp, ca să revii mai puternic.</p><div class="btn-row"><button class="btn sm" data-a="deload" data-k="1">Accept</button><button class="btn ghost sm" data-a="deload" data-k="0">Nu acum</button></div></section>`;
+  if (deloadOn(ctx.S.deload, today)) return '<section class="card"><h3>Săptămâna ușoară și testele</h3><p class="small dim" style="margin:0">Aceleași blocuri, cu aproximativ 2/3 din serii, runde și timp, aceleași greutăți. Testele le faci la începutul săptămânii, cât ești odihnit. Nimic din săptămâna asta nu se numără la progres.</p><button class="btn ghost sm" data-a="tab" data-k="progress" data-to="tests" style="margin-top:12px">Teste</button></section>';
+  if (!deloadDue(ctx.S.deload, ctx.S.cycle.start, today)) return '';
+  const c = cycleAt(ctx.S.cycle.start, today);
+  return `<section class="card lime"><h3>Săptămâna 4: ușoară și cu teste</h3><p class="small">Închei trei săptămâni de ${esc((c?.name ?? '').toLowerCase())}. Propun o săptămână cu aceleași blocuri, dar cu aproximativ 2/3 din serii și runde, plus testele, ca să vezi ce ai câștigat și să pornești odihnit în ciclul următor.</p><div class="btn-row"><button class="btn sm" data-a="deload" data-k="1">Accept</button><button class="btn ghost sm" data-a="deload" data-k="0">Nu acum</button></div></section>`;
 }
 
 function introCard(): string {
@@ -145,13 +146,14 @@ export function todayHtml(): string {
     ${introCard()}
     ${deloadCard(today)}
     ${dayBody(day, today, prettyDay(today))}
-    <h2 class="sec">De învățat</h2>
-    ${weekCard(false)}
     <h2 class="sec">Zilnic</h2>
     ${habitCard()}
     ${sleepCard()}
+    ${fuelRow(today)}
     ${whyCard()}
-    ${dailyCard()}`;
+    ${dailyCard()}
+    <h2 class="sec">De învățat</h2>
+    ${weekCard(false)}`;
 }
 
 export function dayViewHtml(idx: number): string {

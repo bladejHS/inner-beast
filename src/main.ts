@@ -4,9 +4,8 @@ import { publishPlan } from './logic/bridge.ts';
 import { blockById, WEEK, type Block } from './data/plan.ts';
 import { rowChallenge } from './data/row.ts';
 import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
-import { addDays, dayKey, esc, uid, weekdayIdx, weekStart } from './logic/util.ts';
+import { dayKey, esc, shortDay, uid, weekdayIdx, weekStart } from './logic/util.ts';
 import { initAudio, unlock } from './ui/audio.ts';
-import { countUp, initParallax, revealBelowFold } from './ui/fx.ts';
 import { closePlayer, closeSheet, ctx, openSheet, ask, save, sheetAct, toast, type Tab, type View } from './ui/ctx.ts';
 import { ic } from './ui/icons.ts';
 import { openBreath } from './ui/players/breath.ts';
@@ -18,9 +17,10 @@ import { fightHtml, setComboCat, startQuick } from './ui/screens/fight.ts';
 import { alexHtml, toggleLearned } from './ui/screens/alex.ts';
 import { chapterHtml, mindHtml } from './ui/screens/mind.ts';
 import { planHtml } from './ui/screens/plan.ts';
-import { historyHtml, progressHtml } from './ui/screens/progress.ts';
+import { historyHtml, progressHtml, testValue } from './ui/screens/progress.ts';
+import { testById, UNIT_LABEL } from './data/tests.ts';
+import { parseTime } from './logic/runlog.ts';
 import { settingsHtml } from './ui/screens/settings.ts';
-import { MORE_TABS, moreHtml } from './ui/screens/more.ts';
 import { openCoach } from './ui/players/coach.ts';
 import { challengeHtml, toggleRace } from './ui/screens/challenge.ts';
 import { resumeRace, startRace } from './ui/players/race.ts';
@@ -28,21 +28,22 @@ import { discAct, disciplineHtml } from './ui/screens/discipline.ts';
 import { labHtml } from './ui/screens/lab.ts';
 import { openLab } from './ui/players/lab.ts';
 import { icsExport } from './ui/ics.ts';
-import { isDark, saveSteps, setTheme, startBlock, toggleMark } from './ui/screens/shared.ts';
+import { isDark, liveBlock, planPicks, saveSteps, setTheme, startBlock, toggleMark } from './ui/screens/shared.ts';
 import { dayViewHtml, todayHtml } from './ui/screens/today.ts';
 
 initAudio(() => ctx.S.set);
-initParallax();
 
-// six destinations; Minte and Alex live behind "Mai mult"
+// Five places, labels always on, nothing hidden behind "More". Settings live only behind the gear.
 const TABS: Array<[Tab, string, string]> = [
   ['today', 'Azi', 'today'],
   ['plan', 'Plan', 'plan'],
   ['fight', 'Lupte', 'fight'],
-  ['challenge', 'Challenge', 'trophy'],
+  ['mind', 'Minte', 'mind'],
   ['progress', 'Progres', 'progress'],
-  ['more', 'Mai mult', 'more'],
 ];
+
+/** Screens that open from a tab: the bar keeps their tab marked, and their back button returns there. */
+export const PARENT: Partial<Record<Tab, Tab>> = { alex: 'fight', lab: 'mind', disc: 'mind', challenge: 'progress' };
 
 const views: View[] = [];
 const scrollMem: Partial<Record<Tab, number>> = {};
@@ -70,8 +71,6 @@ function screenHtml(): string {
       return labHtml();
     case 'challenge':
       return challengeHtml();
-    case 'more':
-      return moreHtml();
     case 'progress':
       return progressHtml();
     default:
@@ -80,7 +79,7 @@ function screenHtml(): string {
 }
 
 function navHtml(): string {
-  const cur = MORE_TABS.includes(ctx.tab) ? 'more' : ctx.tab;
+  const cur = PARENT[ctx.tab] ?? ctx.tab;
   return `<nav class="tabs" aria-label="Secțiuni">${TABS.map(([k, label, icon]) => `<button data-a="tab" data-k="${k}" ${cur === k && !views.length ? 'aria-current="page"' : ''}>${ic(icon)}<span>${label}</span></button>`).join('')}</nav>`;
 }
 
@@ -89,7 +88,7 @@ function render(): void {
   if (!app) return;
   const active = document.activeElement as HTMLElement | null;
   const keepId = active && (active.tagName === 'TEXTAREA' || active.tagName === 'INPUT') ? active.id : '';
-  publishPlan(ctx.S.set);
+  publishPlan(planPicks());
   app.innerHTML = screenHtml() + navHtml();
   if (keepId) {
     const el = document.getElementById(keepId) as HTMLInputElement | null;
@@ -98,24 +97,9 @@ function render(): void {
 }
 ctx.render = render;
 
-/** Cards slide in when a new screen opens (not on every re-render). */
-function enter(): void {
-  const app = document.getElementById('app');
-  if (!app) return;
-  app.classList.remove('enter');
-  void app.offsetWidth;
-  app.classList.add('enter');
-  revealBelowFold(app);
-  countUp(app);
-  window.clearTimeout(enterTimer);
-  enterTimer = window.setTimeout(() => app.classList.remove('enter'), 900);
-}
-let enterTimer = 0;
-
 function go(fn: () => void, top = true): void {
   fn();
   render();
-  enter();
   if (top) window.scrollTo(0, 0);
 }
 
@@ -129,7 +113,6 @@ function pushView(v: View): void {
 function popView(): void {
   views.pop();
   render();
-  enter();
   window.scrollTo(0, views.length ? 0 : scrollMem[ctx.tab] ?? 0);
 }
 
@@ -198,6 +181,34 @@ function habitSheet(fresh: boolean): void {
   );
 }
 
+/** Notes a test result; the how-to and the published reference sit above the field. */
+function testSheet(id: string): void {
+  const t = testById(id);
+  if (!t) return;
+  const rows = ctx.S.tests[id] ?? [];
+  const time = t.unit === 'time';
+  openSheet(
+    `<h2>${esc(t.name)}</h2>
+    <p class="dim">${esc(t.how)}</p>
+    ${t.ref ? `<p class="small"><b>Reper.</b> ${esc(t.ref)}</p>` : '<p class="small dim">Fără normă publicată: te compari cu tine.</p>'}
+    <div class="field"><div class="field-l">Rezultat azi<small>${esc(UNIT_LABEL[t.unit])}</small></div><input id="test-v" type="${time ? 'text' : 'number'}" inputmode="decimal" ${time ? 'placeholder="10:59"' : 'min="0" step="any"'} style="width:120px"></div>
+    ${rows.length ? `<p class="small dim">Până acum: ${rows.slice(-4).map((r) => `${testValue(t, r.v)} (${shortDay(r.d)})`).join(', ')}.</p>` : ''}
+    <button class="btn" data-a="test-save">Salvează</button>`,
+    {
+      'test-save': () => {
+        const raw = (document.getElementById('test-v') as HTMLInputElement).value.trim();
+        const v = time ? parseTime(raw) : Number(raw.replace(',', '.'));
+        if (!(v > 0)) return toast(time ? 'Scrie timpul, de exemplu 10:59.' : 'Scrie un rezultat.');
+        (ctx.S.tests[id] ??= []).push({ d: dayKey(), v });
+        save();
+        closeSheet();
+        render();
+        toast('Notat.');
+      },
+    },
+  );
+}
+
 function exportData(): void {
   // the AI key stays on this phone: never in a file that gets shared
   const blob = new Blob([JSON.stringify({ ...ctx.S, nut: { ...ctx.S.nut, aiKey: undefined } }, null, 1)], { type: 'application/json' });
@@ -241,7 +252,6 @@ function act(a: string, el: HTMLElement): void {
       views.length = 0;
       ctx.tab = k;
       render();
-      if (!same) enter();
       const to = el.dataset.to;
       if (to) document.getElementById(to)?.scrollIntoView({ block: 'start' });
       else window.scrollTo(0, same ? 0 : scrollMem[k] ?? 0);
@@ -262,7 +272,7 @@ function act(a: string, el: HTMLElement): void {
     }
     case 'polar': {
       const b = blockById(el.dataset.b || '');
-      if (b) openPolar({ mode: 'run', block: b.id, target: jogTarget((b.min ?? 20) * 60) });
+      if (b) openPolar({ mode: 'run', block: b.id, target: jogTarget((liveBlock(b).min ?? 20) * 60) });
       return;
     }
     case 'day':
@@ -314,9 +324,9 @@ function act(a: string, el: HTMLElement): void {
       }
       return render();
     case 'deload': {
-      // Not now: the proposal comes back next week.
+      // Either answer closes this week's proposal; the next one comes in the 4th week of the next emphasis.
       const mon = weekStart(today);
-      S.deload = el.dataset.k === '1' ? { last: mon, week: mon } : { last: addDays(mon, -35), week: '' };
+      S.deload = el.dataset.k === '1' ? { last: mon, week: mon } : { last: mon, week: '' };
       save();
       return render();
     }
@@ -335,6 +345,8 @@ function act(a: string, el: HTMLElement): void {
       save();
       return render();
     }
+    case 'test':
+      return testSheet(el.dataset.k || '');
     case 'hab-edit':
       return habitSheet(false);
     case 'hab-new':
@@ -386,7 +398,7 @@ function act(a: string, el: HTMLElement): void {
       return render();
     case 'set-opening':
       try {
-        localStorage.setItem('beast:opening', el.dataset.v || 'full');
+        localStorage.setItem('beast:opening', el.dataset.v || 'auto');
       } catch {
         /* storage blocked: the intro stays on */
       }
@@ -397,6 +409,7 @@ function act(a: string, el: HTMLElement): void {
       return render();
     case 'alt':
       if (el.dataset.b === 'thu-rope') S.set.thuFeet = el.dataset.v === 'ladder' ? 'ladder' : 'rope';
+      else if (el.dataset.b === 'thu-shadow') S.set.thuPartner = el.dataset.v === 'spar' ? 'spar' : 'shadow';
       else S.set.thuMain = el.dataset.v === 'row' ? 'row' : 'bag';
       save();
       return render();
@@ -550,7 +563,6 @@ window.addEventListener('popstate', () => {
 });
 
 render();
-enter();
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   window.addEventListener('load', () => {

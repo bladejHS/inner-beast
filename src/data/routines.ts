@@ -10,50 +10,74 @@ export interface Move {
 }
 
 export interface Routine {
-  id: 'stretch-push' | 'stretch-pull' | 'mobility' | 'daily' | 'dagestan' | 'peekaboo' | 'abs' | 'splits' | 'homebox';
+  id: 'stretch-push' | 'stretch-pull' | 'legwarm' | 'cooldown' | 'mobility' | 'daily' | 'dagestan' | 'peekaboo' | 'abs' | 'splits' | 'homebox';
   name: string;
   intro: string;
   moves: Move[];
 }
 
-function stretch(kind: 'push' | 'pull'): Move[] {
+/** Ten minutes of moving warm-up before push or pull work. Long static holds before explosive work cost power, so there are none. */
+function warmUp(kind: 'push' | 'pull'): Move[] {
   const push = kind === 'push';
   return [
-    { name: 'Jumping Jacks', sec: 30, cue: 'Ridici pulsul și temperatura corpului.' },
+    { name: 'Jumping Jacks', sec: 45, cue: 'Ridici pulsul și temperatura corpului.' },
     { name: 'Arm Circles', sec: 60, cue: '30 de secunde înainte, 30 înapoi. Cercuri mari, relaxate.', alex: true },
-    { name: 'Shoulder Rolls', sec: 45, cue: 'Rotiri ample ale umerilor, înainte și înapoi.' },
-    { name: 'Shoulder Dislocates', sec: 60, cue: 'Cu un prosop sau o bandă: brațele întinse trec peste cap, în spate, și revin.' },
+    { name: 'Shoulder Dislocates', sec: 60, cue: 'Cu un prosop sau o bandă: brațele întinse trec peste cap, în spate, și revin. Fără să forțezi.' },
+    { name: 'Band External Rotation', sec: 60, sides: true, cue: 'Cotul lipit de corp, la 90°: rotești antebrațul în afară cu banda, lent, și revii.' },
     push
       ? { name: 'Scapular Push-ups', sec: 45, cue: 'În poziție de flotare, cu brațele întinse: mișți doar omoplații.' }
       : { name: 'Scapular Pulls', sec: 45, cue: 'Atârnat de bară, cu brațele întinse: tragi doar din omoplați.' },
-    { name: 'Cross-body Shoulder Stretch', sec: 60, sides: true, cue: 'Tragi brațul peste piept și ții.' },
-    push
-      ? { name: 'Doorway Chest Stretch', sec: 60, cue: 'Antebrațul pe tocul ușii, pășești înainte până simți pieptul.' }
-      : { name: 'Lat Stretch', sec: 60, sides: true, cue: 'Te ții de tocul ușii și împingi șoldul în spate: se întinde dorsalul.' },
-    { name: 'Overhead Triceps Stretch', sec: 60, sides: true, cue: 'Cotul sus, palma coboară pe spate.' },
     { name: 'Wrist Circles', sec: 45, cue: push ? 'Încheieturile pregătite pentru flotări.' : 'Încheieturile și antebrațele pregătite pentru bară.' },
-    { name: 'Neck Mobility', sec: 45, cue: 'Înclini capul lent stânga-dreapta și înainte, fără rotiri forțate.' },
-    { name: 'Cat-Cow', sec: 60, cue: 'În patru labe: arcuiești și rotunjești spatele odată cu respirația.' },
-    { name: 'Thoracic Rotations', sec: 60, sides: true, cue: 'În patru labe, cu mâna la ceafă: deschizi cotul spre tavan.' },
-    { name: "World's Greatest Stretch", sec: 90, sides: true, cue: 'Fandare adâncă, cotul spre sol, apoi rotești brațul spre tavan.' },
-    { name: 'Hip Flexor Stretch', sec: 60, sides: true, cue: 'Genunchiul din spate pe sol, împingi șoldul înainte.' },
-    { name: 'Hamstring Stretch', sec: 60, cue: 'Picioarele întinse, cobori din șold cu spatele drept.' },
-    { name: 'Deep Squat Hold', sec: 60, cue: 'Ghemuit adânc, călcâiele pe sol, coatele împing genunchii în afară.' },
+    { name: 'Cat-Cow', sec: 45, cue: 'În patru labe: arcuiești și rotunjești spatele odată cu respirația.' },
+    { name: 'Thoracic Rotations', sec: 60, sides: true, cue: 'În patru labe, cu mâna la ceafă: deschizi cotul spre tavan, în ritm.' },
+    { name: "World's Greatest Stretch", sec: 90, sides: true, cue: 'Fandare adâncă, cotul spre sol, apoi rotești brațul spre tavan. Intri și ieși din poziție, nu o ții.' },
+    push
+      ? { name: 'Bodyweight Squats', sec: 45, cue: 'Genuflexiuni lente, adânci: pregătesc picioarele pentru split squat.' }
+      : { name: 'Band Pull-Aparts', sec: 45, cue: 'Brațele întinse în față, desfaci banda până la piept și strângi omoplații.' },
+    push
+      ? { name: 'Incline Push-ups', sec: 45, cue: 'O serie ușoară de încălzire, la jumătate din ce poți.' }
+      : { name: 'Active Hang', sec: 45, cue: 'Atârni cu umerii trași în jos, câteva secunde, apoi te lași ușor și reiei.' },
   ];
 }
 
 export const ROUTINES: Routine[] = [
   {
     id: 'stretch-push',
-    name: 'Full Body Stretching',
-    intro: 'Încălzirea umerilor pentru ziua de push: 15 minute, fiecare exercițiu are timerul lui.',
-    moves: stretch('push'),
+    name: 'Dynamic Warm-up',
+    intro: 'Încălzirea pentru ziua de push: 10 minute în mișcare, fiecare exercițiu are timerul lui. Întinderile lungi vin la final.',
+    moves: warmUp('push'),
   },
   {
     id: 'stretch-pull',
-    name: 'Full Body Stretching',
-    intro: 'Încălzirea umerilor pentru ziua de pull: 15 minute, fiecare exercițiu are timerul lui.',
-    moves: stretch('pull'),
+    name: 'Dynamic Warm-up',
+    intro: 'Încălzirea pentru ziua de pull: 10 minute în mișcare, cu umerii, omoplații și priza pregătite pentru bară.',
+    moves: warmUp('pull'),
+  },
+  {
+    id: 'legwarm',
+    name: 'Leg Day Warm-up',
+    intro: '10 minute: pulsul sus, șoldurile mobile și trei accelerări progresive. Abia apoi sprinturi și sărituri la maxim.',
+    moves: [
+      { name: 'Easy Jog or Row', sec: 180, cue: '3 minute ușor: pe loc, afară sau la aparatul de canotaj.' },
+      { name: 'Leg Swings (front-back)', sec: 60, sides: true, cue: 'Te ții de perete și balansezi piciorul înainte-înapoi, tot mai larg.' },
+      { name: 'Leg Swings (side)', sec: 60, sides: true, cue: 'Balans lateral, prin fața corpului.' },
+      { name: 'Hip Circles', sec: 45, cue: 'Mâinile pe șolduri, cercuri mari în ambele sensuri.' },
+      { name: 'Walking Lunges', sec: 60, cue: 'Fandări mergând, cu trunchiul drept, fără greutate.' },
+      { name: 'A-Skips', sec: 45, cue: 'Țopăi ritmic, genunchiul urcă la nivelul șoldului, brațele lucrează opus.' },
+      { name: 'Lateral Shuffles', sec: 45, cue: 'Pași laterali rapizi, joși, fără să încrucișezi picioarele.' },
+      { name: 'Pogo Hops', sec: 30, cue: 'Sărituri mici și elastice din glezne, genunchii aproape întinși.' },
+      { name: 'Build-up Runs', sec: 75, cue: 'Trei accelerări de 20 de metri, la 60, 70 și 80%, cu mers înapoi între ele.' },
+    ],
+  },
+  {
+    id: 'cooldown',
+    name: 'Cool-down Stretch',
+    intro: '5 minute de întinderi ținute, după antrenament, când mușchii sunt calzi.',
+    moves: [
+      { name: 'Doorway Chest Stretch', sec: 60, cue: 'Antebrațul pe tocul ușii, pășești înainte până simți pieptul. Respiri lent.' },
+      { name: 'Lat Stretch', sec: 120, sides: true, cue: 'Te ții de tocul ușii și împingi șoldul în spate: se întinde dorsalul.' },
+      { name: 'Hip Flexor Stretch', sec: 120, sides: true, cue: 'Genunchiul din spate pe sol, strângi fesierul și împingi șoldul înainte.' },
+    ],
   },
   {
     id: 'mobility',

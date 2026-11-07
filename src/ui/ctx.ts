@@ -8,7 +8,7 @@ import { WEEK } from '../data/plan.ts';
 import { dayComplete, weekDone } from '../logic/progress.ts';
 import { dayKey, weekStart, weekdayIdx } from '../logic/util.ts';
 
-export type Tab = 'today' | 'plan' | 'fight' | 'alex' | 'mind' | 'progress' | 'more' | 'disc' | 'lab' | 'challenge';
+export type Tab = 'today' | 'plan' | 'fight' | 'alex' | 'mind' | 'progress' | 'disc' | 'lab' | 'challenge';
 export type View =
   | { t: 'day'; idx: number }
   | { t: 'chapter'; id: string }

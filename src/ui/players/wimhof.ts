@@ -53,7 +53,7 @@ class WimHofPlayer implements Player {
           <li>Repeți de ${s.whRounds} ori, apoi stai în liniște.</li>
         </ol>
         <div class="card" style="border-color:var(--accent)">
-          <p style="margin:0 0 10px"><b>Siguranță.</b> Stai așezat sau întins. Niciodată în apă, la volan sau în picioare: poți leșina. Furnicăturile și o amețeală ușoară sunt normale; dacă te simți rău, te oprești. Dacă ai epilepsie, probleme cu inima, tensiune mare sau ești însărcinat, întreabă întâi medicul.</p>
+          <p style="margin:0 0 10px"><b>Siguranță.</b> Stai așezat sau întins. Niciodată în duș, în cadă sau în apă, la volan sau în picioare: poți leșina. Nu e un concurs: retenția nu se forțează și nu se urmărește ca record. Furnicăturile și o amețeală ușoară sunt normale; dacă te simți rău, te oprești. Dacă ai epilepsie, probleme cu inima, tensiune mare sau ești însărcinat, întreabă întâi medicul.</p>
           <label class="row" style="justify-content:flex-start;gap:12px;font-weight:700"><span class="switch"><input type="checkbox" data-a="p:safe" ${s.whSafety ? 'checked' : ''}><span></span></span>Am înțeles</label>
         </div>
         <div class="setup">
@@ -62,18 +62,16 @@ class WimHofPlayer implements Player {
           ${field('Ritm', `<div class="chips">${(['slow', 'normal', 'fast'] as const).map((k) => `<button class="chip" aria-pressed="${s.whPace === k}" data-a="p:pace" data-v="${k}">${{ slow: 'Lent', normal: 'Normal', fast: 'Rapid' }[k]}</button>`).join('')}</div>`)}
           ${field('Liniște la final', stepper('p:med', `${s.whMed} min`, 'Liniște'))}
         </div>
-        ${hs.best ? `<p class="prev">Cea mai lungă retenție: ${mmss(hs.best)}. Ultima sesiune: ${hs.last.map(mmss).join(', ')}.</p>` : ''}
+        ${hs.last.length ? `<p class="prev">Ultima sesiune: ${hs.last.map(mmss).join(', ')}.</p>` : ''}
         <button class="btn" data-a="p:start" ${s.whSafety ? '' : 'disabled style="opacity:.4"'}>Start</button>`,
       );
       return;
     }
     if (this.st === 'done') {
-      const hs = holdStats(ctx.S.log);
       el.innerHTML = chrome(
         'Wim Hof',
         `${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1>
         <p class="lead">Retenții: ${this.holds.map(mmss).join(', ') || '–'}</p>
-        ${hs.best ? `<p class="dim">Recordul tău: ${mmss(hs.best)}.</p>` : ''}
         <p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p>
         <button class="btn" data-a="p:close">Închide</button>`,
         { center: true },

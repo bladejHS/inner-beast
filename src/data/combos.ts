@@ -217,12 +217,12 @@ export const COMBOS: Combo[] = [
   },
   {
     id: 'duck-counter', name: 'Duck Under → Right Hand', seq: ['Duck under', 'Right Hand (head)'], call: 'Duck, right hand', cat: 'counter',
-    note: 'Când adversarul se aruncă cu o lovitură largă, cobori sub ea îndoind mult genunchii (Alex îi marchează cu roșu) și urci imediat cu dreapta la cap. Mâna cealaltă stă la bărbie.',
+    note: 'Când adversarul se aruncă cu o lovitură largă, cobori sub ea îndoind genunchii (Alex îi marchează cu roșu) și urci imediat cu dreapta la cap. Mâna cealaltă stă la bărbie. La 2 m, nu cobori capul sub linia centurii lui: e regulă în box și te expune.',
     vid: '7698054696329596193', src: 'Monster KO',
   },
   {
-    id: 'off-ropes', name: 'Off the Ropes', seq: ['Push off', 'Right Hook', 'Left Hook'], call: 'Push off, right hook, left hook', cat: 'power',
-    note: 'Când atingi peretele sau corzile, te împingi înapoi și ieși cu două croșee. Nu rămâi lipit acolo.',
+    id: 'off-ropes', name: 'Off the Ropes', seq: ['Pivot off', 'Right Hook', 'Left Hook'], call: 'Pivot off, right hook, left hook', cat: 'power',
+    note: 'Când atingi peretele sau corzile, ieși cu un pivot sau un pas lateral spre centru, apoi două croșee. Nu te împingi din corzi: în box e o folosire neregulamentară a lor. Cel mai bine nu ajungi deloc acolo.',
     vid: '7695784903249562912', src: 'This was really fast',
   },
   {
@@ -301,7 +301,7 @@ export const COMBOS: Combo[] = [
   // Getting out when a shorter opponent gets inside: not to fight there, to leave and reset the range.
   {
     id: 'clinch-exit', name: 'Frame – Pivot Out – Jab', seq: ['Frame (lead forearm)', 'Pivot out', 'Jab', 'Step back'], call: 'Frame, pivot, jab', cat: 'defense',
-    note: 'Când intră peste tine: antebrațul din față pe umărul sau pieptul lui ca distanțier, pivotezi pe piciorul din față și ieși. Jabul îl oprește să te urmărească.',
+    note: 'Când intră peste tine: un contact scurt și ușor cu antebrațul din față pe umărul lui, doar cât să-l oprești o clipă, fără să împingi și fără să lovești cu antebrațul. Pivotezi pe piciorul din față și ieși; jabul îl oprește să te urmărească.',
   },
   {
     id: 'corner-exit', name: 'Corner Exit: Slip – Pivot – Step to the Side', seq: ['Slip', 'Pivot out', 'Step to the side', 'Jab'], call: 'Slip, pivot, step to the side, jab', cat: 'defense',
@@ -385,9 +385,18 @@ const LEARN = [
 ];
 const FIRST_WEEK = '2026-10-26';
 
-export function learnOrder(): Combo[] {
-  const listed = LEARN.map((id) => COMBOS.find((c) => c.id === id)).filter((c): c is Combo => !!c);
-  return [...listed, ...COMBOS.filter((c) => !LEARN.includes(c.id) && c.id !== 'jab')];
+/** The order for a boxer from TALL_CM up: long range, the jab and the exits first, a defence early, and no inside fighting. */
+const LEARN_TALL = [
+  'double-jab', 'jab-step-in', 'jab-out', 'one-two', 'catch-step-jab', 'one-two-angle', 'double-jab-back', 'jab-circle', 'step-jab-cross-back',
+  'guard-reset', 'jab-body-cross', 'pull-counter', 'jab-reset-reenter', 'double-jab-cross-exit', 'jab-cross-hook', 'one-two-hook-pivot',
+  'corner-exit', 'clinch-exit', 'check-hook', 'jab-feint-cross', 'liver-setup',
+];
+
+/** The learning order. A tall boxer gets the long-range order; inside-fighting combinations stay in the library only. */
+export function learnOrder(heightCm = 0): Combo[] {
+  const ids = heightCm >= TALL_CM ? LEARN_TALL : LEARN;
+  const listed = ids.map((id) => COMBOS.find((c) => c.id === id)).filter((c): c is Combo => !!c);
+  return [...listed, ...COMBOS.filter((c) => !ids.includes(c.id) && c.id !== 'jab' && !(heightCm >= TALL_CM && INSIDE.has(c.id)))];
 }
 
 /** Week number in the learning plan (0 = the week the app got this feature). */
@@ -395,11 +404,20 @@ export function learnWeek(today = dayKey()): number {
   return Math.max(0, Math.floor(daysBetween(FIRST_WEEK, weekStart(today)) / 7));
 }
 
-/** The two combinations to learn in a given week; they cycle once the list is done. */
-export function weekCombos(week = learnWeek()): Combo[] {
-  const all = learnOrder();
-  const i = (week * 2) % all.length;
-  return [all[i], all[(i + 1) % all.length]];
+/**
+ * The week's pair: one new combination, and last week's one to review. One new item a week, so it gets enough
+ * repetitions to stick; the list cycles once it is done.
+ */
+export function weekCombos(week = learnWeek(), heightCm = 0): Combo[] {
+  const all = learnOrder(heightCm);
+  const i = week % all.length;
+  return [all[i], all[(i - 1 + all.length) % all.length]];
+}
+
+/** The last `n` combinations of the plan up to this week, newest first. */
+export function recentCombos(n: number, week = learnWeek(), heightCm = 0): Combo[] {
+  const all = learnOrder(heightCm);
+  return Array.from({ length: Math.min(n, all.length) }, (_, k) => all[(week - k + all.length * 4) % all.length]);
 }
 
 const POWER_PUNCH = /Hook|Uppercut|Overhand|Gazelle/;
@@ -431,8 +449,23 @@ const THEMES_BY_FOCUS: Record<string, string[]> = {
   distance: ['jab', 'defense', 'straight'],
 };
 
+/**
+ * Thursday's "focus on combinations" is where new material is learned: round 1 only the new combination (blocked),
+ * round 2 the new one with last week's (serial), round 3 the last four mixed (random), as in Porter & Magill's
+ * blocked-to-random progression.
+ */
+function learningThemes(heightCm: number): RoundTheme[] {
+  const [fresh, prev] = weekCombos(learnWeek(), heightCm);
+  return [
+    { name: 'Combinația nouă', cue: `Doar ${fresh.name}, repetată curat, de la lent la ritm.`, combos: [fresh] },
+    { name: 'Nouă și cea de săptămâna trecută', cue: 'Le alternezi; fiecare cu ieșirea ei.', combos: [fresh, prev] },
+    { name: 'Ultimele patru', cue: 'Amestecate: alegi ce se potrivește distanței.', combos: recentCombos(4, learnWeek(), heightCm) },
+  ];
+}
+
 /** One theme per round, cycling: round r uses themes[(r - 1) % length]. Themes with fewer than 2 combos are dropped. */
 export function roundThemes(focus: string | undefined, heightCm = 0): RoundTheme[] {
+  if (focus === 'combo') return learningThemes(heightCm);
   const keys = THEMES_BY_FOCUS[focus ?? ''];
   if (!keys) return [];
   const tall = heightCm >= TALL_CM;
@@ -450,7 +483,7 @@ export function roundThemes(focus: string | undefined, heightCm = 0): RoundTheme
 
 /** heightCm: the boxer's height from the profile; tall boxers get the long-range set. */
 export function focusCombos(focus: string | undefined, heightCm = 0): Combo[] {
-  const week = weekCombos();
+  const week = weekCombos(learnWeek(), heightCm);
   if (focus === 'week') return week;
   const ids = (heightCm >= TALL_CM ? FOCUS_TALL : FOCUS)[focus ?? ''] ?? [];
   const list = ids.map((id) => COMBOS.find((c) => c.id === id)).filter((c): c is Combo => !!c);

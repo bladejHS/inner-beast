@@ -437,7 +437,7 @@ function onChange(el: HTMLElement): void {
   if (a.startsWith('p:')) return ctx.player?.act(a, el);
   const S = ctx.S;
   if (a === 'set-bool') {
-    const k = el.dataset.k as 'sound' | 'voice' | 'vibrate' | 'wake';
+    const k = el.dataset.k as 'sound' | 'voice' | 'vibrate' | 'wake' | 'bellThroughMute';
     S.set[k] = (el as HTMLInputElement).checked;
     save();
     return;

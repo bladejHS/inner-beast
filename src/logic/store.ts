@@ -66,6 +66,8 @@ export interface Settings {
   showerEndCold: boolean;
   bwScheme: number;
   whSafety: boolean;
+  /** iPhone: the bell rings with the silent switch on (it may pause music). */
+  bellThroughMute: boolean;
 }
 
 /** A logged meal: name, kcal, protein, carbs, fat (g); pl = which plan meal it was ("t2"). */
@@ -196,6 +198,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showerEndCold: true,
   bwScheme: 1,
   whSafety: false,
+  bellThroughMute: false,
 };
 
 export function defaultHabit(today: string): Habit {

@@ -9,8 +9,20 @@ export function initAudio(get: () => Settings): void {
   getSet = get;
 }
 
+/** iPhone (iOS 17+): "playback" lets the bell ring with the silent switch on, but it can pause music from other apps. */
+function audioSession(): void {
+  const s = (navigator as unknown as { audioSession?: { type: string } }).audioSession;
+  if (!s) return;
+  try {
+    s.type = getSet().bellThroughMute ? 'playback' : 'auto';
+  } catch {
+    /* not supported */
+  }
+}
+
 /** Must run inside a tap handler: browsers only allow audio after a user gesture. */
 export function unlock(): void {
+  audioSession();
   try {
     if (!ac) ac = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     if (ac.state === 'suspended') void ac.resume();

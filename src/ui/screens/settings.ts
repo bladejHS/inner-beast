@@ -31,7 +31,8 @@ export function settingsHtml(): string {
     <h2 class="sec">Sunet și ecran</h2>
     ${row('Sunete', 'Gong, bipuri, semnale', sw('sound', s.sound, 'Sunete'))}
     ${row('Voce', 'Combinațiile strigate în engleză, indicațiile în română', sw('voice', s.voice, 'Voce'))}
-    ${row('Vibrații', 'La schimbarea rundelor', sw('vibrate', s.vibrate, 'Vibrații'))}
+    ${row('Vibrații', 'La schimbarea rundelor; pe iPhone browserul nu le permite', sw('vibrate', s.vibrate, 'Vibrații'))}
+    ${row('Gongul trece de modul silențios', 'iPhone: sună și cu butonul de silențios pornit, dar poate opri muzica din alte aplicații', sw('bellThroughMute', s.bellThroughMute, 'Gongul trece de modul silențios'))}
     ${row('Ecranul rămâne aprins', 'Cât timp rulează un timer', sw('wake', s.wake, 'Ecran aprins'))}
     ${row('Intro la pornire', 'Automat: complet la prima pornire și după o versiune nouă, altfel doar lupul, o clipă', `<div class="chips">${[['auto', 'Automat'], ['full', 'Mereu'], ['short', 'Scurt'], ['off', 'Oprit']].map(([v, l]) => `<button class="chip" aria-pressed="${op === v}" data-a="set-opening" data-v="${v}">${l}</button>`).join('')}</div>`)}
     <h2 class="sec">Runde</h2>

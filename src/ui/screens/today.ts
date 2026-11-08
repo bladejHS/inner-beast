@@ -3,7 +3,7 @@
 import { HABIT_STEPS } from '../../data/book.ts';
 import { WEEK, type Day } from '../../data/plan.ts';
 import { cycleAt, dayProgress, deloadDue, deloadOn, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, weekDone } from '../../logic/progress.ts';
-import { dayKey, esc, prettyDay, RO_DAYS, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
+import { dayKey, esc, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { dayPhoto } from '../art.ts';
@@ -40,7 +40,10 @@ export function dayBody(day: Day, today: string, kicker: string): string {
   const next = day.blocks.find((b) => !done.has(b.id));
   const c = cycleAt(ctx.S.cycle.start, today);
   const light = deloadOn(ctx.S.deload, today);
-  const cyc = light ? ['Ușoară', 'săptămâna'] : c ? [`${c.id} · ${c.week}/4`, 'ciclul'] : ['—', 'ciclul'];
+  // before the loop starts, the stat says when it starts instead of showing a dash
+  const until = ctx.S.cycle.start ? daysBetween(today, ctx.S.cycle.start) : 0;
+  const starts = until > 6 ? shortDay(ctx.S.cycle.start) : until > 0 ? RO_DAYS[weekdayIdx(ctx.S.cycle.start)] : '';
+  const cyc = light ? ['Ușoară', 'săptămâna'] : c ? [`${c.id} · ${c.week}/4`, 'ciclul'] : starts ? [starts, 'începe ciclul'] : ['—', 'ciclul'];
   return `
     <section class="mission${n === total ? ' cleared' : ''}" aria-label="Misiunea zilei">
       <div class="ms-ph">${dayPhoto(day.idx, 'ms-img')}</div>

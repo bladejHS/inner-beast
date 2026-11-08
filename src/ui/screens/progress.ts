@@ -117,6 +117,11 @@ function boxHtml(today: string): string {
 
 export const PROGRESS_SEGS: Array<[string, string]> = [['week', 'Săptămâna'], ['train', 'Antrenament'], ['tests', 'Teste'], ['log', 'Istoric']];
 
+const day2 = (d: string) => RO_DAYS[weekdayIdx(d)].slice(0, 2);
+const hours = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(1).replace('.', ','));
+/** 8200 → "8,2k", 10000 → "10k". */
+const kSteps = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(1).replace('.', ',').replace(/,0$/, '')}k` : String(v));
+
 /** Săptămâna: the week, the totals, sleep and steps. */
 function weekSeg(): string {
   const S = ctx.S;
@@ -126,7 +131,9 @@ function weekSeg(): string {
   const streak = activeStreak(S.log, today);
   const week = WEEK.map((d) => {
     const n = dayProgress(d, done);
-    return `<div class="${weekdayIdx(today) === d.idx ? 'today' : ''}"><i style="--f:${(n / d.blocks.length).toFixed(3)}"><b></b></i><span>${RO_DAYS[d.idx].slice(0, 2)}</span></div>`;
+    // gold for a finished day, as on Azi and in Plan
+    const cls = [weekdayIdx(today) === d.idx ? 'today' : '', n === d.blocks.length ? 'full' : ''].filter(Boolean).join(' ');
+    return `<div class="${cls}"><i style="--f:${(n / d.blocks.length).toFixed(3)}"><b></b></i><span>${RO_DAYS[d.idx].slice(0, 2)}</span></div>`;
   }).join('');
   const full = WEEK.filter((d) => dayProgress(d, done) === d.blocks.length).length;
   const last7 = Array.from({ length: 7 }, (_, i) => addDays(today, i - 6));
@@ -138,7 +145,7 @@ function weekSeg(): string {
   return `<h2 class="sec first">Săptămâna asta<small>${full} din 7 zile complete</small></h2>
     <div class="week7">${week}</div>
     <div class="stats">
-      ${stat(streak, streak === 1 ? 'zi activă la rând' : 'zile active la rând', 'hot')}
+      ${stat(streak, streak === 1 ? 'zi activă la rând' : 'zile active la rând', streak > 0 ? 'hot' : '')}
       ${stat(t.sessions, 'sesiuni în total')}
       ${stat(Math.round(t.boxingMin), 'minute de runde')}
       <div class="stat"><b class="num">${t.runKm.toFixed(1).replace('.', ',')}</b><span>km alergați</span></div>
@@ -146,9 +153,9 @@ function weekSeg(): string {
       ${stat(Math.round(t.breathMin), 'minute de respirație')}
     </div>
     <h2 class="sec">Somn<small>${avgSleep ? `Media pe 7 zile: ${avgSleep.toFixed(1).replace('.', ',')} h` : 'Notează-l pe ecranul Azi'}</small></h2>
-    ${bars(last7.map((d, i) => ({ v: sleepVals[i], label: RO_DAYS[weekdayIdx(d)].slice(0, 2) })), 7)}
+    ${bars(last7.map((d, i) => ({ v: sleepVals[i], label: day2(d), today: d === today })), 7, { fmt: hours, goalLabel: '7 h', name: 'Somn pe 7 zile, în ore' })}
     <h2 class="sec">Pași<small>Ținta: 10.000</small></h2>
-    ${bars(last7.map((d, i) => ({ v: stepsVals[i], label: RO_DAYS[weekdayIdx(d)].slice(0, 2) })), 10000)}`;
+    ${bars(last7.map((d, i) => ({ v: stepsVals[i], label: day2(d), today: d === today })), 10000, { fmt: kSteps, goalLabel: '10k', name: 'Pași pe 7 zile' })}`;
 }
 
 /** Istoric: the latest entries, then the whole list on its own screen. */

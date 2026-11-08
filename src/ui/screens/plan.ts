@@ -70,7 +70,10 @@ export function planHtml(): string {
     <section class="plan-sum">
       <div class="ps-n"><b class="num" data-count="${full}">${full}</b><span>din 7 zile</span></div>
       <div class="ps-n"><b class="num" data-count="${blocksDone}">${blocksDone}</b><span>din ${totalBlocks} blocuri</span></div>
-      <div class="wk-bar" aria-hidden="true">${WEEK.map((d) => `<i class="${d.idx === tIdx ? 'now' : ''}" style="--f:${(dayProgress(d, done) / d.blocks.length).toFixed(3)}"></i>`).join('')}</div>
+      <div class="wk-bar" aria-hidden="true">${WEEK.map((d) => {
+        const f = dayProgress(d, done) / d.blocks.length;
+        return `<i class="${[d.idx === tIdx ? 'now' : '', f === 1 ? 'full' : ''].filter(Boolean).join(' ')}" style="--f:${f.toFixed(3)}"></i>`;
+      }).join('')}</div>
     </section>
     ${cycleCard(today)}
     <ol class="dcs">${days}</ol>

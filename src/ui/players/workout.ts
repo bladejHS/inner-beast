@@ -256,6 +256,7 @@ class WorkoutPlayer implements Player {
     const lastVals = x.last ? (ticked(ex) ? `${x.last.log.sets.filter((v) => v).length} serii` : `${x.last.log.sets.filter((v) => v !== null && v > 0).join(', ')}${isSec(ex) ? ' s' : ''}${x.last.log.kg ? ` cu ${String(x.last.log.kg).replace('.', ',')} kg` : ''}`) : '';
     const lastLine = x.last && ex.type !== 'emom' ? `<p class="prev">Data trecută (${shortDay(x.last.date)}, ${esc(ex.vars[x.last.lvl] ?? '')}): ${lastVals}</p>` : '';
     const isLast = this.i === this.xs.length - 1;
+    // between sets the thumb goes to the sets, so they come right after the goal; the instructions follow them
     const body = `
       ${this.dots()}
       <p class="small dim" style="margin:6px 0 0">Exercițiul ${this.i + 1} din ${this.xs.length}, <span id="el">${elapsed}</span>${ex.opt ? ', opțional' : ''}</p>
@@ -263,11 +264,11 @@ class WorkoutPlayer implements Player {
       ${varChips}
       <p class="target">${esc(targetLine(ex))}</p>
       ${advHtml}
+      ${lastLine}
+      ${main}
       <p class="cue">${esc(ex.cue)}</p>
       ${howHtml(ex.id, ex.vars[x.lvl])}
-      ${ex.alex ? `<p class="alex"><b>Alex:</b> ${esc(ex.alex)}</p>` : ''}
-      ${lastLine}
-      ${main}`;
+      ${ex.alex ? `<p class="alex"><b>Alex:</b> ${esc(ex.alex)}</p>` : ''}`;
     const nav = `<div class="ex-nav">${this.i > 0 ? `<button class="btn ghost" data-a="p:back">Înapoi</button>` : ''}<button class="btn" data-a="p:next">${isLast ? 'Termină' : 'Următorul'}</button></div>`;
     const over = this.rest ? this.restHtml() : this.hold ? this.holdHtml() : '';
     return chrome(this.w.name, body, { cls: '' }).replace(/<\/div>\s*$/, `${nav}${over}</div>`);

@@ -21,15 +21,26 @@ export function spark(values: number[], invert = false): string {
   return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2.2" vector-effect="non-scaling-stroke"/><circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="3" fill="currentColor"/></svg>`;
 }
 
-/** Vertical bars with labels; values at or above `goal` are lime, under it red. */
-export function bars(items: Array<{ v: number; label: string }>, goal?: number, floor = 1): string {
-  const max = Math.max(goal ?? 0, floor, ...items.map((i) => i.v));
-  return `<div class="bars">${items
+/** Vertical bars over a dashed goal line: at or over the goal in steel, under it hatched red, a day with nothing a stub.
+ *  Each bar carries its value and the goal is labelled beside the line, so the chart reads without a legend. */
+export function bars(
+  items: Array<{ v: number; label: string; today?: boolean }>,
+  goal?: number,
+  o: { fmt?: (v: number) => string; goalLabel?: string; name?: string; floor?: number } = {},
+): string {
+  const fmt = o.fmt ?? ((v: number) => String(v));
+  const max = Math.max(goal ?? 0, o.floor ?? 1, ...items.map((i) => i.v));
+  const pct = (v: number) => ((v / max) * 100).toFixed(1);
+  const said = items.map((i) => `${i.label} ${i.v > 0 ? fmt(i.v) : 'nimic'}`).join(', ');
+  const line = goal !== undefined ? `<div class="bars-goal" style="bottom:${pct(goal)}%"><span>${esc(o.goalLabel ?? fmt(goal))}</span></div>` : '';
+  const cols = items
     .map((i) => {
       const cls = goal === undefined ? 'ok' : i.v >= goal ? 'ok' : i.v > 0 ? 'low' : '';
-      return `<div><i class="${cls}" style="height:${((i.v / max) * 100).toFixed(1)}%"></i><span>${esc(i.label)}</span></div>`;
+      return `<div class="bc"><i class="${cls}" style="height:${pct(i.v)}%">${i.v > 0 ? `<b>${esc(fmt(i.v))}</b>` : ''}</i></div>`;
     })
-    .join('')}</div>`;
+    .join('');
+  const days = items.map((i) => `<span${i.today ? ' class="today"' : ''}>${esc(i.label)}</span>`).join('');
+  return `<div class="bars" role="img" aria-label="${esc(o.name ? `${o.name}: ${said}` : said)}"><div class="bars-plot">${line}${cols}</div><div class="bars-x" aria-hidden="true">${days}</div></div>`;
 }
 
 /** Circular progress ring (0..1). */

@@ -410,6 +410,16 @@ test('records: the best bodyweight set on each variation, not the loaded sets or
   assert.equal(bestSet(log, 'pushups', 2), null);
 });
 
+test('push, pull, legs after the review of 2026-11-08: no bench dips, TRX rows, neck twice a week, hip thrust', () => {
+  const ids = (w: string) => workoutById(w as 'push').ex.map((e) => e.id);
+  assert.ok(!WORKOUTS.some((w) => w.ex.some((e) => e.vars.includes('Bench Dips'))));
+  assert.equal(exerciseById('dips')!.vars[0], 'Assisted Dips');
+  assert.ok(ids('push').includes('neck') && ids('pull').includes('neck-fri'));
+  assert.deepEqual(ids('pull').slice(0, 3), ['emom', 'rows', 'trxrow']);
+  assert.ok(!exerciseById('trxrow')!.load && !exerciseById('trxrow')!.bar, 'no weights for the back');
+  assert.equal(ids('legs')[ids('legs').indexOf('rdl') + 1], 'hipthrust');
+});
+
 test('reaction rounds: round 4 on Thursday, the last 3 minutes on Friday, none with a partner, no legs on a no-kick day', () => {
   const thu = WEEK[3].blocks[1];
   assert.deepEqual([thu.rounds, thu.dose, thu.react], [4, '4 × 3 min', { round: 4 }]);
@@ -780,7 +790,7 @@ test('Upper Strength: the second strength dose replaces the AMRAP on Monday in c
   assert.equal(resolveBlock(bw, P).kind, 'amrap');
   const up = workoutById('upper');
   assert.deepEqual(up.ex.map((x) => [x.id, x.sets, x.lo, x.hi, x.rest]), [['pull-str', 3, 3, 5, 150], ['dips-str', 3, 3, 5, 150]]);
-  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 45], ['pull', 50], ['legs', 60], ['upper', 15], ['knee', 8], ['kick', 10]]);
+  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 48], ['pull', 56], ['legs', 66], ['upper', 15], ['knee', 8], ['kick', 10]]);
 });
 
 test('knees: three clean Leg Days bring Box Jump, three more with Box Jump bring CMJ and Broad Jump', () => {

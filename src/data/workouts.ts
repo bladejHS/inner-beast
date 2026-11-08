@@ -8,6 +8,11 @@
 // (no squats with it), dumbbells up to 30 kg, a medicine ball, a partner now and then.
 // The user approved on 2026-11-07 a second strength dose for pulling and pressing: in the strength emphasis (cycle A)
 // Monday's AMRAP becomes Upper Strength, short heavy sets of pull-ups and dips.
+// Reviewed on 2026-11-08 against the specialists, all approved: no Bench Dips (the shoulder ends far back and turned in,
+// a load physiotherapists avoid, heavier still at 134 kg; assisted dips open the progression instead); TRX Rows on
+// Friday for a horizontal pull that keeps progressing without weights (the user wants no weights for the back);
+// neck isometrics twice a week for the strikes to the head; a barbell Hip Thrust on Saturday, glute strength with the
+// knee barely working.
 // Exercise names stay in English; cues are Romanian.
 
 /** The heaviest dumbbells the user owns: past this the weight can't go up, the variation or the tempo does. */
@@ -52,7 +57,7 @@ export const WORKOUTS: Workout[] = [
   {
     id: 'push',
     name: 'Push Training',
-    min: 45,
+    min: 48,
     ex: [
       {
         id: 'explosive', name: 'Explosive Push-ups', vars: ['Incline Explosive Push-ups', 'Explosive Push-ups', 'Clap Push-ups', 'Superman Push-ups'], start: 0,
@@ -66,7 +71,7 @@ export const WORKOUTS: Workout[] = [
         cue: 'A doua doză de picioare a săptămânii, scurtă: te oprești cu 2–3 repetări înainte de limită. Dacă picioarele sunt încă febrile de luni, o sari.',
       },
       {
-        id: 'dips', name: 'Dips', vars: ['Bench Dips', 'Negative Dips', 'Parallel Bar Dips', 'Weighted Dips'], start: 0,
+        id: 'dips', name: 'Dips', vars: ['Assisted Dips', 'Negative Dips', 'Parallel Bar Dips', 'Weighted Dips'], start: 0,
         type: 'reps', sets: 3, lo: 5, hi: 8, rest: 165, muscles: 'piept, triceps',
         cue: 'Umerii jos, departe de urechi. Cobori până când cotul ajunge la 90°. Ajungi la 3 × 8 curat, apoi adaugi greutate.',
       },
@@ -92,6 +97,11 @@ export const WORKOUTS: Workout[] = [
         alex: 'Când folosești core-ul, pumnii au mult mai multă forță.',
       },
       {
+        id: 'neck', name: 'Neck Isometrics', vars: ['Neck Isometrics (hand)', 'Neck Isometrics (band)'], start: 0,
+        type: 'done', sets: 2, label: '4 direcții × 10 s', rest: 30, muscles: 'gâtul',
+        cue: 'Pentru loviturile la cap din kickboxing: gâtul ține, mâna sau banda doar se opune, iar capul nu se mișcă. Frunte, ceafă, stânga, dreapta, câte 10 secunde, cu forța crescută treptat.',
+      },
+      {
         id: 'diamond', name: 'Diamond Push-ups', vars: ['Incline Diamond Push-ups', 'Diamond Push-ups', 'Decline Diamond Push-ups'], start: 0,
         type: 'reps', sets: 2, lo: 8, hi: 15, rest: 60, opt: true, muscles: 'triceps',
         cue: 'Opțional, primul de tăiat când timpul e scurt. Mâinile formează un romb sub piept, coatele rămân lângă corp.',
@@ -101,7 +111,7 @@ export const WORKOUTS: Workout[] = [
   {
     id: 'pull',
     name: 'Pull Training',
-    min: 50,
+    min: 56,
     ex: [
       {
         id: 'emom', name: 'Pull-up EMOM', vars: ['Negative Pull-ups', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 2,
@@ -114,6 +124,11 @@ export const WORKOUTS: Workout[] = [
         type: 'reps', sets: 3, lo: 8, hi: 12, rest: 75, muscles: 'spate',
         cue: 'Corpul drept, tragi pieptul la bară și strângi omoplații. Merge și la TRX: cu cât ești mai orizontal, cu atât e mai greu.',
         alex: 'Ramat 4 × 10–12, ca în ziua lui de spate.',
+      },
+      {
+        id: 'trxrow', name: 'TRX Rows', vars: ['TRX Rows (upright)', 'TRX Rows', 'TRX Rows (feet elevated)', 'TRX Single-arm Rows'], start: 1,
+        type: 'reps', sets: 3, lo: 8, hi: 12, rest: 75, muscles: 'spate, omoplați, biceps',
+        cue: 'Fără greutăți: greutatea o reglezi din unghiul corpului. Cu picioarele mai în față e mai greu. Varianta cu un braț e cea mai grea: repetările sunt pe fiecare braț, iar trunchiul nu se rotește.',
       },
       {
         id: 'face', name: 'Face Pulls', vars: ['Band Pull-Aparts', 'Band Face Pulls', 'TRX Face Pulls', 'TRX Rear Delt Flys'], start: 2,
@@ -153,12 +168,17 @@ export const WORKOUTS: Workout[] = [
         cue: 'Opțional. O serie înseamnă 5 repetări cu brațele în Y, 5 în T și 5 în W, fără pauză.',
         alex: 'Face 4 × 5-5-5 la TRX: umerii din spate trebuie întăriți ca să nu ajungi cu „umeri de boxer”, aduși în față.',
       },
+      {
+        id: 'neck-fri', name: 'Neck Isometrics', vars: ['Neck Isometrics (hand)', 'Neck Isometrics (band)'], start: 0,
+        type: 'done', sets: 2, label: '4 direcții × 10 s', rest: 30, muscles: 'gâtul',
+        cue: 'Pentru loviturile la cap din kickboxing: gâtul ține, mâna sau banda doar se opune, iar capul nu se mișcă. Frunte, ceafă, stânga, dreapta, câte 10 secunde, cu forța crescută treptat.',
+      },
     ],
   },
   {
     id: 'legs',
     name: 'Leg Day',
-    min: 60,
+    min: 66,
     ex: [
       {
         id: 'sprint', name: 'Sprints', vars: ['Hill Sprints (8–10 s)', 'Accelerations (10–20 m)'], start: 0,
@@ -189,6 +209,11 @@ export const WORKOUTS: Workout[] = [
         id: 'rdl', name: 'Romanian Deadlift', vars: ['Barbell Romanian Deadlift'], start: 0,
         type: 'reps', sets: 3, lo: 5, hi: 8, rest: 150, load: true, bar: true, muscles: 'ischiogambieri, fesieri, spate',
         cue: 'Cu bara olimpică: șoldul pleacă înapoi, bara alunecă pe coapse până sub genunchi, spatele rămâne drept. Genunchii stau ușor îndoiți și aproape nemișcați, de aceea îi încarcă puțin. Te oprești cu 1–2 repetări înainte de limită.',
+      },
+      {
+        id: 'hipthrust', name: 'Hip Thrust', vars: ['Glute Bridge', 'Barbell Glute Bridge', 'Barbell Hip Thrust'], start: 1,
+        type: 'reps', sets: 3, lo: 8, hi: 12, rest: 90, load: true, bar: true, muscles: 'fesieri, ischiogambieri',
+        cue: 'Bara pe șold, cu un prosop împăturit sub ea. Împingi prin călcâie până când corpul e drept de la umeri la genunchi, strângi fesierii o secundă sus și cobori controlat. Genunchiul abia lucrează; bărbia spre piept, coastele jos.',
       },
       {
         id: 'sldl', name: 'Single-leg Romanian Deadlift', vars: ['Single-leg RDL (bodyweight)', 'Dumbbell Single-leg RDL'], start: 1,

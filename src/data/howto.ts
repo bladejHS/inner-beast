@@ -122,6 +122,24 @@ export const HOW: Record<string, How> = {
     ],
     mistake: 'Să tragi cu umerii ridicați spre urechi. Umerii rămân jos.',
   },
+  neck: {
+    steps: [
+      'Stai drept, cu bărbia ușor trasă înapoi și umerii jos.',
+      'Palma pe frunte: împingi capul în ea 10 secunde, fără să se miște. Gâtul ține, mâna doar se opune.',
+      'La fel cu palmele la ceafă, apoi cu palma pe partea stângă a capului și pe cea dreaptă.',
+      'În primele săptămâni împingi cam la jumătate din forță, apoi crești treptat. Respiri normal.',
+    ],
+    mistake: 'Să smucești sau să lași capul să se miște: e o ținută, nu o mișcare. Dacă apare durere sau amorțeală în braț, te oprești.',
+  },
+  hipthrust: {
+    steps: [
+      'Glute Bridge: pe spate, genunchii îndoiți, tălpile pe sol la lățimea șoldurilor. Cu bara: bara pe șold, cu un prosop împăturit sub ea.',
+      'Hip Thrust: omoplații pe marginea unei bănci, bara pe șold, tălpile sub genunchi.',
+      'Împingi prin călcâie până când corpul e drept de la umeri la genunchi și strângi fesierii o secundă sus.',
+      'Cobori controlat, fără să atingi solul cu șoldul între repetări.',
+    ],
+    mistake: 'Să arcuiești spatele sus în loc să strângi fesierii: coastele rămân jos și bărbia spre piept.',
+  },
   trxrow: {
     steps: [
       'Ții mânerele TRX, picioarele în față, și te lași pe spate cu brațele întinse. Corpul drept, fesierii strânși.',
@@ -688,6 +706,9 @@ export const HOW: Record<string, How> = {
  * Full steps for a variation that is a different movement from its exercise: the throws that stand in for the jumps
  * while the knees don't take landings. The jump variations fall back to the exercise's own steps (cmj, broad).
  */
+/** The Friday neck work is the Tuesday one. */
+HOW['neck-fri'] = HOW.neck!;
+
 export const VAR_HOW: Record<string, How> = {
   'Medicine Ball Scoop Toss': {
     steps: [
@@ -726,7 +747,10 @@ export const VAR_NOTES: Record<string, string> = {
   'Decline Push-ups': 'Picioarele pe un scaun: mai multă greutate pe umeri și pe partea de sus a pieptului.',
   'Archer Push-ups': 'Mâinile foarte depărtate. Cobori spre o mână, celălalt braț rămâne întins. Alternezi părțile.',
   'Pseudo Planche Push-ups': 'Mâinile la nivelul taliei, degetele spre picioare, corpul înclinat în față peste mâini.',
-  'Bench Dips': 'Mâinile pe marginea unei bănci în spatele tău, picioarele în față. Cu genunchii îndoiți e mai ușor.',
+  'Assisted Dips': 'Între bare, cu picioarele pe sol în față sau cu genunchii pe o bandă prinsă de bare: ele preiau o parte din greutate. Cobori doar până când cotul ajunge la 90°.',
+  'Barbell Glute Bridge': 'Pe sol, bara pe șold cu un prosop sub ea: același gest ca la Glute Bridge, cu greutate.',
+  'Barbell Hip Thrust': 'Omoplații pe marginea unei bănci, bara pe șold: amplitudinea e mai mare decât la glute bridge.',
+  'Neck Isometrics (band)': 'O bandă prinsă la înălțimea capului și trecută pe după cap: ții poziția 10 secunde pe fiecare direcție, cu banda întinsă.',
   'Negative Dips': 'Sari sau urci sus pe bare și cobori cât de lent poți, 3–5 secunde.',
   'Parallel Bar Dips': 'Varianta completă, pe bare paralele.',
   'Weighted Dips': 'Cu un rucsac încărcat sau o centură cu greutăți.',

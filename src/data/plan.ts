@@ -62,6 +62,8 @@ export interface Block {
   hiit?: boolean;
   /** Minutes that grow by `step` after each completed session, from `base` to `cap` (easy aerobic work). */
   grow?: { base: number; step: number; cap: number };
+  /** A reaction drill (see REACT_CUES): one whole round, or the last seconds of a single long round. */
+  react?: { round?: number; lastSec?: number };
 }
 
 /** 7-minute warm-up before the first fighting block (Monday, Thursday): the hips open for the kicks, no jumping. */
@@ -173,7 +175,8 @@ export const WEEK: Day[] = [
     title: 'Combat Training II',
     blocks: [
       { id: 'thu-rope', kind: 'rounds', name: 'Jumping Rope', dose: '3 × 3 min', rounds: 3, work: 180, rest: 'r3', focus: 'rope', alt: 'feet', warmup: true, tip: 'Încălzire pentru picioare: joc ușor, pe vârfuri, sărituri de 1–2 cm pe o suprafață care amortizează. Dacă simți genunchii, alege Agility Ladder.' },
-      { id: 'thu-shadow', kind: 'rounds', name: 'Shadow Kickboxing', dose: '3 × 3 min', rounds: 3, work: 180, rest: 'r3', focus: 'combo', alt: 'partner', tip: 'Combinations: pumni și picioare legate, cu pregătire, ordine clară și ieșire controlată.',
+      { id: 'thu-shadow', kind: 'rounds', name: 'Shadow Kickboxing', dose: '4 × 3 min', line: '4 × 3 min Shadow Kickboxing: 3 runde de combinații, 1 de reacție', rounds: 4, work: 180, rest: 'r3', focus: 'combo', alt: 'partner', react: { round: 4 },
+        tip: 'Combinations: pumni și picioare legate, cu pregătire, ordine clară și ieșire controlată. Runda a patra e de reacție: îți strig atacul lui când nu te aștepți și răspunzi imediat.',
         cues: ['Fiecare combinație are un scop: o pregătești cu jabul, cu teep-ul sau cu o fentă.', 'Stil olandez: pumnii pregătesc, piciorul închide; după kick ieși în unghi.', 'Lovitura de după vine din șoldul pe care l-a încărcat cea dinainte (Ernesto Hoost).', 'Garda rămâne sus și când lovești cu piciorul: o mână e mereu la bărbie.'] },
       { id: 'thu-power', kind: 'rounds', name: 'Punch-out', dose: '3 × 14 × 3 s', line: '3 runde punch-out: 14 × 3 s la maxim, 10 s ușor', rounds: 3, work: BURST_SEC, restSec: 60, focus: 'power', burstFrom: 1, bagOnly: true,
         tip: 'Protocolul testat pe boxeri: 14 explozii de 3 secunde la maxim, cu 10 secunde ușor între ele, de trei ori. Cam 2 minute de efort maxim în total.',
@@ -190,7 +193,8 @@ export const WEEK: Day[] = [
       { id: 'fri-stretch', kind: 'routine', name: 'Dynamic Warm-up', dose: '10 min', routine: 'stretch-pull', min: 10, tip: 'Încălzire în mișcare pentru umeri, omoplați și priză, înainte de tracțiuni.' },
       { id: 'fri-cal', kind: 'workout', name: 'Calisthenics: Back, Biceps, Shoulders', dose: '50 min', line: "50 min Calisthenics (Back, Biceps, Shoulders) + Farmer's Carry", workout: 'pull', min: 50, tip: 'Pull-ups (variante), ramat, umărul posterior, plus cărat greutăți pentru priză și trunchi.' },
       KICK_ARMOR,
-      { id: 'fri-easy', kind: 'rounds', name: 'Easy Shadow Kickboxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'distance', tip: 'Distance Work: controlul distanței e obiectivul principal. La 2 m, distanța lungă e a ta.',
+      { id: 'fri-easy', kind: 'rounds', name: 'Easy Shadow Kickboxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'distance', react: { lastSec: 180 },
+        tip: 'Distance Work: controlul distanței e obiectivul principal. La 2 m, distanța lungă e a ta. Ultimele 3 minute sunt de reacție: atacul lui strigat la întâmplare, răspunsul tău imediat.',
         cues: ['Stai la capătul jabului și al teep-ului: tu ajungi la el, el nu ajunge la tine.', 'Pe pasul lui: teep sau low kick exact când pune piciorul jos.', 'Când te presează, ieși în cerc; înapoi în linie dreaptă ajungi la corzi.', 'Dacă ajunge aproape: genunchi, antebrațele pe umerii lui, apoi ieși.'] },
     ],
   },
@@ -243,7 +247,8 @@ export function resolveBlock(b: Block, p: Picks): Block {
   }
   if (r.alt === 'partner' && p.thuPartner === 'spar') {
     return {
-      ...r, name: 'Technical Sparring / Pads', focus: 'pads',
+      // with a partner the pads take the slot: three rounds, no solo reaction round
+      ...r, name: 'Technical Sparring / Pads', focus: 'pads', rounds: 3, dose: '3 × 3 min', line: undefined, react: undefined,
       tip: 'Partea pe care niciun timer nu o înlocuiește: reacționezi la un om. Thai pads: partenerul ține, tu lovești, iar în runda a treia atacă el, lent, și tu răspunzi. Aplicația vă strigă amândurora ce urmează. La sparring tehnic oprești combinațiile strigate.',
       cues: ['Tibiere amândoi la exercițiile cu low kick și check; el atacă lent și controlat.', 'Pernele ținute ferm, cu cotul îndoit, aduse puțin în lovitură.', 'Sparring doar cu un antrenor de față, cu cască, proteză și mănuși de sparring.'],
     };

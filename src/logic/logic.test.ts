@@ -22,7 +22,7 @@ import { BURST_SEC, WEEK, blockName, blockLine, resolveBlock, type Picks } from 
 import { ROW_CHALLENGES, rowChallenge, rowRests, rowTotal } from '../data/row.ts';
 import { WORKOUTS, exerciseById, workoutById } from '../data/workouts.ts';
 import { ROUTINES, routineSeconds } from '../data/routines.ts';
-import { COMBOS, INSIDE, focusCombos, learnOrder, usesLegs, weekCombos } from '../data/combos.ts';
+import { COMBOS, INSIDE, focusCombos, learnOrder, legStrike, REACT_GAP, reactCues, usesLegs, weekCombos } from '../data/combos.ts';
 import { BOOK } from '../data/book.ts';
 import { testById } from '../data/tests.ts';
 
@@ -408,6 +408,18 @@ test('records: the best bodyweight set on each variation, not the loaded sets or
   assert.equal(bestSet(log, 'pushups', 1)?.v, 22);
   assert.equal(bestSet(log, 'pushups', 1, log[1].ts)?.v, 20);
   assert.equal(bestSet(log, 'pushups', 2), null);
+});
+
+test('reaction rounds: round 4 on Thursday, the last 3 minutes on Friday, none with a partner, no legs on a no-kick day', () => {
+  const thu = WEEK[3].blocks[1];
+  assert.deepEqual([thu.rounds, thu.dose, thu.react], [4, '4 × 3 min', { round: 4 }]);
+  assert.deepEqual(WEEK[4].blocks.find((b) => b.id === 'fri-easy')!.react, { lastSec: 180 });
+  const pads = resolveBlock(thu, { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', thuPartner: 'spar', rowCh: 'a' });
+  assert.deepEqual([pads.rounds, pads.react, blockLine(thu, { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', thuPartner: 'spar', rowCh: 'a' })], [3, undefined, '3 × 3 min Technical Sparring / Pads']);
+  assert.ok(reactCues().length >= 6 && reactCues().every((c) => c.answer.length > 0 && c.call.endsWith('!')));
+  assert.ok(reactCues().filter((c) => c.answer.some(legStrike)).length >= 3);
+  assert.ok(reactCues(false).length >= 4 && !reactCues(false).some((c) => c.answer.some(legStrike)));
+  assert.ok(REACT_GAP[0] >= 2 && REACT_GAP[1] > REACT_GAP[0]);
 });
 
 test('program additions: Kick Armor on Friday, pad rounds for the partner slot, the Kick Height test', () => {

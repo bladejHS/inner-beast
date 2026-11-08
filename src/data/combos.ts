@@ -473,6 +473,44 @@ export const PAD_DRILLS: Combo[] = [
   { id: 'pad-check-hook', name: 'Check Hook', seq: ['Lead Hook', 'Pivot out'], call: 'Come in. Check hook', cat: 'counter', note: 'Partenerul: intră peste tine cu pernele sus; tu dai croșeul în perna lui și pivotezi în afara liniei.' },
 ];
 
+/** One attack the reaction rounds call at random: what he does, and your answer (strike names in English). */
+export interface ReactCue {
+  id: string;
+  /** What the voice says (English). */
+  call: string;
+  attack: string;
+  answer: string[];
+}
+
+/**
+ * Reaction rounds, no partner needed (approved 2026-11-08): his attack is called at moments you can't predict and you
+ * answer at once, then reset. Every answer is one the plan already teaches, so the drill trains the reaction and the
+ * decision, not new technique. A no-kick day keeps only answers without legs.
+ */
+export const REACT_CUES: ReactCue[] = [
+  { id: 'jab', call: 'Jab!', attack: 'Jab', answer: ['Lean back', 'Right Cross'] },
+  { id: 'hook', call: 'Hook!', attack: 'Hook', answer: ['Cover', 'Cross'] },
+  { id: 'low', call: 'Low kick!', attack: 'Low Kick', answer: ['Check', 'Cross'] },
+  { id: 'step', call: 'Step in!', attack: 'Intră peste tine', answer: ['Lead Teep'] },
+  { id: 'duck', call: 'Comes in low!', attack: 'Intră aplecat', answer: ['Rear Knee'] },
+  { id: 'press', call: 'Pressure!', attack: 'Te presează', answer: ['Circle out', 'Lead Teep'] },
+  { id: 'clinch', call: 'Clinch!', attack: 'Te prinde în clinci', answer: ['Stand tall', 'Rear Knee', 'Frame out'] },
+];
+
+const REACT_BOX: ReactCue[] = [
+  { id: 'jab', call: 'Jab!', attack: 'Jab', answer: ['Lean back', 'Right Cross'] },
+  { id: 'hook', call: 'Hook!', attack: 'Hook', answer: ['Cover', 'Cross'] },
+  { id: 'step', call: 'Step in!', attack: 'Intră peste tine', answer: ['Jab', 'Step out'] },
+  { id: 'press', call: 'Pressure!', attack: 'Te presează', answer: ['Circle out', 'Jab'] },
+  { id: 'clinch', call: 'Clinch!', attack: 'Te prinde în clinci', answer: ['Frame', 'Pivot out', 'Jab'] },
+];
+
+/** The attacks of a reaction round; kicks = false on a no-kick day. */
+export const reactCues = (kicks = true): ReactCue[] => (kicks ? REACT_CUES : REACT_BOX);
+
+/** Seconds between two attacks: random, so the moment can't be guessed, and long enough to answer and reset. */
+export const REACT_GAP: [number, number] = [3, 7];
+
 const PAD_ROUNDS: Array<{ name: string; cue: string; ids: string[] }> = [
   { name: 'Arme lungi', cue: 'Partenerul ține, tu lucrezi de la distanța ta: jab, teep, inside low kick.', ids: ['pad-jab-teep', 'pad-jab-inside', 'pad-teep-step'] },
   { name: 'Pumni, apoi piciorul', cue: 'Partenerul mută pernele pe rând: sus pentru pumni, pe coapsă sau pe coaste pentru kick.', ids: ['pad-12-low', 'pad-123-low', 'pad-hook-body', 'pad-cross-lbody'] },

@@ -3,7 +3,7 @@
 // boxing ones on a day the knee note says no kicks).
 
 import { BURST, BURST_SEC, WARMUP, WARMUP_SEC, type ComboFocus } from '../../data/plan.ts';
-import { focusCombos, LADDER_MOVES, legStrike, ROPE_MOVES, FOCUS_LINE, roundThemes, type Combo, type RoundTheme } from '../../data/combos.ts';
+import { focusCombos, LADDER_MOVES, legStrike, REACT_GAP, reactCues, ROPE_MOVES, FOCUS_LINE, roundThemes, type Combo, type ReactCue, type RoundTheme } from '../../data/combos.ts';
 
 /** The e-book's focus line for each block, as printed on the plan page. */
 const BOOK_FOCUS: Record<string, string> = {
@@ -47,7 +47,12 @@ export interface RoundsCfg {
   cardio?: boolean;
   /** Hard intervals on the rower (4 × 4): no combinations, the pulse window on screen, saved as cardio. */
   hiit?: boolean;
+  /** Reaction drill: a whole round (1-based), or the last seconds of a single round. */
+  react?: { round?: number; lastSec?: number };
 }
+
+/** The reaction round's theme, for the round list and the phase label. */
+const REACT_THEME: RoundTheme = { name: 'Reacție', cue: 'Atacul lui, strigat la întâmplare: răspunzi imediat, apoi revii în gardă.', combos: [] };
 
 /** Last seconds of a round that turn into a straight-punch sprint (second half of the rounds). */
 const SPRINT = 30;
@@ -89,6 +94,13 @@ class RoundsPlayer implements Player {
   sore: KneeNote | null = null;
   /** The week of kicking when this block calls kicks (0 when it doesn't): sets the kick power, see logic/knee.ts. */
   kickW = 0;
+  /** Reaction drill: the attacks it calls, the one on screen, when the next comes, how many were called. */
+  reacts: ReactCue[] = [];
+  react: ReactCue | null = null;
+  reactIdx = -1;
+  nextReact = 0;
+  reactOn = false;
+  reactN = 0;
   /** Sprint finish on the later rounds; on by default at the bag. */
   sprint: boolean;
   sprinting = false;
@@ -108,6 +120,7 @@ class RoundsPlayer implements Player {
     this.calls = cfg.cardio || cfg.hiit || cfg.burstFrom === 1 ? [] : this.buildCalls();
     this.themes = cfg.rounds > 1 && !cfg.cardio && !cfg.hiit && cfg.burstFrom !== 1 ? roundThemes(cfg.focus, ctx.S.nut.h, !this.sore) : [];
     this.kickW = !this.sore && this.calls.some((c) => c.seq.some(legStrike)) ? kickWeek(ctx.S.log, dayKey()) : 0;
+    this.reacts = cfg.react && !cfg.cardio && !cfg.hiit ? reactCues(!this.sore) : [];
     this.caller = this.calls.length > 0 && ctx.S.set.callEvery > 0;
     // Off by default: long all-out finishes wear technique down; the tested burst format is the punch-out.
     this.sprint = false;
@@ -115,9 +128,52 @@ class RoundsPlayer implements Player {
     this.render();
   }
 
-  /** The theme of a round (1-based), if the block has themes. */
+  /** The theme of a round (1-based), if the block has themes; the reaction round has its own. */
   themeOf(round: number | undefined): RoundTheme | null {
+    if (round && this.reactRound(round)) return REACT_THEME;
     return round && this.themes.length ? this.themes[(round - 1) % this.themes.length] : null;
+  }
+
+  /** The round given whole to the reaction drill. */
+  reactRound(round: number | undefined): boolean {
+    return !!round && !!this.reacts.length && this.cfg.react?.round === round;
+  }
+
+  /** Whether the reaction drill runs now: in its round, or in the last seconds of a single long round. */
+  reacting(p: Phase | undefined, left: number): boolean {
+    const r = this.cfg.react;
+    if (!r || !p || p.kind !== 'work' || !this.reacts.length || !this.caller || this.isBurst(p.round)) return false;
+    if (r.round) return p.round === r.round;
+    return !!r.lastSec && left <= r.lastSec;
+  }
+
+  /** His next attack: never the same twice in a row, after a gap that can't be guessed. */
+  nextReactCall(): void {
+    let i = Math.floor(Math.random() * this.reacts.length);
+    if (this.reacts.length > 1 && i === this.reactIdx) i = (i + 1) % this.reacts.length;
+    this.reactIdx = i;
+    this.react = this.reacts[i];
+    this.reactN++;
+    const [lo, hi] = REACT_GAP;
+    this.nextReact = this.clock.t + lo + Math.random() * (hi - lo);
+    hush();
+    say(this.react.call, 'en');
+    buzz(80);
+  }
+
+  reactHtml(): string {
+    const r = this.react;
+    if (!r) return '<div class="call-box"><h4>Reacție</h4><div class="c-name">Fii gata</div><p class="small" style="margin:0">Atacul lui vine când nu te aștepți. Răspunzi imediat, apoi revii în gardă.</p></div>';
+    return `<div class="call-box" aria-live="assertive"><h4>${esc(r.attack)}</h4><div class="c-name">${esc(r.answer.join(' → '))}</div></div>`;
+  }
+
+  /** On the start screen: when the drill runs and what to answer to each attack. */
+  reactInfoHtml(): string {
+    const r = this.cfg.react;
+    if (!r || !this.reacts.length) return '';
+    const when = r.round ? `Runda ${r.round}` : `Ultimele ${Math.round((r.lastSec ?? 0) / 60)} minute`;
+    return `<div class="call-box"><h4>${when}: reacție</h4><p class="small" style="margin:0 0 6px">Îți strig atacul lui la ${REACT_GAP[0]}–${REACT_GAP[1]} secunde, la întâmplare. Răspunzi imediat, apoi revii în gardă.${this.sore ? ' Azi fără kick-uri: doar răspunsuri cu pumni și pași.' : ''}</p>
+      <ul class="calls">${this.reacts.map((c) => `<li><b>${esc(c.attack)}</b><span>${esc(c.answer.join(' → '))}</span></li>`).join('')}</ul></div>`;
   }
 
   isBurst(round: number | undefined): boolean {
@@ -125,7 +181,7 @@ class RoundsPlayer implements Player {
   }
 
   sprintRound(round: number | undefined): boolean {
-    return this.sprint && !!round && !this.isBurst(round) && round > Math.floor(this.cfg.rounds / 2) && this.cfg.work >= 90;
+    return this.sprint && !!round && !this.isBurst(round) && !this.reactRound(round) && round > Math.floor(this.cfg.rounds / 2) && this.cfg.work >= 90;
   }
 
   buildCalls(): Call[] {
@@ -186,7 +242,8 @@ class RoundsPlayer implements Player {
       ${c.cues?.length ? `<ul class="ticks small">${c.cues.map((q) => `<li>${esc(q)}</li>`).join('')}</ul>` : ''}
       ${c.legSwap ? `<p class="dim">${esc(LEG_CUES[ctx.S.set.legMode])}</p>` : ''}
       ${howHtml(c.legSwap ? (ctx.S.set.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit') : c.name, undefined, { open: true })}
-      ${this.themes.length ? `<div class="call-box"><h4>Tema fiecărei runde</h4><ol class="small" style="margin:0;padding-left:18px">${this.themes.map((t) => `<li><b>${esc(t.name)}</b>: ${esc(t.cue)}</li>`).join('')}</ol>${this.themes.length < c.rounds ? '<p class="small dim" style="margin:6px 0 0">Apoi se reiau în ordine.</p>' : ''}</div>` : ''}
+      ${this.themes.length ? `<div class="call-box"><h4>Tema fiecărei runde</h4><ol class="small" style="margin:0;padding-left:18px">${Array.from({ length: Math.min(c.rounds, this.themes.length + (this.reactRound(c.react?.round) ? 1 : 0)) }, (_, i) => this.themeOf(i + 1)).filter((t): t is RoundTheme => !!t).map((t) => `<li><b>${esc(t.name)}</b>: ${esc(t.cue)}</li>`).join('')}</ol>${this.themes.length + (this.reactRound(c.react?.round) ? 1 : 0) < c.rounds ? '<p class="small dim" style="margin:6px 0 0">Apoi se reiau în ordine.</p>' : ''}</div>` : ''}
+      ${this.reactInfoHtml()}
       ${this.callsHtml()}
       <div class="setup">
         ${legs}
@@ -209,9 +266,11 @@ class RoundsPlayer implements Player {
     const cls = burst ? (burst.on ? 'ph-burst' : 'ph-work') : p.kind === 'work' ? (last ? 'ph-last' : this.cfg.cardio ? 'ph-easy' : 'ph-work') : p.kind === 'prep' || p.kind === 'move' ? 'ph-prep' : 'ph-rest';
     const roundTxt = p.kind === 'move' ? `Încălzire ${p.round} din ${p.rounds}` : p.round && (p.rounds ?? 0) > 1 ? (burst ? `Runda ${p.round}/${p.rounds} · explozia ${burst.n}/${BURST.reps}` : `Runda ${p.round} din ${p.rounds}`) : burst ? `Explozia ${burst.n} din ${BURST.reps}` : '';
     const theme = p.kind === 'work' && !burst ? this.themeOf(p.round) : null;
+    const reacting = this.reacting(p, L.left);
     let panel = '';
     if (burst) panel = `<div class="call-box"><h4>${burst.on ? 'Maxim' : 'Ușor'}</h4><div class="c-name">${burst.on ? (this.cfg.name.includes('Shadow') ? 'Drepte, cât de rapid poți' : 'Lovește prin sac') : 'Respiră, mișcă-te'}</div></div>`;
     else if (p.kind === 'move') panel = `<div class="call-box"><h4>${esc(p.label)}</h4><p style="margin:0;font-weight:600">${esc(WARMUP[p.move ?? 0]?.cue ?? '')}</p></div>`;
+    else if (reacting) panel = this.reactHtml();
     else if (p.kind === 'work' && this.sprinting) panel = '<div class="call-box"><h4>Sprint</h4><div class="c-name">Lovituri drepte, viteză maximă</div><p class="small" style="margin:0">Jab-cross non-stop, pe toată distanța. Garda revine la fiecare pumn.</p></div>';
     else if (p.kind === 'work' && this.call && this.caller) panel = this.callHtml(theme ? theme.name : 'Acum');
     else if (p.kind === 'work' && this.cfg.cardio) panel = this.zoneHtml();
@@ -221,7 +280,7 @@ class RoundsPlayer implements Player {
     else if (p.kind === 'rest') panel = `<div class="call-box"><h4>Urmează</h4><p style="margin:0;font-weight:600">Runda ${(p.round ?? 0) + 1} din ${p.rounds}. Respiră adânc.</p></div>`;
     else if (p.kind === 'prep') panel = this.cfg.tip ? `<div class="call-box"><h4>Focus</h4><p style="margin:0;font-weight:600">${esc(this.cfg.tip)}</p></div>` : '';
     const body = `
-      <p class="phase-lbl" id="ph">${esc(burst ? (burst.on ? 'Maxim' : 'Ușor') : p.kind === 'work' ? (this.sprinting ? 'Sprint' : theme?.name || (this.cfg.focus && FOCUS_LINE[this.cfg.focus]) || (this.cfg.cardio ? 'Ușor, în ritm de conversație' : 'Lucru')) : p.kind === 'move' ? 'Încălzire' : p.label)}</p>
+      <p class="phase-lbl" id="ph">${esc(burst ? (burst.on ? 'Maxim' : 'Ușor') : p.kind === 'work' ? (this.sprinting ? 'Sprint' : reacting ? 'Reacție' : theme?.name || (this.cfg.focus && FOCUS_LINE[this.cfg.focus]) || (this.cfg.cardio ? 'Ușor, în ritm de conversație' : 'Lucru')) : p.kind === 'move' ? 'Încălzire' : p.label)}</p>
       <div class="big-time" id="t">${burst ? Math.ceil(burst.left) : mmss(Math.ceil(L.left))}</div>
       ${p.kind === 'rest' && p.round && (p.rounds ?? 0) > 1
         ? `<p class="round-lbl" id="rd">Urmează runda</p><div class="rd-big" aria-label="Runda ${p.round + 1} din ${p.rounds}">${p.round + 1}<small>/${p.rounds}</small></div>`
@@ -383,6 +442,30 @@ class RoundsPlayer implements Player {
         }
       } else if (sec <= 3 && sec >= 1) sfx.tick();
     }
+    if (this.reacting(p, L.left)) {
+      if (!this.reactOn) {
+        // the drill starts: a first attack after 2.5 s; the tail of a long round is announced
+        this.reactOn = true;
+        this.react = null;
+        this.nextReact = this.clock.t + 2.5;
+        if (!this.reactRound(p.round)) {
+          hush();
+          sfx.warn();
+          buzz([120, 60, 120]);
+          say('Reaction', 'en');
+        }
+        this.render();
+      }
+      if (this.clock.running && this.clock.t >= this.nextReact && L.left > 2) {
+        this.nextReactCall();
+        this.render();
+      }
+      return;
+    }
+    if (this.reactOn) {
+      this.reactOn = false;
+      this.react = null;
+    }
     if (p.kind === 'work' && this.caller && !this.sprinting && this.clock.running && this.clock.t - this.lastCall >= this.every && L.left > 5) {
       this.nextCall();
       this.render();
@@ -405,7 +488,9 @@ class RoundsPlayer implements Player {
       sfx.bell(1);
       buzz(350);
       const th = this.themeOf(p.round);
-      if (this.caller && !burst) {
+      this.reactOn = false;
+      if (this.caller && this.reactRound(p.round)) window.setTimeout(() => this.clock.running && say('Reaction round', 'en'), 300);
+      else if (this.caller && !burst) {
         this.nextCall(false);
         if (th) window.setTimeout(() => this.clock.running && say(th.name, 'ro'), 300);
         window.setTimeout(() => this.call && this.clock.running && say(this.call.say, 'en'), 900);
@@ -446,7 +531,7 @@ class RoundsPlayer implements Player {
         ? { min: Math.round(work / 60), workDone: Math.round(work), ...(this.deload ? { deload: true } : {}) }
         : this.cfg.hiit
           ? { hiit: true, rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), ...(this.deload ? { deload: true } : {}) }
-        : { rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), focus: this.cfg.focus ?? '', called: this.called, ...(bursts ? { bursts } : {}), ...(this.kickW ? { kicks: true } : {}) },
+        : { rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), focus: this.cfg.focus ?? '', called: this.called, ...(bursts ? { bursts } : {}), ...(this.kickW ? { kicks: true } : {}), ...(this.reactN ? { react: this.reactN } : {}) },
     });
     addEntry(this.entry);
     this.saved = true;
@@ -509,9 +594,12 @@ class RoundsPlayer implements Player {
         this.lastI = -2;
         return this.tick();
       }
-      case 'p:combo':
-        this.nextCall();
+      case 'p:combo': {
+        const L = locate(this.phases, this.clock.t);
+        if (this.reacting(this.phases[L.i], L.left)) this.nextReactCall();
+        else this.nextCall();
         return this.render();
+      }
       case 'p:reset': {
         const was = this.clock.running;
         this.clock.pause();

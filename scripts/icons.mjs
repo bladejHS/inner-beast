@@ -1,7 +1,7 @@
 // Renders the app icons from the wolf emblem (public/splash/emblem.webp): node scripts/icons.mjs
 // Design (2026-11-07), after Apple's app icon guidelines, web.dev on maskable icons and Michael Flarup's five aspects
 // (scalability, recognisability, consistency, uniqueness, no words): one object, the app's own low-poly wolf from the
-// opening and the tab bar; a black field lit blood red from behind; a red rim around the head so its outline holds at
+// opening and the tab bar; a steel-black field under a cold spotlight, lit red from behind (Broadcast, 2026-11-08); a red rim around the head so its outline holds at
 // 40 px on any wallpaper; the eyes lit, the mark that survives at the smallest sizes. No text, no thin lines.
 import sharp from 'sharp';
 import { writeFileSync } from 'node:fs';
@@ -10,12 +10,13 @@ const EMBLEM = 'public/splash/emblem.webp';
 
 const svg = (body, w, h) => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${body}</svg>`);
 
-/** Black with a blood glow behind the head, a little darker at the bottom. */
+/** Steel black under a cold spotlight, a red light from behind the head, darker at the bottom (Broadcast, 2026-11-08). */
 function background(size) {
   return svg(`<defs>
-    <radialGradient id="g" cx="0.5" cy="0.46" r="0.62"><stop offset="0" stop-color="#b3121c" stop-opacity=".81"/><stop offset="0.38" stop-color="#5a0a10" stop-opacity=".77"/><stop offset="0.75" stop-color="#160405"/><stop offset="1" stop-color="#080606"/></radialGradient>
-    <linearGradient id="v" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></linearGradient>
-  </defs><rect width="${size}" height="${size}" fill="#080606"/><rect width="${size}" height="${size}" fill="url(#g)"/><rect width="${size}" height="${size}" fill="url(#v)"/>`, size, size);
+    <radialGradient id="s" cx="0.5" cy="0.05" r="0.75"><stop offset="0" stop-color="#9fb0cf" stop-opacity=".42"/><stop offset="0.5" stop-color="#1b2130" stop-opacity=".5"/><stop offset="1" stop-color="#05060a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="g" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#e5102c" stop-opacity=".55"/><stop offset="0.6" stop-color="#6e0715" stop-opacity=".35"/><stop offset="1" stop-color="#05060a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="v" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
+  </defs><rect width="${size}" height="${size}" fill="#05060a"/><rect width="${size}" height="${size}" fill="url(#s)"/><rect width="${size}" height="${size}" fill="url(#g)"/><rect width="${size}" height="${size}" fill="url(#v)"/>`, size, size);
 }
 
 /** The emblem's alpha as one solid colour. */
@@ -58,7 +59,7 @@ async function icon(size, scale) {
   const { width: w } = await sharp(head).metadata();
   const x = Math.round((size - w) / 2);
   const y = Math.round((size - h) / 2 + size * 0.015);
-  const rim = await silhouette(h, [255, 59, 48]);
+  const rim = await silhouette(h, [255, 41, 68]);
   const e = await eyes(h, Math.max(0.6, size * 0.02));
   return sharp(background(size))
     .composite([

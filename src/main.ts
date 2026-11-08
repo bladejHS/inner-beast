@@ -171,6 +171,7 @@ function render(enter: Enter = ''): void {
   syncNav();
   placeSegInk(enter === 'seg');
   moveRings(app, !!enter);
+  fitTitles(app);
   if (enter) for (const el of app.querySelectorAll<HTMLElement>('[data-count]')) countUp(el, 0, Number(el.dataset.count) || 0, 800);
   if (keepId) {
     const el = document.getElementById(keepId) as HTMLInputElement | null;
@@ -178,6 +179,26 @@ function render(enter: Enter = ''): void {
   }
 }
 ctx.render = () => render();
+
+/**
+ * The big titles never run off the screen: a long word (MEDITATION, CALISTHENICS) shrinks its title until the widest
+ * word fits. Runs after every draw, once the font has loaded and when the window changes size.
+ */
+function fitTitles(root: ParentNode = document): void {
+  for (const el of root.querySelectorAll<HTMLElement>('.ms-t span, .ph-t span')) {
+    el.style.fontSize = '';
+    for (let i = 0; i < 3 && el.scrollWidth > el.clientWidth + 1; i++) {
+      const size = parseFloat(getComputedStyle(el).fontSize);
+      el.style.fontSize = `${Math.floor(size * (el.clientWidth / el.scrollWidth) * 0.98)}px`;
+    }
+  }
+}
+document.fonts?.ready.then(() => fitTitles()).catch(() => {});
+let fitTimer = 0;
+addEventListener('resize', () => {
+  clearTimeout(fitTimer);
+  fitTimer = window.setTimeout(() => fitTitles(), 120);
+});
 
 /** The red blade under the current section: slides from the section that was open before. */
 function placeSegInk(slide: boolean): void {

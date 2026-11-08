@@ -33,7 +33,7 @@ export function top(back: boolean | Tab = false): string {
       ? `<button class="back" data-a="tab" data-k="${back}" aria-label="Înapoi la ${esc(TAB_NAME[back] ?? back)}">${ic('back')}<span>${esc(TAB_NAME[back] ?? 'Înapoi')}</span></button>`
       : back
         ? `<button class="back" data-a="back" aria-label="Înapoi">${ic('back')}<span>Înapoi</span></button>`
-        : `<div class="brand"><i class="brand-wolf" style="--m:url(${BASE}art/wolf.webp)" aria-hidden="true"></i><span>Inner <b>Beast</b></span></div>`;
+        : `<div class="brand"><img class="brand-mark" src="${BASE}ui/mark.svg" alt="" width="30" height="30"><span>Inner <b>Beast</b></span></div>`;
   const run = streak > 1 ? `<button class="streak${streak >= 7 ? ' hot' : ''}" data-a="tab" data-k="progress" aria-label="${streak} zile active la rând">${ic('claw')}<b class="num">${streak}</b><span>zile</span></button>` : '';
   return `<header class="top">${left}<div class="top-r">${run}<button class="icon-btn" data-a="settings" aria-label="Setări">${ic('gear')}</button></div></header>`;
 }

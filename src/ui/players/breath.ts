@@ -9,6 +9,7 @@ import { art } from '../art.ts';
 import { chrome, ctrlBtn, setText } from './common.ts';
 
 class BreathPlayer implements Player {
+  readonly cool = true;
   st: 'ready' | 'run' | 'done' = 'ready';
   block?: string;
   phases: Phase[] = [];

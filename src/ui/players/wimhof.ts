@@ -12,6 +12,7 @@ import { chrome, field, setText, stepper } from './common.ts';
 type St = 'ready' | 'breathe' | 'hold' | 'recover' | 'exhale' | 'med' | 'done';
 
 class WimHofPlayer implements Player {
+  readonly cool = true;
   st: St = 'ready';
   block?: string;
   round = 1;

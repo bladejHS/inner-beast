@@ -22,6 +22,8 @@ export interface Player {
   input?(el: HTMLElement): void;
   /** Return false to block closing (e.g. ask first). */
   close?(): boolean;
+  /** Breathing, Wim Hof, the cold shower and the Breathwork Lab: shown in the cool zone's ice instead of red. */
+  cool?: boolean;
   destroy(): void;
 }
 
@@ -141,6 +143,7 @@ export function mountPlayer(p: Player): void {
   }
   if (ctx.player) ctx.player.destroy();
   ctx.player = p;
+  ov?.classList.toggle('cool', !!p.cool);
   void keepAwake(true);
 }
 
@@ -153,7 +156,10 @@ export function closePlayer(force = false): void {
   hush();
   void keepAwake(false);
   const ov = document.getElementById('ov');
-  if (ov) ov.innerHTML = '';
+  if (ov) {
+    ov.innerHTML = '';
+    ov.classList.remove('cool');
+  }
   ctx.render();
   ctx.onPlayerClosed();
 }

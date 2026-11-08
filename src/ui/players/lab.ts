@@ -10,6 +10,7 @@ import { art } from '../art.ts';
 import { chrome, ctrlBtn, setText } from './common.ts';
 
 class LabPlayer implements Player {
+  readonly cool = true;
   st: 'ready' | 'run' | 'done' = 'ready';
   m: LabDef;
   min: number;

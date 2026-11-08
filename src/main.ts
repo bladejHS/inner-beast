@@ -96,7 +96,7 @@ nav.className = 'nav';
 nav.setAttribute('aria-label', 'Secțiuni');
 nav.innerHTML = `<div class="nav-plate" aria-hidden="true"></div><i class="nav-blade" aria-hidden="true"></i>${ORDER.map(([k, label, icon]) =>
   k === 'today'
-    ? `<button class="nav-b nav-wolf" data-a="tab" data-k="today"><span class="nw" aria-hidden="true"><i class="nw-ring"></i><span class="nw-hex"><img src="${BASE}ui/wolf-badge.webp" alt="" width="168" height="198" decoding="async"></span></span><span class="nav-l">${label}</span></button>`
+    ? `<button class="nav-b nav-wolf" data-a="tab" data-k="today"><span class="nw" aria-hidden="true"><i class="nw-ring"></i><span class="nw-hex"><img src="${BASE}ui/mark-badge.webp" alt="" width="192" height="192" decoding="async"></span></span><span class="nav-l">${label}</span></button>`
     : `<button class="nav-b" data-a="tab" data-k="${k}">${ic(icon)}<span class="nav-l">${label}</span></button>`,
 ).join('')}`;
 document.body.appendChild(nav);
@@ -141,6 +141,9 @@ function syncNav(): void {
   }
   if (cur !== navOn) {
     nav.dataset.on = cur;
+    // Minte is the cool zone: its action colour is ice, not red (beast.css)
+    if (cur === 'mind') document.documentElement.dataset.zone = 'cool';
+    else delete document.documentElement.dataset.zone;
     // the wolf roars when Azi is picked again
     if (cur === 'today' && navOn) roar();
     navOn = cur;

@@ -10,6 +10,7 @@ import { howHtml } from '../how.ts';
 import { chrome, ctrlBtn, field, setText, stepper, switchCtl } from './common.ts';
 
 class ShowerPlayer implements Player {
+  readonly cool = true;
   st: 'ready' | 'run' | 'done' = 'ready';
   block?: string;
   phases: Phase[] = [];

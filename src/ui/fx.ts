@@ -80,7 +80,7 @@ export function celebrate(title: string, sub: string): void {
     <div class="cele-core">
       <div class="cele-mark" aria-hidden="true">
         <i class="cele-halo"></i>
-        <img src="${BASE}splash/emblem.webp" alt="" width="680" height="801" decoding="async">
+        <img src="${BASE}splash/umbra.webp" alt="" width="680" height="801" decoding="async">
         <svg class="cele-claws" viewBox="0 0 100 100">${claws}</svg>
       </div>
       <p class="cele-k">${sub}</p>

@@ -11,8 +11,8 @@
 // Reviewed on 2026-11-08 against the specialists, all approved: no Bench Dips (the shoulder ends far back and turned in,
 // a load physiotherapists avoid, heavier still at 134 kg; assisted dips open the progression instead); TRX Rows on
 // Friday for a horizontal pull that keeps progressing without weights (the user wants no weights for the back);
-// neck isometrics twice a week for the strikes to the head; a barbell Hip Thrust on Saturday, glute strength with the
-// knee barely working.
+// neck isometrics for the strikes to the head, as their own routine outside the plan (Lupte → Timere, the user's
+// choice); a barbell Hip Thrust on Saturday, glute strength with the knee barely working.
 // Exercise names stay in English; cues are Romanian.
 
 /** The heaviest dumbbells the user owns: past this the weight can't go up, the variation or the tempo does. */
@@ -57,7 +57,7 @@ export const WORKOUTS: Workout[] = [
   {
     id: 'push',
     name: 'Push Training',
-    min: 48,
+    min: 45,
     ex: [
       {
         id: 'explosive', name: 'Explosive Push-ups', vars: ['Incline Explosive Push-ups', 'Explosive Push-ups', 'Clap Push-ups', 'Superman Push-ups'], start: 0,
@@ -97,11 +97,6 @@ export const WORKOUTS: Workout[] = [
         alex: 'Când folosești core-ul, pumnii au mult mai multă forță.',
       },
       {
-        id: 'neck', name: 'Neck Isometrics', vars: ['Neck Isometrics (hand)', 'Neck Isometrics (band)'], start: 0,
-        type: 'done', sets: 2, label: '4 direcții × 10 s', rest: 30, muscles: 'gâtul',
-        cue: 'Pentru loviturile la cap din kickboxing: gâtul ține, mâna sau banda doar se opune, iar capul nu se mișcă. Frunte, ceafă, stânga, dreapta, câte 10 secunde, cu forța crescută treptat.',
-      },
-      {
         id: 'diamond', name: 'Diamond Push-ups', vars: ['Incline Diamond Push-ups', 'Diamond Push-ups', 'Decline Diamond Push-ups'], start: 0,
         type: 'reps', sets: 2, lo: 8, hi: 15, rest: 60, opt: true, muscles: 'triceps',
         cue: 'Opțional, primul de tăiat când timpul e scurt. Mâinile formează un romb sub piept, coatele rămân lângă corp.',
@@ -111,7 +106,7 @@ export const WORKOUTS: Workout[] = [
   {
     id: 'pull',
     name: 'Pull Training',
-    min: 56,
+    min: 54,
     ex: [
       {
         id: 'emom', name: 'Pull-up EMOM', vars: ['Negative Pull-ups', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 2,
@@ -167,11 +162,6 @@ export const WORKOUTS: Workout[] = [
         type: 'ytw', sets: 3, rest: 60, opt: true, muscles: 'umeri posteriori',
         cue: 'Opțional. O serie înseamnă 5 repetări cu brațele în Y, 5 în T și 5 în W, fără pauză.',
         alex: 'Face 4 × 5-5-5 la TRX: umerii din spate trebuie întăriți ca să nu ajungi cu „umeri de boxer”, aduși în față.',
-      },
-      {
-        id: 'neck-fri', name: 'Neck Isometrics', vars: ['Neck Isometrics (hand)', 'Neck Isometrics (band)'], start: 0,
-        type: 'done', sets: 2, label: '4 direcții × 10 s', rest: 30, muscles: 'gâtul',
-        cue: 'Pentru loviturile la cap din kickboxing: gâtul ține, mâna sau banda doar se opune, iar capul nu se mișcă. Frunte, ceafă, stânga, dreapta, câte 10 secunde, cu forța crescută treptat.',
       },
     ],
   },

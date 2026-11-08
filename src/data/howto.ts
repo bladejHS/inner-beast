@@ -122,13 +122,20 @@ export const HOW: Record<string, How> = {
     ],
     mistake: 'Să tragi cu umerii ridicați spre urechi. Umerii rămân jos.',
   },
-  neck: {
-    steps: [
-      'Stai drept, cu bărbia ușor trasă înapoi și umerii jos.',
-      'Palma pe frunte: împingi capul în ea 10 secunde, fără să se miște. Gâtul ține, mâna doar se opune.',
-      'La fel cu palmele la ceafă, apoi cu palma pe partea stângă a capului și pe cea dreaptă.',
-      'În primele săptămâni împingi cam la jumătate din forță, apoi crești treptat. Respiri normal.',
-    ],
+  'Neck Hold: Front': {
+    steps: ['Palma pe frunte: împingi capul înainte, în ea.', 'Gâtul ține, mâna doar se opune: capul nu se mișcă. Stai drept, bărbia ușor trasă înapoi, respiri normal.', 'În primele săptămâni împingi cam la jumătate din forță, apoi crești treptat.'],
+    mistake: 'Să smucești sau să lași capul să se miște: e o ținută, nu o mișcare. Dacă apare durere sau amorțeală în braț, te oprești.',
+  },
+  'Neck Hold: Back': {
+    steps: ['Palmele împreunate la ceafă: împingi capul înapoi, în ele.', 'Gâtul ține, mâna doar se opune: capul nu se mișcă. Stai drept, bărbia ușor trasă înapoi, respiri normal.', 'În primele săptămâni împingi cam la jumătate din forță, apoi crești treptat.'],
+    mistake: 'Să smucești sau să lași capul să se miște: e o ținută, nu o mișcare. Dacă apare durere sau amorțeală în braț, te oprești.',
+  },
+  'Neck Hold: Left': {
+    steps: ['Palma pe partea stângă a capului, deasupra urechii: împingi capul spre ea.', 'Gâtul ține, mâna doar se opune: capul nu se mișcă. Stai drept, bărbia ușor trasă înapoi, respiri normal.', 'În primele săptămâni împingi cam la jumătate din forță, apoi crești treptat.'],
+    mistake: 'Să smucești sau să lași capul să se miște: e o ținută, nu o mișcare. Dacă apare durere sau amorțeală în braț, te oprești.',
+  },
+  'Neck Hold: Right': {
+    steps: ['Palma pe partea dreaptă a capului, deasupra urechii: împingi capul spre ea.', 'Gâtul ține, mâna doar se opune: capul nu se mișcă. Stai drept, bărbia ușor trasă înapoi, respiri normal.', 'În primele săptămâni împingi cam la jumătate din forță, apoi crești treptat.'],
     mistake: 'Să smucești sau să lași capul să se miște: e o ținută, nu o mișcare. Dacă apare durere sau amorțeală în braț, te oprești.',
   },
   hipthrust: {
@@ -706,9 +713,6 @@ export const HOW: Record<string, How> = {
  * Full steps for a variation that is a different movement from its exercise: the throws that stand in for the jumps
  * while the knees don't take landings. The jump variations fall back to the exercise's own steps (cmj, broad).
  */
-/** The Friday neck work is the Tuesday one. */
-HOW['neck-fri'] = HOW.neck!;
-
 export const VAR_HOW: Record<string, How> = {
   'Medicine Ball Scoop Toss': {
     steps: [
@@ -750,7 +754,6 @@ export const VAR_NOTES: Record<string, string> = {
   'Assisted Dips': 'Între bare, cu picioarele pe sol în față sau cu genunchii pe o bandă prinsă de bare: ele preiau o parte din greutate. Cobori doar până când cotul ajunge la 90°.',
   'Barbell Glute Bridge': 'Pe sol, bara pe șold cu un prosop sub ea: același gest ca la Glute Bridge, cu greutate.',
   'Barbell Hip Thrust': 'Omoplații pe marginea unei bănci, bara pe șold: amplitudinea e mai mare decât la glute bridge.',
-  'Neck Isometrics (band)': 'O bandă prinsă la înălțimea capului și trecută pe după cap: ții poziția 10 secunde pe fiecare direcție, cu banda întinsă.',
   'Negative Dips': 'Sari sau urci sus pe bare și cobori cât de lent poți, 3–5 secunde.',
   'Parallel Bar Dips': 'Varianta completă, pe bare paralele.',
   'Weighted Dips': 'Cu un rucsac încărcat sau o centură cu greutăți.',

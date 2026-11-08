@@ -294,6 +294,7 @@ function openTool(k: string): void {
     case 'abs':
     case 'splits':
     case 'homebox':
+    case 'neck':
       return openRoutine(k);
   }
 }

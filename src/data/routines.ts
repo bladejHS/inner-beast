@@ -10,7 +10,7 @@ export interface Move {
 }
 
 export interface Routine {
-  id: 'stretch-push' | 'stretch-pull' | 'legwarm' | 'cooldown' | 'mobility' | 'daily' | 'dagestan' | 'peekaboo' | 'abs' | 'splits' | 'homebox';
+  id: 'stretch-push' | 'stretch-pull' | 'legwarm' | 'cooldown' | 'mobility' | 'daily' | 'dagestan' | 'peekaboo' | 'abs' | 'splits' | 'homebox' | 'neck';
   name: string;
   intro: string;
   moves: Move[];
@@ -41,6 +41,24 @@ function warmUp(kind: 'push' | 'pull'): Move[] {
 }
 
 export const ROUTINES: Routine[] = [
+  {
+    // Outside the plan, from Lupte → Timere (the user asked on 2026-11-08 for the neck work to stand apart from the
+    // sessions). Stronger necks went with fewer concussions in high-school athletes (Collins et al. 2014).
+    id: 'neck',
+    name: 'Neck Isometrics',
+    intro: 'Separat de plan: oricând, de 2–3 ori pe săptămână. Un gât puternic ține capul la loviturile din kickboxing. Gâtul ține, mâna doar se opune, iar capul nu se mișcă.',
+    moves: [
+      { name: 'Neck Hold: Front', sec: 10, cue: 'Palma pe frunte: împingi capul în ea, fără să se miște.' },
+      { name: 'Neck Hold: Back', sec: 10, cue: 'Palmele la ceafă: împingi capul înapoi în ele.' },
+      { name: 'Neck Hold: Left', sec: 10, cue: 'Palma pe partea stângă: împingi capul spre ea.' },
+      { name: 'Neck Hold: Right', sec: 10, cue: 'Palma pe partea dreaptă: împingi capul spre ea.' },
+      { name: 'Rest', sec: 20, cue: 'Respiri, umerii jos. Urmează a doua tură.' },
+      { name: 'Neck Hold: Front', sec: 10, cue: 'Palma pe frunte: împingi capul în ea, fără să se miște.' },
+      { name: 'Neck Hold: Back', sec: 10, cue: 'Palmele la ceafă: împingi capul înapoi în ele.' },
+      { name: 'Neck Hold: Left', sec: 10, cue: 'Palma pe partea stângă: împingi capul spre ea.' },
+      { name: 'Neck Hold: Right', sec: 10, cue: 'Palma pe partea dreaptă: împingi capul spre ea.' },
+    ],
+  },
   {
     id: 'stretch-push',
     name: 'Dynamic Warm-up',

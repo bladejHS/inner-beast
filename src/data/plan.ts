@@ -152,7 +152,7 @@ export const WEEK: Day[] = [
     title: 'Push Training',
     blocks: [
       { id: 'tue-stretch', kind: 'routine', name: 'Dynamic Warm-up', dose: '10 min', routine: 'stretch-push', min: 10, tip: 'Încălzire în mișcare pentru umeri și șolduri. Întinderile lungi vin la final: ținute înainte de exercițiile explozive, scad puterea.' },
-      { id: 'tue-cal', kind: 'workout', name: 'Calisthenics: Chest, Shoulders, Triceps', dose: '48 min', line: '48 min Calisthenics (Chest, Shoulders, Triceps) + Split Squat, Neck', workout: 'push', min: 48, tip: 'Push-ups (variante) și dips, cu explozivele primele, plus a doua doză de picioare a săptămânii.' },
+      { id: 'tue-cal', kind: 'workout', name: 'Calisthenics: Chest, Shoulders, Triceps', dose: '45 min', line: '45 min Calisthenics (Chest, Shoulders, Triceps) + Split Squat', workout: 'push', min: 45, tip: 'Push-ups (variante) și dips, cu explozivele primele, plus a doua doză de picioare a săptămânii.' },
       KNEE_ARMOR('knee-tue'),
       { id: 'tue-easy', kind: 'rounds', name: 'Easy Shadow Kickboxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'slow', tip: 'Slow, Clean Technique: fiecare lovitură de picior lentă, pe bucăți, ca să-i înveți mecanica.',
         cues: ['Kick-urile la jumătate de viteză: genunchiul sus, pivot pe vârf, șoldul prin țintă, revii în gardă.', 'Echilibrul înaintea vitezei: dacă nu revii stabil, încetinești.', 'Check-ul: genunchiul din față sus, tibia ușor în afară, garda sus.', 'Pumnii întinși complet, iar mâna revine la bărbie după fiecare lovitură.'] },
@@ -191,7 +191,7 @@ export const WEEK: Day[] = [
     title: 'Pull Training',
     blocks: [
       { id: 'fri-stretch', kind: 'routine', name: 'Dynamic Warm-up', dose: '10 min', routine: 'stretch-pull', min: 10, tip: 'Încălzire în mișcare pentru umeri, omoplați și priză, înainte de tracțiuni.' },
-      { id: 'fri-cal', kind: 'workout', name: 'Calisthenics: Back, Biceps, Shoulders', dose: '56 min', line: "56 min Calisthenics (Back, Biceps, Shoulders) + TRX Rows, Farmer's Carry, Neck", workout: 'pull', min: 56, tip: 'Pull-ups (variante), ramat, umărul posterior, plus cărat greutăți pentru priză și trunchi.' },
+      { id: 'fri-cal', kind: 'workout', name: 'Calisthenics: Back, Biceps, Shoulders', dose: '54 min', line: "54 min Calisthenics (Back, Biceps, Shoulders) + TRX Rows, Farmer's Carry", workout: 'pull', min: 54, tip: 'Pull-ups (variante), ramat, umărul posterior, plus cărat greutăți pentru priză și trunchi.' },
       KICK_ARMOR,
       { id: 'fri-easy', kind: 'rounds', name: 'Easy Shadow Kickboxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'distance', react: { lastSec: 180 },
         tip: 'Distance Work: controlul distanței e obiectivul principal. La 2 m, distanța lungă e a ta. Ultimele 3 minute sunt de reacție: atacul lui strigat la întâmplare, răspunsul tău imediat.',

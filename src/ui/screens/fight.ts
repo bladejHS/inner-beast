@@ -76,6 +76,7 @@ export function tipCard(t: TipCard, red = false): string {
 function timersSeg(): string {
   return `<div class="timer-list">${QUICK.map(quickRow).join('')}
       ${timerRow('tool', 'coach', 'camera', 'Antrenor cu camera', 'Garda, loviturile și ritmul, urmărite live')}
+      ${timerRow('tool', 'neck', 'timer', 'Neck Isometrics', 'Gâtul, 2 minute, de 2–3 ori pe săptămână, separat de plan')}
       ${timerRow('tool', 'peekaboo', 'shadow', 'Peekaboo Workout', '7 exerciții, câte 2 serii, de la Alex')}
       ${timerRow('tool', 'homebox', 'timer', 'Home Boxing Rounds', '3 × 3 min fără echipament, de la Alex')}
       ${timerRow('qt', 'free', 'timer', 'Runde libere', 'Setezi tu rundele, lucrul și pauza')}

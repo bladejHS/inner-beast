@@ -2,7 +2,7 @@
 
 import { HABIT_STEPS } from '../../data/book.ts';
 import { WEEK, type Day } from '../../data/plan.ts';
-import { cycleAt, dayProgress, deloadDue, deloadOn, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, weekDone } from '../../logic/progress.ts';
+import { cycleAt, dayProgress, deloadDue, deloadOn, lightOn, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, weekDone } from '../../logic/progress.ts';
 import { dayKey, esc, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
@@ -12,6 +12,7 @@ import { blockCard, blockMinutes, gauge, liveBlock, top } from './shared.ts';
 import { draftSets, workoutDraft } from '../players/workout.ts';
 import { KNEE_STEPS, kneeAsk, legDays } from '../../logic/knee.ts';
 import { weekCard } from './alex.ts';
+import { readiness, sleepAvg3, type ReadyLevel } from '../../logic/ready.ts';
 
 /** Monday–Sunday strip: how much of each day is done this week. */
 export function weekStrip(today: string, active: number): string {
@@ -39,11 +40,11 @@ export function dayBody(day: Day, today: string, kicker: string): string {
   const mins = day.blocks.reduce((s, b) => s + blockMinutes(b), 0);
   const next = day.blocks.find((b) => !done.has(b.id));
   const c = cycleAt(ctx.S.cycle.start, today);
-  const light = deloadOn(ctx.S.deload, today);
+  const light = lightOn(ctx.S, today);
   // before the loop starts, the stat says when it starts instead of showing a dash
   const until = ctx.S.cycle.start ? daysBetween(today, ctx.S.cycle.start) : 0;
   const starts = until > 6 ? shortDay(ctx.S.cycle.start) : until > 0 ? RO_DAYS[weekdayIdx(ctx.S.cycle.start)] : '';
-  const cyc = light ? ['Ușoară', 'săptămâna'] : c ? [`${c.id} · ${c.week}/4`, 'ciclul'] : starts ? [starts, 'începe ciclul'] : ['—', 'ciclul'];
+  const cyc = light ? ['Ușoară', ctx.S.easy === today ? 'ziua' : 'săptămâna'] : c ? [`${c.id} · ${c.week}/4`, 'ciclul'] : starts ? [starts, 'începe ciclul'] : ['—', 'ciclul'];
   return `
     <section class="mission${n === total ? ' cleared' : ''}" aria-label="Misiunea zilei">
       <div class="ms-ph">${dayPhoto(day.idx, 'ms-img')}</div>
@@ -124,14 +125,56 @@ export function habitCard(compact = false): string {
   </section>`;
 }
 
-export function sleepCard(): string {
-  const today = dayKey();
-  const v = ctx.S.sleep[today];
-  const shown = v === undefined ? 'Notează' : `${String(v).replace('.', ',')} h`;
-  return `<section class="card" aria-label="Somn">
-    <div class="row"><div class="row-l"><p class="label">Azi-noapte</p><h3>Somn</h3><p class="small dim" style="margin:0">Niciodată sub 7 ore.</p></div>
-    <div class="stepper${v !== undefined && v < 7 ? ' low' : ''}${v === undefined ? ' empty' : ''}"><button data-a="sleep" data-d="-1" aria-label="Mai puțin">−</button><output>${shown}</output><button data-a="sleep" data-d="1" aria-label="Mai mult">+</button></div></div>
-  </section>`;
+let editReady = false;
+/** Reopens the three questions after they were answered. */
+export const setReadyEdit = (on: boolean): void => {
+  editReady = on;
+};
+
+const READY_TITLE: Record<ReadyLevel, string> = { go: 'Gata de luptă', hold: 'Ține intensitatea, taie volumul', easy: 'Zi ușoară' };
+const READY_REST: Record<ReadyLevel, string> = { go: 'Odihnit', hold: 'Recuperează', easy: 'Recuperează' };
+
+/** Ten seconds before training: last night's sleep, energy, muscle freshness. Then the verdict, and on a low day the
+ *  offer to run today like a day of the lighter week (see logic/ready.ts for the rules and the sources). */
+export function readyCard(today: string, idx: number): string {
+  const S = ctx.S;
+  const note = S.ready[today] ?? {};
+  const sleep = S.sleep[today];
+  const r = readiness(note, sleep, sleepAvg3(S.sleep, today));
+  if (!r || editReady) {
+    const five = (f: 'e' | 'f', cur: number | undefined, name: string): string =>
+      `<div class="chips five" role="group" aria-label="${name}">${[1, 2, 3, 4, 5].map((n) => `<button class="chip" aria-pressed="${cur === n}" data-a="ready" data-f="${f}" data-v="${n}">${n}</button>`).join('')}</div>`;
+    const shown = sleep === undefined ? 'Notează' : `${String(sleep).replace('.', ',')} h`;
+    return `<section class="card rdy-ask" aria-label="Pregătirea de azi">
+      <p class="label">10 secunde · înainte de antrenament</p><h3>Cum ești azi?</h3>
+      <div class="rdy-q"><div><b>Somn</b><span>Azi-noapte. Niciodată sub 7 ore.</span></div>
+        <div class="stepper${sleep !== undefined && sleep < 7 ? ' low' : ''}${sleep === undefined ? ' unset' : ''}"><button data-a="sleep" data-d="-1" aria-label="Mai puțin somn">−</button><output>${shown}</output><button data-a="sleep" data-d="1" aria-label="Mai mult somn">+</button></div></div>
+      <div class="rdy-q col"><div><b>Energie</b><span>1 stors, 5 plin de energie</span></div>${five('e', note.e, 'Energie')}</div>
+      <div class="rdy-q col"><div><b>Mușchii</b><span>1 foarte febrili, 5 proaspeți</span></div>${five('f', note.f, 'Mușchii')}</div>
+      ${r ? '<button class="btn ghost sm" style="margin-top:16px" data-a="ready-edit" data-k="0">Gata</button>' : '<p class="small dim" style="margin:14px 0 0">Din răspunsuri afli dacă azi merge planul întreg sau varianta ușoară.</p>'}
+    </section>`;
+  }
+  const trainDay = idx !== 2 && idx !== 6;
+  const easyOn = S.easy === today;
+  const why = r.why.length ? `${r.why.join(' și ')}. `.replace(/^./, (c) => c.toUpperCase()) : '';
+  const text = r.level === 'go'
+    ? ''
+    : !trainDay
+      ? `${why}Azi e oricum zi ușoară: mergi, mănâncă bine și culcă-te devreme, ca mâine să poți duce planul întreg.`
+    : r.level === 'hold'
+      ? `${why}Păstrezi intensitatea, dar sari exercițiile opționale și te oprești cu o repetare mai devreme.`
+      : `${why}Azi câștigi mai mult din varianta ușoară: aceleași blocuri și aceleași greutăți, cam două treimi din volum.`;
+  const offer = trainDay && !deloadOn(S.deload, today) && r.level !== 'go' && !easyOn
+    ? `<div class="btn-row"><button class="btn ${r.level === 'easy' ? '' : 'ghost '}sm" data-a="easy-day" data-k="1">Fă varianta ușoară azi</button></div>`
+    : '';
+  const on = easyOn
+    ? '<p class="small" style="margin:12px 0 0"><b class="hl">Zi ușoară pornită.</b> Seriile, rundele și timpul scad la două treimi; sesiunile de azi nu se numără la progres.</p><button class="link" data-a="easy-day" data-k="0">Revin la planul întreg</button>'
+    : '';
+  return `<section class="card rdy-v lv-${r.level}" aria-label="Pregătirea de azi">
+    <div class="row"><div class="row-l"><p class="label">Pregătirea de azi</p><h3>${(trainDay ? READY_TITLE : READY_REST)[r.level]}</h3>${r.level === 'go' && trainDay ? '<p class="small dim" style="margin:6px 0 0">Planul întreg, la intensitatea scrisă.</p>' : ''}</div><div class="rdy-n"><b class="num">${r.score}</b><span>din 100</span></div></div>
+    <div class="bar" style="--fill:${(r.score / 100).toFixed(3)}"><i></i></div>
+    ${text ? `<p class="small" style="margin:10px 0 0">${esc(text)}</p>` : ''}${offer}${on}
+    <button class="link" data-a="ready-edit" data-k="1">Schimbă răspunsurile</button></section>`;
 }
 
 function whyCard(): string {
@@ -200,10 +243,10 @@ export function todayHtml(): string {
     ${kneeCard(today)}
     ${introCard()}
     ${deloadCard(today)}
+    ${readyCard(today, idx)}
     ${dayBody(day, today, prettyDay(today))}
     <h2 class="sec">Zilnic<small>Mintea și corpul, în afara rundelor.</small></h2>
     ${habitCard()}
-    ${sleepCard()}
     ${fuelRow(today)}
     ${whyCard()}
     ${dailyCard()}

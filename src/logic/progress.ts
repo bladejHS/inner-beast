@@ -219,6 +219,11 @@ export const lighter = (n: number): number => Math.ceil((n * 2) / 3);
 
 export const deloadOn = (d: { week: string }, today: string): boolean => d.week === weekStart(today);
 
+/** Today runs light: the lighter week is on, or an easy day was chosen after a low readiness note. */
+export const lightOn = (s: { deload: { week: string }; easy?: string }, today: string): boolean => deloadOn(s.deload, today) || s.easy === today;
+/** What to call it on screen. */
+export const lightWord = (s: { easy?: string }, today: string): string => (s.easy === today ? 'Zi ușoară' : 'Săptămână ușoară');
+
 // ---------- the 12-week loop: three emphases of 4 weeks, the 4th week lighter, with the tests ----------
 
 export const CYCLE_WEEKS = 4;

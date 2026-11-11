@@ -181,6 +181,10 @@ export interface State {
   tests: Record<string, Array<{ d: string; v: number }>>;
   /** Knee pain by Leg Day date, 0–10: d during the session, m the next morning. Decides when the jumps come back. */
   knee: Record<string, { d?: number; m?: number }>;
+  /** The ten-second note before training, by day: energy and muscle freshness, 1–5 (see logic/ready.ts). */
+  ready: Record<string, { e?: number; f?: number }>;
+  /** The day an easy version was chosen after a low readiness: that day runs like a lighter week. */
+  easy: string;
 }
 
 export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 200, startW: 80, goalW: 75, act: 1.55 };
@@ -246,6 +250,8 @@ export function freshState(today: string = dayKey()): State {
     cycle: { start: cycleStartFor(today) },
     tests: {},
     knee: {},
+    ready: {},
+    easy: '',
   };
 }
 
@@ -291,6 +297,8 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     cycle: isObj(r.cycle) && typeof r.cycle.start === 'string' && r.cycle.start ? { start: r.cycle.start } : base.cycle,
     tests: isObj(r.tests) ? (r.tests as State['tests']) : {},
     knee: isObj(r.knee) ? (r.knee as State['knee']) : {},
+    ready: isObj(r.ready) ? (r.ready as State['ready']) : {},
+    easy: typeof r.easy === 'string' ? r.easy : '',
   };
 }
 

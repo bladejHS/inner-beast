@@ -6,6 +6,7 @@ import { BW_SCHEMES, EMOM_GOAL, WORKOUTS } from '../../data/workouts.ts';
 import { activeStreak, allRecords, amrapBest, amrapTrend, dayProgress, exerciseTrend, stalled, totals, variationPath, weekDone } from '../../logic/progress.ts';
 import { runAdvice, zone2 } from '../../logic/runlog.ts';
 import { KNEE_RUN, kneeStreak, legDays } from '../../logic/knee.ts';
+import { loadReport, loadText } from '../../logic/ready.ts';
 import type { Entry } from '../../logic/store.ts';
 import { addDays, dayKey, esc, km, mmss, raceTime, num, paceStr, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { bars, spark } from '../charts.ts';
@@ -141,6 +142,8 @@ function weekSeg(): string {
   const slept = sleepVals.filter((v) => v > 0);
   const avgSleep = slept.length ? slept.reduce((a, b) => a + b, 0) / slept.length : 0;
   const stepsVals = last7.map((d) => S.steps[d] ?? 0);
+  const lr = loadReport(S.log, today);
+  const dm = (d: string) => `${Number(d.slice(8))}.${Number(d.slice(5, 7))}`;
   const stat = (v: number, label: string, cls = '', shown = String(v)) => `<div class="stat ${cls}"><b class="num" data-count="${Math.round(v)}">${shown}</b><span>${label}</span></div>`;
   return `<h2 class="sec first">Săptămâna asta<small>${full} din 7 zile complete</small></h2>
     <div class="week7">${week}</div>
@@ -152,7 +155,10 @@ function weekSeg(): string {
       ${stat(Math.round(t.coldMin), 'minute la rece')}
       ${stat(Math.round(t.breathMin), 'minute de respirație')}
     </div>
-    <h2 class="sec">Somn<small>${avgSleep ? `Media pe 7 zile: ${avgSleep.toFixed(1).replace('.', ',')} h` : 'Notează-l pe ecranul Azi'}</small></h2>
+    <h2 class="sec">Încărcare<small>Minute × efort la fiecare sesiune, pe săptămâni${lr.usual ? `. Obișnuitul tău: ${kSteps(lr.usual)}` : ''}</small></h2>
+    ${bars(lr.weeks.map((w, i) => ({ v: w.load, label: dm(w.mon), today: i === lr.weeks.length - 1 })), undefined, { fmt: kSteps, name: 'Încărcarea pe ultimele 6 săptămâni' })}
+    <p class="small dim" style="margin:12px 0 0">${esc(loadText(lr))}</p>
+    <h2 class="sec">Somn<small>${avgSleep ? `Media pe 7 zile: ${avgSleep.toFixed(1).replace('.', ',')} h` : 'Notează-l pe ecranul Azi, la „Cum ești azi?”'}</small></h2>
     ${bars(last7.map((d, i) => ({ v: sleepVals[i], label: day2(d), today: d === today })), 7, { fmt: hours, goalLabel: '7 h', name: 'Somn pe 7 zile, în ore' })}
     <h2 class="sec">Pași<small>Ținta: 10.000</small></h2>
     ${bars(last7.map((d, i) => ({ v: stepsVals[i], label: day2(d), today: d === today })), 10000, { fmt: kSteps, goalLabel: '10k', name: 'Pași pe 7 zile' })}`;

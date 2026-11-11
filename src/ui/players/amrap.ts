@@ -1,7 +1,7 @@
 // Monday's 10-minute bodyweight workout: squats, push-ups and pull-ups, as many rounds as possible.
 
 import { BW_MOVES, BW_SCHEMES } from '../../data/workouts.ts';
-import { amrapBest, amrapUp, deloadOn, lighter } from '../../logic/progress.ts';
+import { amrapBest, amrapUp, lighter, lightOn, lightWord } from '../../logic/progress.ts';
 import { Clock } from '../../logic/seq.ts';
 import { makeEntry } from '../../logic/store.ts';
 import { dayKey, esc, mmss, shortDay } from '../../logic/util.ts';
@@ -25,7 +25,7 @@ class AmrapPlayer implements Player {
   saved = false;
   block?: string;
   /** Lighter week: a shorter block that counts for neither the records nor the next scheme. */
-  deload = deloadOn(ctx.S.deload, dayKey());
+  deload = lightOn(ctx.S, dayKey());
 
   constructor(block?: string, min = 10) {
     this.block = block;
@@ -59,7 +59,7 @@ class AmrapPlayer implements Player {
         `<h1 class="pl-h">Bodyweight Workout</h1>
         <p class="pl-sub">${this.min} minute, cât mai multe runde</p>
         <p class="dim">O rundă înseamnă toate trei exercițiile, în ordine. Numeri rundele, apoi repetările din runda neterminată.</p>
-        ${this.deload ? '<div class="advice">Săptămână ușoară: mai scurt și fără să forțezi. Sesiunea nu se numără la recorduri.</div>' : ''}
+        ${this.deload ? `<div class="advice">${lightWord(ctx.S, dayKey())}: mai scurt și fără să forțezi. Sesiunea nu se numără la recorduri.</div>` : ''}
         <div class="chips" style="margin:14px 0 4px">${BW_SCHEMES.map((s, i) => `<button class="chip" aria-pressed="${i === this.scheme}" data-a="p:scheme" data-i="${i}">${esc(s.name)} ${s.reps.join('-')}</button>`).join('')}</div>
         ${moves(true)}
         ${BW_MOVES.map((m) => howHtml(m, undefined, { title: `Cum se face: ${m}` })).join('')}

@@ -30,7 +30,7 @@ import { labHtml } from './ui/screens/lab.ts';
 import { openLab } from './ui/players/lab.ts';
 import { icsExport } from './ui/ics.ts';
 import { liveBlock, planPicks, saveSteps, startBlock, toggleMark } from './ui/screens/shared.ts';
-import { dayViewHtml, todayHtml } from './ui/screens/today.ts';
+import { dayViewHtml, setReadyEdit, todayHtml } from './ui/screens/today.ts';
 import { clawSwipe, countUp, lite } from './ui/fx.ts';
 
 initAudio(() => ctx.S.set);
@@ -577,6 +577,20 @@ function act(a: string, el: HTMLElement): void {
       return habitSheet(false);
     case 'hab-new':
       return habitSheet(true);
+    case 'ready': {
+      const f = el.dataset.f === 'f' ? 'f' : 'e';
+      S.ready[today] = { ...(S.ready[today] ?? {}), [f]: Number(el.dataset.v) || 0 };
+      save();
+      return render();
+    }
+    case 'ready-edit':
+      setReadyEdit(el.dataset.k === '1');
+      return render();
+    case 'easy-day':
+      S.easy = el.dataset.k === '1' ? today : '';
+      save();
+      toast(S.easy ? 'Zi ușoară: două treimi din volum, aceleași greutăți.' : 'Planul întreg, la loc.');
+      return render();
     case 'sleep': {
       const v = S.sleep[today];
       S.sleep[today] = v === undefined ? 7.5 : Math.max(0, Math.min(14, v + (Number(el.dataset.d) || 0) * 0.5));

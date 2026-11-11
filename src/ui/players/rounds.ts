@@ -17,7 +17,7 @@ const BOOK_FOCUS: Record<string, string> = {
 };
 import { REST_TIPS } from '../../data/alex.ts';
 import { burstAt, Clock, doneSec, locate, phaseStart, roundsSeq, type Phase } from '../../logic/seq.ts';
-import { deloadOn, lighter } from '../../logic/progress.ts';
+import { lighter, lightOn, lightWord } from '../../logic/progress.ts';
 import { makeEntry, type Entry } from '../../logic/store.ts';
 import { dayKey, esc, mmss } from '../../logic/util.ts';
 import { zone2, zoneHard } from '../../logic/runlog.ts';
@@ -107,7 +107,7 @@ class RoundsPlayer implements Player {
   warm: boolean;
   /** The saved session, rated on the final screen. */
   entry: Entry | null = null;
-  deload = deloadOn(ctx.S.deload, dayKey());
+  deload = lightOn(ctx.S, dayKey());
   /** Inside a punch-out round: the burst now running, and whether it is the all-out part. */
   lastBurst = '';
 
@@ -233,7 +233,7 @@ class RoundsPlayer implements Player {
       <h1 class="pl-h">${esc(c.name)}</h1>
       ${c.focus && FOCUS_LINE[c.focus] && !c.cardio ? `<p class="pl-sub">${esc(FOCUS_LINE[c.focus])}</p>` : ''}
       ${burstBox}
-      ${this.deload ? `<div class="advice">Săptămână ușoară: ${c.rounds} ${c.rounds === 1 ? 'rundă' : 'runde'}, fără să forțezi.</div>` : ''}
+      ${this.deload ? `<div class="advice">${lightWord(ctx.S, dayKey())}: ${c.rounds} ${c.rounds === 1 ? 'rundă' : 'runde'}, fără să forțezi.</div>` : ''}
       ${this.sore && this.calls.length ? `<div class="advice">Genunchiul: ultima notă, ${this.sore.from === 'legs' ? 'de la Leg Day' : 'de după kick-uri'}, e ${this.sore.v} din 10. Azi îți strig doar combinații de box, fără kick-uri și genunchi.</div>` : ''}
       ${this.kickW && kickPower(this.kickW) < 100 ? `<div class="advice">Kick-urile, săptămâna ${this.kickW} din 4: la ${kickPower(this.kickW)}% din putere. Tibia și genunchii se obișnuiesc în câteva săptămâni; din săptămâna 4 lovești din plin.</div>` : ''}
       ${c.cardio ? this.zoneHtml() : ''}

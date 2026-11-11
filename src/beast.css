@@ -237,7 +237,7 @@ input[type='date'] { flex: none; width: 160px; min-height: 48px; padding: 8px 10
 .stepper input::-webkit-inner-spin-button, .stepper input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .stepper input:focus { background: var(--n3); box-shadow: none; }
 .stepper.low output { color: var(--red-text); }
-.stepper.empty output { font: 650 normal 14px/1 var(--font); color: var(--mute); }
+.stepper.unset output { font: 650 normal 14px/1 var(--font); color: var(--mute); }
 .switch { position: relative; width: 56px; height: 32px; flex: none; }
 .switch input { position: absolute; inset: -8px; width: auto; height: auto; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
 .switch span { position: absolute; inset: 0; border: 1px solid var(--n5); background: var(--n2); transition: background-color .2s, border-color .2s; }
@@ -1052,3 +1052,79 @@ html[data-motion='lite'] .cele *, html[data-motion='lite'] .done-mark path { cli
   .sh { bottom: 24px; max-width: 640px; }
   .pl-wrap { max-width: 720px; }
 }
+
+/* ---------- readiness: the ten-second note before training, and its verdict (logic/ready.ts) ---------- */
+.rdy-q { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
+.rdy-q.col { flex-direction: column; align-items: stretch; gap: 10px; }
+.rdy-q b { display: block; font: 800 condensed 19px/1 var(--font); letter-spacing: .04em; text-transform: uppercase; }
+.rdy-q span { display: block; margin-top: 5px; font-size: 13px; line-height: 1.3; color: var(--mute); }
+.chips.five { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.chips.five .chip { min-width: 0; min-height: 50px; padding: 0; font: 850 condensed 21px/1 var(--font); font-variant-numeric: tabular-nums; }
+.rdy-n { flex: none; text-align: right; }
+.rdy-n b { display: block; font: 900 extra-condensed 56px/.86 var(--font); }
+.rdy-n span { display: block; margin-top: 4px; font: 700 semi-condensed 11px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; color: var(--label); }
+.rdy-v h3 { margin: 0; }
+.rdy-v .bar { margin: 14px 0 0; height: 5px; }
+.rdy-v .link { display: flex; margin-top: 6px; }
+.rdy-v.lv-easy h3 { color: var(--red-text); }
+
+/* ---------- 5.0, 2026-11-11: the finish ----------
+   The identity stays (Broadcast: steel black, red plates, gold for what is won). What changes is the material, the
+   way broadcast graphics packages and the premium training apps build depth: a hairline of light on the top edge of
+   every plate and a shadow under it, glass in the two bars that float over the content, light bleeding from whatever
+   is live, metal in the big numbers, and a fine grain so the black is a surface and not a void. Nothing new moves. */
+
+/* grain: one small noise tile, painted once behind the content */
+body::after {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .055; mix-blend-mode: overlay;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* plates: translucent hairlines instead of grey outlines, light on the top edge, weight underneath */
+.card, .stat, .tile, .row-link, .knee-q, .week7 i {
+  border-color: rgba(255, 255, 255, .075);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09), inset 0 -1px 0 rgba(0, 0, 0, .45);
+}
+.card { border-left-color: var(--edge); background: linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, 0) 46%), linear-gradient(135deg, var(--n2), var(--n1) 62%); }
+.card.lime { border-color: rgba(var(--glow-2), .4); border-left-color: var(--red-hot); background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, 0) 40%), linear-gradient(155deg, rgba(var(--glow-d), .55), var(--n1) 58%); }
+.card.white { background: var(--ink); border-color: var(--ink); box-shadow: none; }
+.rdy-v.lv-go { border-left-color: var(--ink); }
+.rdy-v.lv-go .bar i { background: var(--steel); }
+.rdy-v.lv-hold .bar i { background: var(--ink-2); }
+.rdy-v.lv-easy { border-left-color: var(--red-hot); }
+.stat, .tile, .row-link { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09), inset 0 -1px 0 rgba(0, 0, 0, .45), 0 16px 26px -20px rgba(0, 0, 0, .95); }
+.stat { background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, 0) 50%), var(--n1); }
+.stat.hot { border-color: rgba(var(--glow-2), .45); background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, 0) 45%), linear-gradient(150deg, rgba(var(--glow-d), .6), var(--n1) 70%); }
+.row-link.big { border-color: rgba(220, 179, 94, .4); }
+.tile:active { border-color: var(--red); }
+.week7 .today i { border-color: var(--red-hot); }
+
+/* metal in the numbers that carry a screen, as in the titles */
+.stat b, .ms-m b, .rdy-n b {
+  padding-top: .05em; margin-top: -.05em;
+  background: linear-gradient(180deg, #fff 38%, #a3adbf); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* the action plates: lit from above, darker at the foot; pressed and disabled states keep their own fills */
+.btn, .cta, .go {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, 0) 48%, rgba(0, 0, 0, .16)), linear-gradient(90deg, var(--red-0), var(--red) 55%, var(--red-hot));
+}
+
+/* light from what is live */
+.g-v { filter: drop-shadow(0 0 5px rgba(var(--glow), .65)); }
+.mission.cleared .g-v { filter: drop-shadow(0 0 5px rgba(220, 179, 94, .6)); }
+.segs i.next, .wk-d.now::before { box-shadow: 0 0 12px rgba(var(--glow), .75); }
+.sec::before { box-shadow: 0 0 16px rgba(var(--glow), .4); }
+.bar i { background: linear-gradient(90deg, var(--red), var(--red-hot)); }
+.week7 .full i b, .wk-d.full i::after { box-shadow: 0 0 10px rgba(220, 179, 94, .45); }
+
+/* glass: the tab bar and the header blur what scrolls under them */
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .nav-plate::before { background: linear-gradient(180deg, rgba(34, 40, 54, .7), rgba(8, 9, 13, .84) 72%); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); }
+  .top::before { background: rgba(5, 6, 10, .7); -webkit-backdrop-filter: blur(18px) saturate(1.5); backdrop-filter: blur(18px) saturate(1.5); }
+}
+.nav-plate { background: linear-gradient(180deg, rgba(255, 255, 255, .3), var(--n5) 34%, rgba(58, 65, 82, .55)); }
+
+/* chips and steppers: the chosen one stands out of the plate */
+.chip[aria-pressed='true'], .chip.on { box-shadow: 0 8px 18px -10px rgba(255, 255, 255, .55); }
+.stepper { border-color: rgba(255, 255, 255, .22); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06); }

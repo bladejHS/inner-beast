@@ -3,9 +3,9 @@
 // Azi and the next start of the same workout offer to carry on, or to save what was done.
 
 import { EMOM_GOAL, RECORD_WIDS, recordable, workoutById, type Exercise, type Workout } from '../../data/workouts.ts';
-import { advise, bestSet, deloadOn, emomAdvice, emomNext, lastExercise, lighter, loadable, stalled, STALL_TEXT, ticked, type Advice, type LastEx } from '../../logic/progress.ts';
+import { advise, bestSet, lightOn, lightWord, emomAdvice, emomNext, lastExercise, lighter, loadable, stalled, STALL_TEXT, ticked, type Advice, type LastEx } from '../../logic/progress.ts';
 import { Clock } from '../../logic/seq.ts';
-import { makeEntry, type SetLog } from '../../logic/store.ts';
+import { makeEntry, type Entry, type SetLog } from '../../logic/store.ts';
 import { KNEE_STEPS, kneeAdvice, legDays } from '../../logic/knee.ts';
 import { dayKey, esc, mmss, shortDay } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
@@ -117,6 +117,8 @@ class WorkoutPlayer implements Player {
   hold: { k: number; start: number } | null = null;
   lastRestSec = -1;
   saved = false;
+  /** The saved session, so the effort rating on the last screen lands on it. */
+  entry: Entry | null = null;
   savedEntry: SetLog[] = [];
   /** When the session began; a draft carried over from another day is saved on its own date. */
   startTs = 0;
@@ -125,7 +127,7 @@ class WorkoutPlayer implements Player {
   /** Records set in this session, for the done screen. */
   recs: Array<{ name: string; v: number; prev: number; sec: boolean }> = [];
   /** Accepted lighter week: fewer sets, and nothing here moves the progression. */
-  deload = deloadOn(ctx.S.deload, dayKey());
+  deload = lightOn(ctx.S, dayKey());
 
   constructor(wid: string, block?: string, draft?: WorkoutDraft, silent = false) {
     this.w = workoutById(wid);
@@ -219,7 +221,7 @@ class WorkoutPlayer implements Player {
       <p class="pl-sub">${this.xs.filter((x) => !x.ex.opt).length} exerciții${this.xs.some((x) => x.ex.opt) ? ` și ${this.xs.filter((x) => x.ex.opt).length} opționale` : ''}, aproximativ ${this.w.min} de minute cu pauze</p>
       ${this.resumeHtml()}
       <p class="dim">La fiecare exercițiu alegi varianta potrivită. Seriile de forță se opresc cu 1–3 repetări înainte de limită. Când atingi capătul intervalului la toate seriile, aplicația îți propune pasul următor: altă variantă sau mai multă greutate.</p>
-      ${this.deload ? '<div class="advice">Săptămână ușoară: mai puține serii, fără să forțezi. Sesiunea nu se numără la progres.</div>' : ''}
+      ${this.deload ? `<div class="advice">${lightWord(ctx.S, dayKey())}: mai puține serii, fără să forțezi. Sesiunea nu se numără la progres.</div>` : ''}
       <ul class="hist" style="margin:8px 0 18px">${rows}</ul>
       <button class="btn" data-a="p:begin">Start</button>`,
     );
@@ -385,10 +387,19 @@ class WorkoutPlayer implements Player {
       <p class="lead">${mmss((Date.now() - this.t0) / 1000)} de antrenament. ${this.saved ? 'Salvat în progres.' : ''}</p>
       ${this.recs.length ? `<div class="advice"><b>${this.recs.length === 1 ? 'Record nou' : 'Recorduri noi'}:</b> ${this.recs.map((r) => `${esc(r.name)} ${r.v}${r.sec ? ' s' : ''} (înainte ${r.prev}${r.sec ? ' s' : ''})`).join(', ')}.</div>` : ''}
       <ul class="hist">${lines || '<li><span>Nicio serie bifată.</span></li>'}</ul>
+      ${this.saved ? this.rpeHtml() : ''}
       ${this.w.id === 'legs' && this.saved ? this.kneeHtml() : ''}
       <div style="height:16px"></div>
       <button class="btn" data-a="p:close">Închide</button>`,
     );
+  }
+
+  /** How hard the whole session was, 1–5: it feeds the week's load in Progres (session-RPE). */
+  rpeHtml(): string {
+    const cur = this.entry?.data.rpe;
+    return `<div class="knee-q"><p class="label">Cât de greu a fost, în total?</p>
+      <div class="chips" style="justify-content:center">${[1, 2, 3, 4, 5].map((n) => `<button class="chip" aria-pressed="${cur === n}" data-a="p:rpe" data-k="${n}">${n}</button>`).join('')}</div>
+      <p class="small dim">1 ușor, 3 greu dar controlat, 5 la limită. Din asta se calculează încărcarea săptămânii.</p></div>`;
   }
 
   /** After Leg Day: how the knees felt during the session (the next morning is asked on Azi). */
@@ -492,6 +503,10 @@ class WorkoutPlayer implements Player {
         this.apply(d);
         return this.render();
       }
+      case 'p:rpe':
+        if (this.entry) this.entry.data.rpe = Number(el.dataset.k);
+        save();
+        return this.render();
       case 'p:knee': {
         const v = Number(el.dataset.k);
         const day = this.sessionDate();
@@ -693,16 +708,15 @@ class WorkoutPlayer implements Player {
     const doneCore = core.filter((x) => ex.some((e) => e.id === x.ex.id)).length;
     // a session carried over from an earlier day is saved on that day
     const other = this.startTs && dayKey(new Date(this.startTs)) !== dayKey();
-    addEntry(
-      makeEntry({
+    this.entry = makeEntry({
         kind: 'workout',
         block: doneCore * 2 >= core.length ? this.block : undefined,
         name: this.w.name,
         dur: Math.min((Date.now() - this.t0) / 1000, 4 * 3600),
         data: { wid: this.w.id, ex, ...(this.deload ? { deload: true } : {}) },
         ...(other ? { ts: this.startTs } : {}),
-      }),
-    );
+      });
+    addEntry(this.entry);
     save();
     this.saved = true;
     dropWorkoutDraft();

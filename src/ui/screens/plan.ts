@@ -5,7 +5,7 @@ import { WEEK, blockLine } from '../../data/plan.ts';
 import { CYCLE_WEEKS, CYCLES, cycleAt, dayComplete, dayProgress, weekDone } from '../../logic/progress.ts';
 import { addDays, dayKey, daysBetween, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
-import { dayPhoto } from '../art.ts';
+import { dayPoster } from '../art.ts';
 import { ic } from '../icons.ts';
 import { blockIcon, blockMinutes, pageHead, planPicks, top } from './shared.ts';
 
@@ -53,7 +53,7 @@ export function planHtml(): string {
     const state = d.idx === tIdx ? 'Azi' : complete ? 'Gata' : d.idx < tIdx && n < d.blocks.length ? 'Rămas' : '';
     return `<li>
       <button class="dc ${d.idx === tIdx ? 'now' : ''} ${complete ? 'full' : ''}" style="--f:${(n / d.blocks.length).toFixed(3)}" data-a="${d.idx === tIdx ? 'tab' : 'day'}" data-k="today" data-i="${d.idx}">
-        <span class="dc-ph">${dayPhoto(d.idx, '', true)}</span>
+        <span class="dc-ph">${dayPoster(d.idx, 'sm')}</span>
         <span class="dc-head">
           <span class="dc-day">${esc(RO_DAYS[d.idx])}</span>
           ${state ? `<span class="dc-tag">${state}</span>` : ''}

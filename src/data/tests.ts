@@ -41,6 +41,17 @@ export const TESTS: FitTest[] = [
   {
     id: 'pullups', name: 'Max Pull-ups', what: 'Forța relativă de tracțiune', unit: 'reps', higher: true, every: 'În săptămâna ușoară',
     how: 'Din atârnat complet, bărbia peste bară, fără balans. La 5 minute după flotări.',
+    ref: 'Baremul SRI, Brigada Antitero (bărbați): 14 tracțiuni = nota 10, 13 = 9, 9 = 5, 5 = 1.',
+  },
+  {
+    id: 'sprint50', name: '50 m Sprint', what: 'Viteză, proba SRI', unit: 's', higher: false, every: 'În săptămâna ușoară',
+    how: 'Pe pistă sau pe asfalt plat, 50 m măsurați, după încălzire și două accelerări. Start din picioare, cronometrat de un partener sau filmat; cel mai bun din 2, cu pauză completă. Zecimala contează.',
+    ref: 'Baremul SRI, Brigada Antitero (bărbați): 6,8 s = nota 10, 6,9 = 9, 7,3 = 5, 7,7 = 1.',
+  },
+  {
+    id: 'run1000', name: '1000 m Run', what: 'Rezistență, proba SRI', unit: 'time', higher: false, every: 'La 8 săptămâni',
+    how: 'Pe pistă (2,5 ture) sau pe o buclă măsurată, după 10 minute de încălzire. Primii 400 m puțin sub ritmul-țintă, apoi ții. Se face în altă zi decât 2,4 km.',
+    ref: 'Baremul SRI, Brigada Antitero (bărbați): 3:20 = nota 10, 3:25 = 9, 3:45 = 5, 4:05 = 1.',
   },
   {
     id: 'plank', name: 'Forearm Plank', what: 'Rezistența trunchiului', unit: 's', higher: true, every: 'În săptămâna ușoară',

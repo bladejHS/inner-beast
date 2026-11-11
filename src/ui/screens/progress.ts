@@ -18,6 +18,7 @@ import { boxCycle, boxScore, boxStats } from '../../logic/boxstats.ts';
 import { COMBOS } from '../../data/combos.ts';
 import { bestOf, TESTS, UNIT_LABEL, type FitTest } from '../../data/tests.ts';
 import { learned } from './alex.ts';
+import { goalHtml } from './goal.ts';
 
 /** A test result in its unit: 10:59, 34 cm, 41 repetări. */
 export function testValue(t: FitTest, v: number): string {
@@ -34,7 +35,7 @@ function testsHtml(): string {
       : `${t.what}. ${t.every}`;
     return `<li class="test-row"><div><b>${esc(t.name)}</b><span>${esc(info)}</span></div><button class="btn ghost sm" data-a="test" data-k="${t.id}" aria-label="Notează ${esc(t.name)}">Notează</button></li>`;
   });
-  return `<h2 class="sec first" id="tests">Teste<small>În săptămâna ușoară, odihnit: puterea întâi, alergarea la final</small></h2><ul class="hist tests">${rows.join('')}</ul>`;
+  return `${goalHtml(dayKey())}<h2 class="sec" id="tests">Teste<small>În săptămâna ușoară, odihnit: puterea întâi, alergarea la final</small></h2><ul class="hist tests">${rows.join('')}</ul>`;
 }
 
 function entryLine(e: Entry, del = false): string {
@@ -156,7 +157,7 @@ function weekSeg(): string {
       ${stat(Math.round(t.breathMin), 'minute de respirație')}
     </div>
     <h2 class="sec">Încărcare<small>Minute × efort la fiecare sesiune, pe săptămâni${lr.usual ? `. Obișnuitul tău: ${kSteps(lr.usual)}` : ''}</small></h2>
-    ${bars(lr.weeks.map((w, i) => ({ v: w.load, label: dm(w.mon), today: i === lr.weeks.length - 1 })), undefined, { fmt: kSteps, name: 'Încărcarea pe ultimele 6 săptămâni' })}
+    ${bars(lr.weeks.map((w, i) => ({ v: w.load, label: dm(w.mon), today: i === lr.weeks.length - 1 })), lr.usual ?? undefined, { fmt: kSteps, goalLabel: 'obișnuit', name: 'Încărcarea pe ultimele 6 săptămâni' })}
     <p class="small dim" style="margin:12px 0 0">${esc(loadText(lr))}</p>
     <h2 class="sec">Somn<small>${avgSleep ? `Media pe 7 zile: ${avgSleep.toFixed(1).replace('.', ',')} h` : 'Notează-l pe ecranul Azi, la „Cum ești azi?”'}</small></h2>
     ${bars(last7.map((d, i) => ({ v: sleepVals[i], label: day2(d), today: d === today })), 7, { fmt: hours, goalLabel: '7 h', name: 'Somn pe 7 zile, în ore' })}

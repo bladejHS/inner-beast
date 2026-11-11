@@ -23,13 +23,22 @@ const RATIO = {
 
 export type ArtName = keyof typeof RATIO;
 
-/** Picture file per weekday (Monday first). The files were cut for the old week, when Leg Day was on Sunday:
- *  Saturday (Leg Day now) takes the runner, Sunday (mobility) the wolf on the rock. */
-const DAY_FILE = [0, 1, 2, 3, 4, 6, 5];
+/** The day's motto, as the e-book's banners had them (the last word is the one in red). */
+export const DAY_MOTTO: Array<[string, string]> = [
+  ['Hard work beats talent when talent', "doesn't work hard"],
+  ['Discipline builds', 'freedom'],
+  ['Better than', 'yesterday'],
+  ['No', 'excuses'],
+  ['Small steps,', 'big results'],
+  ['Pain today,', 'power tomorrow'],
+  ['Same you,', 'but stronger'],
+];
 
-/** The day's banner (public/days, made by scripts/photos.mjs): a picture with the day's motto lettered in. */
-export function dayPhoto(idx: number, cls = '', lazy = false): string {
-  return `<img class="day-ph ${cls}" src="${import.meta.env.BASE_URL}days/${DAY_FILE[idx] ?? idx}.webp" width="830" height="216" alt="" decoding="async"${lazy ? ' loading="lazy"' : ''}>`;
+/** The day's poster (2026-11-11, in place of the stock photos): the motto set in Saira over a steel plate, the wolf's
+ *  mark faint at the right, the day's number stencilled, the red slash. `sm` is the small cut on the plan's day cards. */
+export function dayPoster(idx: number, cls = ''): string {
+  const [a, b] = DAY_MOTTO[idx] ?? DAY_MOTTO[0]!;
+  return `<div class="poster ${cls}" aria-hidden="true"><i class="po-mark" style="--m:url(${import.meta.env.BASE_URL}ui/mark.svg)"></i><i class="po-n">0${idx + 1}</i><i class="po-slash"></i><p class="po-t"><span>${a}</span> <b>${b}</b></p></div>`;
 }
 
 /** The finish mark on every "Gata." screen: three claw gashes torn in, with a shock ring. */

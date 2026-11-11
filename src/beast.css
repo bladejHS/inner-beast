@@ -1128,3 +1128,84 @@ body::after {
 /* chips and steppers: the chosen one stands out of the plate */
 .chip[aria-pressed='true'], .chip.on { box-shadow: 0 8px 18px -10px rgba(255, 255, 255, .55); }
 .stepper { border-color: rgba(255, 255, 255, .22); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06); }
+
+/* ---------- 5.1, 2026-11-11: the day's poster, the objective's dossier, the live screens from two metres ---------- */
+
+/* the poster: the motto set in Saira on a steel plate, the wolf faint at the right, the day's number stencilled */
+.poster { position: relative; display: flex; align-items: flex-end; width: 100%; aspect-ratio: 830 / 216; overflow: hidden; padding: 0 var(--gutter) 14px; background: linear-gradient(100deg, #10131b, #05060a 55%, #140608); -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
+.poster::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(-30deg, rgba(255, 255, 255, .025) 0 2px, transparent 2px 9px); pointer-events: none; }
+.po-mark { position: absolute; right: -4%; top: -12%; width: 38%; aspect-ratio: 680 / 801; background: currentColor; color: rgba(255, 255, 255, .11); -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+.po-n { position: absolute; left: 6px; top: -4px; font: 900 extra-condensed 112px/1 var(--font); letter-spacing: -.03em; color: transparent; -webkit-text-stroke: 1.5px rgba(255, 255, 255, .13); }
+.po-slash { position: absolute; left: var(--gutter); bottom: 8px; width: 46px; height: 5px; background: linear-gradient(90deg, var(--red), var(--red-hot)); transform: skewX(-30deg); transform-origin: 0 50%; box-shadow: 0 0 14px rgba(var(--glow), .5); }
+.po-t { position: relative; max-width: 72%; margin: 0 0 10px; font: 900 extra-condensed 34px/.9 var(--font); letter-spacing: .01em; text-transform: uppercase; text-wrap: balance; background: linear-gradient(180deg, #fff 40%, #a9b2c2); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.po-t b { color: var(--red-text); -webkit-text-fill-color: var(--red-text); }
+.poster.ms-img { filter: none; }
+.poster.sm { aspect-ratio: auto; height: 70px; padding: 0 16px 8px; margin: 0; -webkit-mask-image: linear-gradient(#000 35%, transparent); mask-image: linear-gradient(#000 35%, transparent); }
+.poster.sm .po-t { max-width: 80%; margin: 0; font-size: 19px; }
+.poster.sm .po-n { font-size: 64px; top: -2px; }
+.poster.sm .po-slash { display: none; }
+.poster.sm .po-mark { width: 30%; top: -10%; }
+.dc-ph { height: 70px; }
+@media (min-width: 980px) { .po-t { font-size: 46px; } }
+
+/* the dossier: a plate with hazard tape, the average and its threshold, the three marks */
+.card.goal { border-left-color: var(--gold); padding-top: 24px; }
+.gl-tape { position: absolute; left: 0; right: 0; top: 0; height: 6px; background: repeating-linear-gradient(-45deg, var(--gold) 0 14px, #0b0c12 14px 28px); opacity: .85; }
+.card.goal h3 { letter-spacing: .04em; }
+.gl-avg { flex: none; text-align: right; }
+.gl-avg b { display: block; font: 900 extra-condensed 54px/.86 var(--font); background: linear-gradient(180deg, #fff 38%, #a3adbf); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.gl-avg span { display: block; margin-top: 4px; font: 700 semi-condensed 11px/1.2 var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--label); }
+.gl-avg.big { margin: 14px 0 0; text-align: left; }
+.gl-avg.big b { font-size: 72px; }
+.gl-meter { position: relative; height: 8px; margin: 14px 0 18px; background: var(--n3); }
+.gl-meter i { position: absolute; inset: 0; background: linear-gradient(90deg, var(--red), var(--gold)); transform: scaleX(var(--f, 0)); transform-origin: 0 50%; transition: transform .8s var(--e-out); }
+.gl-meter b { position: absolute; top: -5px; width: 2px; height: 18px; background: var(--ink); }
+.gl-meter b span { position: absolute; left: 50%; top: 20px; transform: translateX(-50%); font: 800 semi-condensed 10.5px/1 var(--font); letter-spacing: .08em; color: var(--label); white-space: nowrap; }
+.gl-rows { list-style: none; margin: 0; padding: 0; }
+.gl-rows li { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--n4); }
+.gl-rows li:first-child { border-top: 0; }
+.gl-rows b { display: block; font: 800 condensed 16px/1.1 var(--font); text-transform: uppercase; letter-spacing: .02em; }
+.gl-rows span { display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.3; color: var(--mute); }
+.gl-n { min-width: 44px; text-align: center; font: 900 extra-condensed 34px/1 var(--font); font-style: normal; color: var(--mute); }
+.gl-n.ok { color: var(--gold); }
+.gl-n.low { color: var(--red-text); }
+.gl-h { margin: 20px 0 8px; font: 700 semi-condensed 11.5px/1.3 var(--font); letter-spacing: .18em; text-transform: uppercase; color: var(--label); }
+.gl-table { font-variant-numeric: tabular-nums; }
+.gl-tr { display: grid; grid-template-columns: 52px 1fr 1fr 1fr; gap: 6px; padding: 6px 0; border-top: 1px solid var(--n4); font-size: 13.5px; }
+.gl-tr span:first-child { font-weight: 850; color: var(--ink); }
+.gl-th { border-top: 0; font: 700 semi-condensed 11px/1.2 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--label); }
+.gl-th span:first-child { font-weight: 700; color: var(--label); }
+.gl-tr.mark { color: var(--gold); background: linear-gradient(90deg, rgba(220, 179, 94, .14), transparent); }
+.gl-tr.mark span:first-child { color: var(--gold); }
+.gl-stages { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+
+/* the live screens: the clock takes the width, the cue is a headline, the controls sit under the thumb */
+.big-time { font-size: clamp(150px, 54vw, 320px); }
+.call-box .c-name { font-size: clamp(40px, 12.5vw, 64px); }
+.pl-ctrl button { height: 76px; }
+.pl-ctrl button.main { height: 100px; }
+.pl-ctrl svg { width: 32px; height: 32px; }
+/* focus: only the clock, the round and the cue; everything else leaves */
+.pl.focus .pl-title, .pl.focus .rd-dots, .pl.focus .call-box p, .pl.focus .call-box .seq, .pl.focus .call-box h4, .pl.focus .pl-glow, .pl.focus .round-lbl:empty { display: none; }
+.pl.focus .big-time { font-size: clamp(170px, 64vw, 380px); margin-top: 0; }
+.pl.focus .call-box { margin-top: 10px; padding: 12px 14px; }
+.pl.focus .call-box .c-name { margin: 0; font-size: clamp(48px, 15vw, 80px); }
+.pl.focus .phase-lbl { font-size: 24px; }
+/* the phone on its side against the bag: the clock on the left, the round and the cue on the right */
+@media (orientation: landscape) and (max-height: 520px) {
+  .pl-body.center > .pl-wrap { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; column-gap: 24px; max-width: none; }
+  .pl-body.center > .pl-wrap > .phase-lbl { grid-column: 1; }
+  .pl-body.center > .pl-wrap > .big-time { grid-column: 1; font-size: clamp(110px, 36vh, 240px); margin: 0; }
+  .pl-body.center > .pl-wrap > .round-lbl, .pl-body.center > .pl-wrap > .rd-big, .pl-body.center > .pl-wrap > .rd-dots, .pl-body.center > .pl-wrap > .call-box, .pl-body.center > .pl-wrap > .knee-q, .pl-body.center > .pl-wrap > .advice { grid-column: 2; }
+  .pl-body.center > .pl-wrap > .call-box { margin-top: 0; }
+  .pl-body.center > .pl-wrap > .call-box .c-name { font-size: clamp(30px, 7vh, 48px); }
+  .pl-bar { min-height: 44px; }
+  .pl-ctrl { padding-top: 4px; padding-bottom: calc(6px + env(safe-area-inset-bottom)); }
+  .pl-ctrl button { height: 54px; }
+  .pl-ctrl button.main { height: 62px; }
+  .pl.focus .big-time { font-size: clamp(130px, 44vh, 300px); }
+}
+
+/* Minte: the breath on the whole screen, slower */
+.orb-wrap { width: min(88vw, 400px); }
+.orb { transition: transform .15s linear; }

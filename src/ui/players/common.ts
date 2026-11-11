@@ -4,13 +4,24 @@ import { esc } from '../../logic/util.ts';
 import { ic } from '../icons.ts';
 import { ctx } from '../ctx.ts';
 
+/** Focus: on the live screens only the clock, the round and the cue stay, read from two metres (2026-11-11). */
+let focus = false;
+try { focus = sessionStorage.getItem('beast:focus') === '1'; } catch { /* storage blocked */ }
+export function toggleFocus(): boolean {
+  focus = !focus;
+  try { sessionStorage.setItem('beast:focus', focus ? '1' : '0'); } catch { /* storage blocked */ }
+  return focus;
+}
+
 export function chrome(title: string, body: string, o: { cls?: string; ctrl?: string; center?: boolean } = {}): string {
   const snd = ctx.S.set.sound;
-  return `<div class="pl ${o.cls ?? ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}">
+  const live = !!o.ctrl;
+  return `<div class="pl ${o.cls ?? ''}${live && focus ? ' focus' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}">
   <i class="pl-glow" aria-hidden="true"></i>
   <div class="pl-bar">
     <button class="icon-btn" data-a="p:close" aria-label="Închide">${ic('close')}</button>
     <div class="pl-title">${esc(title)}</div>
+    ${live ? `<button class="icon-btn" data-a="p:focus" aria-pressed="${focus}" aria-label="${focus ? 'Arată tot' : 'Doar ceasul'}">${ic(focus ? 'eye' : 'eyeoff')}</button>` : ''}
     <button class="icon-btn" data-a="p:sound" aria-label="${snd ? 'Oprește sunetul' : 'Pornește sunetul'}">${ic(snd ? 'sound' : 'mute')}</button>
   </div>
   <div class="pl-body${o.center ? ' center' : ''}"><div class="pl-wrap">${body}</div></div>

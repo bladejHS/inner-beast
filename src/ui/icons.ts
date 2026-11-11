@@ -9,6 +9,9 @@ const P: Record<string, string> = {
   progress: '<path d="M3 20.5h18"/><path class="f" d="M5 14.5h3.6v6H5zM10.2 10.5h3.6v10h-3.6zM15.4 5.5H19v15h-3.6z"/>',
   /** Three claw gashes: the streak, the "done" marks. */
   claw: '<path d="M9.4 2.6c-.8 6.2-2.6 12.6-5.7 18.9 4-5.5 6.4-11.9 7.3-18.9z" fill="currentColor" stroke="none"/><path d="M14.5 2.1c-.9 6.5-2.8 13.1-5.9 19.8 4.1-5.8 6.6-12.5 7.5-19.8z" fill="currentColor" stroke="none"/><path d="M19.6 2.6c-.8 6.2-2.6 12.6-5.7 18.9 4-5.5 6.4-11.9 7.3-18.9z" fill="currentColor" stroke="none"/>',
+  /** The live screens' focus: only the clock. */
+  eye: '<path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff: '<path d="M2.5 12s3.5-6.5 9.5-6.5c1.6 0 3 .4 4.3 1.1M21.5 12s-3.5 6.5-9.5 6.5c-1.6 0-3-.4-4.3-1.1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M4 4l16 16"/>',
   gear: '<circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M21.2 12h-2.6M5.4 12H2.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8M18.5 18.5l-1.8-1.8M7.3 7.3L5.5 5.5"/><circle cx="12" cy="12" r="6.6"/>',
   play: '<path d="M7 4.5v15l12.5-7.5z" fill="currentColor" stroke="none"/>',
   pause: '<rect x="6" y="4.5" width="4" height="15" fill="currentColor" stroke="none"/><rect x="14" y="4.5" width="4" height="15" fill="currentColor" stroke="none"/>',

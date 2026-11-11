@@ -185,6 +185,8 @@ export interface State {
   ready: Record<string, { e?: number; f?: number }>;
   /** The day an easy version was chosen after a low readiness: that day runs like a lighter week. */
   easy: string;
+  /** The objective (data/sri.ts): the selection date, when known. */
+  goal: { date: string };
 }
 
 export const DEFAULT_NUT: NutProfile = { sex: 'm', age: 30, h: 200, startW: 80, goalW: 75, act: 1.55 };
@@ -252,6 +254,7 @@ export function freshState(today: string = dayKey()): State {
     knee: {},
     ready: {},
     easy: '',
+    goal: { date: '' },
   };
 }
 
@@ -299,6 +302,7 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     knee: isObj(r.knee) ? (r.knee as State['knee']) : {},
     ready: isObj(r.ready) ? (r.ready as State['ready']) : {},
     easy: typeof r.easy === 'string' ? r.easy : '',
+    goal: { date: isObj(r.goal) && typeof r.goal.date === 'string' ? r.goal.date : '' },
   };
 }
 

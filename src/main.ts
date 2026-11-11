@@ -14,6 +14,7 @@ import { jogTarget, openPolar } from './ui/players/run.ts';
 import { openShower } from './ui/players/shower.ts';
 import { openWimHof } from './ui/players/wimhof.ts';
 import { dropWorkoutDraft, resumeWorkout, saveWorkoutDraft } from './ui/players/workout.ts';
+import { toggleFocus } from './ui/players/common.ts';
 import { fightHtml, setComboCat, startQuick } from './ui/screens/fight.ts';
 import { toggleLearned } from './ui/screens/alex.ts';
 import { chapterHtml, mindHtml } from './ui/screens/mind.ts';
@@ -346,6 +347,31 @@ function habitSheet(fresh: boolean): void {
 }
 
 /** Notes a test result; the how-to and the published reference sit above the field. */
+/** The selection date of the objective (data/sri.ts). */
+function goalSheet(): void {
+  openSheet(
+    `<h2>Data selecției</h2><p class="dim">Ziua probelor sportive, când o afli de pe sri.ro. Azi îți arată câte zile mai ai.</p>
+    <div class="field"><div class="field-l">Data</div><input id="goal-d" type="date" value="${esc(ctx.S.goal.date)}" style="width:100%"></div>
+    <div class="btn-row"><button class="btn ghost" data-a="goal-clear">Fără dată</button><button class="btn" data-a="goal-save">Salvează</button></div>`,
+    {
+      'goal-save': () => {
+        const v = (document.getElementById('goal-d') as HTMLInputElement).value;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return toast('Alege o dată.');
+        ctx.S.goal.date = v;
+        save();
+        closeSheet();
+        render();
+      },
+      'goal-clear': () => {
+        ctx.S.goal.date = '';
+        save();
+        closeSheet();
+        render();
+      },
+    },
+  );
+}
+
 function testSheet(id: string): void {
   const t = testById(id);
   if (!t) return;
@@ -586,6 +612,8 @@ function act(a: string, el: HTMLElement): void {
     case 'ready-edit':
       setReadyEdit(el.dataset.k === '1');
       return render();
+    case 'goal-date':
+      return goalSheet();
     case 'easy-day':
       S.easy = el.dataset.k === '1' ? today : '';
       save();
@@ -720,6 +748,11 @@ document.addEventListener('click', (ev) => {
   const a = el.dataset.a || '';
   if (document.getElementById('sheet')?.innerHTML && sheetAct(a, el)) return;
   if (a === 'p:close') return closePlayer();
+  if (a === 'p:focus') {
+    toggleFocus();
+    (ctx.player as { render?: () => void } | null)?.render?.();
+    return;
+  }
   if (a === 'p:sound') {
     ctx.S.set.sound = !ctx.S.set.sound;
     save();

@@ -6,13 +6,14 @@ import { cycleAt, dayProgress, deloadDue, deloadOn, lightOn, habitDone, habitGoa
 import { dayKey, esc, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
-import { dayPhoto } from '../art.ts';
+import { dayPoster } from '../art.ts';
 import { rake } from '../claws.ts';
 import { blockCard, blockMinutes, gauge, liveBlock, top } from './shared.ts';
 import { draftSets, workoutDraft } from '../players/workout.ts';
 import { KNEE_STEPS, kneeAsk, legDays } from '../../logic/knee.ts';
 import { weekCard } from './alex.ts';
 import { readiness, sleepAvg3, type ReadyLevel } from '../../logic/ready.ts';
+import { goalCard, goalDays } from './goal.ts';
 
 /** Monday–Sunday strip: how much of each day is done this week. */
 export function weekStrip(today: string, active: number): string {
@@ -44,10 +45,11 @@ export function dayBody(day: Day, today: string, kicker: string): string {
   // before the loop starts, the stat says when it starts instead of showing a dash
   const until = ctx.S.cycle.start ? daysBetween(today, ctx.S.cycle.start) : 0;
   const starts = until > 6 ? shortDay(ctx.S.cycle.start) : until > 0 ? RO_DAYS[weekdayIdx(ctx.S.cycle.start)] : '';
-  const cyc = light ? ['Ușoară', ctx.S.easy === today ? 'ziua' : 'săptămâna'] : c ? [`${c.id} · ${c.week}/4`, 'ciclul'] : starts ? [starts, 'începe ciclul'] : ['—', 'ciclul'];
+  const gd = goalDays(today);
+  const cyc = gd !== null && gd > 0 ? [`${gd}`, 'zile · selecție'] : light ? ['Ușoară', ctx.S.easy === today ? 'ziua' : 'săptămâna'] : c ? [`${c.id} · ${c.week}/4`, 'ciclul'] : starts ? [starts, 'începe ciclul'] : ['—', 'ciclul'];
   return `
     <section class="mission${n === total ? ' cleared' : ''}" aria-label="Misiunea zilei">
-      <div class="ms-ph">${dayPhoto(day.idx, 'ms-img')}</div>
+      <div class="ms-ph">${dayPoster(day.idx, 'ms-img')}</div>
       ${embers()}
       ${rake('ms-rake')}
       <p class="ms-k"><span>Today's Mission</span><b>${esc(kicker)}</b></p>
@@ -245,6 +247,7 @@ export function todayHtml(): string {
     ${deloadCard(today)}
     ${readyCard(today, idx)}
     ${dayBody(day, today, prettyDay(today))}
+    ${goalCard(today)}
     <h2 class="sec">Zilnic<small>Mintea și corpul, în afara rundelor.</small></h2>
     ${habitCard()}
     ${fuelRow(today)}

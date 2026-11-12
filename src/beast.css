@@ -1209,3 +1209,8 @@ body::after {
 /* Minte: the breath on the whole screen, slower */
 .orb-wrap { width: min(88vw, 400px); }
 .orb { transition: transform .15s linear; }
+
+/* Azi, airier (2026-11-12): the readiness questions are optional and fold into one line until asked for */
+.rdy-mini { padding-top: 16px; padding-bottom: 16px; }
+.rdy-mini h3 { margin: 2px 0 0; }
+.rdy-mini .btn { flex: none; width: auto; }

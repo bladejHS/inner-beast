@@ -11,7 +11,6 @@ import { rake } from '../claws.ts';
 import { blockCard, blockMinutes, gauge, liveBlock, top } from './shared.ts';
 import { draftSets, workoutDraft } from '../players/workout.ts';
 import { KNEE_STEPS, kneeAsk, legDays } from '../../logic/knee.ts';
-import { weekCard } from './alex.ts';
 import { readiness, sleepAvg3, type ReadyLevel } from '../../logic/ready.ts';
 
 /** Monday–Sunday strip: how much of each day is done this week. */
@@ -141,6 +140,10 @@ export function readyCard(today: string, idx: number): string {
   const note = S.ready[today] ?? {};
   const sleep = S.sleep[today];
   const r = readiness(note, sleep, sleepAvg3(S.sleep, today));
+  // 2026-11-12: optional. Unanswered it is one quiet line; the questions open only when asked for.
+  if (!r && !editReady) {
+    return `<section class="card rdy-mini" aria-label="Pregătirea de azi"><div class="row"><div class="row-l"><p class="label">Opțional · 10 secunde</p><h3>Cum ești azi?</h3></div><button class="btn ghost sm" data-a="ready-edit" data-k="1">Răspunde</button></div></section>`;
+  }
   if (!r || editReady) {
     const five = (f: 'e' | 'f', cur: number | undefined, name: string): string =>
       `<div class="chips five" role="group" aria-label="${name}">${[1, 2, 3, 4, 5].map((n) => `<button class="chip" aria-pressed="${cur === n}" data-a="ready" data-f="${f}" data-v="${n}">${n}</button>`).join('')}</div>`;
@@ -151,7 +154,7 @@ export function readyCard(today: string, idx: number): string {
         <div class="stepper${sleep !== undefined && sleep < 7 ? ' low' : ''}${sleep === undefined ? ' unset' : ''}"><button data-a="sleep" data-d="-1" aria-label="Mai puțin somn">−</button><output>${shown}</output><button data-a="sleep" data-d="1" aria-label="Mai mult somn">+</button></div></div>
       <div class="rdy-q col"><div><b>Energie</b><span>1 stors, 5 plin de energie</span></div>${five('e', note.e, 'Energie')}</div>
       <div class="rdy-q col"><div><b>Mușchii</b><span>1 foarte febrili, 5 proaspeți</span></div>${five('f', note.f, 'Mușchii')}</div>
-      ${r ? '<button class="btn ghost sm" style="margin-top:16px" data-a="ready-edit" data-k="0">Gata</button>' : '<p class="small dim" style="margin:14px 0 0">Din răspunsuri afli dacă azi merge planul întreg sau varianta ușoară.</p>'}
+      <button class="btn ghost sm" style="margin-top:16px" data-a="ready-edit" data-k="0">${r ? 'Gata' : 'Închide'}</button>
     </section>`;
   }
   const trainDay = idx !== 2 && idx !== 6;
@@ -188,7 +191,7 @@ function whyCard(): string {
 }
 
 function dailyCard(): string {
-  return `<section class="card"><div class="row"><div class="row-l"><p class="label">10 minute · opțional</p><h3>Mobilitate zilnică</h3><p class="small dim" style="margin:0">Alex face mobilitate în fiecare zi ca să rămână rapid.</p></div><button class="go" data-a="tool" data-k="daily" aria-label="Start mobilitate zilnică">${ic('play')}</button></div></section>`;
+  return `<section class="card"><div class="row"><div class="row-l"><p class="label">10 minute · opțional</p><h3>Mobilitate zilnică</h3></div><button class="go" data-a="tool" data-k="daily" aria-label="Start mobilitate zilnică">${ic('play')}</button></div></section>`;
 }
 
 /** The 4th week of every emphasis: the lighter week with the tests, proposed; and the reminder while it is on. */
@@ -245,13 +248,11 @@ export function todayHtml(): string {
     ${deloadCard(today)}
     ${readyCard(today, idx)}
     ${dayBody(day, today, prettyDay(today))}
-    <h2 class="sec">Zilnic<small>Mintea și corpul, în afara rundelor.</small></h2>
+    <h2 class="sec">Zilnic</h2>
     ${habitCard()}
     ${fuelRow(today)}
-    ${whyCard()}
     ${dailyCard()}
-    <h2 class="sec">De învățat<small>Combinațiile săptămânii.</small></h2>
-    ${weekCard(false)}`;
+    ${whyCard()}`;
 }
 
 export function dayViewHtml(idx: number): string {

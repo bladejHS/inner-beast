@@ -190,10 +190,6 @@ function whyCard(): string {
   return `<section class="card why"><p class="label">De ce-ul tău</p><p class="why-quote">${esc(pick)}</p></section>`;
 }
 
-function dailyCard(): string {
-  return `<section class="card"><div class="row"><div class="row-l"><p class="label">10 minute · opțional</p><h3>Mobilitate zilnică</h3></div><button class="go" data-a="tool" data-k="daily" aria-label="Start mobilitate zilnică">${ic('play')}</button></div></section>`;
-}
-
 /** The 4th week of every emphasis: the lighter week with the tests, proposed; and the reminder while it is on. */
 function deloadCard(today: string): string {
   if (deloadOn(ctx.S.deload, today)) return '<section class="card lime"><p class="label">Săptămâna 4</p><h3>Săptămâna ușoară și testele</h3><p class="small dim">Aceleași blocuri, cu aproximativ 2/3 din serii, runde și timp, aceleași greutăți. Testele le faci la începutul săptămânii, cât ești odihnit. Nimic din săptămâna asta nu se numără la progres.</p><button class="btn ghost sm" data-a="tab" data-k="progress" data-to="tests">Teste</button></section>';
@@ -246,13 +242,12 @@ export function todayHtml(): string {
     ${kneeCard(today)}
     ${introCard()}
     ${deloadCard(today)}
-    ${readyCard(today, idx)}
     ${dayBody(day, today, prettyDay(today))}
     <h2 class="sec">Zilnic</h2>
     ${habitCard()}
     ${fuelRow(today)}
-    ${dailyCard()}
-    ${whyCard()}`;
+    ${whyCard()}
+    ${readyCard(today, idx)}`;
 }
 
 export function dayViewHtml(idx: number): string {

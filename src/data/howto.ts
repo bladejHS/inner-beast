@@ -220,14 +220,14 @@ export const HOW: Record<string, How> = {
     ],
     mistake: 'Să simți doar spatele jos: înseamnă că tragi din spate. Cobori mai puțin, împingi șoldul mai mult înapoi și strângi fesierii sus.',
   },
-  legpress: {
+  hacksq: {
     steps: [
-      'Spatele și bazinul lipite de spătar, picioarele sus pe platformă, la lățimea umerilor, vârfurile ușor în afară.',
-      'Deblochezi siguranțele și cobori platforma controlat, în 2–3 secunde, cu genunchii în linie cu vârfurile.',
-      'Te oprești înainte ca bazinul să se ridice de pe spătar sau ca genunchiul să doară peste 3 din 10.',
-      'Împingi prin toată talpa până aproape de întins, fără să blochezi genunchii. Pui siguranțele la loc după ultima repetare.',
+      'Spatele și bazinul lipite de spătar, umerii sub perne. Picioarele la lățimea umerilor, puțin mai în față pe platformă, vârfurile ușor în afară.',
+      'Deblochezi siguranțele și cobori controlat, în 2–3 secunde, cu genunchii în linie cu vârfurile.',
+      'La varianta parțială te oprești pe la 90° la genunchi; oricum te oprești înainte ca bazinul să se dezlipească de spătar sau ca genunchiul să doară peste 3 din 10.',
+      'Împingi prin toată talpa, mai ales prin călcâie, până aproape de întins, fără să blochezi genunchii. Pui siguranțele la loc după ultima repetare.',
     ],
-    mistake: 'Să cobori atât de jos încât bazinul se rulează de pe spătar: spatele jos preia greutatea.',
+    mistake: 'Picioarele jos pe platformă și călcâiele ridicate: genunchii fug mult în față și preiau toată greutatea.',
   },
   cmj: {
     steps: [

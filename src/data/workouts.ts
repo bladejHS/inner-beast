@@ -268,10 +268,12 @@ export const WORKOUTS: Workout[] = [
         cue: 'Mai greu și mai scurt decât sâmbătă: 3 × 4–6 cu 2 repetări în rezervă. Șoldul pleacă înapoi, bara pe coapse, spatele drept, genunchii aproape nemișcați. Trebuie să simți întinderea în spatele coapselor; dacă simți doar spatele jos, coboară mai puțin și împinge șoldul mai mult înapoi. Când faci 3 × 6 curat, pui greutate.',
       },
       {
-        // added 2026-11-13 at the user's request: a machine at the end, so the legs feel the work
-        id: 'legpress', name: 'Leg Press', vars: ['Leg Press (feet high)', 'Leg Press', 'Single-leg Leg Press'], start: 0,
+        // added 2026-11-13 at the user's request: a machine at the end, so the legs feel the work. The user picked the
+        // hack squat over the leg press; the machine guides the path and the back rests on the pad, so it is not the
+        // barbell squat the plan avoids. Depth is capped by knee pain, as on every leg exercise.
+        id: 'hacksq', name: 'Hack Squat', vars: ['Hack Squat (partial range)', 'Hack Squat'], start: 0,
         type: 'reps', sets: 3, lo: 8, hi: 12, rest: 120, load: true, machine: true, muscles: 'cvadricepși, fesieri',
-        cue: 'La final, pe aparat. Picioarele sus pe platformă, la lățimea umerilor: genunchii lucrează mai puțin, fesierii mai mult. Cobori controlat doar până unde genunchiul nu doare peste 3 din 10, fără ca bazinul să se ridice de pe spătar, și nu blochezi genunchii sus. Te oprești cu 1–2 repetări înainte de limită. Fără aparat liber, sari exercițiul.',
+        cue: 'La final, pe aparat. Spatele lipit de spătar, picioarele la lățimea umerilor, puțin mai în față pe platformă. Începi cu amplitudine parțială, până la aproximativ 90° la genunchi; Hack Squat complet doar după 3 săptămâni fără durere peste 3 din 10, nici a doua zi. Cobori în 2–3 secunde, urci fără să blochezi genunchii, te oprești cu 1–2 repetări înainte de limită. Aparatul ocupat: Leg Press, la fel.',
       },
     ],
   },

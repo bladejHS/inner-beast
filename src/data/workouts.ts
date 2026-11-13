@@ -103,7 +103,7 @@ export const WORKOUTS: Workout[] = [
   {
     id: 'pull',
     name: 'Pull Training',
-    min: 54,
+    min: 56,
     ex: [
       {
         id: 'emom', name: 'Pull-up EMOM', vars: ['Negative Pull-ups', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 2,
@@ -147,6 +147,13 @@ export const WORKOUTS: Workout[] = [
         id: 'hang', name: 'Dead Hang', vars: ['Dead Hang', 'Active Hang', 'One-arm Assisted Hang'], start: 0,
         type: 'time', sets: 3, lo: 20, hi: 60, rest: 60, muscles: 'priză, umeri',
         cue: 'Atârni relaxat, umerii activi, și te dai jos înainte să cedeze priza. Ținta pe termen lung e 90 s dintr-o bucată (proba SRI), dar testul de maxim îl faci doar în săptămâna de teste. Priza ține și în clinch, la tracțiuni și la cărat.',
+      },
+      {
+        // back on Friday at the user's request (2026-11-13), next to Monday's Biceps Curls: hammer grip here, for the forearms
+        id: 'hammer', name: 'Hammer Curls', vars: ['Bodyweight Biceps Curls', 'Band Hammer Curls', 'Dumbbell Hammer Curls'], start: 2,
+        type: 'reps', sets: 2, lo: 10, hi: 12, rest: 60, opt: true, muscles: 'biceps, antebrațe',
+        cue: 'Opțional. Palmele una spre alta, coatele lipite de corp, fără balans.',
+        alex: 'Face hammer curls și biceps curls, 4 × 10–12 fiecare.',
       },
       {
         id: 'ytw', name: 'Y-T-W Raises', vars: ['Band Y-T-W Raises', 'TRX Y-T-W Raises'], start: 1,

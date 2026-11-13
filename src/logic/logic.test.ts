@@ -794,12 +794,12 @@ test('Upper Strength: the second strength dose replaces the AMRAP on Monday in c
   assert.equal(resolveBlock(bw, P).kind, 'amrap');
   const up = workoutById('upper');
   assert.deepEqual(up.ex.map((x) => [x.id, x.sets, x.lo, x.hi, x.rest]), [['pull-str', 3, 3, 5, 150], ['dips-str', 3, 3, 5, 150]]);
-  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 38], ['pull', 54], ['legs', 66], ['upper', 15], ['lower', 14], ['knee', 8], ['kick', 10]]);
+  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 38], ['pull', 56], ['legs', 66], ['upper', 15], ['lower', 14], ['knee', 8], ['kick', 10]]);
   // Monday's hack squat and biceps curls, after the kickboxing; Tuesday has no lower-body block, Friday no curls
   const lower = workoutById('lower');
   assert.deepEqual(lower.ex.map((x) => x.id), ['hacksq', 'curls']);
   assert.deepEqual(WEEK[0].blocks.map((b) => b.id), ['mon-shadow', 'mon-bag', 'mon-bw', 'mon-lower']);
-  assert.ok(!workoutById('pull').ex.some((x) => x.id === 'curls'));
+  assert.ok(!workoutById('pull').ex.some((x) => x.id === 'curls') && exerciseById('hammer')!.opt, 'Friday keeps optional hammer curls');
   assert.ok(!exerciseById('curls')!.opt);
   // the machine has no dumbbell ceiling: 40 kg at the top of the range goes to 42.5
   const lp = advise(exerciseById('hacksq')!, lastOf('hacksq', [12, 12, 12], 0, 40), 0);

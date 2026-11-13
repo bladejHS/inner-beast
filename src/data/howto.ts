@@ -114,6 +114,14 @@ export const HOW: Record<string, How> = {
     ],
     mistake: 'Balansul din trunchi. Dacă te legeni, greutatea e prea mare.',
   },
+  hammer: {
+    steps: [
+      'Stai drept, coatele lipite de corp.',
+      'Ridici greutatea (sau tragi banda) îndoind doar cotul, palmele una spre alta la hammer curls.',
+      'Strângi sus o clipă, apoi cobori lent până la brațe aproape întinse.',
+    ],
+    mistake: 'Balansul din trunchi. Dacă te legeni, greutatea e prea mare.',
+  },
   face: {
     steps: [
       'Ții banda (sau prosopul) în fața ta, la nivelul pieptului sau al feței, cu brațele întinse.',

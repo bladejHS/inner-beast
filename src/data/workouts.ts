@@ -46,7 +46,7 @@ export interface Exercise {
 }
 
 export interface Workout {
-  id: 'push' | 'pull' | 'legs' | 'upper' | 'knee' | 'kick';
+  id: 'push' | 'pull' | 'legs' | 'upper' | 'lower' | 'knee' | 'kick';
   name: string;
   /** About how long it takes, rests included. */
   min: number;
@@ -57,18 +57,13 @@ export const WORKOUTS: Workout[] = [
   {
     id: 'push',
     name: 'Push Training',
-    min: 45,
+    min: 38,
     ex: [
       {
         id: 'explosive', name: 'Explosive Push-ups', vars: ['Incline Explosive Push-ups', 'Explosive Push-ups', 'Clap Push-ups', 'Superman Push-ups'], start: 0,
         type: 'reps', sets: 3, lo: 3, hi: 5, rest: 120, muscles: 'piept, triceps, putere',
         cue: 'Cobori controlat, împingi cât de exploziv poți. Seria se termină când o repetare încetinește, nu când nu mai poți.',
         alex: 'Antrenează mușchii și pentru viteză, nu doar pentru forță. Le faci primele, cât ești proaspăt.',
-      },
-      {
-        id: 'splitsq-tue', name: 'Bulgarian Split Squat', vars: ['Split Squats', 'Bulgarian Split Squats', 'Dumbbell Bulgarian Split Squats'], start: 2,
-        type: 'reps', sets: 3, lo: 5, hi: 5, perSide: true, rest: 90, load: true, muscles: 'cvadricepși, fesieri',
-        cue: 'A doua doză de picioare a săptămânii, scurtă: te oprești cu 2–3 repetări înainte de limită. Dacă picioarele sunt încă febrile de luni, o sari.',
       },
       {
         id: 'dips', name: 'Dips', vars: ['Assisted Dips', 'Negative Dips', 'Parallel Bar Dips', 'Weighted Dips'], start: 0,
@@ -106,7 +101,7 @@ export const WORKOUTS: Workout[] = [
   {
     id: 'pull',
     name: 'Pull Training',
-    min: 54,
+    min: 56,
     ex: [
       {
         id: 'emom', name: 'Pull-up EMOM', vars: ['Negative Pull-ups', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 2,
@@ -148,8 +143,8 @@ export const WORKOUTS: Workout[] = [
       },
       {
         id: 'hang', name: 'Dead Hang', vars: ['Dead Hang', 'Active Hang', 'One-arm Assisted Hang'], start: 0,
-        type: 'time', sets: 2, lo: 20, hi: 40, rest: 60, opt: true, muscles: 'priză, umeri',
-        cue: 'Atârni relaxat și te dai jos înainte să cedeze priza. Testul de maxim îl faci doar în săptămâna de teste.',
+        type: 'time', sets: 3, lo: 20, hi: 60, rest: 60, muscles: 'priză, umeri',
+        cue: 'Atârni relaxat, umerii activi, și te dai jos înainte să cedeze priza. Ținta pe termen lung e 90 s dintr-o bucată (proba SRI), dar testul de maxim îl faci doar în săptămâna de teste. Priza ține și în clinch, la tracțiuni și la cărat.',
       },
       {
         id: 'curls', name: 'Hammer Curls', vars: ['Bodyweight Biceps Curls', 'Band Hammer Curls', 'Dumbbell Hammer Curls'], start: 0,
@@ -253,6 +248,26 @@ export const WORKOUTS: Workout[] = [
     ],
   },
   {
+    // The second lower-body strength session of the week, on Tuesday (approved 2026-11-13): an all-round athlete trains
+    // the legs and the hinge twice a week, and Saturday alone was one dose. No squats, no jumps: the split squat moved
+    // here from the push session, plus a heavy barbell hinge, with 2 reps in reserve so Saturday's sprints stay fresh.
+    id: 'lower',
+    name: 'Lower Strength',
+    min: 16,
+    ex: [
+      {
+        id: 'splitsq-tue', name: 'Bulgarian Split Squat', vars: ['Split Squats', 'Bulgarian Split Squats', 'Dumbbell Bulgarian Split Squats'], start: 2,
+        type: 'reps', sets: 3, lo: 5, hi: 5, perSide: true, rest: 90, load: true, muscles: 'cvadricepși, fesieri',
+        cue: 'A doua doză de picioare a săptămânii, scurtă: te oprești cu 2–3 repetări înainte de limită. Dacă picioarele sunt încă febrile de sâmbătă, alegi varianta mai ușoară.',
+      },
+      {
+        id: 'rdl-tue', name: 'Heavy Romanian Deadlift', vars: ['Barbell Romanian Deadlift'], start: 0,
+        type: 'reps', sets: 3, lo: 4, hi: 6, rest: 150, load: true, bar: true, muscles: 'ischiogambieri, fesieri, spate',
+        cue: 'Mai greu și mai scurt decât sâmbătă: 3 × 4–6 cu 2 repetări în rezervă. Șoldul pleacă înapoi, bara pe coapse, spatele drept, genunchii aproape nemișcați. Când faci 3 × 6 curat, pui greutate.',
+      },
+    ],
+  },
+  {
     // Eight minutes for the knees, after Tuesday's push session and after Leg Day, while jumps hurt them.
     // Isometric holds ease tendon pain for a while (Rio 2015; later trials are mixed), slow loaded work builds the
     // tendon (heavy slow resistance, Kongsgaard 2009), and the front of the shin takes part of the braking.
@@ -305,7 +320,7 @@ export const WORKOUTS: Workout[] = [
 ];
 
 /** Where records count: the strength days, bodyweight sets only (reps or seconds, no dumbbells, no bar). */
-export const RECORD_WIDS = ['push', 'pull', 'legs', 'upper'];
+export const RECORD_WIDS = ['push', 'pull', 'legs', 'upper', 'lower'];
 
 export const recordable = (ex: Exercise): boolean => (ex.type === 'reps' || ex.type === 'time' || ex.type === 'max') && !ex.load && !ex.bar;
 

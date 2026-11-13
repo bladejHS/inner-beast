@@ -71,7 +71,7 @@ test('strength days: power first, then strength; no failure sets in the plan', (
   const legs = order('legs');
   assert.ok(legs.indexOf('sprint') < legs.indexOf('cmj') && legs.indexOf('cmj') < legs.indexOf('splitsq') && legs.indexOf('rot') < legs.indexOf('splitsq'));
   assert.equal(order('push')[0], 'explosive');
-  assert.ok(order('push').includes('splitsq-tue'));
+  assert.ok(workoutById('lower').ex.some((e) => e.id === 'splitsq-tue'));
   assert.ok(!order('push').includes('burnout'));
   assert.ok(order('pull').includes('carry'));
   assert.equal(exerciseById('dips')!.rest, 165);
@@ -665,11 +665,11 @@ test('progression: a fixed target has to be met twice before moving up', () => {
   assert.equal(advise(push, lastOf('pushups', [15, 15, 15, 15], 1), 1).kind, 'up');
 });
 
-test('progression: Dead Hang moves up at 40 s on every set, short of grip failure', () => {
+test('progression: Dead Hang moves up at 60 s on every set, short of grip failure', () => {
   const hang = exerciseById('hang')!;
-  assert.equal(advise(hang, lastOf('hang', [40, 42], 0), 0).kind, 'up');
-  assert.equal(advise(hang, lastOf('hang', [40, 30], 0), 0).kind, 'stay');
-  assert.match(advise(hang, lastOf('hang', [45, 45], 0), 1).text, /Variantă nouă/);
+  assert.equal(advise(hang, lastOf('hang', [60, 62, 60], 0), 0).kind, 'up');
+  assert.equal(advise(hang, lastOf('hang', [60, 45, 60], 0), 0).kind, 'stay');
+  assert.match(advise(hang, lastOf('hang', [65, 65, 65], 0), 1).text, /Variantă nouă/);
 });
 
 test('progression: weight is noted on the hardest variation and goes up by 2.5 kg', () => {
@@ -793,7 +793,13 @@ test('Upper Strength: the second strength dose replaces the AMRAP on Monday in c
   assert.equal(resolveBlock(bw, P).kind, 'amrap');
   const up = workoutById('upper');
   assert.deepEqual(up.ex.map((x) => [x.id, x.sets, x.lo, x.hi, x.rest]), [['pull-str', 3, 3, 5, 150], ['dips-str', 3, 3, 5, 150]]);
-  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 45], ['pull', 54], ['legs', 66], ['upper', 15], ['knee', 8], ['kick', 10]]);
+  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 38], ['pull', 56], ['legs', 66], ['upper', 15], ['lower', 16], ['knee', 8], ['kick', 10]]);
+  // the second lower-body session: no squats with the bar, no jumps, and the split squat moved off the push day
+  const lower = workoutById('lower');
+  assert.deepEqual(lower.ex.map((x) => x.id), ['splitsq-tue', 'rdl-tue']);
+  assert.ok(!workoutById('push').ex.some((x) => x.id === 'splitsq-tue'));
+  assert.deepEqual(WEEK[1].blocks.map((b) => b.id).slice(1, 4), ['tue-cal', 'tue-lower', 'knee-tue']);
+  assert.ok(!workoutById('pull').ex.find((x) => x.id === 'hang')!.opt, 'the dead hang is part of Friday');
 });
 
 test('knees: three clean Leg Days bring Box Jump, three more with Box Jump bring CMJ and Broad Jump', () => {

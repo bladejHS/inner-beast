@@ -51,7 +51,7 @@ test('load: minutes × effort, with the rating given at the end doubled to the 0
 
 test('load: a block ticked by hand counts the plan\'s minutes', () => {
   assert.equal(entryMinutes(ses('2026-11-02', 'rounds', 0, { manual: true }, 'mon-shadow')), 15);
-  assert.equal(entryMinutes(ses('2026-11-03', 'workout', 0, { manual: true }, 'tue-cal')), 45);
+  assert.equal(entryMinutes(ses('2026-11-03', 'workout', 0, { manual: true }, 'tue-cal')), 38);
 });
 
 test('load report: the last 7 days against the three weeks before', () => {

@@ -461,6 +461,10 @@ input[type='date'] { flex: none; width: 160px; min-height: 48px; padding: 8px 10
 .cycle { position: relative; margin: 0 0 22px; padding: 16px; border: 1px solid var(--n4); background: linear-gradient(180deg, var(--n2), var(--n1)); }
 .cycle h3 { margin: 0 0 14px; font: 850 condensed 24px/1.02 var(--font); text-transform: uppercase; }
 .cycle p:last-child { margin: 0; }
+.cy-rep { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--n4); }
+.card .cy-rep { margin-top: 0; padding-top: 0; border-top: 0; }
+.cy-rep h3 { margin: 0 0 6px; }
+.cy-rep p { margin: 0 0 10px; }
 .cy-track { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
 .cy-track i { height: 12px; background: var(--n3); transform: skewX(-30deg); }
 .cy-track i:nth-child(4n):not(:last-child) { margin-right: 6px; }

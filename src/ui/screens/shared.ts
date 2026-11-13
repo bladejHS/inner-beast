@@ -88,13 +88,13 @@ export function planPicks(today = dayKey()): Settings & Picks {
   // a check can be undone without touching the log's length, so the checked entries are counted too
   let marked = 0;
   for (const e of S.log) if (e.block) marked++;
-  const key = `${today}|${S.log.length}|${lastTs}|${marked}|${S.cycle.start}|${S.deload.week}|${JSON.stringify(S.set)}`;
+  const key = `${today}|${S.log.length}|${lastTs}|${marked}|${S.cycle.start}|${S.cycle.repeats.join(',')}|${S.deload.week}|${JSON.stringify(S.set)}`;
   if (picksVal && key === picksKey) return picksVal;
   const grown: Record<string, number> = {};
   const light = deloadOn(S.deload, today);
   for (const b of ALL_BLOCKS) if (b.grow) grown[b.id] = light ? b.grow.base : growMinutes(S.log, b.id, S.cycle.start, b.grow);
   picksKey = key;
-  const c = cycleAt(S.cycle.start, today);
+  const c = cycleAt(S.cycle.start, today, S.cycle.repeats);
   picksVal = { ...S.set, cycle: c?.id, cycleWeek: c?.week, grown };
   return picksVal;
 }

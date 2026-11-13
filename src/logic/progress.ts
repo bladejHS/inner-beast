@@ -243,10 +243,21 @@ export interface CycleNow {
   lighter: boolean;
 }
 
+/**
+ * Weeks into the loop at `today`, 0-based; negative before it starts, -1 without a start.
+ * `repeats`: Mondays whose week repeats the week before it in the loop, after 3+ days without training.
+ */
+export function loopWeek(start: string, today: string, repeats: string[] = []): number {
+  if (!start) return -1;
+  const mon = weekStart(today);
+  const w = Math.floor(daysBetween(start, mon) / 7);
+  return w < 0 ? w : w - repeats.filter((r) => r > start && r <= mon).length;
+}
+
 /** Where `today` falls in the loop that started on the Monday `start`. Null before it starts. */
-export function cycleAt(start: string, today: string): CycleNow | null {
+export function cycleAt(start: string, today: string, repeats: string[] = []): CycleNow | null {
   if (!start) return null;
-  const w = Math.floor(daysBetween(start, weekStart(today)) / 7);
+  const w = loopWeek(start, today, repeats);
   if (w < 0) return null;
   const c = CYCLES[Math.floor(w / CYCLE_WEEKS) % CYCLES.length];
   const week = (w % CYCLE_WEEKS) + 1;
@@ -259,9 +270,29 @@ export function cycleStartFor(today: string): string {
   return daysBetween(mon, today) <= 2 ? mon : addDays(mon, 7);
 }
 
+/**
+ * The Monday a repeat would land on: this week, when nothing of it is done yet and it is still Monday to Wednesday
+ * (the missed days were last week); otherwise next week, so the week the days were missed in is done again.
+ * In the loop's first week it is always next week. Empty without a start, or before the loop starts.
+ */
+export function repeatMonday(log: Entry[], start: string, today: string): string {
+  const mon = weekStart(today);
+  const fresh = weekDone(log, mon).size === 0 && daysBetween(mon, today) <= 2;
+  if (!start) return '';
+  const at = fresh && mon > start ? mon : addDays(mon, 7);
+  return at > start ? at : '';
+}
+
+/** Days since the last logged block of the plan, or null with none. */
+export function daysOff(log: Entry[], today: string): number | null {
+  let last = '';
+  for (const e of log) if (e.block && e.date > last && e.date <= today) last = e.date;
+  return last ? daysBetween(last, today) : null;
+}
+
 /** The lighter week is proposed in the 4th week of every emphasis, until it is accepted or turned down. */
-export function deloadDue(d: { last: string; week: string }, start: string, today: string): boolean {
-  const c = cycleAt(start, today);
+export function deloadDue(d: { last: string; week: string }, start: string, today: string, repeats: string[] = []): boolean {
+  const c = cycleAt(start, today, repeats);
   const mon = weekStart(today);
   return !!c && c.lighter && d.week !== mon && d.last !== mon;
 }

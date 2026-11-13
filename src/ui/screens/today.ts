@@ -9,6 +9,7 @@ import { ic } from '../icons.ts';
 import { dayPoster } from '../art.ts';
 import { rake } from '../claws.ts';
 import { blockCard, blockMinutes, gauge, liveBlock, top } from './shared.ts';
+import { repeatCard } from './plan.ts';
 import { draftSets, workoutDraft } from '../players/workout.ts';
 import { KNEE_STEPS, kneeAsk, legDays } from '../../logic/knee.ts';
 import { readiness, sleepAvg3, type ReadyLevel } from '../../logic/ready.ts';
@@ -38,7 +39,7 @@ export function dayBody(day: Day, today: string, kicker: string): string {
   const total = day.blocks.length;
   const mins = day.blocks.reduce((s, b) => s + blockMinutes(b), 0);
   const next = day.blocks.find((b) => !done.has(b.id));
-  const c = cycleAt(ctx.S.cycle.start, today);
+  const c = cycleAt(ctx.S.cycle.start, today, ctx.S.cycle.repeats);
   const light = lightOn(ctx.S, today);
   // before the loop starts, the stat says when it starts instead of showing a dash
   const until = ctx.S.cycle.start ? daysBetween(today, ctx.S.cycle.start) : 0;
@@ -82,7 +83,7 @@ function fuelToday(today: string): number | null {
 function weekHead(today: string): string {
   const done = weekDone(ctx.S.log, weekStart(today));
   const total = WEEK.reduce((s, d) => s + d.blocks.length, 0);
-  const c = cycleAt(ctx.S.cycle.start, today);
+  const c = cycleAt(ctx.S.cycle.start, today, ctx.S.cycle.repeats);
   return `<div class="wk-head"><span class="label">Săptămâna${c ? ` · ${c.lighter ? 'ușoară, cu teste' : `ciclul ${c.id}, ${c.week} din 4`}` : ''}</span><span class="wk-c"><b class="num">${done.size}</b>/${total} blocuri</span></div>`;
 }
 
@@ -193,8 +194,8 @@ function whyCard(): string {
 /** The 4th week of every emphasis: the lighter week with the tests, proposed; and the reminder while it is on. */
 function deloadCard(today: string): string {
   if (deloadOn(ctx.S.deload, today)) return '<section class="card lime"><p class="label">Săptămâna 4</p><h3>Săptămâna ușoară și testele</h3><p class="small dim">Aceleași blocuri, cu aproximativ 2/3 din serii, runde și timp, aceleași greutăți. Testele le faci la începutul săptămânii, cât ești odihnit. Nimic din săptămâna asta nu se numără la progres.</p><button class="btn ghost sm" data-a="tab" data-k="progress" data-to="tests">Teste</button></section>';
-  if (!deloadDue(ctx.S.deload, ctx.S.cycle.start, today)) return '';
-  const c = cycleAt(ctx.S.cycle.start, today);
+  if (!deloadDue(ctx.S.deload, ctx.S.cycle.start, today, ctx.S.cycle.repeats)) return '';
+  const c = cycleAt(ctx.S.cycle.start, today, ctx.S.cycle.repeats);
   return `<section class="card lime"><p class="label">Săptămâna 4</p><h3>Ușoară și cu teste</h3><p class="small">Închei trei săptămâni de ${esc((c?.name ?? '').toLowerCase())}. Propun o săptămână cu aceleași blocuri, dar cu aproximativ 2/3 din serii și runde, plus testele, ca să vezi ce ai câștigat și să pornești odihnit în ciclul următor.</p><div class="btn-row"><button class="btn sm" data-a="deload" data-k="1">Accept</button><button class="btn ghost sm" data-a="deload" data-k="0">Nu acum</button></div></section>`;
 }
 
@@ -242,6 +243,7 @@ export function todayHtml(): string {
     ${kneeCard(today)}
     ${introCard()}
     ${deloadCard(today)}
+    ${repeatCard(today)}
     ${dayBody(day, today, prettyDay(today))}
     <h2 class="sec">Zilnic</h2>
     ${habitCard()}

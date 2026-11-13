@@ -11,7 +11,7 @@ import { CHALLENGES, challengeDays } from '../data/challenges.ts';
 import { addDays, dayKey, inWeek, mmss, num, paceStr, weekStart, weekdayIdx } from './util.ts';
 import { Clock, breath478Seq, burstAt, doneSec, locate, phaseStart, roundsSeq, showerSeq, totalSec } from './seq.ts';
 import { Track, haversine, routePath, simplify } from './geo.ts';
-import { activeStreak, advise, allRecords, bestSet, amrapBest, amrapUp, cycleAt, cycleStartFor, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, growMinutes, growPushups, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
+import { activeStreak, advise, allRecords, bestSet, amrapBest, amrapUp, cycleAt, cycleStartFor, daysOff, repeatMonday, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, growMinutes, growPushups, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
 import { defaultHabit, freshState, makeEntry, normalize, type Habit } from './store.ts';
 import { LAB, labSeq } from './breathlab.ts';
 import { roundThemes } from '../data/combos.ts';
@@ -881,4 +881,26 @@ test('daily routine: push-ups from 10, three more every week, and the old routin
   assert.equal(growPushups([read], '2026-11-07'), false);
   assert.equal(habitGoal(read, '2026-12-01'), 10);
   assert.deepEqual(defaultHabit('2026-11-07').prog, { start: 10, step: 3, from: '2026-11-07' });
+});
+
+test('a missed week repeats in the loop instead of moving on, and only from its Monday', () => {
+  const start = '2026-11-09';
+  // week 2 of A (Nov 16) repeated: Nov 23 is week 2 again, Nov 30 week 3, and the lighter week moves to Dec 7
+  const rep = ['2026-11-23'];
+  assert.equal(cycleAt(start, '2026-11-20', rep)!.week, 2);
+  assert.equal(cycleAt(start, '2026-11-23', rep)!.week, 2);
+  assert.equal(cycleAt(start, '2026-11-30', rep)!.week, 3);
+  assert.ok(cycleAt(start, '2026-12-07', rep)!.lighter);
+  assert.deepEqual([cycleAt(start, '2026-12-14', rep)!.id, cycleAt(start, '2026-12-14', rep)!.week], ['B', 1]);
+  // a repeat on the first Monday of the loop does nothing
+  assert.equal(cycleAt(start, '2026-11-09', ['2026-11-09'])!.week, 1);
+  // where the repeat lands: this week when nothing is done yet and it is Monday to Wednesday, otherwise next week
+  const block = (date: string) => makeEntry({ kind: 'workout', block: 'tue-cal', name: 'Push', dur: 60, date, data: {} });
+  assert.equal(repeatMonday([], start, '2026-11-24'), '2026-11-23');
+  assert.equal(repeatMonday([], start, '2026-11-26'), '2026-11-30');
+  assert.equal(repeatMonday([block('2026-11-24')], start, '2026-11-25'), '2026-11-30');
+  assert.equal(repeatMonday([], start, '2026-11-10'), '2026-11-16');
+  assert.equal(repeatMonday([], '', '2026-11-10'), '');
+  assert.equal(daysOff([block('2026-11-17')], '2026-11-21'), 4);
+  assert.equal(daysOff([], '2026-11-21'), null);
 });

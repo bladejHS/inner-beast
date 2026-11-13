@@ -175,8 +175,8 @@ export interface State {
   race: RaceRun | null;
   /** Lighter weeks: the Monday the proposal was last answered, and the Monday of the lighter week now on. */
   deload: { last: string; week: string };
-  /** The 12-week loop of emphases (A, B, C), from the Monday it started. */
-  cycle: { start: string };
+  /** The 12-week loop of emphases (A, B, C), from the Monday it started; `repeats`: Mondays whose week repeats the one before. */
+  cycle: { start: string; repeats: string[] };
   /** Test results by test id, oldest first. */
   tests: Record<string, Array<{ d: string; v: number }>>;
   /** Knee pain by Leg Day date, 0–10: d during the session, m the next morning. Decides when the jumps come back. */
@@ -249,7 +249,7 @@ export function freshState(today: string = dayKey()): State {
     chal: {},
     race: null,
     deload: { last: '', week: '' },
-    cycle: { start: cycleStartFor(today) },
+    cycle: { start: cycleStartFor(today), repeats: [] },
     tests: {},
     knee: {},
     ready: {},
@@ -297,7 +297,9 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     chal: isObj(r.chal) ? (r.chal as Record<string, string>) : {},
     race: isObj(r.race) && typeof r.race.ev === 'string' && Array.isArray(r.race.splits) ? (r.race as unknown as RaceRun) : null,
     deload: { ...base.deload, ...(isObj(r.deload) ? r.deload : {}) },
-    cycle: isObj(r.cycle) && typeof r.cycle.start === 'string' && r.cycle.start ? { start: r.cycle.start } : base.cycle,
+    cycle: isObj(r.cycle) && typeof r.cycle.start === 'string' && r.cycle.start
+      ? { start: r.cycle.start, repeats: Array.isArray(r.cycle.repeats) ? r.cycle.repeats.filter((x): x is string => typeof x === 'string') : [] }
+      : base.cycle,
     tests: isObj(r.tests) ? (r.tests as State['tests']) : {},
     knee: isObj(r.knee) ? (r.knee as State['knee']) : {},
     ready: isObj(r.ready) ? (r.ready as State['ready']) : {},

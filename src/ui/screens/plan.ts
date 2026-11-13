@@ -2,8 +2,8 @@
 
 import { PRINCIPLES } from '../../data/book.ts';
 import { WEEK, blockLine } from '../../data/plan.ts';
-import { CYCLE_WEEKS, CYCLES, cycleAt, dayComplete, dayProgress, weekDone } from '../../logic/progress.ts';
-import { addDays, dayKey, daysBetween, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
+import { CYCLE_WEEKS, CYCLES, cycleAt, dayComplete, dayProgress, daysOff, loopWeek, repeatMonday, weekDone } from '../../logic/progress.ts';
+import { addDays, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { dayPoster } from '../art.ts';
 import { ic } from '../icons.ts';
@@ -15,12 +15,48 @@ function weekRange(mon: string): string {
   return a.split(' ')[1] === b.split(' ')[1] ? `${a.split(' ')[0]}–${b}` : `${a} – ${b}`;
 }
 
+/** A repeat placed on this Monday or the next one, which can still be taken back. */
+function pendingRepeat(today: string): string {
+  const mon = weekStart(today);
+  return ctx.S.cycle.repeats.find((r) => r === mon || r === addDays(mon, 7)) ?? '';
+}
+
+/**
+ * After 3+ days without training: the week repeats in the loop instead of moving on, so the load doesn't jump.
+ * `lead`: the line above, on Azi the days missed.
+ */
+export function repeatHtml(today: string, lead = ''): string {
+  const { start, repeats } = ctx.S.cycle;
+  const mon = weekStart(today);
+  const when = (r: string) => (r === mon ? 'Săptămâna asta' : `De luni, ${shortDay(r)},`);
+  const set = pendingRepeat(today);
+  if (set) {
+    const p = cycleAt(start, set, repeats);
+    return `<div class="cy-rep">${lead}<p class="small">${when(set)} repeți ${p ? `ciclul ${p.id}, săptămâna ${p.week} din 4` : 'săptămâna'}, în loc să treci mai departe.</p>
+      <button class="btn ghost sm" data-a="cy-repeat" data-k="0" data-d="${set}">Anulează</button></div>`;
+  }
+  const at = repeatMonday(ctx.S.log, start, today);
+  if (!at) return '';
+  const p = cycleAt(start, at, [...repeats, at]);
+  if (!p) return '';
+  return `<div class="cy-rep">${lead}<p class="small dim">Ai stat 3 zile sau mai mult fără antrenament? ${when(at)} repeți ciclul ${p.id}, săptămâna ${p.week} din 4, cu aceleași greutăți, în loc să treci la următoarea.</p>
+    <button class="btn sm" data-a="cy-repeat" data-k="1" data-d="${at}">Repetă săptămâna</button></div>`;
+}
+
+/** On Azi, only after more than 3 days without a block of the plan, and while no repeat is set. */
+export function repeatCard(today: string): string {
+  const off = daysOff(ctx.S.log, today);
+  if (off === null || off <= 3 || pendingRepeat(today)) return '';
+  const html = repeatHtml(today, `<h3>Ai lipsit ${off} zile</h3>`);
+  return html ? `<section class="card lime" aria-label="Repetă săptămâna"><p class="label">Ciclul</p>${html}</section>` : '';
+}
+
 /** The 12 weeks of the loop as a strip: three emphases of four, the fourth week lighter. */
 function cycleCard(today: string): string {
   const start = ctx.S.cycle.start;
-  const c = cycleAt(start, today);
+  const c = cycleAt(start, today, ctx.S.cycle.repeats);
   const loop = CYCLES.length * CYCLE_WEEKS;
-  const w = start ? Math.floor(daysBetween(start, weekStart(today)) / 7) : -1;
+  const w = loopWeek(start, today, ctx.S.cycle.repeats);
   const pos = w < 0 ? -1 : w % loop;
   const track = Array.from({ length: loop }, (_, i) => {
     const cls = [i < pos ? 'ok' : '', i === pos ? 'now' : '', (i + 1) % CYCLE_WEEKS === 0 ? 'light' : ''].filter(Boolean).join(' ');
@@ -34,7 +70,8 @@ function cycleCard(today: string): string {
   }
   return `<section class="cycle"><p class="label">Ciclul ${c.id} · săptămâna ${c.week} din 4</p><h3>${esc(c.name)}</h3>
     <div class="cy-track" aria-hidden="true">${track}</div><div class="cy-names" aria-hidden="true">${names}</div>
-    <p class="small dim">${c.lighter ? 'Săptămâna ușoară, cu testele.' : esc(c.what)}</p></section>`;
+    <p class="small dim">${c.lighter ? 'Săptămâna ușoară, cu testele.' : esc(c.what)}</p>
+    ${repeatHtml(today)}</section>`;
 }
 
 export function planHtml(): string {

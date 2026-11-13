@@ -572,6 +572,16 @@ function act(a: string, el: HTMLElement): void {
       save();
       return render();
     }
+    case 'cy-repeat': {
+      // The week repeats in the loop: same emphasis, same week number, same weights. Can be taken back the same week.
+      const d = el.dataset.d ?? '';
+      if (!d) return;
+      const rest = S.cycle.repeats.filter((r) => r !== d);
+      S.cycle = { ...S.cycle, repeats: el.dataset.k === '1' ? [...rest, d].sort() : rest };
+      save();
+      toast(el.dataset.k === '1' ? 'Săptămâna se repetă.' : 'Anulat: ciclul merge mai departe.');
+      return render();
+    }
     case 'hab': {
       const h = S.habits.find((x) => !x.archived);
       if (!h) return;

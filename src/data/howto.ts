@@ -211,15 +211,6 @@ export const HOW: Record<string, How> = {
     ],
     mistake: 'Să rotunjești spatele ca să cobori mai jos sau să transformi mișcarea într-o genuflexiune, îndoind genunchii.',
   },
-  'rdl-tue': {
-    steps: [
-      'Bara pe suporturi sau ridicată de pe sol cu spatele drept; priza puțin mai largă decât șoldurile, picioarele la lățimea șoldurilor.',
-      'Genunchii ușor îndoiți și ficși. Împingi șoldul înapoi, iar bara alunecă pe coapse spre genunchi.',
-      'Cobori până simți întinderea în spatele coapselor, de obicei puțin sub genunchi, cu spatele drept.',
-      'Strângi fesierii și împingi șoldul înainte până stai drept. Bara rămâne lipită de corp tot drumul.',
-    ],
-    mistake: 'Să simți doar spatele jos: înseamnă că tragi din spate. Cobori mai puțin, împingi șoldul mai mult înapoi și strângi fesierii sus.',
-  },
   hacksq: {
     steps: [
       'Spatele și bazinul lipite de spătar, umerii sub perne. Picioarele la lățimea umerilor, puțin mai în față pe platformă, vârfurile ușor în afară.',
@@ -254,15 +245,6 @@ export const HOW: Record<string, How> = {
       'Prinzi, te reașezi și repeți. Apoi cealaltă parte.',
     ],
     mistake: 'Să arunci din brațe, cu șoldul blocat.',
-  },
-  'splitsq-tue': {
-    steps: [
-      'Laba piciorului din spate pe o bancă sau un scaun, piciorul din față la un pas mare în față.',
-      'Ganterele în mâini, trunchiul ușor aplecat înainte.',
-      'Cobori până când genunchiul din spate aproape atinge solul și împingi prin toată talpa din față.',
-      'Toate repetările pe un picior, apoi pe celălalt.',
-    ],
-    mistake: 'Piciorul din față prea aproape de bancă: genunchiul alunecă mult în față și se ridică călcâiul.',
   },
   splitsq: {
     steps: [

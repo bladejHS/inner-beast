@@ -164,7 +164,7 @@ export function toggleMark(raw: Block): void {
 const ICON_BY_ID: Record<string, string> = {
   'mon-shadow': 'shadow', 'thu-shadow': 'shadow', 'tue-easy': 'shadow', 'fri-easy': 'shadow',
   'mon-bag': 'bag', 'thu-bag': 'bag', 'thu-power': 'bolt', 'thu-rope': 'rope', 'sun-legs': 'stretch', 'mon-bw': 'bolt',
-  'tue-cal': 'fight', 'tue-lower': 'fight', 'fri-cal': 'fight', 'sun-lunges': 'fight', 'tue-stretch': 'stretch', 'fri-stretch': 'stretch', 'tue-cool': 'stretch',
+  'tue-cal': 'fight', 'mon-lower': 'fight', 'fri-cal': 'fight', 'sun-lunges': 'fight', 'tue-stretch': 'stretch', 'fri-stretch': 'stretch', 'tue-cool': 'stretch',
   'sat-mob': 'stretch', 'wed-walk': 'walk', 'wed-shower': 'drop', 'wed-med': 'wind', 'sat-med': 'wind',
   'sat-breath': 'mind', 'sun-jog': 'run', 'tue-row': 'row', 'knee-tue': 'wall', 'knee-sat': 'wall', 'kick-fri': 'stretch',
 };

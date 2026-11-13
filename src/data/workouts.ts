@@ -103,7 +103,7 @@ export const WORKOUTS: Workout[] = [
   {
     id: 'pull',
     name: 'Pull Training',
-    min: 56,
+    min: 54,
     ex: [
       {
         id: 'emom', name: 'Pull-up EMOM', vars: ['Negative Pull-ups', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 2,
@@ -147,12 +147,6 @@ export const WORKOUTS: Workout[] = [
         id: 'hang', name: 'Dead Hang', vars: ['Dead Hang', 'Active Hang', 'One-arm Assisted Hang'], start: 0,
         type: 'time', sets: 3, lo: 20, hi: 60, rest: 60, muscles: 'priză, umeri',
         cue: 'Atârni relaxat, umerii activi, și te dai jos înainte să cedeze priza. Ținta pe termen lung e 90 s dintr-o bucată (proba SRI), dar testul de maxim îl faci doar în săptămâna de teste. Priza ține și în clinch, la tracțiuni și la cărat.',
-      },
-      {
-        id: 'curls', name: 'Hammer Curls', vars: ['Bodyweight Biceps Curls', 'Band Hammer Curls', 'Dumbbell Hammer Curls'], start: 0,
-        type: 'reps', sets: 2, lo: 10, hi: 12, rest: 60, opt: true, muscles: 'biceps, antebrațe',
-        cue: 'Opțional. Coatele lipite de corp, fără balans.',
-        alex: 'Face hammer curls și biceps curls, 4 × 10–12 fiecare.',
       },
       {
         id: 'ytw', name: 'Y-T-W Raises', vars: ['Band Y-T-W Raises', 'TRX Y-T-W Raises'], start: 1,
@@ -250,30 +244,23 @@ export const WORKOUTS: Workout[] = [
     ],
   },
   {
-    // The second lower-body strength session of the week, on Tuesday (approved 2026-11-13): an all-round athlete trains
-    // the legs and the hinge twice a week, and Saturday alone was one dose. No squats, no jumps: the split squat moved
-    // here from the push session, plus a heavy barbell hinge, with 2 reps in reserve so Saturday's sprints stay fresh.
+    // Monday, after the kickboxing (the user's call, 2026-11-13: Tuesday's Lower Strength is gone). The hack squat is the
+    // week's second leg dose, on a machine that guides the path with the back on the pad, so not the barbell squat the
+    // plan avoids; depth is capped by knee pain. The biceps curls moved here from Friday and are no longer optional.
     id: 'lower',
-    name: 'Lower Strength',
-    min: 24,
+    name: 'Hack Squat & Biceps Curls',
+    min: 14,
     ex: [
       {
-        id: 'splitsq-tue', name: 'Bulgarian Split Squat', vars: ['Split Squats', 'Bulgarian Split Squats', 'Dumbbell Bulgarian Split Squats'], start: 2,
-        type: 'reps', sets: 3, lo: 5, hi: 5, perSide: true, rest: 90, load: true, muscles: 'cvadricepși, fesieri',
-        cue: 'A doua doză de picioare a săptămânii, scurtă: te oprești cu 2–3 repetări înainte de limită. Dacă picioarele sunt încă febrile de sâmbătă, alegi varianta mai ușoară.',
-      },
-      {
-        id: 'rdl-tue', name: 'Heavy Romanian Deadlift', vars: ['Barbell Romanian Deadlift'], start: 0,
-        type: 'reps', sets: 3, lo: 4, hi: 6, rest: 150, load: true, bar: true, muscles: 'ischiogambieri, fesieri, spate',
-        cue: 'Mai greu și mai scurt decât sâmbătă: 3 × 4–6 cu 2 repetări în rezervă. Șoldul pleacă înapoi, bara pe coapse, spatele drept, genunchii aproape nemișcați. Trebuie să simți întinderea în spatele coapselor; dacă simți doar spatele jos, coboară mai puțin și împinge șoldul mai mult înapoi. Când faci 3 × 6 curat, pui greutate.',
-      },
-      {
-        // added 2026-11-13 at the user's request: a machine at the end, so the legs feel the work. The user picked the
-        // hack squat over the leg press; the machine guides the path and the back rests on the pad, so it is not the
-        // barbell squat the plan avoids. Depth is capped by knee pain, as on every leg exercise.
         id: 'hacksq', name: 'Hack Squat', vars: ['Hack Squat (partial range)', 'Hack Squat'], start: 0,
         type: 'reps', sets: 3, lo: 8, hi: 12, rest: 120, load: true, machine: true, muscles: 'cvadricepși, fesieri',
-        cue: 'La final, pe aparat. Spatele lipit de spătar, picioarele la lățimea umerilor, puțin mai în față pe platformă. Începi cu amplitudine parțială, până la aproximativ 90° la genunchi; Hack Squat complet doar după 3 săptămâni fără durere peste 3 din 10, nici a doua zi. Cobori în 2–3 secunde, urci fără să blochezi genunchii, te oprești cu 1–2 repetări înainte de limită. Aparatul ocupat: Leg Press, la fel.',
+        cue: 'Pe aparat. Spatele lipit de spătar, picioarele la lățimea umerilor, puțin mai în față pe platformă. Începi cu amplitudine parțială, până la aproximativ 90° la genunchi; Hack Squat complet doar după 3 săptămâni fără durere peste 3 din 10, nici a doua zi. Cobori în 2–3 secunde, urci fără să blochezi genunchii, te oprești cu 1–2 repetări înainte de limită. Aparatul ocupat: Leg Press, la fel.',
+      },
+      {
+        id: 'curls', name: 'Biceps Curls', vars: ['Bodyweight Biceps Curls', 'Band Hammer Curls', 'Dumbbell Hammer Curls', 'Dumbbell Biceps Curls'], start: 3,
+        type: 'reps', sets: 3, lo: 8, hi: 12, rest: 60, muscles: 'biceps, antebrațe',
+        cue: 'Coatele lipite de corp, fără balans din spate: urci în 1 secundă, cobori în 2–3. Te oprești cu 1–2 repetări înainte de limită. Greutatea o notezi la gantere.',
+        alex: 'Face hammer curls și biceps curls, 4 × 10–12 fiecare.',
       },
     ],
   },

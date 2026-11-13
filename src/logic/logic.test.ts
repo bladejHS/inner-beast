@@ -793,10 +793,13 @@ test('Upper Strength: the second strength dose replaces the AMRAP on Monday in c
   assert.equal(resolveBlock(bw, P).kind, 'amrap');
   const up = workoutById('upper');
   assert.deepEqual(up.ex.map((x) => [x.id, x.sets, x.lo, x.hi, x.rest]), [['pull-str', 3, 3, 5, 150], ['dips-str', 3, 3, 5, 150]]);
-  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 38], ['pull', 56], ['legs', 66], ['upper', 15], ['lower', 16], ['knee', 8], ['kick', 10]]);
+  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 38], ['pull', 56], ['legs', 66], ['upper', 15], ['lower', 24], ['knee', 8], ['kick', 10]]);
   // the second lower-body session: no squats with the bar, no jumps, and the split squat moved off the push day
   const lower = workoutById('lower');
-  assert.deepEqual(lower.ex.map((x) => x.id), ['splitsq-tue', 'rdl-tue']);
+  assert.deepEqual(lower.ex.map((x) => x.id), ['splitsq-tue', 'rdl-tue', 'legpress']);
+  // the machine has no dumbbell ceiling: 40 kg at the top of the range goes to 42.5
+  const lp = advise(exerciseById('legpress')!, lastOf('legpress', [12, 12, 12], 0, 40), 0);
+  assert.deepEqual([lp.kind, lp.kg], ['top', 42.5]);
   assert.ok(!workoutById('push').ex.some((x) => x.id === 'splitsq-tue'));
   assert.deepEqual(WEEK[1].blocks.map((b) => b.id).slice(1, 4), ['tue-cal', 'tue-lower', 'knee-tue']);
   assert.ok(!workoutById('pull').ex.find((x) => x.id === 'hang')!.opt, 'the dead hang is part of Friday');

@@ -286,7 +286,7 @@ class WorkoutPlayer implements Player {
 
   kgHtml(x: XS): string {
     if (!loadable(x.ex, x.lvl)) return '';
-    const unit = x.ex.bar ? 'kg cu tot cu bara (20 kg), opțional' : x.ex.load ? 'kg pe o ganteră, opțional' : 'kg, opțional';
+    const unit = x.ex.machine ? 'kg pe aparat, opțional' : x.ex.bar ?'kg cu tot cu bara (20 kg), opțional' : x.ex.load ? 'kg pe o ganteră, opțional' : 'kg, opțional';
     return `<div class="field"><div class="field-l">Greutate<small>${unit}</small></div><input type="number" inputmode="decimal" step="0.5" min="0" max="300" value="${x.kg || ''}" data-a="p:kg" aria-label="Greutate în kg" style="width:96px"></div>`;
   }
 

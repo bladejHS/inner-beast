@@ -41,6 +41,8 @@ export interface Exercise {
   load?: boolean;
   /** Loaded with the barbell: kg include the bar, and there is no dumbbell ceiling. */
   bar?: boolean;
+  /** On a machine: kg as the machine shows them, no dumbbell ceiling. */
+  machine?: boolean;
   /** For sets you tick off: what one set is. */
   label?: string;
 }
@@ -253,7 +255,7 @@ export const WORKOUTS: Workout[] = [
     // here from the push session, plus a heavy barbell hinge, with 2 reps in reserve so Saturday's sprints stay fresh.
     id: 'lower',
     name: 'Lower Strength',
-    min: 16,
+    min: 24,
     ex: [
       {
         id: 'splitsq-tue', name: 'Bulgarian Split Squat', vars: ['Split Squats', 'Bulgarian Split Squats', 'Dumbbell Bulgarian Split Squats'], start: 2,
@@ -263,7 +265,13 @@ export const WORKOUTS: Workout[] = [
       {
         id: 'rdl-tue', name: 'Heavy Romanian Deadlift', vars: ['Barbell Romanian Deadlift'], start: 0,
         type: 'reps', sets: 3, lo: 4, hi: 6, rest: 150, load: true, bar: true, muscles: 'ischiogambieri, fesieri, spate',
-        cue: 'Mai greu și mai scurt decât sâmbătă: 3 × 4–6 cu 2 repetări în rezervă. Șoldul pleacă înapoi, bara pe coapse, spatele drept, genunchii aproape nemișcați. Când faci 3 × 6 curat, pui greutate.',
+        cue: 'Mai greu și mai scurt decât sâmbătă: 3 × 4–6 cu 2 repetări în rezervă. Șoldul pleacă înapoi, bara pe coapse, spatele drept, genunchii aproape nemișcați. Trebuie să simți întinderea în spatele coapselor; dacă simți doar spatele jos, coboară mai puțin și împinge șoldul mai mult înapoi. Când faci 3 × 6 curat, pui greutate.',
+      },
+      {
+        // added 2026-11-13 at the user's request: a machine at the end, so the legs feel the work
+        id: 'legpress', name: 'Leg Press', vars: ['Leg Press (feet high)', 'Leg Press', 'Single-leg Leg Press'], start: 0,
+        type: 'reps', sets: 3, lo: 8, hi: 12, rest: 120, load: true, machine: true, muscles: 'cvadricepși, fesieri',
+        cue: 'La final, pe aparat. Picioarele sus pe platformă, la lățimea umerilor: genunchii lucrează mai puțin, fesierii mai mult. Cobori controlat doar până unde genunchiul nu doare peste 3 din 10, fără ca bazinul să se ridice de pe spătar, și nu blochezi genunchii sus. Te oprești cu 1–2 repetări înainte de limită. Fără aparat liber, sari exercițiul.',
       },
     ],
   },

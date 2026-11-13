@@ -114,7 +114,7 @@ export function advise(ex: Exercise, last: LastEx | undefined, lvl: number, prev
     const lkg = last.log.kg;
     if (ex.load && lkg) {
       // Dumbbells stop at DB_MAX_KG: past that, a harder variation or a slower tempo takes over.
-      const next = ex.bar ? lkg + KG_STEP : Math.min(lkg + KG_STEP, DB_MAX_KG);
+      const next = ex.bar || ex.machine ? lkg + KG_STEP : Math.min(lkg + KG_STEP, DB_MAX_KG);
       if (next <= lkg) {
         const heaviest = `Ai atins ${hi}${ex.type === 'time' ? ' s' : ''} la toate seriile cu ${kgStr(lkg)} kg, cele mai grele gantere.`;
         if (lvl < ex.vars.length - 1) return { kind: 'up', lvl: lvl + 1, text: `${heaviest} Treci la ${ex.vars[lvl + 1]}.` };

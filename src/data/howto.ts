@@ -211,6 +211,24 @@ export const HOW: Record<string, How> = {
     ],
     mistake: 'Să rotunjești spatele ca să cobori mai jos sau să transformi mișcarea într-o genuflexiune, îndoind genunchii.',
   },
+  'rdl-tue': {
+    steps: [
+      'Bara pe suporturi sau ridicată de pe sol cu spatele drept; priza puțin mai largă decât șoldurile, picioarele la lățimea șoldurilor.',
+      'Genunchii ușor îndoiți și ficși. Împingi șoldul înapoi, iar bara alunecă pe coapse spre genunchi.',
+      'Cobori până simți întinderea în spatele coapselor, de obicei puțin sub genunchi, cu spatele drept.',
+      'Strângi fesierii și împingi șoldul înainte până stai drept. Bara rămâne lipită de corp tot drumul.',
+    ],
+    mistake: 'Să simți doar spatele jos: înseamnă că tragi din spate. Cobori mai puțin, împingi șoldul mai mult înapoi și strângi fesierii sus.',
+  },
+  legpress: {
+    steps: [
+      'Spatele și bazinul lipite de spătar, picioarele sus pe platformă, la lățimea umerilor, vârfurile ușor în afară.',
+      'Deblochezi siguranțele și cobori platforma controlat, în 2–3 secunde, cu genunchii în linie cu vârfurile.',
+      'Te oprești înainte ca bazinul să se ridice de pe spătar sau ca genunchiul să doară peste 3 din 10.',
+      'Împingi prin toată talpa până aproape de întins, fără să blochezi genunchii. Pui siguranțele la loc după ultima repetare.',
+    ],
+    mistake: 'Să cobori atât de jos încât bazinul se rulează de pe spătar: spatele jos preia greutatea.',
+  },
   cmj: {
     steps: [
       'Picioarele la lățimea șoldurilor, mâinile pe șolduri (sau libere, dacă nu măsori).',

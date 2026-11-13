@@ -13,7 +13,7 @@ import { bars, spark } from '../charts.ts';
 import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { ic } from '../icons.ts';
-import { pageHead, segBar, segOf, top } from './shared.ts';
+import { healthRow, pageHead, segBar, segOf, top } from './shared.ts';
 import { boxCycle, boxScore, boxStats } from '../../logic/boxstats.ts';
 import { COMBOS } from '../../data/combos.ts';
 import { bestOf, TESTS, UNIT_LABEL, type FitTest } from '../../data/tests.ts';
@@ -162,7 +162,8 @@ function weekSeg(): string {
     <h2 class="sec">Somn<small>${avgSleep ? `Media pe 7 zile: ${avgSleep.toFixed(1).replace('.', ',')} h` : 'Notează-l pe ecranul Azi, la „Cum ești azi?”'}</small></h2>
     ${bars(last7.map((d, i) => ({ v: sleepVals[i], label: day2(d), today: d === today })), 7, { fmt: hours, goalLabel: '7 h', name: 'Somn pe 7 zile, în ore' })}
     <h2 class="sec">Pași<small>Ținta: 10.000</small></h2>
-    ${bars(last7.map((d, i) => ({ v: stepsVals[i], label: day2(d), today: d === today })), 10000, { fmt: kSteps, goalLabel: '10k', name: 'Pași pe 7 zile' })}`;
+    ${bars(last7.map((d, i) => ({ v: stepsVals[i], label: day2(d), today: d === today })), 10000, { fmt: kSteps, goalLabel: '10k', name: 'Pași pe 7 zile' })}
+    ${healthRow()}`;
 }
 
 /** Istoric: the latest entries, then the whole list on its own screen. */

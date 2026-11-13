@@ -2,6 +2,7 @@
 
 import { Track, routePath, simplify, MAX_ACC, type Fix } from '../../logic/geo.ts';
 import { Clock } from '../../logic/seq.ts';
+import { Pedometer, strideM } from '../../logic/pedometer.ts';
 import { readRun, runAdvice, zone2, type RunInput } from '../../logic/runlog.ts';
 import { makeEntry } from '../../logic/store.ts';
 import { dayKey, esc, km, mmss, num, paceStr, raceTime } from '../../logic/util.ts';
@@ -20,7 +21,6 @@ export interface RunCfg {
   target?: number;
 }
 
-const STRIDE_M = 0.75;
 const RUN_CUES: Array<[number, string]> = [
   [0, 'Începe încet. Respiră calm.'],
   [300, 'Poți vorbi în propoziții? Dacă nu, încetinește.'],
@@ -109,6 +109,8 @@ export function openPolar(cfg: RunCfg): void {
 }
 
 type GpsState = 'off' | 'wait' | 'ok' | 'weak' | 'denied' | 'none';
+/** The motion sensor for the step count on a walk: on once readings arrive. */
+type MotionState = 'off' | 'wait' | 'on' | 'denied' | 'none';
 
 class RunPlayer implements Player {
   st: 'ready' | 'run' | 'done' = 'ready';
@@ -124,6 +126,87 @@ class RunPlayer implements Player {
   timer = 0;
   saved = false;
   steps = 0;
+  ped = new Pedometer();
+  motion: MotionState = 'off';
+  stride = strideM(ctx.S.nut.h);
+
+  /** Accelerometer readings, counted only while the clock runs (a pause is not walked). */
+  onMotion = (e: DeviceMotionEvent): void => {
+    const g = e.accelerationIncludingGravity;
+    if (!g || g.x === null || g.y === null || g.z === null) return;
+    if (this.motion !== 'on') {
+      this.motion = 'on';
+      this.renderMotion();
+    }
+    if (this.st === 'run' && this.clock.running && this.ped.push(g.x, g.y, g.z, e.timeStamp)) setText('st', num(this.ped.steps));
+  };
+
+  /** Asks for the motion sensor (iPhone: only inside the tap on Start) and listens. */
+  startMotion(): void {
+    if (this.cfg.mode !== 'walk' || this.motion === 'on' || this.motion === 'wait') return;
+    const DME = (window as unknown as { DeviceMotionEvent?: { requestPermission?: () => Promise<string> } }).DeviceMotionEvent;
+    if (!DME) {
+      this.motion = 'none';
+      return;
+    }
+    const listen = () => {
+      this.motion = 'wait';
+      window.addEventListener('devicemotion', this.onMotion);
+      // no reading within 3 s: the phone has no sensor for the browser
+      window.setTimeout(() => {
+        if (this.motion === 'wait') {
+          this.motion = 'none';
+          this.renderMotion();
+        }
+      }, 3000);
+    };
+    if (typeof DME.requestPermission === 'function') {
+      DME.requestPermission().then(
+        (r) => {
+          if (r === 'granted') listen();
+          else this.motion = 'denied';
+          this.renderMotion();
+        },
+        () => {
+          this.motion = 'denied';
+          this.renderMotion();
+        },
+      );
+    } else listen();
+  }
+
+  stopMotion(): void {
+    window.removeEventListener('devicemotion', this.onMotion);
+  }
+
+  /** Counted by the sensor when it works, otherwise estimated from the GPS distance and the stride for your height. */
+  get counted(): boolean {
+    return this.motion === 'on';
+  }
+
+  stepsNow(): number {
+    return this.counted ? this.ped.steps : Math.round(this.track.m / this.stride);
+  }
+
+  motionHtml(): string {
+    if (this.cfg.mode !== 'walk') return '';
+    const map: Record<MotionState, [string, string]> = {
+      off: ['', 'Pedometrul pornește la Start'],
+      wait: ['mid', 'Pornesc senzorul de mișcare…'],
+      on: ['ok', 'Pedometru: senzorul numără fiecare pas'],
+      denied: ['', 'Fără acces la senzorul de mișcare: estimez pașii din GPS'],
+      none: ['', 'Senzorul de mișcare nu răspunde: estimez pașii din GPS'],
+    };
+    const [cls, txt] = map[this.motion];
+    return `<span class="gps ${cls}" id="motion"><i></i>${esc(txt)}</span>`;
+  }
+
+  renderMotion(): void {
+    const el = document.getElementById('motion');
+    if (el) el.outerHTML = this.motionHtml();
+    const lab = document.getElementById('st-l');
+    if (lab) lab.textContent = this.counted ? 'pași numărați' : 'pași estimați';
+  }
 
   constructor(cfg: RunCfg) {
     this.cfg = cfg.target ? { ...cfg, target: jogTarget(cfg.target) } : cfg;
@@ -197,7 +280,7 @@ class RunPlayer implements Player {
         ${c.mode === 'run' && runAdvice(ctx.S.log, zone2(ctx.S.set.hrMax)) ? `<div class="advice">${esc(runAdvice(ctx.S.log, zone2(ctx.S.set.hrMax)))}</div>` : ''}
         ${howHtml(c.mode === 'run' ? 'Jogging' : 'Walk (10K Steps)', undefined, { open: true })}
         <p>${this.gpsHtml()}</p>
-        <p class="small dim">Ecranul rămâne aprins cât timp alergi. Dacă îl blochezi, unele telefoane opresc GPS-ul din browser.</p>
+        ${c.mode === 'walk' ? `<p>${this.motionHtml()}</p><p class="small dim">Pașii îi numără senzorul de mișcare al telefonului, cât aplicația e deschisă și ecranul aprins: ține telefonul în buzunar sau în mână, nu în rucsac. Pentru totalul zilei, cel mai precis e numărul din aplicația Sănătate.</p>` : '<p class="small dim">Ecranul rămâne aprins cât timp alergi. Dacă îl blochezi, unele telefoane opresc GPS-ul din browser.</p>'}
         <button class="btn" data-a="p:start" style="margin-top:12px">Start</button>
         ${c.mode === 'run' ? '<button class="btn ghost" data-a="p:manual" style="margin-top:10px">Adaugă din Polar Flow</button>' : '<button class="link" data-a="p:manual">Introdu manual (bandă, ceas)</button>'}`,
       );
@@ -219,8 +302,9 @@ class RunPlayer implements Player {
           <div><b id="dk">${km(this.track.m)}</b><span>km</span></div>
           <div><b id="pn">${paceStr(this.track.pace())}</b><span>ritm acum, min/km</span></div>
           <div><b id="pa">${paceStr(avg)}</b><span>ritm mediu, min/km</span></div>
-          <div><b id="st">${c.mode === 'walk' ? num(this.track.m / STRIDE_M) : this.track.splits.length}</b><span>${c.mode === 'walk' ? 'pași estimați' : 'km întregi'}</span></div>
+          <div><b id="st">${c.mode === 'walk' ? num(this.stepsNow()) : this.track.splits.length}</b><span id="st-l">${c.mode === 'walk' ? (this.counted ? 'pași numărați' : 'pași estimați') : 'km întregi'}</span></div>
         </div>
+        ${c.mode === 'walk' ? `<p>${this.motionHtml()}</p>` : ''}
         ${pts.length > 1 ? `<svg class="route" viewBox="0 0 300 160"><path d="${routePath(pts, 300, 160)}"/></svg>` : ''}
         <p>${this.gpsHtml()}</p>`,
         { ctrl: ctrlBtn('p:pause', paused ? 'play' : 'pause', paused ? 'Continuă' : 'Pauză', true) + ctrlBtn('p:finish', 'flag', 'Termină') },
@@ -230,7 +314,7 @@ class RunPlayer implements Player {
     const t = this.clock.t;
     const avg = this.track.m > 50 ? (t / this.track.m) * 1000 : 0;
     const pts = simplify(this.track.pts, 8);
-    const est = Math.round(this.track.m / STRIDE_M);
+    const est = this.stepsNow();
     el.innerHTML = chrome(
       this.name,
       `${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1>
@@ -243,7 +327,7 @@ class RunPlayer implements Player {
       ${this.track.splits.length ? `<p class="small dim">Pe kilometru: ${this.track.splits.map((s, i) => mmss(s - (i ? this.track.splits[i - 1] : 0))).join(', ')}</p>` : ''}
       ${pts.length > 1 ? `<svg class="route" viewBox="0 0 300 160"><path d="${routePath(pts, 300, 160)}"/></svg>` : ''}
       ${c.mode === 'run' ? `<h2 class="sec">Datele alergării<small>Corectează sau completează din Polar Flow</small></h2>${runFields(this.gpsInput())}` : ''}
-      ${c.mode === 'walk' ? `<p style="margin-top:14px">Pași (din telefon sau estimare)</p><input type="number" inputmode="numeric" data-a="p:steps" value="${this.steps || est}" min="0" max="100000">` : ''}
+      ${c.mode === 'walk' ? `<p style="margin-top:14px">Pași ${this.counted ? 'numărați de senzor' : 'estimați din distanță'} (poți corecta)</p><input type="number" inputmode="numeric" data-a="p:steps" value="${this.steps || est}" min="0" max="100000">` : ''}
       <div style="height:16px"></div>
       <button class="btn" data-a="p:save">${this.saved ? 'Salvat' : 'Salvează'}</button>
       <button class="link" data-a="p:discard">Nu salva</button>`,
@@ -261,6 +345,7 @@ class RunPlayer implements Player {
 
   start(): void {
     unlock();
+    this.startMotion();
     if (this.watchId === null && this.gps !== 'none') this.watch();
     this.st = 'run';
     this.clock.start();
@@ -277,7 +362,7 @@ class RunPlayer implements Player {
     setText('dk', km(this.track.m));
     setText('pn', paceStr(this.track.pace()));
     setText('pa', paceStr(this.track.m > 50 ? (t / this.track.m) * 1000 : 0));
-    setText('st', this.cfg.mode === 'walk' ? num(this.track.m / STRIDE_M) : String(this.track.splits.length));
+    setText('st', this.cfg.mode === 'walk' ? num(this.stepsNow()) : String(this.track.splits.length));
     const target = this.cfg.target ?? 0;
     const ringVal = ovEl().querySelector<SVGCircleElement>('.ring .val');
     if (ringVal && target) {
@@ -313,6 +398,7 @@ class RunPlayer implements Player {
     window.clearInterval(this.timer);
     this.clock.pause();
     this.stopWatch();
+    this.stopMotion();
     sfx.chime();
     this.st = 'done';
     this.render();
@@ -345,7 +431,7 @@ class RunPlayer implements Player {
         }),
       );
     } else {
-      const steps = this.steps || Math.round(this.track.m / STRIDE_M);
+      const steps = this.steps || this.stepsNow();
       const today = dayKey();
       ctx.S.steps[today] = Math.max(ctx.S.steps[today] ?? 0, steps);
       addEntry(
@@ -354,7 +440,7 @@ class RunPlayer implements Player {
           block: steps >= 10000 ? c.block : undefined,
           name: 'Walk (10K Steps)',
           dur: t,
-          data: { m: Math.round(this.track.m), steps, pts: simplify(this.track.pts, 25) },
+          data: { m: Math.round(this.track.m), steps, counted: !this.steps && this.counted, pts: simplify(this.track.pts, 25) },
         }),
       );
     }
@@ -451,6 +537,7 @@ class RunPlayer implements Player {
   destroy(): void {
     window.clearInterval(this.timer);
     this.stopWatch();
+    this.stopMotion();
   }
 }
 

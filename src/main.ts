@@ -30,7 +30,7 @@ import { discAct, disciplineHtml } from './ui/screens/discipline.ts';
 import { labHtml } from './ui/screens/lab.ts';
 import { openLab } from './ui/players/lab.ts';
 import { icsExport } from './ui/ics.ts';
-import { liveBlock, planPicks, saveSteps, startBlock, toggleMark } from './ui/screens/shared.ts';
+import { healthHow, importHealthSteps, liveBlock, planPicks, saveSteps, startBlock, toggleMark } from './ui/screens/shared.ts';
 import { dayViewHtml, setReadyEdit, todayHtml } from './ui/screens/today.ts';
 import { clawSwipe, countUp, lite } from './ui/fx.ts';
 
@@ -491,6 +491,10 @@ function act(a: string, el: HTMLElement): void {
       if (b) toggleMark(b);
       return;
     }
+    case 'health':
+      return importHealthSteps();
+    case 'health-how':
+      return healthHow();
     case 'polar': {
       const b = blockById(el.dataset.b || '');
       if (b) openPolar({ mode: 'run', block: b.id, target: jogTarget((liveBlock(b).min ?? 20) * 60) });

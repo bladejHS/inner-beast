@@ -1218,3 +1218,11 @@ body::after {
 .rdy-mini { padding-top: 16px; padding-bottom: 16px; }
 .rdy-mini h3 { margin: 2px 0 0; }
 .rdy-mini .btn { flex: none; width: auto; }
+
+/* steps from Apple Health */
+.health-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 10px 0 0; }
+.health-row .btn { display: inline-flex; align-items: center; gap: 8px; }
+.health-row .btn svg { width: 18px; height: 18px; }
+ol.how-list { margin: 8px 0 14px; padding-left: 20px; color: var(--mute); font-size: 14.5px; line-height: 1.5; }
+ol.how-list li + li { margin-top: 6px; }
+ol.how-list b { color: var(--ink, #fff); }

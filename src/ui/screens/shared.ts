@@ -7,8 +7,9 @@ import { activeStreak, cycleAt, deloadOn, growMinutes } from '../../logic/progre
 import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
 import { zone2, zoneHard } from '../../logic/runlog.ts';
 import { kickPower, kickWeek, kneeNotes, kneeSore, type KneeNote } from '../../logic/knee.ts';
+import { parseSteps } from '../../logic/pedometer.ts';
 import { dayKey, esc, inWeek, num, pad2, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
-import { addEntry, ask, ctx, fresh, save, toast, type Tab } from '../ctx.ts';
+import { addEntry, ask, closeSheet, ctx, fresh, openSheet, save, toast, type Tab } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { openAmrap } from '../players/amrap.ts';
 import { openBreath } from '../players/breath.ts';
@@ -219,7 +220,7 @@ export function blockCard(raw: Block, n: number, today: string, next = false): s
   let extra = b.alt ? altPicker(b) : '';
   if (b.kind === 'walk') {
     const st = ctx.S.steps[today] ?? 0;
-    extra = `<div class="steps-in"><label class="sr" for="steps-in">Pași azi</label><input id="steps-in" type="number" inputmode="numeric" min="0" max="100000" data-a="steps" value="${st || ''}" placeholder="Pași azi"><span>din 10.000</span></div>`;
+    extra = `<div class="steps-in"><label class="sr" for="steps-in">Pași azi</label><input id="steps-in" type="number" inputmode="numeric" min="0" max="100000" data-a="steps" value="${st || ''}" placeholder="Pași azi"><span>din 10.000</span></div>${healthRow()}`;
   }
   if (b.kind === 'run' || b.kind === 'cardio') {
     const [lo, hi] = zone2(ctx.S.set.hrMax);
@@ -257,6 +258,54 @@ export function blockCard(raw: Block, n: number, today: string, next = false): s
 function doneWhen(date: string, today: string): string {
   if (date === today) return 'Făcut azi';
   return `Făcut ${RO_DAYS[weekdayIdx(date)].toLowerCase()}`;
+}
+
+/** The day's steps from Apple Health: the phone's own count, the most precise there is. */
+export function healthRow(): string {
+  return `<p class="health-row"><button class="btn ghost sm" data-a="health">${ic('walk')}<span>Din Sănătate</span></button><button class="link" data-a="health-how">Cum se leagă?</button></p>`;
+}
+
+/** Reads the step count a Shortcut copied from Apple Health. Web apps can't read Health themselves. */
+export function importHealthSteps(): void {
+  const clip = navigator.clipboard;
+  if (!clip?.readText) {
+    toast('Telefonul nu dă voie la clipboard. Scrie numărul în câmp.');
+    return;
+  }
+  clip.readText().then(
+    (txt) => {
+      const n = parseSteps(txt);
+      if (n === null) {
+        toast('În clipboard nu e un număr de pași. Rulează întâi scurtătura „Pași azi”.');
+        return;
+      }
+      saveSteps(n);
+      toast(`${num(n)} de pași din Sănătate.`);
+      ctx.render();
+    },
+    () => toast('Ai refuzat lipirea. Apasă din nou și alege „Lipește”.'),
+  );
+}
+
+/** How to set up the Shortcut once. */
+export function healthHow(): void {
+  openSheet(`<h2>Pașii din Sănătate</h2>
+    <p class="small">iPhone-ul numără pașii toată ziua, cu cipul de mișcare, și îi pune în aplicația Sănătate. E cel mai precis număr pe care îl poți avea, mai precis decât orice aplicație web. O aplicație web nu poate citi Sănătate direct, așa că o scurtătură îl copiază, iar Inner Beast îl lipește.</p>
+    <h3>O singură dată: scurtătura</h3>
+    <ol class="how-list">
+      <li>Deschide aplicația <b>Scurtături</b> și apasă <b>+</b>. Numește-o „Pași azi”.</li>
+      <li>Adaugă acțiunea <b>Găsește eșantioane de sănătate</b> (Find Health Samples): tipul <b>Pași</b>, data de început <b>Azi</b>, grupare <b>Zi</b>. Gruparea pe zi dă exact totalul din Sănătate, fără pași numărați de două ori de telefon și ceas.</li>
+      <li>Adaugă <b>Obține detaliile eșantionului de sănătate</b> → <b>Valoare</b>.</li>
+      <li>Adaugă <b>Rotunjește numărul</b>, apoi <b>Copiază în clipboard</b>.</li>
+      <li>La prima rulare, permite accesul la Pași.</li>
+    </ol>
+    <h3>Zilnic</h3>
+    <ol class="how-list">
+      <li>Rulezi „Pași azi”: din widget, din Siri sau cu <b>Atingere pe spate</b> (Configurări → Accesibilitate → Atingere → Atingere pe spate → dublu → „Pași azi”).</li>
+      <li>Deschizi Inner Beast și apeși <b>Din Sănătate</b>, apoi <b>Lipește</b>.</li>
+    </ol>
+    <p class="small dim">Numărul înlocuiește pașii de azi; peste 10.000 bifează plimbarea de miercuri.</p>
+    <button class="btn" data-a="m:close">Am înțeles</button>`, { 'm:close': () => closeSheet() });
 }
 
 /** Saves today's steps; 10.000 checks off the walk. */

@@ -2,7 +2,7 @@
 
 import { HABIT_STEPS } from '../../data/book.ts';
 import { WEEK, type Day } from '../../data/plan.ts';
-import { cycleAt, dayProgress, deloadDue, deloadOn, lightOn, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, weekDone } from '../../logic/progress.ts';
+import { cycleAt, dayProgress, deloadDue, deloadOn, lightOn, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, weekDone, weekSince } from '../../logic/progress.ts';
 import { dayKey, esc, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
@@ -16,7 +16,7 @@ import { readiness, sleepAvg3, type ReadyLevel } from '../../logic/ready.ts';
 
 /** Monday–Sunday strip: how much of each day is done this week. */
 export function weekStrip(today: string, active: number): string {
-  const done = weekDone(ctx.S.log, weekStart(today));
+  const done = weekDone(ctx.S.log, weekStart(today), weekSince(ctx.S.cycle, weekStart(today)));
   const tIdx = weekdayIdx(today);
   return `<nav class="wk" aria-label="Zilele săptămânii">${WEEK.map((d) => {
     const n = dayProgress(d, done);
@@ -34,7 +34,7 @@ const embers = (): string =>
   `<div class="ms-embers" aria-hidden="true">${EMBERS.map(([x, d, s, z]) => `<i style="--x:${x}%;--d:${d}s;--s:${s}s;--z:${z}px"></i>`).join('')}</div>`;
 
 export function dayBody(day: Day, today: string, kicker: string): string {
-  const done = weekDone(ctx.S.log, weekStart(today));
+  const done = weekDone(ctx.S.log, weekStart(today), weekSince(ctx.S.cycle, weekStart(today)));
   const n = dayProgress(day, done);
   const total = day.blocks.length;
   const mins = day.blocks.reduce((s, b) => s + blockMinutes(b), 0);
@@ -81,7 +81,7 @@ function fuelToday(today: string): number | null {
 
 /** One line above the week strip: where the week and the loop stand. */
 function weekHead(today: string): string {
-  const done = weekDone(ctx.S.log, weekStart(today));
+  const done = weekDone(ctx.S.log, weekStart(today), weekSince(ctx.S.cycle, weekStart(today)));
   const total = WEEK.reduce((s, d) => s + d.blocks.length, 0);
   const c = cycleAt(ctx.S.cycle.start, today, ctx.S.cycle.repeats);
   return `<div class="wk-head"><span class="label">Săptămâna${c ? ` · ${c.lighter ? 'ușoară, cu teste' : `ciclul ${c.id}, ${c.week} din 4`}` : ''}</span><span class="wk-c"><b class="num">${done.size}</b>/${total} blocuri</span></div>`;

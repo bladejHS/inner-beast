@@ -303,11 +303,21 @@ export function growMinutes(log: Entry[], blockId: string, since: string, g: { b
   return Math.min(g.cap, g.base + g.step * n);
 }
 
-/** Block ids logged during the week that starts on `monday`. */
-export function weekDone(log: Entry[], monday: string): Set<string> {
+/** Block ids logged during the week that starts on `monday`; with `since`, only from that moment (a restarted week). */
+export function weekDone(log: Entry[], monday: string, since = 0): Set<string> {
   const s = new Set<string>();
-  for (const e of log) if (e.block && inWeek(e.date, monday)) s.add(e.block);
+  for (const e of log) if (e.block && inWeek(e.date, monday) && e.ts >= since) s.add(e.block);
   return s;
+}
+
+/** When the week was restarted with "Repetă săptămâna", if that happened in the week of `monday`; 0 otherwise.
+ *  The blocks done before it stay in the history but no longer check off this week's days. */
+export function weekSince(cycle: { resetAt?: number }, monday: string): number {
+  const t = cycle.resetAt ?? 0;
+  if (!t) return 0;
+  const d = new Date(t);
+  const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return inWeek(day, monday) ? t : 0;
 }
 
 export function dayComplete(day: Day, done: Set<string>): boolean {

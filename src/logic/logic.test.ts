@@ -11,7 +11,7 @@ import { CHALLENGES, challengeDays } from '../data/challenges.ts';
 import { addDays, dayKey, inWeek, mmss, num, paceStr, weekStart, weekdayIdx } from './util.ts';
 import { Clock, breath478Seq, burstAt, doneSec, locate, phaseStart, roundsSeq, showerSeq, totalSec } from './seq.ts';
 import { Track, haversine, routePath, simplify } from './geo.ts';
-import { activeStreak, advise, allRecords, bestSet, amrapBest, amrapUp, cycleAt, cycleStartFor, daysOff, repeatMonday, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, growMinutes, growPushups, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
+import { activeStreak, advise, allRecords, bestSet, amrapBest, amrapUp, cycleAt, cycleStartFor, daysOff, repeatMonday, weekSince, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, growMinutes, growPushups, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
 import { defaultHabit, freshState, makeEntry, normalize, type Habit } from './store.ts';
 import { LAB, labSeq } from './breathlab.ts';
 import { roundThemes } from '../data/combos.ts';
@@ -907,4 +907,18 @@ test('a missed week repeats in the loop instead of moving on, and only from its 
   assert.equal(repeatMonday([], '', '2026-11-10'), '');
   assert.equal(daysOff([block('2026-11-17')], '2026-11-21'), 4);
   assert.equal(daysOff([], '2026-11-21'), null);
+});
+
+test('a restarted week: the days checked off before the restart are open again, the history keeps them', () => {
+  const at = (d: string, h: number) => new Date(`${d}T${String(h).padStart(2, '0')}:00:00`).getTime();
+  const log = [
+    makeEntry({ kind: 'workout', block: 'tue-cal', name: 'Push', dur: 60, date: '2026-11-17', ts: at('2026-11-17', 18), data: {} }),
+    makeEntry({ kind: 'rounds', block: 'mon-bag', name: 'Bag', dur: 60, date: '2026-11-21', ts: at('2026-11-21', 19), data: {} }),
+  ];
+  const reset = at('2026-11-20', 10);
+  assert.equal(weekSince({ resetAt: reset }, '2026-11-16'), reset);
+  assert.equal(weekSince({ resetAt: reset }, '2026-11-23'), 0, 'next week starts clean anyway');
+  assert.equal(weekSince({}, '2026-11-16'), 0);
+  assert.deepEqual([...weekDone(log, '2026-11-16', reset)], ['mon-bag']);
+  assert.equal(weekDone(log, '2026-11-16').size, 2);
 });

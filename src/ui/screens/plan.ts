@@ -2,7 +2,7 @@
 
 import { PRINCIPLES } from '../../data/book.ts';
 import { WEEK, blockLine } from '../../data/plan.ts';
-import { CYCLE_WEEKS, CYCLES, cycleAt, dayComplete, dayProgress, daysOff, loopWeek, repeatMonday, weekDone } from '../../logic/progress.ts';
+import { CYCLE_WEEKS, CYCLES, cycleAt, dayComplete, dayProgress, daysOff, loopWeek, repeatMonday, weekDone, weekSince } from '../../logic/progress.ts';
 import { addDays, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { dayPoster } from '../art.ts';
@@ -32,14 +32,14 @@ export function repeatHtml(today: string, lead = ''): string {
   const set = pendingRepeat(today);
   if (set) {
     const p = cycleAt(start, set, repeats);
-    return `<div class="cy-rep">${lead}<p class="small">${when(set)} repeți ${p ? `ciclul ${p.id}, săptămâna ${p.week} din 4` : 'săptămâna'}, în loc să treci mai departe.</p>
+    return `<div class="cy-rep">${lead}<p class="small">${set === mon ? '' : 'Săptămâna asta ai luat-o de la capăt: zilele sunt din nou deschise, ce ai făcut înainte rămâne în istoric. '}${when(set)} repeți ${p ? `ciclul ${p.id}, săptămâna ${p.week} din 4` : 'săptămâna'}, în loc să treci mai departe.</p>
       <button class="btn ghost sm" data-a="cy-repeat" data-k="0" data-d="${set}">Anulează</button></div>`;
   }
   const at = repeatMonday(ctx.S.log, start, today);
   if (!at) return '';
   const p = cycleAt(start, at, [...repeats, at]);
   if (!p) return '';
-  return `<div class="cy-rep">${lead}<p class="small dim">Ai stat 3 zile sau mai mult fără antrenament? ${when(at)} repeți ciclul ${p.id}, săptămâna ${p.week} din 4, cu aceleași greutăți, în loc să treci la următoarea.</p>
+  return `<div class="cy-rep">${lead}<p class="small dim">Ai stat 3 zile sau mai mult fără antrenament? ${at === mon ? '' : 'Săptămâna asta o iei de la capăt: zilele bifate se deschid din nou, iar ce ai făcut rămâne în istoric. '}${when(at)} repeți ciclul ${p.id}, săptămâna ${p.week} din 4, cu aceleași greutăți, în loc să treci la următoarea.</p>
     <button class="btn sm" data-a="cy-repeat" data-k="1" data-d="${at}">Repetă săptămâna</button></div>`;
 }
 
@@ -77,7 +77,7 @@ function cycleCard(today: string): string {
 export function planHtml(): string {
   const today = dayKey();
   const mon = weekStart(today);
-  const done = weekDone(ctx.S.log, mon);
+  const done = weekDone(ctx.S.log, mon, weekSince(ctx.S.cycle, mon));
   const full = WEEK.filter((d) => dayComplete(d, done)).length;
   const blocksDone = WEEK.reduce((s, d) => s + dayProgress(d, done), 0);
   const tIdx = weekdayIdx(today);

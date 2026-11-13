@@ -3,7 +3,7 @@
 import { focusCombos, usesLegs } from '../../data/combos.ts';
 import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks, type RestKey } from '../../data/plan.ts';
 import { ROW_CHALLENGES, rowChallenge } from '../../data/row.ts';
-import { activeStreak, cycleAt, deloadOn, growMinutes } from '../../logic/progress.ts';
+import { activeStreak, cycleAt, deloadOn, growMinutes, weekSince } from '../../logic/progress.ts';
 import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
 import { zone2, zoneHard } from '../../logic/runlog.ts';
 import { kickPower, kickWeek, kneeNotes, kneeSore, type KneeNote } from '../../logic/knee.ts';
@@ -138,7 +138,8 @@ const KIND_OF: Record<string, Kind> = { row: 'row', rounds: 'rounds', amrap: 'am
 /** Entries of this block in the current week, newest first. */
 export function blockEntries(b: Block, today = dayKey()): typeof ctx.S.log {
   const mon = weekStart(today);
-  return ctx.S.log.filter((e) => e.block === b.id && inWeek(e.date, mon)).reverse();
+  const since = weekSince(ctx.S.cycle, mon);
+  return ctx.S.log.filter((e) => e.block === b.id && inWeek(e.date, mon) && e.ts >= since).reverse();
 }
 
 /** Tap on the block number: check off without the timer, or undo the check. */

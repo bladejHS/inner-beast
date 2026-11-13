@@ -580,10 +580,13 @@ function act(a: string, el: HTMLElement): void {
       // The week repeats in the loop: same emphasis, same week number, same weights. Can be taken back the same week.
       const d = el.dataset.d ?? '';
       if (!d) return;
+      // and the week starts over now: what was checked off before stays in the history, but the days are open again
       const rest = S.cycle.repeats.filter((r) => r !== d);
-      S.cycle = { ...S.cycle, repeats: el.dataset.k === '1' ? [...rest, d].sort() : rest };
+      const on = el.dataset.k === '1';
+      const { resetAt: _old, ...cycle } = S.cycle;
+      S.cycle = { ...cycle, repeats: on ? [...rest, d].sort() : rest, ...(on ? { resetAt: Date.now() } : {}) };
       save();
-      toast(el.dataset.k === '1' ? 'Săptămâna se repetă.' : 'Anulat: ciclul merge mai departe.');
+      toast(on ? 'Săptămâna o iei de la capăt.' : 'Anulat: zilele bifate revin, ciclul merge mai departe.');
       return render();
     }
     case 'hab': {

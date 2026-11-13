@@ -3,7 +3,7 @@
 
 import { WEEK } from '../../data/plan.ts';
 import { BW_SCHEMES, EMOM_GOAL, WORKOUTS } from '../../data/workouts.ts';
-import { activeStreak, allRecords, amrapBest, amrapTrend, dayProgress, exerciseTrend, stalled, totals, variationPath, weekDone } from '../../logic/progress.ts';
+import { activeStreak, allRecords, amrapBest, amrapTrend, dayProgress, exerciseTrend, stalled, totals, variationPath, weekDone, weekSince } from '../../logic/progress.ts';
 import { runAdvice, zone2 } from '../../logic/runlog.ts';
 import { KNEE_RUN, kneeStreak, legDays } from '../../logic/knee.ts';
 import { loadReport, loadText } from '../../logic/ready.ts';
@@ -128,7 +128,7 @@ const kSteps = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(1).replace('.',
 function weekSeg(): string {
   const S = ctx.S;
   const today = dayKey();
-  const done = weekDone(S.log, weekStart(today));
+  const done = weekDone(S.log, weekStart(today), weekSince(S.cycle, weekStart(today)));
   const t = totals(S.log);
   const streak = activeStreak(S.log, today);
   const week = WEEK.map((d) => {

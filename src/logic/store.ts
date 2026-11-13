@@ -176,7 +176,7 @@ export interface State {
   /** Lighter weeks: the Monday the proposal was last answered, and the Monday of the lighter week now on. */
   deload: { last: string; week: string };
   /** The 12-week loop of emphases (A, B, C), from the Monday it started; `repeats`: Mondays whose week repeats the one before. */
-  cycle: { start: string; repeats: string[] };
+  cycle: { start: string; repeats: string[]; resetAt?: number };
   /** Test results by test id, oldest first. */
   tests: Record<string, Array<{ d: string; v: number }>>;
   /** Knee pain by Leg Day date, 0–10: d during the session, m the next morning. Decides when the jumps come back. */
@@ -298,7 +298,7 @@ export function normalize(raw: unknown, today: string = dayKey()): State {
     race: isObj(r.race) && typeof r.race.ev === 'string' && Array.isArray(r.race.splits) ? (r.race as unknown as RaceRun) : null,
     deload: { ...base.deload, ...(isObj(r.deload) ? r.deload : {}) },
     cycle: isObj(r.cycle) && typeof r.cycle.start === 'string' && r.cycle.start
-      ? { start: r.cycle.start, repeats: Array.isArray(r.cycle.repeats) ? r.cycle.repeats.filter((x): x is string => typeof x === 'string') : [] }
+      ? { start: r.cycle.start, repeats: Array.isArray(r.cycle.repeats) ? r.cycle.repeats.filter((x): x is string => typeof x === 'string') : [], ...(typeof r.cycle.resetAt === 'number' ? { resetAt: r.cycle.resetAt } : {}) }
       : base.cycle,
     tests: isObj(r.tests) ? (r.tests as State['tests']) : {},
     knee: isObj(r.knee) ? (r.knee as State['knee']) : {},

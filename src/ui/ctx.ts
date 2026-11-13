@@ -5,7 +5,7 @@ import { esc } from '../logic/util.ts';
 import { keepAwake, hush } from './audio.ts';
 import { celebrate } from './fx.ts';
 import { WEEK } from '../data/plan.ts';
-import { dayComplete, weekDone } from '../logic/progress.ts';
+import { dayComplete, weekDone, weekSince } from '../logic/progress.ts';
 import { dayKey, weekStart, weekdayIdx } from '../logic/util.ts';
 
 export type Tab = 'today' | 'plan' | 'fight' | 'alex' | 'mind' | 'progress' | 'disc' | 'lab' | 'challenge';
@@ -64,11 +64,11 @@ export function addEntry(e: Entry): void {
   }
   const day = e.block ? WEEK.find((d) => d.blocks.some((b) => b.id === e.block)) : undefined;
   const mon = weekStart(dayKey());
-  const before = day ? dayComplete(day, weekDone(ctx.S.log, mon)) : true;
+  const before = day ? dayComplete(day, weekDone(ctx.S.log, mon, weekSince(ctx.S.cycle, mon))) : true;
   ctx.S.log.push(e);
   ctx.S.log.sort((a, b) => a.ts - b.ts);
   save();
-  if (day && !before && dayComplete(day, weekDone(ctx.S.log, mon))) {
+  if (day && !before && dayComplete(day, weekDone(ctx.S.log, mon, weekSince(ctx.S.cycle, mon)))) {
     const today = day.idx === weekdayIdx(dayKey());
     window.setTimeout(() => celebrate(esc(day.title), today ? 'Ziua de azi e bifată' : 'Încă o zi bifată'), 600);
   }

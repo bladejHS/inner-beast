@@ -71,6 +71,7 @@ test('strength days: power first, then strength; no failure sets in the plan', (
   const legs = order('legs');
   assert.ok(legs.indexOf('sprint') < legs.indexOf('cmj') && legs.indexOf('cmj') < legs.indexOf('splitsq') && legs.indexOf('rot') < legs.indexOf('splitsq'));
   assert.equal(order('push')[0], 'explosive');
+  assert.ok(order('push').includes('splitsq-tue'));
   assert.ok(workoutById('lower').ex.some((e) => e.id === 'hacksq'));
   assert.ok(!order('push').includes('burnout'));
   assert.ok(order('pull').includes('carry'));
@@ -794,7 +795,7 @@ test('Upper Strength: the second strength dose replaces the AMRAP on Monday in c
   assert.equal(resolveBlock(bw, P).kind, 'amrap');
   const up = workoutById('upper');
   assert.deepEqual(up.ex.map((x) => [x.id, x.sets, x.lo, x.hi, x.rest]), [['pull-str', 3, 3, 5, 150], ['dips-str', 3, 3, 5, 150]]);
-  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 38], ['pull', 56], ['legs', 66], ['upper', 15], ['lower', 14], ['knee', 8], ['kick', 10]]);
+  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 45], ['pull', 56], ['legs', 66], ['upper', 15], ['lower', 14], ['knee', 8], ['kick', 10]]);
   // Monday's hack squat and biceps curls, after the kickboxing; Tuesday has no lower-body block, Friday no curls
   const lower = workoutById('lower');
   assert.deepEqual(lower.ex.map((x) => x.id), ['hacksq', 'curls']);

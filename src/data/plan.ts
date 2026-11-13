@@ -153,7 +153,7 @@ export const WEEK: Day[] = [
     title: 'Push Training',
     blocks: [
       { id: 'tue-stretch', kind: 'routine', name: 'Dynamic Warm-up', dose: '10 min', routine: 'stretch-push', min: 10, tip: 'Încălzire în mișcare pentru umeri și șolduri. Întinderile lungi vin la final: ținute înainte de exercițiile explozive, scad puterea.' },
-      { id: 'tue-cal', kind: 'workout', name: 'Calisthenics: Chest, Shoulders, Triceps', dose: '38 min', line: '38 min Calisthenics (Chest, Shoulders, Triceps)', workout: 'push', min: 38, tip: 'Push-ups (variante) și dips, cu explozivele primele.' },
+      { id: 'tue-cal', kind: 'workout', name: 'Calisthenics: Chest, Shoulders, Triceps', dose: '45 min', line: '45 min Calisthenics (Chest, Shoulders, Triceps) + Split Squat', workout: 'push', min: 45, tip: 'Push-ups (variante) și dips, cu explozivele primele, plus a doua doză de picioare a săptămânii.' },
       KNEE_ARMOR('knee-tue'),
       { id: 'tue-easy', kind: 'rounds', name: 'Easy Shadow Kickboxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'slow', tip: 'Slow, Clean Technique: fiecare lovitură de picior lentă, pe bucăți, ca să-i înveți mecanica.',
         cues: ['Kick-urile la jumătate de viteză: genunchiul sus, pivot pe vârf, șoldul prin țintă, revii în gardă.', 'Echilibrul înaintea vitezei: dacă nu revii stabil, încetinești.', 'Check-ul: genunchiul din față sus, tibia ușor în afară, garda sus.', 'Pumnii întinși complet, iar mâna revine la bărbie după fiecare lovitură.'] },

@@ -254,6 +254,15 @@ export const HOW: Record<string, How> = {
     ],
     mistake: 'Să arunci din brațe, cu șoldul blocat.',
   },
+  'splitsq-tue': {
+    steps: [
+      'Laba piciorului din spate pe o bancă sau un scaun, piciorul din față la un pas mare în față.',
+      'Ganterele în mâini, trunchiul ușor aplecat înainte.',
+      'Cobori până când genunchiul din spate aproape atinge solul și împingi prin toată talpa din față.',
+      'Toate repetările pe un picior, apoi pe celălalt.',
+    ],
+    mistake: 'Piciorul din față prea aproape de bancă: genunchiul alunecă mult în față și se ridică călcâiul.',
+  },
   splitsq: {
     steps: [
       'Laba piciorului din spate pe o bancă sau un scaun, piciorul din față la un pas mare în față.',

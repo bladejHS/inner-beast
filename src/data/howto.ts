@@ -487,7 +487,7 @@ export const HOW: Record<string, How> = {
     steps: [
       'Scara întinsă pe o suprafață plană, care nu alunecă. Stai la capătul ei, pe vârfuri, în gardă.',
       'Contacte scurte și rapide cu solul, fără să calci pe treptele scării.',
-      'Treci prin drill-urile strigate: In and Out, Step-in Jab, Jab-Cross-Jab, Step-in Pivot, Shuffle, apoi clasicele. Fiecare apare cu animația pașilor, văzută de sus: albastru e piciorul stâng, alb cel drept.',
+      'Treci prin drill-urile strigate: In and Out, Step-in Jab, Jab-Cross-Jab, Step-in Pivot, Shuffle, apoi clasicele. Fiecare apare cu animația pașilor, văzută de sus: roșu e piciorul stâng, alb cel drept.',
       'La capăt te întorci și reiei. Privirea înainte, ca în ring, nu la picioare.',
     ],
     mistake: 'Să grăbești până calci strâmb: întâi precizia, apoi viteza.',

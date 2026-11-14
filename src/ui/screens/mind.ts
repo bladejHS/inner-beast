@@ -27,10 +27,11 @@ function whyBlock(): string {
   const q = (k: 'victim' | 'winner' | 'drive', label: string, ph: string) =>
     `<label class="small" for="why-${k}" style="font-weight:700;display:block;margin:12px 0 6px">${esc(label)}</label><textarea id="why-${k}" data-a="why" data-k="${k}" placeholder="${esc(ph)}">${esc(w[k])}</textarea>`;
   return `<section id="why">${art('why', 'why-art')}
-    ${q('victim', 'De ce nu vrei să fii o victimă?', 'Scrie sincer, doar tu vezi asta.')}
-    ${q('winner', 'De ce tocmai tu ar trebui să fii un câștigător?', '')}
-    ${q('drive', 'Cum va arăta viața ta când atingi tot ce ți-ai propus? Ce vor spune cei care te-au tras în jos?', 'Motorul tău suprem, pentru când corpul spune că nu mai poate.')}
-    <p class="small dim" style="margin-top:8px">Se salvează singur. Pe ecranul Azi vezi zilnic una dintre ele.</p>
+    ${/* Deeper questions since 2026-11-14 (the user's request). The keys are the old ones, so answers already written stay. */ ''}
+    ${q('victim', 'Pentru cine te ridici în zilele în care pentru tine n-ai mai face-o?', 'Un nume, o față. Scrie sincer, doar tu vezi asta.')}
+    ${q('winner', 'Ce fel de om ești când nu te vede nimeni și nu te obligă nimic? Și ce fel de om vrei să fii?', 'Nu ce vrei să obții. Cine vrei să fii.')}
+    ${q('drive', 'Dacă peste un an ești exact unde ești azi, ce o să-ți reproșezi cel mai tare?', 'Răspunsul ăsta e pentru când corpul spune că nu mai poate.')}
+    <p class="small dim" style="margin-top:8px">Se salvează singur. Pe ecranul Azi vezi zilnic unul dintre răspunsuri.</p>
   </section>`;
 }
 

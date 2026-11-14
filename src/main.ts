@@ -704,7 +704,7 @@ function act(a: string, el: HTMLElement): void {
       save();
       return render();
     case 'alt':
-      if (el.dataset.b === 'thu-rope') S.set.thuFeet = el.dataset.v === 'ladder' ? 'ladder' : 'rope';
+      if (el.dataset.b === 'thu-rope') S.set.thuFeet = el.dataset.v === 'ladder' ? 'ladder' : el.dataset.v === 'plate' ? 'plate' : 'rope';
       else if (el.dataset.b === 'thu-shadow') S.set.thuPartner = el.dataset.v === 'spar' ? 'spar' : 'shadow';
       else if (el.dataset.b === 'sun-jog') S.set.sunAero = el.dataset.v === 'run' ? 'run' : 'row';
       else S.set.thuMain = el.dataset.v === 'row' ? 'row' : 'bag';

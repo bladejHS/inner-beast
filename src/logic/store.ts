@@ -52,7 +52,7 @@ export interface Settings {
   callEvery: number;
   legMode: 'wall' | 'jump';
   /** Thursday's first slot: Jumping Rope or Agility Ladder. */
-  thuFeet: 'rope' | 'ladder';
+  thuFeet: 'rope' | 'ladder' | 'plate';
   /** Thursday's last slot: Heavy Bag or Machine Row, and the rowing challenge. */
   thuMain: 'bag' | 'row';
   /** Thursday's shadow slot: alone, or technical sparring / pads with a partner. */

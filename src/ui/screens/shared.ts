@@ -172,7 +172,7 @@ const ICON_BY_ID: Record<string, string> = {
 
 export function blockIcon(raw: Block): string {
   const b = liveBlock(raw);
-  if (b.focus === 'ladder') return 'ladder';
+  if (b.focus === 'ladder' || b.focus === 'plate') return 'ladder';
   if (b.kind === 'row' || b.hiit || (b.kind === 'cardio' && b.alt === 'aero')) return 'row';
   return ICON_BY_ID[b.id] ?? 'timer';
 }
@@ -196,7 +196,7 @@ function altPicker(b: Block): string {
   const s = ctx.S.set;
   const opts: Array<[string, string, boolean]> =
     b.alt === 'feet'
-      ? [['rope', 'Jumping Rope', s.thuFeet === 'rope'], ['ladder', 'Agility Ladder', s.thuFeet === 'ladder']]
+      ? [['rope', 'Jumping Rope', s.thuFeet === 'rope'], ['ladder', 'Agility Ladder', s.thuFeet === 'ladder'], ['plate', 'Plate Footwork', s.thuFeet === 'plate']]
       : b.alt === 'partner'
         ? [['shadow', 'Singur', s.thuPartner !== 'spar'], ['spar', 'Cu partener', s.thuPartner === 'spar']]
         : b.alt === 'aero'
@@ -232,7 +232,7 @@ export function blockCard(raw: Block, n: number, today: string, next = false): s
     extra += `<p class="rd-hr">${ic('pulse')}<span>Intervale: <b>${lo}–${hi}</b> bpm</span></p>`;
   }
   if (b.kind === 'run') extra += `<button class="link" data-a="polar" data-b="${b.id}">Adaugă din Polar Flow</button>`;
-  if (b.kind === 'rounds' && b.focus && b.burstFrom !== 1 && b.focus !== 'legs' && b.focus !== 'rope' && b.focus !== 'ladder') {
+  if (b.kind === 'rounds' && b.focus && b.burstFrom !== 1 && b.focus !== 'legs' && b.focus !== 'rope' && b.focus !== 'ladder' && b.focus !== 'plate') {
     const sore = soreKnee();
     const cs = focusCombos(b.focus, ctx.S.nut.h, !sore);
     extra += `<p class="rd-calls"><b>${sore ? 'Doar box, cât genunchiul cere pauză de la kick-uri:' : 'Combinații strigate:'}</b> ${esc(cs.slice(0, 4).map((c) => c.name).join(', '))}${cs.length > 4 ? ` și încă ${cs.length - 4}` : ''}</p>`;

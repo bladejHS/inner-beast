@@ -61,18 +61,18 @@ export function umbra(size = 'medium', id = `u${++n}`) {
     <filter id="${id}h" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
     <filter id="${id}g" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="${o.glow}"/></filter>
   </defs>
-  <path d="${OUTLINE_D}" fill="#e5102c" opacity="${o.halo}" filter="url(#${id}h)"/>
+  <path d="${OUTLINE_D}" fill="#1652f0" opacity="${o.halo}" filter="url(#${id}h)"/>
   ${face}
   <path d="${OUTLINE_D}" fill="none" stroke="url(#${id}r)" stroke-opacity="${o.rimA}" stroke-width="${o.rim}" stroke-linejoin="round"/>
-  <g filter="url(#${id}g)">${eyes.map((e) => `<path d="${d(e)}" fill="#ff2944"/>`).join('')}</g>
-  ${eyes.map((e) => `<path d="${d(e)}" fill="#ff2944"/>`).join('')}
-  ${eyes.map((e) => `<path d="${d(grow(e, 0.42))}" fill="#ffa3ad" opacity=".85"/>`).join('')}`;
+  <g filter="url(#${id}g)">${eyes.map((e) => `<path d="${d(e)}" fill="#3b7bff"/>`).join('')}</g>
+  ${eyes.map((e) => `<path d="${d(e)}" fill="#3b7bff"/>`).join('')}
+  ${eyes.map((e) => `<path d="${d(grow(e, 0.42))}" fill="#cfe0ff" opacity=".85"/>`).join('')}`;
 }
 
 /** The icon's field: steel black under a cold spotlight, a red light behind the head, darker at the bottom. */
 export function field(id = `f${++n}`) {
   return `<defs><radialGradient id="${id}s" cx=".5" cy=".02" r=".85"><stop offset="0" stop-color="#9fb0cf" stop-opacity=".36"/><stop offset=".55" stop-color="#1b2130" stop-opacity=".45"/><stop offset="1" stop-color="#05060a" stop-opacity="0"/></radialGradient>
-    <radialGradient id="${id}r" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#e5102c" stop-opacity=".5"/><stop offset=".6" stop-color="#6e0715" stop-opacity=".26"/><stop offset="1" stop-color="#05060a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="${id}r" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#1652f0" stop-opacity=".5"/><stop offset=".6" stop-color="#0b2670" stop-opacity=".26"/><stop offset="1" stop-color="#05060a" stop-opacity="0"/></radialGradient>
     <linearGradient id="${id}v" x1="0" y1="0" x2="0" y2="1"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".4"/></linearGradient></defs>
     <rect width="240" height="240" fill="#05060a"/><rect width="240" height="240" fill="url(#${id}s)"/><circle cx="120" cy="132" r="112" fill="url(#${id}r)"/><rect width="240" height="240" fill="url(#${id}v)"/>`;
 }

@@ -3,7 +3,8 @@
 // boxing ones on a day the knee note says no kicks).
 
 import { BURST, BURST_SEC, WARMUP, WARMUP_SEC, type ComboFocus } from '../../data/plan.ts';
-import { focusCombos, LADDER_MOVES, legStrike, REACT_GAP, reactCues, ROPE_MOVES, FOCUS_LINE, roundThemes, type Combo, type ReactCue, type RoundTheme } from '../../data/combos.ts';
+import { comboSvg, drillSvg, hasDrill } from '../boxer.ts';
+import { focusCombos, LADDER_MOVES, PLATE_MOVES, legStrike, REACT_GAP, reactCues, ROPE_MOVES, FOCUS_LINE, roundThemes, type Combo, type ReactCue, type RoundTheme } from '../../data/combos.ts';
 
 /** The e-book's focus line for each block, as printed on the plan page. */
 const BOOK_FOCUS: Record<string, string> = {
@@ -58,7 +59,7 @@ const REACT_THEME: RoundTheme = { name: 'Reacție', cue: 'Atacul lui, strigat la
 const SPRINT = 30;
 
 /** Footwork drills (rope, ladder) are called as moves, not combinations. */
-const isDrill = (f: ComboFocus | undefined): boolean => f === 'rope' || f === 'ladder';
+const isDrill = (f: ComboFocus | undefined): boolean => f === 'rope' || f === 'ladder' || f === 'plate';
 
 interface Call {
   name: string;
@@ -186,7 +187,7 @@ class RoundsPlayer implements Player {
 
   buildCalls(): Call[] {
     const f = this.cfg.focus;
-    if (isDrill(f)) return (f === 'ladder' ? LADDER_MOVES : ROPE_MOVES).map((m) => ({ name: m.name, seq: [], say: m.call, note: m.note }));
+    if (isDrill(f)) return (f === 'ladder' ? LADDER_MOVES : f === 'plate' ? PLATE_MOVES : ROPE_MOVES).map((m) => ({ name: m.name, seq: [], say: m.call, note: m.note }));
     return focusCombos(f, ctx.S.nut.h, !this.sore).map((c: Combo) => ({ name: c.name, seq: c.seq, say: c.call, note: c.note }));
   }
 
@@ -312,9 +313,15 @@ class RoundsPlayer implements Player {
       : `<div class="call-box"><h4>Ușor</h4><div class="c-name">Sub ${easy} bpm</div><p class="small" style="margin:0">Vâslești lejer, nu te oprești: pulsul coboară până la intervalul următor.</p></div>`;
   }
 
+  /** The call, animated: the feet from above for a footwork drill, the boxer strike by strike for a combination. */
+  moveSvg(c: { name: string; seq: string[] }): string {
+    const svg = hasDrill(c.name) ? drillSvg(c.name) : comboSvg(c.seq, /bag/i.test(this.cfg.name));
+    return svg ? `<div class="bx-wrap">${svg}</div>` : '';
+  }
+
   callHtml(h: string): string {
     const c = this.call!;
-    return `<div class="call-box" aria-live="polite"><h4>${esc(h)}</h4><div class="c-name">${esc(c.name)}</div>${c.seq.length ? `<div class="seq">${c.seq.map((s) => `<span>${esc(s)}</span>`).join('')}</div>` : ''}${c.note ? `<p class="small" style="margin:0">${esc(c.note)}</p>` : ''}</div>`;
+    return `<div class="call-box" aria-live="polite"><h4>${esc(h)}</h4><div class="c-name">${esc(c.name)}</div>${this.moveSvg(c)}${c.seq.length ? `<div class="seq">${c.seq.map((s) => `<span>${esc(s)}</span>`).join('')}</div>` : ''}${c.note ? `<p class="small" style="margin:0">${esc(c.note)}</p>` : ''}</div>`;
   }
 
   /** After the bag or the pads: the knees, which decide whether the next rounds have kicks (logic/knee.ts). */

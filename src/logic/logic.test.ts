@@ -922,3 +922,20 @@ test('a restarted week: the days checked off before the restart are open again, 
   assert.deepEqual([...weekDone(log, '2026-11-16', reset)], ['mon-bag']);
   assert.equal(weekDone(log, '2026-11-16').size, 2);
 });
+
+test('Thursday footwork: the ladder drills of the clip, the plate levels, and an animation for every call', async () => {
+  const { LADDER_MOVES, PLATE_MOVES, COMBOS } = await import('../data/combos.ts');
+  const { comboSvg, drillSvg, hasDrill, strikePose } = await import('../ui/boxer.ts');
+  assert.deepEqual(LADDER_MOVES.slice(0, 5).map((m) => m.name), ['In and Out', 'Step-in Jab', 'Jab-Cross-Jab', 'Step-in Pivot', 'Shuffle']);
+  assert.equal(PLATE_MOVES.length, 5);
+  for (const m of [...LADDER_MOVES, ...PLATE_MOVES]) assert.ok(hasDrill(m.name) && drillSvg(m.name).includes('<animate'), m.name);
+  const feet = WEEK[3].blocks[0];
+  const plate = resolveBlock(feet, { legMode: 'wall', thuFeet: 'plate', thuMain: 'bag', rowCh: 'a' });
+  assert.deepEqual([plate.name, plate.focus], ['Plate Footwork', 'plate']);
+  // every combination draws, and its feet stay near the floor in every pose
+  for (const c of COMBOS) {
+    assert.ok(comboSvg(c.seq).startsWith('<svg'), c.id);
+    for (const t of c.seq) assert.ok(Number.isFinite(strikePose(t).p[0]), t);
+  }
+  assert.equal(comboSvg([]), '');
+});

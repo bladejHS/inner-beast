@@ -11,7 +11,7 @@
 import { rowChallenge, rowTotal } from './row.ts';
 
 export type BlockKind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'shower' | 'wimhof' | 'breath' | 'row' | 'cardio';
-export type ComboFocus = 'jab' | 'move' | 'combo' | 'power' | 'slow' | 'distance' | 'rope' | 'ladder' | 'legs' | 'week' | 'pads';
+export type ComboFocus = 'jab' | 'move' | 'combo' | 'power' | 'slow' | 'distance' | 'rope' | 'ladder' | 'plate' | 'legs' | 'week' | 'pads';
 export type RestKey = 'r3' | 'r1' | 'none';
 /** The three emphases of the 12-week loop: strength + aerobic base, power + speed, capacity. */
 export type CycleId = 'A' | 'B' | 'C';
@@ -83,7 +83,7 @@ export const WARMUP_SEC = WARMUP.reduce((s, m) => s + m.sec, 0);
 /** The user's picks for the swappable blocks, plus what the calendar and the log decide this week. */
 export interface Picks {
   legMode: 'wall' | 'jump';
-  thuFeet: 'rope' | 'ladder';
+  thuFeet: 'rope' | 'ladder' | 'plate';
   thuMain: 'bag' | 'row';
   thuPartner?: 'shadow' | 'spar';
   rowCh: string;
@@ -244,7 +244,10 @@ export function resolveBlock(b: Block, p: Picks): Block {
     return { ...r, name: 'Punch-out Shadow', tip: 'Fără sac azi: același protocol în shadow, lovituri drepte cât de rapid poți, cu șoldul și trunchiul în fiecare pumn.', cues: ['Brațul se întinde complet, pe toată distanța.', 'În cele 10 secunde doar respiri și te miști.', 'Dacă exploziile încetinesc vizibil, oprește runda.'] };
   }
   if (r.alt === 'feet' && p.thuFeet === 'ladder') {
-    return { ...r, name: 'Agility Ladder', focus: 'ladder', tip: 'Pași rapizi și preciși prin scară, pe vârfuri, cu garda sus.', cues: undefined };
+    return { ...r, name: 'Agility Ladder', focus: 'ladder', tip: 'Pași rapizi și preciși prin scară, pe vârfuri, cu garda sus. Fiecare exercițiu are animația pașilor.', cues: undefined };
+  }
+  if (r.alt === 'feet' && p.thuFeet === 'plate') {
+    return { ...r, name: 'Plate Footwork', focus: 'plate', tip: 'Joc de picioare în jurul unui disc de greutăți pus pe sol, pe cinci niveluri. Fără scară și fără coardă; pe vârfuri, cu garda sus.', cues: undefined };
   }
   if (r.alt === 'partner' && p.thuPartner === 'spar') {
     return {

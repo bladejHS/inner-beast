@@ -104,6 +104,7 @@ export function planHtml(): string {
   }).join('');
   return `${top()}
     ${pageHead('Planul', `Săptămâna ${weekRange(mon)}`)}
+    <p class="obj-plate"><b>Obiectiv</b><span>SRI · Brigada Antiteroristă</span></p>
     <section class="plan-sum">
       <div class="ps-n"><b class="num" data-count="${full}">${full}</b><span>din 7 zile</span></div>
       <div class="ps-n"><b class="num" data-count="${blocksDone}">${blocksDone}</b><span>din ${totalBlocks} blocuri</span></div>

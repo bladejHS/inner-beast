@@ -539,12 +539,26 @@ export const ROPE_MOVES = [
 
 /** Agility ladder drills, the Thursday alternative to the jump rope. */
 export const LADDER_MOVES = [
+  // the five beginner drills of the clip the user sent on 2026-11-14 (animated in ui/boxer.ts), then the classics
+  { name: 'In and Out', call: 'In and out', note: 'În gardă, lângă scară: piciorul din față intră în pătrat și iese, apoi urci un pătrat. Ca intrarea și ieșirea din distanță.' },
+  { name: 'Step-in Jab', call: 'Step in, jab', note: 'Piciorul din față intră în pătrat odată cu jabul; ieși cu mâna înapoi la bărbie.' },
+  { name: 'Jab-Cross-Jab', call: 'Step in, jab, cross, jab', note: 'Intri cu jab, rămâi în pătrat pentru cross și încă un jab, apoi ieși. Picioarele nu se încrucișează.' },
+  { name: 'Step-in Pivot', call: 'Step in, pivot', note: 'Intri cu piciorul din față, pivotezi pe vârful lui cu piciorul din spate în arc, apoi revii lângă scară.' },
+  { name: 'Shuffle', call: 'Shuffle', note: 'Cu fața de-a lungul scării: picioarele în afara ei, apoi amândouă în pătrat, înaintând. Contacte scurte, pe vârfuri.' },
   { name: 'One Foot In', call: 'One foot in', note: 'Un picior în fiecare pătrat, pe vârfuri, brațele în gardă.' },
   { name: 'Two Feet In', call: 'Two feet in', note: 'Ambele picioare în fiecare pătrat, contacte scurte cu solul.' },
   { name: 'Lateral Shuffle', call: 'Lateral shuffle', note: 'Lateral, două picioare în fiecare pătrat; nu încrucișa picioarele, ca în ring.' },
   { name: 'In-In-Out-Out', call: 'In, in, out, out', note: 'Intri cu ambele picioare, ieși lateral cu ambele. Ritm constant.' },
   { name: 'Icky Shuffle', call: 'Icky shuffle', note: 'In-in-out pe diagonală, alternând partea. Privirea înainte, nu în jos.' },
-  { name: 'Boxer Step In-Out', call: 'Boxer in and out', note: 'În gardă, pas înainte în pătrat și înapoi, ca la intrarea și ieșirea din distanță.' },
+];
+
+/** Footwork around a weight plate on the floor, five levels (the second clip of 2026-11-14): Thursday's third option. */
+export const PLATE_MOVES = [
+  { name: 'Toe Taps', call: 'Level one, toe taps', note: 'Nivelul 1: atingi discul cu vârful, alternând picioarele, în ritm de săritură ușoară. Fără să calci apăsat pe el.' },
+  { name: 'In & Out', call: 'Level two, in and out', note: 'Nivelul 2: în gardă, piciorul din față urcă pe disc și cel din spate îl urmează, apoi înapoi. Distanța dintre picioare rămâne aceeași.' },
+  { name: 'Lateral Step-Over', call: 'Level three, side to side', note: 'Nivelul 3: lateral peste disc, pas cu pas, dus și întors. Nu încrucișa picioarele.' },
+  { name: 'Open & Close', call: 'Level four, open and close', note: 'Nivelul 4: picioarele depărtate de o parte și de alta a discului, apoi apropiate pe el. Sărituri mici; dacă simți genunchii, treci la nivelul 2.' },
+  { name: 'Step-in & Duck', call: 'Level five, step in and duck', note: 'Nivelul 5: intri pe disc cu schimbare de nivel și un jab, apoi ieși în gardă.' },
 ];
 
 /** A leg technique: a kick, a teep, a knee or a check (a fake teep is not one). */

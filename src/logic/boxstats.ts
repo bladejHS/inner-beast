@@ -15,7 +15,7 @@ export interface BoxStats {
   called: Record<string, number>;
 }
 
-const isBox = (e: Entry): boolean => e.kind === 'rounds' && !e.data.manual && !['rope', 'ladder', 'legs'].includes(String(e.data.focus));
+const isBox = (e: Entry): boolean => e.kind === 'rounds' && !e.data.manual && !['rope', 'ladder', 'plate', 'legs'].includes(String(e.data.focus));
 
 /**
  * 0–100 for a rated session: rounds finished × how clean it felt (60%) and how easy the same work was (40%).
@@ -68,7 +68,7 @@ export function boxStats(log: Entry[], today: string): BoxStats {
       s.punches += Number(d.punches) || 0;
       s.guard.push(Number(d.guard) || 0);
     }
-    if (e.kind !== 'rounds' || d.manual || d.focus === 'rope' || d.focus === 'ladder' || d.focus === 'legs') continue;
+    if (e.kind !== 'rounds' || d.manual || d.focus === 'rope' || d.focus === 'ladder' || d.focus === 'plate' || d.focus === 'legs') continue;
     const min = (Number(d.workDone) || 0) / 60;
     s.rounds += Number(d.rounds) || 0;
     if (e.date >= from) s.min30 += min;

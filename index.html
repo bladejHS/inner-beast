@@ -59,24 +59,24 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 #sp-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .sp-flash,.sp-vig{position:absolute;inset:0;pointer-events:none}
 .sp-vig{background:radial-gradient(120% 90% at 50% 40%,transparent 40%,rgba(0,0,0,.75) 100%)}
-.sp-flash{background:radial-gradient(circle at 50% 42%,#fff 0,#fff 5%,rgba(255,217,209,.85) 14%,rgba(255,41,68,.4) 32%,rgba(5,6,10,0) 56%);opacity:0}
+.sp-flash{background:radial-gradient(circle at 50% 42%,#fff 0,#fff 5%,rgba(214,228,255,.85) 14%,rgba(59,123,255,.4) 32%,rgba(5,6,10,0) 56%);opacity:0}
 .sp-cam{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:clamp(14px,2.8vh,28px);--w:min(60vw,37vh,340px)}
 .sp-stage{position:relative;width:var(--w);aspect-ratio:680/801;transform-origin:50% 50%}
-.sp-halo{position:absolute;left:50%;top:50%;width:175%;aspect-ratio:1;margin:-87.5% 0 0 -87.5%;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(closest-side,rgba(227,18,29,.36),rgba(126,10,17,.12) 55%,transparent 74%)}
+.sp-halo{position:absolute;left:50%;top:50%;width:175%;aspect-ratio:1;margin:-87.5% 0 0 -87.5%;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(closest-side,rgba(22,82,240,.36),rgba(11,38,112,.12) 55%,transparent 74%)}
 .sp-emb{position:absolute;inset:0;opacity:0;transform:scale(1.1)}
-.sp-emb img{display:block;width:100%;height:100%;filter:drop-shadow(0 0 1px rgba(255,41,68,.9)) drop-shadow(0 0 18px rgba(192,20,29,.5))}
+.sp-emb img{display:block;width:100%;height:100%;filter:drop-shadow(0 0 1px rgba(59,123,255,.9)) drop-shadow(0 0 18px rgba(15,60,192,.5))}
 .sp-id{position:relative;display:grid;justify-items:center;gap:clamp(8px,1.4vh,13px)}
 .sp-name{margin:0;font:900 extra-condensed clamp(50px,15vw,88px)/.9 'Saira','Arial Narrow',sans-serif;letter-spacing:.06em;margin-right:-.06em;text-transform:uppercase;white-space:nowrap}
 .sp-name i{display:inline-block;font-style:normal;opacity:0;color:#f3f5fa;text-shadow:0 0 0 transparent}
-.sp-name .b{color:#ff2944}
+.sp-name .b{color:#3b7bff}
 .sp-name .sp-gap{width:.28em}
-.sp-rule{display:block;width:min(58vw,300px);height:4px;background:linear-gradient(90deg,transparent,#e5102c 18%,#ff2944 50%,#e5102c 82%,transparent);transform:skewX(-30deg) scaleX(0);opacity:0}
-.sp-tag{margin:0;font:700 semi-expanded clamp(10.5px,2.9vw,13.5px)/1.2 'Saira',system-ui,sans-serif;letter-spacing:.3em;margin-right:-.3em;color:#c9bcb7;white-space:nowrap;opacity:0}
-.sp-skip{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));padding:12px 14px;border:0;background:none;color:#c9bcb7;font:700 semi-expanded 11.5px/1 'Saira',system-ui,sans-serif;letter-spacing:.2em;cursor:pointer;opacity:0;transition:opacity .3s}
-.sp-skip:focus-visible{outline:2px solid #ff2944;opacity:1}
+.sp-rule{display:block;width:min(58vw,300px);height:4px;background:linear-gradient(90deg,transparent,#1652f0 18%,#3b7bff 50%,#1652f0 82%,transparent);transform:skewX(-30deg) scaleX(0);opacity:0}
+.sp-tag{margin:0;font:700 semi-expanded clamp(10.5px,2.9vw,13.5px)/1.2 'Saira',system-ui,sans-serif;letter-spacing:.3em;margin-right:-.3em;color:#b9c4d9;white-space:nowrap;opacity:0}
+.sp-skip{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));padding:12px 14px;border:0;background:none;color:#b9c4d9;font:700 semi-expanded 11.5px/1 'Saira',system-ui,sans-serif;letter-spacing:.2em;cursor:pointer;opacity:0;transition:opacity .3s}
+.sp-skip:focus-visible{outline:2px solid #3b7bff;opacity:1}
 #sp-tear{position:fixed;inset:0;z-index:101;width:100%;height:100%;pointer-events:none;opacity:0}
-#sp-tear polyline{fill:none;stroke:#ff2944;stroke-width:3;stroke-linejoin:bevel}
-#sp-tear .core{stroke:#fff1ec;stroke-width:1.2}
+#sp-tear polyline{fill:none;stroke:#3b7bff;stroke-width:3;stroke-linejoin:bevel}
+#sp-tear .core{stroke:#eef4ff;stroke-width:1.2}
 
 /* the impact, keyed off .sp-hit (the engine adds it when the sparks lock) */
 .sp-go .sp-skip,.sp-calm .sp-skip{opacity:.85}
@@ -89,7 +89,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 @keyframes sp-flash{0%{opacity:0}8%{opacity:1}100%{opacity:0}}
 @keyframes sp-burn{0%{opacity:0;transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}
 @keyframes sp-in{to{opacity:1}}
-@keyframes sp-stamp{0%{opacity:0;transform:scale(1.7);text-shadow:-10px 0 0 #ff2944,10px 0 0 #2f8cff}25%{opacity:1}60%{text-shadow:-3px 0 0 #ff2944,3px 0 0 #2f8cff}100%{opacity:1;transform:none;text-shadow:0 0 0 transparent}}
+@keyframes sp-stamp{0%{opacity:0;transform:scale(1.7);text-shadow:-10px 0 0 #3b7bff,10px 0 0 #2f8cff}25%{opacity:1}60%{text-shadow:-3px 0 0 #3b7bff,3px 0 0 #2f8cff}100%{opacity:1;transform:none;text-shadow:0 0 0 transparent}}
 @keyframes sp-rule{to{opacity:1;transform:skewX(-30deg)}}
 @keyframes sp-flicker{0%{opacity:.8}12%{opacity:.1}24%{opacity:.9}36%{opacity:.25}52%,100%{opacity:1}}
 
@@ -112,7 +112,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 @keyframes sp-out{to{opacity:0}}
 @keyframes sp-tear{0%{opacity:0}12%{opacity:1}60%{opacity:.8}100%{opacity:0}}
 .sp-fail{min-height:100dvh;display:grid;place-content:center;justify-items:center;gap:12px;padding:24px;text-align:center;font:600 15px/1.4 'Saira',system-ui,sans-serif;color:#f3f5fa}
-.sp-fail a{color:#ff2944;font-weight:700}
+.sp-fail a{color:#3b7bff;font-weight:700}
 </style>
 </head>
 <body>
@@ -149,7 +149,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 (function () {
   var sp = document.getElementById('splash'), tear = document.getElementById('sp-tear');
   if (!sp) return;
-  var VERSION = '2026-11-11', mode = 'auto', seen = false, known = '', boot = performance.now();
+  var VERSION = '2026-11-14', mode = 'auto', seen = false, known = '', boot = performance.now();
   try { mode = localStorage.getItem('beast:opening') || 'auto'; known = localStorage.getItem('beast:opened-v') || ''; } catch (e) { /* storage blocked */ }
   try { seen = sessionStorage.getItem('beast:opened') === '1'; sessionStorage.setItem('beast:opened', '1'); } catch (e) { /* storage blocked */ }
   var forge = null;
@@ -203,7 +203,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
     sp.classList.add('sp-go');
     forge = window.BeastForge.create({
       canvas: document.getElementById('sp-cv'), mark: 'splash/umbra.webp', stage: sp.querySelector('.sp-stage'),
-      color: [229, 16, 44], hot: [255, 41, 68], count: 2400,
+      color: [22, 82, 240], hot: [59, 123, 255], count: 2400,
       onImpact: function () { sp.classList.add('sp-hit'); try { navigator.vibrate && navigator.vibrate(40); } catch (e) { /* not here */ } }
     });
     forge.start();

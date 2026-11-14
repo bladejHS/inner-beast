@@ -23,7 +23,7 @@
   /* studio white, measured on the lightest card (n3): ink 15:1, label 7.6:1, mute 5.7:1, faint 4.5:1 */
   --ink: #f3f5fa; --ink-2: #d3d8e2; --label: #a9b2c2; --mute: #8f99ab; --faint: #7d879a;
   /* the brand's red: the wordmark's plate, the same in every zone */
-  --brand: #e5102c;
+  --brand: #1652f0;
   /* championship gold: records, finished days, the title belt */
   --gold: #dcb35e; --gold-2: #f5d690;
   /* steel: the frames of the broadcast plates */
@@ -46,9 +46,9 @@
 /* the action colour, electric red: what you press, the live state, the effort. Fills carry white text (4.6:1),
    red-text is for words on black (6:1); the glows use the same reds as RGB. A red timer opened from Minte keeps it. */
 :root, html[data-zone='cool'] #ov:not(.cool) {
-  --red: #e5102c; --red-press: #b50c22; --red-deep: #6e0715; --red-hot: #ff2944; --red-text: #ff5c70; --blood: #26060e; --red-0: #c00b24;
-  --glow: 255, 41, 68; --glow-2: 229, 16, 44; --glow-d: 126, 10, 17;
-  --ph-work: #a50c20; --ph-work-hi: #c3131c; --ph-work-lo: #4d050a; --ph-last: #ff2944;
+  --red: #1652f0; --red-press: #0f3cc0; --red-deep: #0b2670; --red-hot: #3b7bff; --red-text: #7fa8ff; --blood: #06102b; --red-0: #1045d6;
+  --glow: 59, 123, 255; --glow-2: 22, 82, 240; --glow-d: 11, 38, 112;
+  --ph-work: #0f3cb0; --ph-work-hi: #1b55d8; --ph-work-lo: #06174a; --ph-last: #3b7bff;
 }
 /* the cool zone, ice: Minte and the calm timers (breathing, Wim Hof, the cold shower, the Breathwork Lab). Red
    helps a round (grip force and speed went up after seeing it, Elliot & Aarts 2011) but cost performance before
@@ -724,7 +724,7 @@ input[type='date'] { flex: none; width: 160px; min-height: 48px; padding: 8px 10
 .nw img { position: relative; width: 40px; height: auto; opacity: .9; transition: opacity .25s, transform .5s var(--spring); }
 .nw-ring { position: absolute; inset: -20px; border-radius: 50%; background: radial-gradient(closest-side, rgba(var(--glow), .6), rgba(var(--glow-2), .2) 55%, transparent 72%); opacity: 0; transform: scale(.6); transition: opacity .35s, transform .6s var(--spring); pointer-events: none; }
 .nav-wolf[aria-current] .nw-hex { background: var(--red-hot); }
-.nav-wolf[aria-current] .nw-hex::before { background: radial-gradient(120% 90% at 50% 12%, #a10c15, #26060e 76%); }
+.nav-wolf[aria-current] .nw-hex::before { background: radial-gradient(120% 90% at 50% 12%, #0f3cc0, #06102b 76%); }
 .nav-wolf[aria-current] .nw img { opacity: 1; transform: scale(1.06); }
 .nav-wolf[aria-current] .nw-ring { opacity: 1; transform: scale(1); }
 .nav-wolf[aria-current] svg { transform: none; }
@@ -1226,3 +1226,22 @@ body::after {
 ol.how-list { margin: 8px 0 14px; padding-left: 20px; color: var(--mute); font-size: 14.5px; line-height: 1.5; }
 ol.how-list li + li { margin-top: 6px; }
 ol.how-list b { color: var(--ink, #fff); }
+
+/* the animated boxer and the footwork seen from above (ui/boxer.ts) */
+.bx-wrap { display: flex; justify-content: center; height: clamp(120px, 23vh, 190px); margin: 2px 0 12px; }
+.bx { height: 100%; width: auto; max-width: 100%; color: #c3cad6; }
+.bx .bx-acc { stroke: var(--red-hot); }
+.bx .bx-glove { fill: var(--red-hot); stroke: #05060a; stroke-width: .8; }
+.bx .bx-glove.far { opacity: .7; }
+.bx-top .bx-ladder path { fill: none; stroke: #e0a526; stroke-width: 1.5; stroke-linecap: round; }
+.bx-top .bx-plate circle { fill: var(--n3); stroke: var(--n5); stroke-width: 1.4; }
+.bx-top .bx-plate circle + circle { fill: var(--bg); }
+.bx-foot.L { fill: var(--red-hot); }
+.bx-foot.R { fill: var(--ink); }
+.bx-hit { font: 900 condensed 9px var(--font); fill: var(--red-text); text-anchor: middle; letter-spacing: .06em; }
+.pl.focus .bx-wrap { height: clamp(150px, 30vh, 260px); }
+
+/* the goal, as a plate under the plan's title (words only: no institution's insignia in the app) */
+.obj-plate { display: inline-flex; align-items: stretch; margin: -6px 0 18px; font: 800 semi-condensed 12px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; }
+.obj-plate b { padding: 8px 12px 7px 14px; background: var(--red); color: #fff; clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
+.obj-plate span { padding: 8px 14px 7px 10px; margin-left: -4px; background: var(--n3); color: var(--ink); clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }

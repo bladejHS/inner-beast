@@ -42,6 +42,18 @@ const SIZES = {
   small: { tones: null, fill: '#232835', gap: 0, rim: 9, rimA: 1, eye: 1.3, glow: 5, halo: 0.9 },
 };
 
+/** 2026-11-15, the user: "la inner beast pune-i o bandană de luptător ninja". A red fighter's headband across the brow,
+ *  above the eyes, knotted on the right with two tails flying out. Drawn over the head, on the same 240 grid. */
+function accessory(id) {
+  const ink = 'stroke="#05060a" stroke-width="1.8" stroke-linejoin="round"';
+  return `<defs><linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4a5e"/><stop offset=".5" stop-color="#e5102c"/><stop offset="1" stop-color="#8a0a19"/></linearGradient></defs>
+  <path d="M203 93Q222 82 236 70L238 83Q224 95 205 101Z" fill="url(#${id}b)" ${ink}/>
+  <path d="M202 99Q220 108 231 128L219 133Q212 115 199 105Z" fill="#b50c22" ${ink}/>
+  <path d="M45 90Q120 64 195 90L197 105Q120 80 43 105Z" fill="url(#${id}b)" ${ink}/>
+  <path d="M60 91Q120 71 181 91" fill="none" stroke="#ffb3bb" stroke-opacity=".5" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M190 87L205 89L207 105L192 108Z" fill="#c00b24" ${ink}/>`;
+}
+
 let n = 0;
 /** The mark's body on the 240 grid; `id` keeps the gradient and filter names apart when several sit in one page. */
 export function umbra(size = 'medium', id = `u${++n}`) {
@@ -66,7 +78,8 @@ export function umbra(size = 'medium', id = `u${++n}`) {
   <path d="${OUTLINE_D}" fill="none" stroke="url(#${id}r)" stroke-opacity="${o.rimA}" stroke-width="${o.rim}" stroke-linejoin="round"/>
   <g filter="url(#${id}g)">${eyes.map((e) => `<path d="${d(e)}" fill="#ff2944"/>`).join('')}</g>
   ${eyes.map((e) => `<path d="${d(e)}" fill="#ff2944"/>`).join('')}
-  ${eyes.map((e) => `<path d="${d(grow(e, 0.42))}" fill="#ffa3ad" opacity=".85"/>`).join('')}`;
+  ${eyes.map((e) => `<path d="${d(grow(e, 0.42))}" fill="#ffa3ad" opacity=".85"/>`).join('')}
+  ${accessory(id)}`;
 }
 
 /** The icon's field: steel black under a cold spotlight, a red light behind the head, darker at the bottom. */

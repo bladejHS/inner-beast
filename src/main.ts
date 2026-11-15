@@ -187,14 +187,19 @@ ctx.render = () => render();
 
 /** The day's living picture (Azi): the arena engine from the opening draws the day's discipline on a loop. */
 function mountHero(root: ParentNode): void {
-  const cv = root.querySelector<HTMLCanvasElement>('canvas.hero-cv');
   const arena = (window as unknown as { BeastArena?: { hero: (c: HTMLCanvasElement, o: object) => unknown } }).BeastArena;
-  if (!cv || !arena) return;
+  if (!arena) return;
   const still = lite() || matchMedia('(prefers-reduced-motion: reduce)').matches;
-  try {
-    arena.hero(cv, { kind: cv.dataset.kind, color: [229, 16, 44], hot: [255, 41, 68], still });
-  } catch {
-    /* the card stands without its picture */
+  // the zone's own light: red, or ice in Minte
+  const css = getComputedStyle(document.documentElement);
+  const rgb = (v: string, d: number[]) => { const p = css.getPropertyValue(v).split(',').map((x) => Number(x.trim())); return p.length === 3 && p.every((x) => x >= 0) ? p : d; };
+  const color = rgb('--glow-2', [229, 16, 44]), hot = rgb('--glow', [255, 41, 68]);
+  for (const cv of root.querySelectorAll<HTMLCanvasElement>('canvas.hero-cv')) {
+    try {
+      arena.hero(cv, { kind: cv.dataset.kind, color, hot, still });
+    } catch {
+      /* the card stands without its picture */
+    }
   }
 }
 

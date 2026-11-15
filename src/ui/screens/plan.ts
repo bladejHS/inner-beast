@@ -7,7 +7,7 @@ import { addDays, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '
 import { ctx } from '../ctx.ts';
 import { dayPoster } from '../art.ts';
 import { ic } from '../icons.ts';
-import { blockIcon, blockMinutes, pageHead, planPicks, top } from './shared.ts';
+import { blockIcon, blockMinutes, pageHead, planPicks, top, heroBand } from './shared.ts';
 
 function weekRange(mon: string): string {
   const end = addDays(mon, 6);
@@ -104,6 +104,7 @@ export function planHtml(): string {
   }).join('');
   return `${top()}
     ${pageHead('Planul', `Săptămâna ${weekRange(mon)}`)}
+    ${heroBand('push')}
     <p class="obj-plate"><b>Obiectiv</b><span>SRI · Brigada Antiteroristă</span></p>
     <section class="plan-sum">
       <div class="ps-n"><b class="num" data-count="${full}">${full}</b><span>din 7 zile</span></div>

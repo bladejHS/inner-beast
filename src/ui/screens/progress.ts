@@ -13,7 +13,7 @@ import { bars, spark } from '../charts.ts';
 import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { ic } from '../icons.ts';
-import { healthRow, pageHead, segBar, segOf, top } from './shared.ts';
+import { healthRow, pageHead, segBar, segOf, top, heroBand } from './shared.ts';
 import { boxCycle, boxScore, boxStats } from '../../logic/boxstats.ts';
 import { COMBOS } from '../../data/combos.ts';
 import { bestOf, TESTS, UNIT_LABEL, type FitTest } from '../../data/tests.ts';
@@ -179,6 +179,7 @@ export function progressHtml(): string {
   const body = seg === 'train' ? trainSeg() : seg === 'tests' ? testsHtml() : seg === 'log' ? logSeg() : weekSeg();
   return `${top()}
     ${pageHead('Progres', 'Ce ai construit, săptămână de săptămână.')}
+    ${heroBand('pull')}
     ${segBar('Secțiuni Progres', PROGRESS_SEGS, seg)}
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }

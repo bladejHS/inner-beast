@@ -11,7 +11,7 @@ import { howHtml } from '../how.ts';
 import { alexBody, MOVE, nextWeeks, srcLink, weekCard } from './alex.ts';
 import { ic } from '../icons.ts';
 import { openRounds } from '../players/rounds.ts';
-import { blockRest, liveBlock, pageHead, restFor, segBar, segOf, top } from './shared.ts';
+import { blockRest, liveBlock, pageHead, restFor, segBar, segOf, top, heroBand } from './shared.ts';
 
 let cat: ComboCat | 'all' = 'all';
 export function setComboCat(c: string): void {
@@ -124,6 +124,7 @@ export function fightHtml(): string {
   const body = seg === 'combos' ? combosSeg() : seg === 'alex' ? alexBody() : timersSeg();
   return `${top()}
     ${pageHead('Lupte', 'Runde de kickboxing, combinații și tot ce a arătat Alex.')}
+    ${heroBand('bag')}
     ${segBar('Secțiuni Lupte', FIGHT_SEGS, seg)}
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }

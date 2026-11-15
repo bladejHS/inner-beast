@@ -8,4 +8,10 @@
   <path d="M120 66L140 62L174 26L190 86L210 108L197 118L214 146L186 156L160 190L146 212L132 226L120 230L108 226L94 212L80 190L54 156L26 146L43 118L30 108L50 86L66 26L100 62Z" fill="none" stroke="url(#u13r)" stroke-opacity="1" stroke-width="9" stroke-linejoin="round"/>
   <g filter="url(#u13g)"><path d="M118.6 125L173.2 96.4L160.2 114.6Z" fill="#ff2944"/><path d="M79.8 114.6L66.8 96.4L121.4 125Z" fill="#ff2944"/></g>
   <path d="M118.6 125L173.2 96.4L160.2 114.6Z" fill="#ff2944"/><path d="M79.8 114.6L66.8 96.4L121.4 125Z" fill="#ff2944"/>
-  <path d="M137.2 117.46L160.13 105.45L154.67 113.09Z" fill="#ffa3ad" opacity=".85"/><path d="M85.33 113.09L79.87 105.45L102.8 117.46Z" fill="#ffa3ad" opacity=".85"/></g></g></svg>
+  <path d="M137.2 117.46L160.13 105.45L154.67 113.09Z" fill="#ffa3ad" opacity=".85"/><path d="M85.33 113.09L79.87 105.45L102.8 117.46Z" fill="#ffa3ad" opacity=".85"/>
+  <defs><linearGradient id="u13b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4a5e"/><stop offset=".5" stop-color="#e5102c"/><stop offset="1" stop-color="#8a0a19"/></linearGradient></defs>
+  <path d="M203 93Q222 82 236 70L238 83Q224 95 205 101Z" fill="url(#u13b)" stroke="#05060a" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M202 99Q220 108 231 128L219 133Q212 115 199 105Z" fill="#b50c22" stroke="#05060a" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M45 90Q120 64 195 90L197 105Q120 80 43 105Z" fill="url(#u13b)" stroke="#05060a" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M60 91Q120 71 181 91" fill="none" stroke="#ffb3bb" stroke-opacity=".5" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M190 87L205 89L207 105L192 108Z" fill="#c00b24" stroke="#05060a" stroke-width="1.8" stroke-linejoin="round"/></g></g></svg>

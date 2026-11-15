@@ -44,6 +44,11 @@ export function soreKnee(): KneeNote | null {
   return kneeSore(kneeNotes(ctx.S.log, ctx.S.knee), dayKey());
 }
 
+/** A living picture under a tab's title (2026-11-15): the arena engine (public/splash/arena.js) draws `kind` on a loop. */
+export function heroBand(kind: 'fight' | 'bag' | 'push' | 'pull' | 'run' | 'calm'): string {
+  return `<div class="hero-stage band" aria-hidden="true"><img class="hero-wolf" src="${import.meta.env.BASE_URL}splash/umbra.webp" alt="" width="680" height="801" decoding="async"><canvas class="hero-cv" data-kind="${kind}"></canvas></div>`;
+}
+
 /** The big slanted title of a tab, with one line under it. The title rises out of its own box on entry. */
 export function pageHead(title: string, sub = '', kicker = '', size: '' | 'sm' = ''): string {
   return `<div class="ph${size ? ` ph-${size}` : ''}">${kicker ? `<p class="ph-k">${kicker}</p>` : ''}<h1 class="ph-t"><span>${esc(title)}</span></h1><i class="ph-blade" aria-hidden="true"></i>${sub ? `<p class="ph-s">${sub}</p>` : ''}</div>`;

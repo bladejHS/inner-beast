@@ -1429,3 +1429,7 @@ input[type='text'], input[type='number'], input[type='time'], input[type='passwo
 .nw img { width: 34px; }
 .nw-ring { inset: -12px; }
 .nav-wolf:not([aria-current]) .nw-hex { background: linear-gradient(180deg, #8d97aa, #3a4152); }
+
+/* the living picture under a tab's title (heroBand) */
+.hero-stage.band { height: clamp(150px, 22svh, 220px); margin: -6px 0 22px; border-radius: 24px; }
+.hero-stage.band .hero-wolf { width: 44%; top: -22%; opacity: .16; }

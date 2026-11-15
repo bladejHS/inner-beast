@@ -137,8 +137,8 @@ export async function posterBlob(d: PosterData): Promise<Blob | null> {
     x.font = '800 30px Saira, sans-serif';
     if (s.unit) x.fillText(s.unit, tx + tw / 2, ty + 168);
     x.fillStyle = '#8f99ab';
-    x.letterSpacing = '3px';
-    fit(x, s.label.toUpperCase(), 24, 700, tw - 24);
+    x.letterSpacing = '2px';
+    fit(x, s.label.toUpperCase(), 24, 700, tw - 24 - s.label.length * 2);
     x.fillText(s.label.toUpperCase(), tx + tw / 2, ty + 206);
     x.letterSpacing = '0px';
   });

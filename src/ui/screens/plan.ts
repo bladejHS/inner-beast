@@ -7,6 +7,7 @@ import { addDays, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '
 import { ctx } from '../ctx.ts';
 import { dayPoster } from '../art.ts';
 import { ic } from '../icons.ts';
+import { campaignSvg } from '../campaign.ts';
 import { blockIcon, blockMinutes, pageHead, planPicks, top, heroBand } from './shared.ts';
 
 function weekRange(mon: string): string {
@@ -58,18 +59,14 @@ function cycleCard(today: string): string {
   const loop = CYCLES.length * CYCLE_WEEKS;
   const w = loopWeek(start, today, ctx.S.cycle.repeats);
   const pos = w < 0 ? -1 : w % loop;
-  const track = Array.from({ length: loop }, (_, i) => {
-    const cls = [i < pos ? 'ok' : '', i === pos ? 'now' : '', (i + 1) % CYCLE_WEEKS === 0 ? 'light' : ''].filter(Boolean).join(' ');
-    return `<i class="${cls}"></i>`;
-  }).join('');
-  const names = CYCLES.map((x) => `<span class="${c?.id === x.id ? 'on' : ''}">${x.id}</span>`).join('');
+  const lap = w < 0 ? 1 : Math.floor(w / loop) + 1;
   if (!c) {
-    return `<section class="cycle"><p class="label">De luni</p><h3>Ciclul A: forță și bază aerobă</h3>
-      <div class="cy-track" aria-hidden="true">${track}</div><div class="cy-names" aria-hidden="true">${names}</div>
+    return `<section class="cycle"><p class="label">Campania · de luni</p><h3>Ciclul A: forță și bază aerobă</h3>
+      ${campaignSvg(-1, 1)}
       <p class="small dim">Trei emfaze de câte 4 săptămâni, a 4-a mereu ușoară și cu teste. Toate calitățile se lucrează în fiecare săptămână; una primește doza mare.</p></section>`;
   }
-  return `<section class="cycle"><p class="label">Ciclul ${c.id} · săptămâna ${c.week} din 4</p><h3>${esc(c.name)}</h3>
-    <div class="cy-track" aria-hidden="true">${track}</div><div class="cy-names" aria-hidden="true">${names}</div>
+  return `<section class="cycle"><p class="label">Campania${lap > 1 ? ` · turul ${lap}` : ''} · ciclul ${c.id}, săptămâna ${c.week} din 4</p><h3>${esc(c.name)}</h3>
+    ${campaignSvg(pos, lap)}
     <p class="small dim">${c.lighter ? 'Săptămâna ușoară, cu testele.' : esc(c.what)}</p>
     ${repeatHtml(today)}</section>`;
 }

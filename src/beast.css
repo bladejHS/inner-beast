@@ -1513,3 +1513,47 @@ html[data-motion='lite'] .pl-fx { display: none; }
 html[data-motion='lite'] .bc-sweep { display: none; }
 html[data-motion='lite'] .bc-live::before, html[data-motion='lite'] .bc-l3 { animation: none; }
 @media (prefers-reduced-motion: reduce) { .bc-sweep { display: none; } .bc-live::before, .bc-l3 { animation: none; } }
+
+/* ---------- each emphasis of the 12-week loop has its colour (2026-11-15) ----------
+   A, strength: the steel red of the brand (the base above). B, power and speed: fire. C, capacity: crimson with
+   championship gold. Only the action colour changes; Minte stays ice, the wordmark stays the brand red. */
+:root { --ch-A: #ff2944; --ch-B: #ff6a1f; --ch-C: #f2b544; }
+html[data-cycle='B']:not([data-zone='cool']), html[data-cycle='B'][data-zone='cool'] #ov:not(.cool) {
+  --red: #cc360b; --red-press: #a32b08; --red-deep: #5e1a06; --red-hot: #ff6a1f; --red-text: #ff8d57; --blood: #261005; --red-0: #b52f09;
+  --glow: 255, 106, 31; --glow-2: 230, 72, 18; --glow-d: 120, 40, 10;
+  --ph-work: #b23a0b; --ph-work-hi: #dc4f12; --ph-work-lo: #4a1604; --ph-last: #ff6a1f;
+}
+html[data-cycle='C']:not([data-zone='cool']), html[data-cycle='C'][data-zone='cool'] #ov:not(.cool) {
+  --red: #c10f2b; --red-press: #990b22; --red-deep: #5c0814; --red-hot: #f2b544; --red-text: #f5c56a; --blood: #241006; --red-0: #a80d26;
+  --glow: 242, 181, 68; --glow-2: 214, 120, 40; --glow-d: 110, 60, 14;
+  --ph-work: #8f0c22; --ph-work-hi: #b8132c; --ph-work-lo: #3d050d; --ph-last: #f2b544;
+}
+
+/* ---------- the campaign map (Plan) ---------- */
+.camp { display: block; width: 100%; height: auto; margin: 4px 0 10px; overflow: visible; }
+.camp .ch-A { --c: var(--ch-A); }
+.camp .ch-B { --c: var(--ch-B); }
+.camp .ch-C { --c: var(--ch-C); }
+.cp-t { font: 800 semi-condensed 11px var(--font); letter-spacing: .14em; text-transform: uppercase; fill: var(--faint); }
+.cp-t .cp-id { font-weight: 900; font-size: 15px; fill: var(--c); }
+.cp-t.on { fill: var(--ink); }
+.cp-r { fill: none; stroke: var(--n5); stroke-width: 3; stroke-dasharray: 2 7; stroke-linecap: round; }
+.cp-r.ok { stroke: var(--c); stroke-dasharray: none; filter: drop-shadow(0 0 4px var(--c)); }
+.cp-n circle, .cp-n rect { fill: var(--n2); stroke: var(--n5); stroke-width: 2; }
+.cp-n text { font: 900 condensed 14px var(--font); text-anchor: middle; fill: var(--mute); }
+.cp-n.camp rect { stroke-dasharray: 3 3; }
+.cp-n.camp text { fill: var(--gold); }
+.cp-n.ok circle, .cp-n.ok rect { fill: var(--c); stroke: var(--c); stroke-dasharray: none; filter: drop-shadow(0 0 6px var(--c)); }
+.cp-n.ok.camp rect { fill: var(--gold); stroke: var(--gold-2); }
+.cp-ck { fill: none; stroke: #0b0b10; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.cp-n.now circle, .cp-n.now rect { opacity: 0; }
+.cp-me { color: var(--c); }
+.cp-medal { fill: #0b0c12; stroke: var(--red-hot); stroke-width: 3; filter: drop-shadow(0 0 10px rgba(var(--glow), .9)); }
+.cp-pulse { fill: none; stroke: var(--red-hot); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: cp-pulse 2.2s var(--e-out) infinite; }
+.cp-pulse.two { animation-delay: 1.1s; }
+@keyframes cp-pulse { from { opacity: .9; transform: scale(.9); } to { opacity: 0; transform: scale(1.9); } }
+.cp-n { animation: cp-in .5s var(--spring) calc(var(--i) * 45ms) both; transform-box: fill-box; transform-origin: center; }
+@keyframes cp-in { from { opacity: 0; transform: scale(.4); } }
+.cp-r.ok { stroke-dashoffset: 0; }
+html[data-motion='lite'] .cp-pulse, html[data-motion='lite'] .cp-n { animation: none; }
+@media (prefers-reduced-motion: reduce) { .cp-pulse, .cp-n { animation: none; } }

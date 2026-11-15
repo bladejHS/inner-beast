@@ -3,7 +3,7 @@ import { publishPlan } from './logic/bridge.ts';
 import { blockById, WEEK, type Block } from './data/plan.ts';
 import { rowChallenge } from './data/row.ts';
 import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
-import { growPushups, habitGoal } from './logic/progress.ts';
+import { cycleAt, growPushups, habitGoal } from './logic/progress.ts';
 import { dayKey, esc, shortDay, uid, weekdayIdx, weekStart } from './logic/util.ts';
 import { initAudio, unlock } from './ui/audio.ts';
 import { closePlayer, closeSheet, ctx, openSheet, ask, save, sheetAct, toast, type Tab, type View } from './ui/ctx.ts';
@@ -171,6 +171,8 @@ function render(enter: Enter = ''): void {
     clearTimeout(enterTimer);
     enterTimer = window.setTimeout(() => app.classList.remove('enter-tab', 'enter-seg'), 1100);
   }
+  // each emphasis of the 12-week loop has its colour (beast.css, html[data-cycle]); before the loop, A
+  document.documentElement.dataset.cycle = cycleAt(ctx.S.cycle.start, dayKey(), ctx.S.cycle.repeats)?.id ?? 'A';
   app.innerHTML = screenHtml();
   syncNav();
   placeSegInk(enter === 'seg');

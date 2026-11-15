@@ -6,8 +6,6 @@ import { cycleAt, dayProgress, deloadDue, deloadOn, lightOn, habitDone, habitGoa
 import { dayKey, esc, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
-import { dayPoster } from '../art.ts';
-import { rake } from '../claws.ts';
 import { blockCard, blockMinutes, gauge, liveBlock, top } from './shared.ts';
 import { repeatCard } from './plan.ts';
 import { draftSets, workoutDraft } from '../players/workout.ts';
@@ -25,13 +23,8 @@ export function weekStrip(today: string, active: number): string {
   }).join('')}</nav>`;
 }
 
-/** Embers that drift up behind the day's title. Fixed positions, so a redraw does not make them jump. */
-const EMBERS: Array<[number, number, number, number]> = [
-  [8, 0, 5.2, 3], [19, 1.6, 6.4, 2], [31, 3.1, 4.8, 3], [44, 0.8, 5.8, 2], [57, 2.4, 6.9, 3],
-  [66, 4.2, 5.1, 2], [74, 1.1, 6.2, 3], [83, 3.6, 4.6, 2], [91, 0.4, 5.6, 3], [52, 5.1, 6.6, 2],
-];
-const embers = (): string =>
-  `<div class="ms-embers" aria-hidden="true">${EMBERS.map(([x, d, s, z]) => `<i style="--x:${x}%;--d:${d}s;--s:${s}s;--z:${z}px"></i>`).join('')}</div>`;
+/** The living picture on the day's card (public/splash/arena.js): the discipline of the day, in the arena's light. */
+const HERO_KIND = ['fight', 'push', 'run', 'fight', 'pull', 'run', 'calm'];
 
 export function dayBody(day: Day, today: string, kicker: string): string {
   const done = weekDone(ctx.S.log, weekStart(today), weekSince(ctx.S.cycle, weekStart(today)));
@@ -46,12 +39,13 @@ export function dayBody(day: Day, today: string, kicker: string): string {
   const starts = until > 6 ? shortDay(ctx.S.cycle.start) : until > 0 ? RO_DAYS[weekdayIdx(ctx.S.cycle.start)] : '';
   const cyc = light ? ['Ușoară', ctx.S.easy === today ? 'ziua' : 'săptămâna'] : c ? [`${c.id} · ${c.week}/4`, 'ciclul'] : starts ? [starts, 'începe ciclul'] : ['—', 'ciclul'];
   return `
-    <section class="mission${n === total ? ' cleared' : ''}" aria-label="Misiunea zilei">
-      <div class="ms-ph">${dayPoster(day.idx, 'ms-img')}</div>
-      ${embers()}
-      ${rake('ms-rake')}
+    <section class="mission hero${n === total ? ' cleared' : ''}" aria-label="Misiunea zilei">
       <p class="ms-k"><span>Today's Mission</span><b>${esc(kicker)}</b></p>
       <h1 class="ms-t"><span>${esc(day.title)}</span></h1>
+      <div class="hero-stage" aria-hidden="true">
+        <img class="hero-wolf" src="${import.meta.env.BASE_URL}splash/umbra.webp" alt="" width="680" height="801" decoding="async">
+        <canvas class="hero-cv" data-kind="${HERO_KIND[day.idx] ?? 'fight'}"></canvas>
+      </div>
       <div class="ms-row">
         ${gauge(total ? n / total : 0, `<b class="num">${n}</b><small>/${total}</small>`, `day-${day.idx}`, 'ms-g')}
         <div class="ms-m"><b class="num">~${mins}</b><span>minute</span></div>

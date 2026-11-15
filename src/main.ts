@@ -176,6 +176,7 @@ function render(enter: Enter = ''): void {
   placeSegInk(enter === 'seg');
   moveRings(app, !!enter);
   fitTitles(app);
+  mountHero(app);
   if (enter) for (const el of app.querySelectorAll<HTMLElement>('[data-count]')) countUp(el, 0, Number(el.dataset.count) || 0, 800);
   if (keepId) {
     const el = document.getElementById(keepId) as HTMLInputElement | null;
@@ -183,6 +184,19 @@ function render(enter: Enter = ''): void {
   }
 }
 ctx.render = () => render();
+
+/** The day's living picture (Azi): the arena engine from the opening draws the day's discipline on a loop. */
+function mountHero(root: ParentNode): void {
+  const cv = root.querySelector<HTMLCanvasElement>('canvas.hero-cv');
+  const arena = (window as unknown as { BeastArena?: { hero: (c: HTMLCanvasElement, o: object) => unknown } }).BeastArena;
+  if (!cv || !arena) return;
+  const still = lite() || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  try {
+    arena.hero(cv, { kind: cv.dataset.kind, color: [229, 16, 44], hot: [255, 41, 68], still });
+  } catch {
+    /* the card stands without its picture */
+  }
+}
 
 /**
  * The big titles never run off the screen: a long word (MEDITATION, CALISTHENICS) shrinks its title until the widest

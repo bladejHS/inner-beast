@@ -29,7 +29,7 @@
 <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/start-750x1334.png">
 <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/start-1242x2208.png">
 <link rel="preload" href="splash/umbra.webp" as="image" type="image/webp">
-<script src="splash/forge.js"></script>
+<script src="splash/arena.js"></script>
 <link rel="preload" href="fonts/saira-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/saira-latin-ext-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script>
@@ -45,64 +45,61 @@
 @font-face{font-family:'Saira';font-style:normal;font-display:swap;font-weight:100 900;font-stretch:50% 125%;src:url(fonts/saira-latin-ext-wdth-normal.woff2) format('woff2-variations');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
 html{--sp-bg:#05060a;--sp-fg:#f3f5fa}html[data-theme=dark]{--sp-bg:#05060a;--sp-fg:#f3f5fa}
 html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
-/* THE FORGE, about 2.5 s, played on the first run and after a new version (shared engine: splash/forge.js).
-   0–.45 darkness, embers rising; .45–1.25 thousands of sparks stream in from the edges and lock into the wolf;
-   1.25 impact: flash, shake, shock ring, the real wolf burns through the sparks; 1.4–1.95 INNER BEAST stamped in with a
-   red/ice split that snaps together, the blade, the tagline; 2.45 the sparks blow out, the wolf flies home into the tab
-   bar while the black rips open along the claw tear and the app rises. Tap or Enter skips.
-   Reduced motion, "Animații: Reduse" and Data Saver get the still poster. */
-#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#05060a;color:#f3f5fa;animation:sp-guard 0s linear 9s forwards}
+/* THE ARENA, about 3.3 s, on the first run and after a new version (engine: splash/arena.js, shared with Beast Nutrition).
+   In the dark the wolf's eyes light up; the light rises and the wolf watches over the arena: two fighters trade punches,
+   someone does pull-ups, someone push-ups, a runner crosses behind. At 2.0 s the high kick lands (flash, sparks, the
+   camera shakes, time slows) and INNER BEAST is stamped under the fight. Then the black rips open along the claw tear and
+   the wolf flies home into the tab bar. Tap or Enter skips. Reduced motion, "Animații: Reduse" and Data Saver get the
+   still poster: the same arena, frozen on the kick. */
+#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#05060a;color:#f3f5fa;animation:sp-guard 0s linear 10s forwards;--w:min(88vw,40vh,520px)}
 @keyframes sp-guard{to{visibility:hidden;pointer-events:none}}
 .sp-half{position:absolute;inset:-3px;background:#05060a}
 .sp-a{clip-path:polygon(0 0,100% 0,100% 30%,91% 35%,84% 35.2%,73% 42.2%,66% 42.4%,55% 49.4%,48% 49.6%,37% 56.6%,30% 56.8%,19% 63.8%,12% 64%,0 70%)}
 .sp-b{clip-path:polygon(100% 30%,100% 100%,0 100%,0 70%,12% 64%,19% 63.8%,30% 56.8%,37% 56.6%,48% 49.6%,55% 49.4%,66% 42.4%,73% 42.2%,84% 35.2%,91% 35%)}
+.sp-bg{position:absolute;inset:0;opacity:0;pointer-events:none;background:radial-gradient(70% 34% at 50% 30%,rgba(229,16,44,.38),rgba(120,8,16,.16) 55%,transparent 78%),radial-gradient(110% 26% at 50% 70%,rgba(229,16,44,.22),transparent 70%),linear-gradient(180deg,#07060a,#120609 52%,#05060a 80%)}
+.sp-stage{position:absolute;left:50%;top:max(4vh,env(safe-area-inset-top));width:var(--w);margin-left:calc(var(--w) / -2);aspect-ratio:680/801;transform-origin:50% 50%;pointer-events:none}
+.sp-emb{position:absolute;inset:0;opacity:0}
+.sp-emb img{display:block;width:100%;height:100%;filter:brightness(.78) contrast(1.08) drop-shadow(0 0 2px rgba(255,41,68,.7)) drop-shadow(0 0 30px rgba(192,20,29,.45))}
+.sp-eye{position:absolute;width:19%;aspect-ratio:2.4;margin:-3.96% 0 0 -9.5%;border-radius:50%;transform:rotate(var(--r));opacity:0;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(closest-side,#fff 0,#ffd0c8 9%,#ff2944 22%,rgba(255,41,68,.32) 42%,transparent 70%)}
+.sp-eye.l{left:36.6%;top:42%;--r:27deg}.sp-eye.r{left:63.4%;top:42%;--r:-27deg}
 #sp-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .sp-flash,.sp-vig{position:absolute;inset:0;pointer-events:none}
-.sp-vig{background:radial-gradient(120% 90% at 50% 40%,transparent 40%,rgba(0,0,0,.75) 100%)}
-.sp-flash{background:radial-gradient(circle at 50% 42%,#fff 0,#fff 5%,rgba(255,217,209,.85) 14%,rgba(255,41,68,.4) 32%,rgba(5,6,10,0) 56%);opacity:0}
-.sp-cam{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:clamp(14px,2.8vh,28px);--w:min(60vw,37vh,340px)}
-.sp-stage{position:relative;width:var(--w);aspect-ratio:680/801;transform-origin:50% 50%}
-.sp-halo{position:absolute;left:50%;top:50%;width:175%;aspect-ratio:1;margin:-87.5% 0 0 -87.5%;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(closest-side,rgba(227,18,29,.36),rgba(126,10,17,.12) 55%,transparent 74%)}
-.sp-emb{position:absolute;inset:0;opacity:0;transform:scale(1.1)}
-.sp-emb img{display:block;width:100%;height:100%;filter:drop-shadow(0 0 1px rgba(255,41,68,.9)) drop-shadow(0 0 18px rgba(192,20,29,.5))}
-.sp-id{position:relative;display:grid;justify-items:center;gap:clamp(8px,1.4vh,13px)}
+.sp-vig{background:radial-gradient(130% 95% at 50% 42%,transparent 45%,rgba(0,0,0,.8) 100%)}
+.sp-flash{background:radial-gradient(circle at var(--ix,50%) var(--iy,55%),#fff 0,#fff 3%,rgba(255,217,209,.85) 10%,rgba(255,41,68,.38) 26%,rgba(5,6,10,0) 50%);opacity:0}
+.sp-id{position:absolute;left:0;right:0;bottom:max(7vh,calc(env(safe-area-inset-bottom) + 34px));display:grid;justify-items:center;gap:clamp(8px,1.4vh,13px);pointer-events:none}
 .sp-name{margin:0;font:900 extra-condensed clamp(50px,15vw,88px)/.9 'Saira','Arial Narrow',sans-serif;letter-spacing:.06em;margin-right:-.06em;text-transform:uppercase;white-space:nowrap}
 .sp-name i{display:inline-block;font-style:normal;opacity:0;color:#f3f5fa;text-shadow:0 0 0 transparent}
 .sp-name .b{color:#ff2944}
 .sp-name .sp-gap{width:.28em}
 .sp-rule{display:block;width:min(58vw,300px);height:4px;background:linear-gradient(90deg,transparent,#e5102c 18%,#ff2944 50%,#e5102c 82%,transparent);transform:skewX(-30deg) scaleX(0);opacity:0}
 .sp-tag{margin:0;font:700 semi-expanded clamp(10.5px,2.9vw,13.5px)/1.2 'Saira',system-ui,sans-serif;letter-spacing:.3em;margin-right:-.3em;color:#c9bcb7;white-space:nowrap;opacity:0}
-.sp-skip{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));padding:12px 14px;border:0;background:none;color:#c9bcb7;font:700 semi-expanded 11.5px/1 'Saira',system-ui,sans-serif;letter-spacing:.2em;cursor:pointer;opacity:0;transition:opacity .3s}
+.sp-skip{position:absolute;right:max(14px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));padding:12px 14px;border:0;background:none;color:#c9bcb7;font:700 semi-expanded 11.5px/1 'Saira',system-ui,sans-serif;letter-spacing:.2em;cursor:pointer;opacity:0;transition:opacity .3s}
 .sp-skip:focus-visible{outline:2px solid #ff2944;opacity:1}
 #sp-tear{position:fixed;inset:0;z-index:101;width:100%;height:100%;pointer-events:none;opacity:0}
 #sp-tear polyline{fill:none;stroke:#ff2944;stroke-width:3;stroke-linejoin:bevel}
 #sp-tear .core{stroke:#fff1ec;stroke-width:1.2}
 
-/* the impact, keyed off .sp-hit (the engine adds it when the sparks lock) */
+/* the impact, keyed off .sp-hit (the engine calls the page when the kick lands) */
 .sp-go .sp-skip,.sp-calm .sp-skip{opacity:.85}
-.sp-hit .sp-flash{animation:sp-flash .5s cubic-bezier(.16,1,.3,1) both}
-.sp-hit .sp-emb{animation:sp-burn .55s cubic-bezier(.2,.8,.2,1) .05s forwards}
-.sp-hit .sp-halo{animation:sp-in .7s ease-out .2s both}
+.sp-hit .sp-flash{animation:sp-flash .55s cubic-bezier(.16,1,.3,1) both}
 .sp-hit .sp-name i{animation:sp-stamp .42s cubic-bezier(.2,1.4,.3,1) var(--d) forwards}
 .sp-hit .sp-rule{animation:sp-rule .34s cubic-bezier(.7,0,.2,1) .66s forwards}
 .sp-hit .sp-tag{animation:sp-flicker .5s steps(1) .78s forwards}
 @keyframes sp-flash{0%{opacity:0}8%{opacity:1}100%{opacity:0}}
-@keyframes sp-burn{0%{opacity:0;transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}
-@keyframes sp-in{to{opacity:1}}
 @keyframes sp-stamp{0%{opacity:0;transform:scale(1.7);text-shadow:-10px 0 0 #ff2944,10px 0 0 #2f8cff}25%{opacity:1}60%{text-shadow:-3px 0 0 #ff2944,3px 0 0 #2f8cff}100%{opacity:1;transform:none;text-shadow:0 0 0 transparent}}
 @keyframes sp-rule{to{opacity:1;transform:skewX(-30deg)}}
 @keyframes sp-flicker{0%{opacity:.8}12%{opacity:.1}24%{opacity:.9}36%{opacity:.25}52%,100%{opacity:1}}
 
-/* the still poster: reduced motion, the short intro, "Animații: Reduse" or Data Saver */
-.sp-calm .sp-emb{opacity:1;transform:none}.sp-calm .sp-halo{opacity:1}
+/* the still poster */
+.sp-calm .sp-bg{opacity:1}.sp-calm .sp-emb{opacity:.66}.sp-calm .sp-eye{opacity:.9}
 .sp-calm .sp-name i,.sp-calm .sp-tag{opacity:1}.sp-calm .sp-rule{opacity:1;transform:skewX(-30deg)}
 #splash.sp-fade{animation:none;opacity:0;transition:opacity .26s linear;pointer-events:none}
 
-/* the exit: the sparks blow out, the wolf flies home to the tab bar, the black rips apart along the claw tear */
+/* the exit: the arena goes dark, the wolf flies home to the tab bar, the black rips apart along the claw tear */
 #splash.sp-exit{background:transparent;pointer-events:none}
 #splash.sp-exit .sp-a{animation:sp-rip-a .6s cubic-bezier(.7,0,.2,1) forwards}
 #splash.sp-exit .sp-b{animation:sp-rip-b .6s cubic-bezier(.7,0,.2,1) forwards}
-#splash.sp-exit .sp-id,#splash.sp-exit .sp-skip,#splash.sp-exit .sp-halo,#splash.sp-exit .sp-vig{animation:sp-out .2s ease-out forwards}
+#splash.sp-exit .sp-id,#splash.sp-exit .sp-skip,#splash.sp-exit .sp-vig,#splash.sp-exit .sp-bg,#splash.sp-exit #sp-cv,#splash.sp-exit .sp-eye{animation:sp-out .2s ease-out forwards}
 #splash.sp-exit.sp-land .sp-stage{animation:sp-fly .58s cubic-bezier(.55,0,.15,1) forwards}
 #splash.sp-exit:not(.sp-land) .sp-stage{animation:sp-out .3s ease-out forwards}
 #sp-tear.sp-exit{animation:sp-tear .5s ease-out forwards}
@@ -119,18 +116,17 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 <div id="splash">
   <div class="sp-half sp-a" aria-hidden="true"></div>
   <div class="sp-half sp-b" aria-hidden="true"></div>
-  <div class="sp-vig" aria-hidden="true"></div>
+  <div class="sp-bg" aria-hidden="true"></div>
+  <div class="sp-stage" aria-hidden="true">
+    <div class="sp-emb"><img src="splash/umbra.webp" alt="" width="680" height="801" decoding="sync"></div>
+    <i class="sp-eye l"></i><i class="sp-eye r"></i>
+  </div>
   <canvas id="sp-cv" aria-hidden="true"></canvas>
-  <div class="sp-cam">
-    <div class="sp-stage" aria-hidden="true">
-      <div class="sp-halo"></div>
-      <div class="sp-emb"><img src="splash/umbra.webp" alt="" width="680" height="801" decoding="sync"></div>
-    </div>
-    <div class="sp-id">
-      <p class="sp-name" aria-label="Inner Beast"><i style="--d:.16s">I</i><i style="--d:.2s">N</i><i style="--d:.24s">N</i><i style="--d:.28s">E</i><i style="--d:.32s">R</i><i class="sp-gap"></i><i class="b" style="--d:.4s">B</i><i class="b" style="--d:.44s">E</i><i class="b" style="--d:.48s">A</i><i class="b" style="--d:.52s">S</i><i class="b" style="--d:.56s">T</i></p>
-      <i class="sp-rule" aria-hidden="true"></i>
-      <p class="sp-tag">DISCIPLINE. POWER. CONTROL.</p>
-    </div>
+  <div class="sp-vig" aria-hidden="true"></div>
+  <div class="sp-id">
+    <p class="sp-name" aria-label="Inner Beast"><i style="--d:.16s">I</i><i style="--d:.2s">N</i><i style="--d:.24s">N</i><i style="--d:.28s">E</i><i style="--d:.32s">R</i><i class="sp-gap"></i><i class="b" style="--d:.4s">B</i><i class="b" style="--d:.44s">E</i><i class="b" style="--d:.48s">A</i><i class="b" style="--d:.52s">S</i><i class="b" style="--d:.56s">T</i></p>
+    <i class="sp-rule" aria-hidden="true"></i>
+    <p class="sp-tag">DISCIPLINE. POWER. CONTROL.</p>
   </div>
   <div class="sp-flash" aria-hidden="true"></div>
   <button class="sp-skip" type="button" aria-label="Sari peste intro">SARI</button>
@@ -145,11 +141,11 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 // (Apple: launch instantly; a splash belongs to the first run). Settings: Automat (default), Mereu, Scurt, Oprit.
 // A reload in the same session skips it. main.ts builds the dashboard underneath at the same time, so the exit only waits
 // if that is genuinely not ready. The exit sends 'beast:reveal' (the app's entry starts) and 'beast:landed' (the wolf in
-// the tab bar roars), which main.ts listens for. The sparks are drawn by splash/forge.js, shared by the Beast apps.
+// the tab bar roars), which main.ts listens for. The arena is drawn by splash/arena.js, shared with Beast Nutrition.
 (function () {
   var sp = document.getElementById('splash'), tear = document.getElementById('sp-tear');
   if (!sp) return;
-  var VERSION = '2026-11-14b', mode = 'auto', seen = false, known = '', boot = performance.now();
+  var VERSION = '2026-11-15', mode = 'auto', seen = false, known = '', boot = performance.now();
   try { mode = localStorage.getItem('beast:opening') || 'auto'; known = localStorage.getItem('beast:opened-v') || ''; } catch (e) { /* storage blocked */ }
   try { seen = sessionStorage.getItem('beast:opened') === '1'; sessionStorage.setItem('beast:opened', '1'); } catch (e) { /* storage blocked */ }
   var forge = null;
@@ -157,14 +153,14 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
   function ready() { var a = document.getElementById('app'); return !!a && a.children.length > 0; }
   if (seen || mode === 'off') { drop(); return; }
   if (mode === 'auto' && known === VERSION) {
-    sp.classList.add('sp-calm');
+    sp.classList.add('sp-calm'); poster();
     (function wait() { if (ready() || performance.now() - boot > 600) { sp.classList.add('sp-fade'); setTimeout(drop, 240); } else setTimeout(wait, 30); })();
     return;
   }
   try { localStorage.setItem('beast:opened-v', VERSION); } catch (e) { /* storage blocked */ }
   var conn = navigator.connection;
-  var calm = mode === 'short' || matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'lite' || !!(conn && conn.saveData) || !window.BeastForge;
-  var HOLD = calm ? 800 : 2450, LIMIT = 6000;
+  var calm = mode === 'short' || matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'lite' || !!(conn && conn.saveData) || !window.BeastArena;
+  var HOLD = calm ? 1100 : 3300, LIMIT = 6500;
   var t0 = 0, started = false, leaving = false, broken = false;
   addEventListener('error', function (e) { if (e.error || (e.target && e.target.tagName === 'SCRIPT')) broken = true; }, true);
   function say(name) { try { dispatchEvent(new Event(name)); } catch (e) { /* old browser */ } }
@@ -199,16 +195,17 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
     if (started) return;
     started = true;
     t0 = performance.now();
-    if (calm) { sp.classList.add('sp-calm'); setTimeout(leave, HOLD); return; }
+    if (calm) { sp.classList.add('sp-calm'); poster(); setTimeout(leave, HOLD); return; }
     sp.classList.add('sp-go');
-    forge = window.BeastForge.create({
-      canvas: document.getElementById('sp-cv'), mark: 'splash/umbra.webp', stage: sp.querySelector('.sp-stage'),
-      color: [229, 16, 44], hot: [255, 41, 68], count: 2400,
-      onImpact: function () { sp.classList.add('sp-hit'); try { navigator.vibrate && navigator.vibrate(40); } catch (e) { /* not here */ } }
-    });
+    forge = arena(function () { sp.classList.add('sp-hit'); try { navigator.vibrate && navigator.vibrate([30, 40, 60]); } catch (e) { /* not here */ } });
     forge.start();
     setTimeout(leave, HOLD);
   }
+  function arena(hit) {
+    return window.BeastArena.create({ canvas: document.getElementById('sp-cv'), stage: sp.querySelector('.sp-stage'), bg: sp.querySelector('.sp-bg'), root: sp, color: [229, 16, 44], hot: [255, 41, 68], onImpact: hit });
+  }
+  // the calm poster is the same arena, frozen just after the kick lands
+  function poster() { if (!window.BeastArena) return; try { forge = arena(null); forge.still(2.08); } catch (e) { /* the wolf and the name are enough */ } }
   // Starts once main.ts has drawn the dashboard, so that work does not stutter the sparks; after half a second it runs anyway.
   function arm() {
     if (started) return;

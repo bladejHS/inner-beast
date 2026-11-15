@@ -1245,3 +1245,155 @@ ol.how-list b { color: var(--ink, #fff); }
 .obj-plate { display: inline-flex; align-items: stretch; margin: -6px 0 18px; font: 800 semi-condensed 12px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; }
 .obj-plate b { padding: 8px 12px 7px 14px; background: var(--red); color: #fff; clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
 .obj-plate span { padding: 8px 14px 7px 10px; margin-left: -4px; background: var(--n3); color: var(--ink); clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
+
+/* ---------- 6.0 "Arena", 2026-11-15 ----------
+   The user: the look, the layout, the cards and the buttons, "ceva mai spectaculos și plăcut", my pick. The broadcast
+   plates (slants, cut corners, left tabs, skewed blades) give way to the arena of the opening: rounded glass lit from
+   above, red light bleeding from what is live, one living picture of the day's discipline at the top of Azi (the
+   opening's engine, public/splash/arena.js), rounds as cards, a floating dock for the tabs. Same colours, same type,
+   same words; nothing moved in the logic. */
+:root {
+  --r: 20px; --r-sm: 14px; --surf: #0b0d13;
+  --glass: linear-gradient(160deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .015) 42%, rgba(255, 255, 255, 0));
+}
+body::before {
+  background:
+    radial-gradient(120% 46% at 50% -12%, rgba(var(--glow-2), .22), transparent 66%),
+    radial-gradient(70% 40% at 105% 28%, rgba(var(--glow-d), .3), transparent 70%),
+    radial-gradient(70% 36% at -10% 70%, rgba(var(--glow-d), .2), transparent 70%),
+    radial-gradient(90% 50% at 50% 118%, rgba(0, 0, 0, .7), transparent 72%);
+}
+
+/* no more slanted plates */
+.btn, .go, .rd-go, .cta, .streak, .tap-big, .pl-ctrl button.main, .card, .wk-d, .nav-plate, .nav-plate::before, .tr-go, .seq span, .obj-plate b, .obj-plate span, .brand b, .nw-hex, .nw-hex::before { clip-path: none; }
+.brand b { border-radius: 7px; }
+.icon-btn, .ok-mark { border-radius: 50%; }
+.streak { border-radius: 999px; }
+.tag, .ntag, .rd-hr { border-radius: 999px; }
+.bar, .bar i, .gl-meter, .gl-meter i { border-radius: 99px; }
+.segs i, .wk-bar i, .cy-track i, .rd-dots i, .ex-dots i { transform: none; border-radius: 4px; }
+.advice { border-left: 0; border-radius: var(--r-sm); box-shadow: inset 3px 0 0 var(--red-hot); }
+.advice.up { box-shadow: inset 3px 0 0 var(--gold); }
+@keyframes blade { from { transform: scaleX(0); } to { transform: none; } }
+
+/* glass cards */
+.card {
+  border-radius: var(--r); padding: 20px 18px; border: 1px solid rgba(255, 255, 255, .075); border-left-width: 1px;
+  background: var(--glass), var(--surf);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 20px 44px -28px rgba(0, 0, 0, .95);
+}
+.card.lime { border-color: rgba(var(--glow-2), .38); background: radial-gradient(130% 100% at 0 0, rgba(var(--glow-2), .24), transparent 62%), var(--glass), var(--surf); }
+.card.lime::before { display: none; }
+.card.white { border-radius: var(--r); }
+.card h3 { font: 800 semi-condensed 22px/1.12 var(--font); letter-spacing: .005em; text-transform: none; }
+.card.goal { border-left-color: rgba(255, 255, 255, .075); }
+.row-link, .tile, .timer-row, .dc, .combo, .tip-card, .stat, .knee-q, .pr, .wc-item, .how, .week7 i { border-radius: 18px; }
+.row-link, .tile, .timer-row, .stat, .knee-q { border-color: rgba(255, 255, 255, .075); background: var(--glass), var(--surf); }
+.dc { overflow: hidden; }
+.rl-ic { border-radius: 14px; }
+.tr-go { border-radius: 50%; width: 48px; height: 48px; }
+
+/* buttons: lit pills */
+.btn {
+  border-radius: 16px; min-height: 54px; font: 800 semi-condensed 16px/1 var(--font); letter-spacing: .07em;
+  box-shadow: 0 14px 30px -14px rgba(var(--glow-2), .85), inset 0 1px 0 rgba(255, 255, 255, .26);
+}
+.btn.ghost, .btn.danger { border-radius: 16px; background: rgba(255, 255, 255, .045); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .15); }
+.btn.danger { box-shadow: inset 0 0 0 1px rgba(var(--glow-2), .55); }
+.btn.sm { min-height: 46px; border-radius: 14px; }
+.btn:disabled, .btn[disabled] { box-shadow: none; }
+.go, .rd-go { border-radius: 50%; }
+.go { box-shadow: 0 10px 24px -10px rgba(var(--glow-2), .9), inset 0 1px 0 rgba(255, 255, 255, .26); }
+.chip { border-radius: 999px; border-color: rgba(255, 255, 255, .15); background: rgba(255, 255, 255, .04); }
+.chip[aria-pressed='true'], .chip.on { border-color: var(--ink); background: var(--ink); }
+.link { text-decoration-color: rgba(255, 255, 255, .25); }
+
+/* fields */
+input[type='text'], input[type='number'], input[type='time'], input[type='password'], textarea, select, .nfld input, .nfld select, input[type='date'] { border-radius: 12px; border-color: rgba(255, 255, 255, .17); background: rgba(255, 255, 255, .04); }
+.stepper { border-radius: 14px; overflow: hidden; border-color: rgba(255, 255, 255, .17); }
+.switch span { border-radius: 999px; }
+.switch span::after { border-radius: 50%; }
+.colon { border-radius: 12px; }
+.field { border-bottom-color: rgba(255, 255, 255, .07); }
+
+/* type: the posters stay, a size calmer; section heads in sentence case */
+.ph-t { font-size: clamp(54px, 16vw, 92px); }
+.ph-blade { width: 52px; height: 4px; border-radius: 4px; transform: none; }
+.sec { margin: 40px 0 14px; font: 800 semi-condensed 24px/1.08 var(--font); letter-spacing: .005em; text-transform: none; }
+.sec::before { width: 26px; height: 4px; margin-bottom: 12px; border-radius: 4px; transform: none; }
+
+/* the section switcher: a segmented pill, the red one slides */
+.seg { padding-top: 4px; padding-bottom: 6px; background: linear-gradient(var(--bg) 72%, rgba(5, 6, 10, 0)); }
+.seg-in { padding: 4px; gap: 4px; border: 0; border-radius: 16px; background: rgba(255, 255, 255, .05); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07); }
+.seg-b { position: relative; z-index: 1; min-height: 42px; border-radius: 12px; font: 750 semi-condensed 14px/1 var(--font); letter-spacing: .09em; }
+.seg-b[aria-current] { color: #fff; }
+.seg-ink { top: 4px; bottom: 4px; height: auto; border-radius: 12px; background: linear-gradient(180deg, var(--red-hot), var(--red)); box-shadow: 0 8px 20px -8px rgba(var(--glow), .85), inset 0 1px 0 rgba(255, 255, 255, .25); z-index: 0; }
+.seg-ink::after { display: none; }
+
+/* Azi: the day's card, with the living picture */
+.mission.hero { padding-bottom: 6px; }
+.mission.hero::after { top: 6%; height: 60%; }
+.hero .ms-k { margin-top: 6px; }
+.hero .ms-t { font-size: clamp(46px, min(14vw, 7.6svh), 84px); line-height: .84; }
+.hero-stage {
+  position: relative; isolation: isolate; height: clamp(210px, 31svh, 320px); margin: 16px 0 0; overflow: hidden; border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, .07);
+  background: radial-gradient(85% 75% at 50% -5%, rgba(var(--glow-2), .3), transparent 70%), linear-gradient(180deg, #0f0a10, #06070b 78%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 34px 60px -34px rgba(var(--glow-2), .6);
+}
+.hero-wolf { position: absolute; z-index: -1; left: 50%; top: -14%; width: 66%; height: auto; transform: translateX(-50%); opacity: .2; filter: brightness(.8) saturate(1.1); pointer-events: none; }
+.hero-cv { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero .ms-row { margin: 18px 0 14px; gap: 18px; }
+.hero .gauge { width: 66px; }
+.ms-m b { font-size: 34px; }
+
+/* the start button */
+.cta {
+  grid-template-columns: 78px 1fr; min-height: 78px; border-radius: 22px;
+  box-shadow: 0 20px 40px -18px rgba(var(--glow-2), .9), inset 0 1px 0 rgba(255, 255, 255, .28);
+}
+.cta-ic { margin: 12px 0 12px 14px; border-radius: 50%; background: rgba(0, 0, 0, .26); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18); }
+.cta-l b { font-size: 28px; }
+
+/* the week */
+.wk { gap: 6px; }
+.wk-d { min-height: 62px; border-radius: 16px; border-color: rgba(255, 255, 255, .075); background: var(--glass), var(--surf); }
+.wk-d i { border-radius: 4px; }
+.wk-d.now { border-color: rgba(var(--glow-2), .7); box-shadow: 0 0 0 1px rgba(var(--glow-2), .3), 0 10px 22px -12px rgba(var(--glow-2), .8); }
+.wk-d.now::before { left: 32%; right: 32%; top: 6px; height: 3px; border-radius: 3px; }
+.wk-d.on { background: var(--ink); }
+
+/* the rounds: a card each, a numbered disc, a round play button */
+.rd {
+  grid-template-columns: 40px 1fr 52px; gap: 12px; margin: 0 0 12px; padding: 16px 14px; border-radius: var(--r);
+  border: 1px solid rgba(255, 255, 255, .075); background: var(--glass), var(--surf);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 18px 40px -28px rgba(0, 0, 0, .95);
+}
+.rd::before { display: none; }
+.rd.next { border-color: rgba(var(--glow-2), .45); background: radial-gradient(130% 110% at 0 0, rgba(var(--glow-2), .2), transparent 60%), var(--glass), var(--surf); box-shadow: 0 22px 44px -26px rgba(var(--glow-2), .75); }
+.rd.done { opacity: .78; }
+.rd-node { width: 40px; height: 40px; }
+.rd-node::before { inset: 3px; border-radius: 50%; transform: none; }
+.rd.next .rd-node::after { inset: 3px; border-radius: 50%; transform: none; animation-name: node-ring; }
+@keyframes node-ring { 0% { opacity: .95; transform: scale(1); } 100% { opacity: 0; transform: scale(1.7); } }
+.rd.just .rd-node::before { animation-name: node-stamp; }
+@keyframes node-stamp { 0% { opacity: 0; transform: scale(2.3); } 50% { opacity: 1; } 100% { transform: scale(1); } }
+.rd-go { width: 52px; height: 52px; }
+.rd.next .rd-go { box-shadow: 0 10px 24px -10px rgba(var(--glow-2), .9); }
+.rd-name { font-size: 22px; }
+.rd-slash { inset: 0 60px 0 50px; }
+
+/* the dock: a floating rounded bar, the live tab lit from inside, the wolf in a disc */
+.nav { left: 12px; right: 12px; height: 68px; }
+.nav-plate { border-radius: 26px; background: linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .06)); }
+.nav-plate::before { border-radius: 25px; }
+.nav-plate::after { left: 34px; right: 34px; }
+.nav-blade { top: 7px; height: calc(100% - 14px); }
+.nav-blade::before { left: 7%; right: 7%; top: 0; bottom: 0; height: auto; border-radius: 17px; transform: none; background: linear-gradient(180deg, rgba(var(--glow), .26), rgba(var(--glow-2), .1)); box-shadow: inset 0 0 0 1px rgba(var(--glow), .35), 0 0 24px -6px rgba(var(--glow), .55); }
+.nw { width: 60px; height: 60px; margin-top: -26px; }
+.nw-hex, .nw-hex::before { border-radius: 50%; }
+.nav-wolf[aria-current] .nw-hex { box-shadow: 0 0 26px -2px rgba(var(--glow), .8); }
+
+/* plan */
+.obj-plate b { border-radius: 999px 0 0 999px; padding-left: 14px; }
+.obj-plate span { border-radius: 0 999px 999px 0; margin-left: 0; }

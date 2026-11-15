@@ -1,5 +1,6 @@
 // Settings: sound, voice, rest times, data backup and the sources.
 
+declare const __BUILD__: string;
 import { esc } from '../../logic/util.ts';
 import { zone2 } from '../../logic/runlog.ts';
 import { ctx } from '../ctx.ts';
@@ -73,5 +74,7 @@ export function settingsHtml(): string {
       <li>Combinațiile, rutina de spate, mobilitatea și sfaturile: canalul lui Alex Hanma, <a href="https://www.tiktok.com/@alexhanma___" target="_blank" rel="noopener">TikTok @alexhanma___</a> și <a href="https://www.instagram.com/alexhanma_/" target="_blank" rel="noopener">Instagram @alexhanma_</a>.</li>
       <li>Meditația: metoda de respirație Wim Hof. Respirația 4-7-8: metoda din carte.</li>
     </ul>
-    <p class="small dim" style="text-align:center;margin-top:28px">Inner Beast 3.0</p>`;
+    <h2 class="sec">Versiunea<small>Aplicația se actualizează singură când o deschizi cu internet. Dacă vezi totuși ceva vechi, apasă butonul: datele tale rămân.</small></h2>
+    <button class="btn ghost sm" style="width:100%" data-a="force-update">${ic('refresh')}Actualizează acum</button>
+    <p class="small dim" style="text-align:center;margin-top:28px">Inner Beast 3.0 · versiunea ${__BUILD__}</p>`;
 }

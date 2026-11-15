@@ -7,4 +7,6 @@ export default defineConfig({
     target: 'es2022',
     assetsInlineLimit: 0,
   },
+  // the version shown in Settings: the commit on GitHub, "local" on this machine
+  define: { __BUILD__: JSON.stringify(process.env['GITHUB_SHA']?.slice(0, 7) ?? 'local') },
 });

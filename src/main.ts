@@ -5,6 +5,7 @@ import { rowChallenge } from './data/row.ts';
 import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
 import { cycleAt, growPushups, habitGoal } from './logic/progress.ts';
 import { chapterCheck, ranksSheet } from './ui/show.ts';
+import { forceUpdate } from './ui/update.ts';
 import { dayKey, esc, shortDay, uid, weekdayIdx, weekStart } from './logic/util.ts';
 import { initAudio, unlock } from './ui/audio.ts';
 import { closePlayer, closeSheet, ctx, openSheet, ask, save, sheetAct, toast, type Tab, type View } from './ui/ctx.ts';
@@ -526,6 +527,9 @@ function act(a: string, el: HTMLElement): void {
       if (b) openPolar({ mode: 'run', block: b.id, target: jogTarget((liveBlock(b).min ?? 20) * 60) });
       return;
     }
+    case 'force-update':
+      void forceUpdate(['pose-v1']);
+      return;
     case 'rank':
       return openSheet(`<h2>Rangurile</h2>${ranksSheet()}<button class="btn" data-a="sh:close">Închide</button>`);
     case 'day':
@@ -894,7 +898,17 @@ if (growPushups(ctx.S.habits, dayKey())) save();
 render();
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+  // 2026-11-16 (the user: "nu se actualizează", after closing it 2–3 times): an iPhone home-screen app is mostly
+  // resumed, not launched, so it asks for a new version each time it comes back to the screen, and when the new
+  // version has taken over it reloads by itself, unless a timer is running or something is being typed.
+  const had = !!navigator.serviceWorker.controller;
+  const reg = navigator.serviceWorker.register('sw.js');
+  reg.catch(() => {});
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) void reg.then((r) => r.update()).catch(() => {}); });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!had) return;
+    const busy = !!document.querySelector('#ov .pl') || ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName ?? '');
+    if (busy) toast('Versiune nouă instalată. Se aplică la următoarea deschidere.');
+    else location.reload();
   });
 }

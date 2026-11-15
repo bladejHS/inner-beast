@@ -18,6 +18,7 @@ export function chrome(title: string, body: string, o: { cls?: string; ctrl?: st
   const live = !!o.ctrl;
   return `<div class="pl ${o.cls ?? ''}${live && focus ? ' focus' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}">
   <i class="pl-glow" aria-hidden="true"></i>
+  ${live ? '<canvas class="pl-fx" aria-hidden="true"></canvas>' : ''}
   <div class="pl-bar">
     <button class="icon-btn" data-a="p:close" aria-label="Închide">${ic('close')}</button>
     <div class="pl-title">${esc(title)}</div>

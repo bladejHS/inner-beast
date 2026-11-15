@@ -26,6 +26,20 @@ export function weekStrip(today: string, active: number): string {
 /** The living picture on the day's card (public/splash/arena.js): the discipline of the day, in the arena's light. */
 const HERO_KIND = ['fight', 'push', 'run', 'fight', 'pull', 'run', 'calm'];
 
+/** The stage as a fight-night broadcast (2026-11-15): the LIVE bug, the corner brackets, a light sweep, and the lower
+ *  third with the day's main event: its longest block. Decoration only; the same facts are in the rows below. */
+function broadcast(day: Day, n: number, total: number, tag: string): string {
+  const main = [...day.blocks].sort((a, b) => blockMinutes(b) - blockMinutes(a))[0];
+  if (!main) return '';
+  const m = liveBlock(main);
+  const cleared = n === total;
+  return `<div class="bc" aria-hidden="true">
+    <i class="bc-c tl"></i><i class="bc-c tr"></i><i class="bc-c bl"></i><i class="bc-c br"></i><i class="bc-sweep"></i>
+    <p class="bc-bug"><span class="bc-live${cleared ? ' off' : ''}">${cleared ? 'Final' : 'Live'}</span><b>${esc(tag)}</b></p>
+    <div class="bc-l3"><span class="bc-tag">${cleared ? 'Câștigat' : 'Main event'}</span><span class="bc-name"><b>${esc(m.name)}</b><small>${esc(m.dose)}</small></span></div>
+  </div>`;
+}
+
 export function dayBody(day: Day, today: string, kicker: string): string {
   const done = weekDone(ctx.S.log, weekStart(today), weekSince(ctx.S.cycle, weekStart(today)));
   const n = dayProgress(day, done);
@@ -45,6 +59,7 @@ export function dayBody(day: Day, today: string, kicker: string): string {
       <div class="hero-stage" aria-hidden="true">
         <img class="hero-wolf" src="${import.meta.env.BASE_URL}splash/umbra.webp" alt="" width="680" height="801" decoding="async">
         <canvas class="hero-cv" data-kind="${HERO_KIND[day.idx] ?? 'fight'}"></canvas>
+        ${broadcast(day, n, total, c ? `Ciclul ${c.id} · ${c.week}/4` : RO_DAYS[day.idx])}
       </div>
       <div class="ms-row">
         ${gauge(total ? n / total : 0, `<b class="num">${n}</b><small>/${total}</small>`, `day-${day.idx}`, 'ms-g')}

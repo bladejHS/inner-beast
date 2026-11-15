@@ -13,7 +13,7 @@ import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type P
 import { lite, slam } from '../fx.ts';
 import { howHtml } from '../how.ts';
 import { ic } from '../icons.ts';
-import { art } from '../art.ts';
+import { winHtml, winPlay } from '../win.ts';
 import { chrome, setText } from './common.ts';
 
 interface EmomState {
@@ -204,8 +204,14 @@ class WorkoutPlayer implements Player {
     const el = ovEl();
     if (this.st === 'ready') el.innerHTML = this.readyHtml();
     else if (this.st === 'ex') el.innerHTML = this.exHtml();
-    else el.innerHTML = this.doneHtml();
+    else {
+      el.innerHTML = this.doneHtml();
+      if (!this.winShown) winPlay(el);
+      this.winShown = true;
+    }
   }
+
+  winShown = false;
 
   readyHtml(): string {
     const rows = this.xs
@@ -383,9 +389,18 @@ class WorkoutPlayer implements Player {
       .join('');
     return chrome(
       this.w.name,
-      `${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1>
-      <p class="lead">${mmss((Date.now() - this.t0) / 1000)} de antrenament. ${this.saved ? 'Salvat în progres.' : ''}</p>
-      ${this.recs.length ? `<div class="advice"><b>${this.recs.length === 1 ? 'Record nou' : 'Recorduri noi'}:</b> ${this.recs.map((r) => `${esc(r.name)} ${r.v}${r.sec ? ' s' : ''} (înainte ${r.prev}${r.sec ? ' s' : ''})`).join(', ')}.</div>` : ''}
+      `${winHtml({
+        name: this.w.name,
+        full: this.saved,
+        by: this.saved ? (this.recs.length ? 'Prin forță' : 'Prin disciplină') : 'Nicio serie bifată',
+        first: !this.winShown,
+        recs: this.recs.map((r) => `${r.name} ${r.v}${r.sec ? ' s' : ''} (înainte ${r.prev}${r.sec ? ' s' : ''})`),
+        stats: [
+          { v: this.xs.reduce((s, x) => s + x.done.filter(Boolean).length, 0), label: 'Serii' },
+          { v: this.xs.filter((x) => x.done.some(Boolean) || x.emom?.st === 'done').length, unit: `/${this.xs.length}`, label: 'Exerciții' },
+          { v: Math.max(1, Math.round((Date.now() - this.t0) / 60000)), unit: 'min', label: 'Antrenament' },
+        ],
+      })}
       <ul class="hist">${lines || '<li><span>Nicio serie bifată.</span></li>'}</ul>
       ${this.saved ? this.rpeHtml() : ''}
       ${this.w.id === 'legs' && this.saved ? this.kneeHtml() : ''}

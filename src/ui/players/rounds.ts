@@ -26,8 +26,9 @@ import { kickPower, kickWeek, KNEE_STEPS, kneeNotes, kneeSore, type KneeNote } f
 import { buzz, say, sfx, unlock, hush } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
 import { slam } from '../fx.ts';
+import { feed } from '../livefx.ts';
+import { winHtml, winPlay, type WinStat } from '../win.ts';
 import { howHtml } from '../how.ts';
-import { art } from '../art.ts';
 import { chrome, ctrlBtn, field, setText, stepper, switchCtl } from './common.ts';
 
 export interface RoundsCfg {
@@ -215,7 +216,11 @@ class RoundsPlayer implements Player {
     const el = ovEl();
     if (this.st === 'ready') el.innerHTML = this.readyHtml();
     else if (this.st === 'run') el.innerHTML = this.runHtml();
-    else el.innerHTML = this.doneHtml();
+    else {
+      el.innerHTML = this.doneHtml();
+      if (!this.winShown) winPlay(el);
+      this.winShown = true;
+    }
   }
 
   readyHtml(): string {
@@ -351,13 +356,33 @@ class RoundsPlayer implements Player {
   doneHtml(): string {
     const r = this.roundsDone();
     const body = `
-      ${art('claws', 'done-claws')}<h1 class="pl-h done-h">Gata.</h1>
-      <p class="lead">${this.cfg.cardio ? `${esc(this.cfg.name)}: ${mmss(doneSec(this.phases, this.clock.t, 'work'))} în ritm ușor.` : `${esc(this.cfg.name)}: ${r} din ${this.cfg.rounds} ${this.cfg.rounds === 1 ? 'rundă' : 'runde'}, ${mmss(doneSec(this.phases, this.clock.t, 'work'))} de lucru.`}</p>
-      <p class="dim">${this.saved ? 'Salvat în progres.' : ''}</p>
+      ${winHtml({ name: this.cfg.name, full: !!this.entry?.block || (!this.cfg.block && !!this.entry), by: this.winBy(), stats: this.winStats(r), first: !this.winShown })}
       ${this.rateHtml()}
       ${this.kneeAsk() ? this.kneeHtml() : ''}
       <button class="btn" data-a="p:close">Închide</button>`;
     return chrome(this.cfg.name, body, { center: true });
+  }
+
+  winShown = false;
+
+  winBy(): string {
+    if (!this.entry) return 'Prea scurt ca să se salveze';
+    if (this.cfg.block && !this.entry.block) return 'Sesiune parțială, salvată în progres';
+    return this.cfg.cardio ? 'Prin consecvență' : this.cfg.hiit ? 'Prin rezistență' : this.isBurst(this.cfg.rounds) ? 'Prin KO' : 'Prin disciplină';
+  }
+
+  winStats(r: number): WinStat[] {
+    const work = doneSec(this.phases, this.clock.t, 'work');
+    const out: WinStat[] = [];
+    if (this.cfg.rounds > 1) out.push({ v: r, unit: `/${this.cfg.rounds}`, label: 'Runde' });
+    out.push(work >= 120 ? { v: Math.round(work / 60), unit: 'min', label: 'De lucru' } : { v: Math.round(work), unit: 's', label: 'De lucru' });
+    const calls = Object.values(this.called).reduce((s, n) => s + n, 0);
+    const bursts = this.cfg.burstFrom ? this.phases.filter((p) => p.kind === 'work' && this.isBurst(p.round) && p.round! <= r).length * BURST.reps : 0;
+    if (bursts) out.push({ v: bursts, label: 'Explozii la maxim' });
+    if (calls) out.push({ v: calls, label: 'Combinații strigate' });
+    if (this.reactN) out.push({ v: this.reactN, label: 'Reacții' });
+    if (out.length < 3) out.push({ v: Math.round(this.clock.t / 60), unit: 'min', label: 'Total' });
+    return out.slice(0, 4);
   }
 
   roundsDone(): number {
@@ -404,6 +429,7 @@ class RoundsPlayer implements Player {
     const L = locate(this.phases, this.clock.t);
     if (L.done) return this.finish();
     const p = this.phases[L.i];
+    this.feedFx(p, L.left, L.into);
     if (L.i !== this.lastI) {
       const first = this.lastI === -1;
       this.lastI = L.i;
@@ -479,6 +505,15 @@ class RoundsPlayer implements Player {
     }
   }
 
+  /** The arena behind the clock (livefx.ts): which phase, how much of it is left. */
+  feedFx(p: Phase, left: number, into: number): void {
+    const burst = p.kind === 'work' && this.isBurst(p.round) ? burstAt(into, BURST.on, BURST.off, BURST.reps) : null;
+    const kind = burst ? (burst.on ? 'burst' : 'work')
+      : p.kind === 'work' ? (this.cfg.cardio ? 'easy' : left <= 10 && this.cfg.work > 20 ? 'last' : 'work')
+      : p.kind === 'rest' ? 'rest' : 'prep';
+    feed({ kind, left, total: p.sec, running: this.clock.running });
+  }
+
   onPhase(p: Phase): void {
     this.sprinting = false;
     if (p.kind === 'move') {
@@ -513,6 +548,7 @@ class RoundsPlayer implements Player {
 
   finish(): void {
     window.clearInterval(this.timer);
+    feed(null);
     this.clock.pause();
     sfx.bell(3);
     buzz([300, 120, 300]);
@@ -653,6 +689,7 @@ class RoundsPlayer implements Player {
 
   destroy(): void {
     window.clearInterval(this.timer);
+    feed(null);
   }
 }
 

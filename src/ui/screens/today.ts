@@ -7,6 +7,7 @@ import { dayKey, esc, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx, daysB
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { blockCard, blockMinutes, gauge, liveBlock, top } from './shared.ts';
+import { rankPlate, wolfMood } from '../show.ts';
 import { repeatCard } from './plan.ts';
 import { draftSets, workoutDraft } from '../players/workout.ts';
 import { KNEE_STEPS, kneeAsk, legDays } from '../../logic/knee.ts';
@@ -33,8 +34,9 @@ function broadcast(day: Day, n: number, total: number, tag: string): string {
   if (!main) return '';
   const m = liveBlock(main);
   const cleared = n === total;
-  return `<div class="bc" aria-hidden="true">
+  return `<div class="bcast" aria-hidden="true">
     <i class="bc-c tl"></i><i class="bc-c tr"></i><i class="bc-c bl"></i><i class="bc-c br"></i><i class="bc-sweep"></i>
+    ${wolfMood(day.idx)}
     <p class="bc-bug"><span class="bc-live${cleared ? ' off' : ''}">${cleared ? 'Final' : 'Live'}</span><b>${esc(tag)}</b></p>
     <div class="bc-l3"><span class="bc-tag">${cleared ? 'Câștigat' : 'Main event'}</span><span class="bc-name"><b>${esc(m.name)}</b><small>${esc(m.dose)}</small></span></div>
   </div>`;
@@ -71,6 +73,7 @@ export function dayBody(day: Day, today: string, kicker: string): string {
         ? `<button class="cta" data-a="start" data-b="${next.id}"><span class="cta-ic">${ic('play')}</span><span class="cta-l"><small>Începe</small><b>${esc(liveBlock(next).name)}</b></span><i class="cta-sheen" aria-hidden="true"></i></button>`
         : `<p class="ms-done">${ic('claw')}<span>Misiune încheiată</span></p>`}
     </section>
+    ${weekdayIdx(today) === day.idx ? rankPlate() : ''}
     ${weekHead(today)}
     ${weekStrip(today, day.idx)}
     <h2 class="sec">Rundele zilei<small>Atinge numărul unei runde ca s-o bifezi fără timer.</small></h2>

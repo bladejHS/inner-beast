@@ -18,7 +18,11 @@ export function spark(values: number[], invert = false): string {
   });
   const d = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
   const last = pts[pts.length - 1];
-  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2.2" vector-effect="non-scaling-stroke"/><circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="3" fill="currentColor"/></svg>`;
+  // the last value is a record: it pulses in gold (2026-11-15)
+  const lastV = values[values.length - 1]!;
+  const best = values.length >= 3 && values.slice(0, -1).every((v) => (invert ? lastV < v : lastV > v));
+  const area = `${d} L${last[0].toFixed(1)} ${h} L${pts[0][0].toFixed(1)} ${h} Z`;
+  return `<svg class="spark${best ? ' best' : ''}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="sp-a" d="${area}" fill="currentColor"/><path class="sp-l" d="${d}" pathLength="1" fill="none" stroke="currentColor" stroke-width="2.2" vector-effect="non-scaling-stroke"/>${best ? `<circle class="sp-p" cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="5" vector-effect="non-scaling-stroke"/>` : ''}<circle class="sp-d" cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="3" fill="currentColor"/></svg>`;
 }
 
 /** Vertical bars over a dashed goal line: at or over the goal in steel, under it hatched red, a day with nothing a stub.

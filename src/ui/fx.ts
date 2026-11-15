@@ -70,9 +70,9 @@ export function countUp(el: HTMLElement, from: number, to: number, ms = 750): vo
 }
 
 /** Full-screen celebration when the last block of the day is done: the wolf lands, claws rip, sparks fly. */
-export function celebrate(title: string, sub: string): void {
+export function celebrate(title: string, sub: string, o: { mark?: string; word?: string; cls?: string } = {}): void {
   const el = document.createElement('div');
-  el.className = 'cele';
+  el.className = `cele${o.cls ? ` ${o.cls}` : ''}`;
   el.setAttribute('role', 'status');
   const claws = CLAWS.map((c, i) => `<path d="${c.fill}" style="--d:${(0.92 + i * 0.07).toFixed(2)}s"/>`).join('');
   el.innerHTML = `
@@ -80,12 +80,12 @@ export function celebrate(title: string, sub: string): void {
     <div class="cele-core">
       <div class="cele-mark" aria-hidden="true">
         <i class="cele-halo"></i>
-        <img src="${BASE}splash/umbra.webp" alt="" width="680" height="801" decoding="async">
-        <svg class="cele-claws" viewBox="0 0 100 100">${claws}</svg>
+        ${o.mark ?? `<img src="${BASE}splash/umbra.webp" alt="" width="680" height="801" decoding="async">
+        <svg class="cele-claws" viewBox="0 0 100 100">${claws}</svg>`}
       </div>
       <p class="cele-k">${sub}</p>
       <h2 class="cele-t">${title}</h2>
-      <p class="cele-w">Misiune îndeplinită</p>
+      <p class="cele-w">${o.word ?? 'Misiune îndeplinită'}</p>
     </div>
     <p class="cele-tap">Atinge ca să închizi</p>`;
   document.body.appendChild(el);
@@ -95,7 +95,7 @@ export function celebrate(title: string, sub: string): void {
     window.setTimeout(() => el.remove(), 520);
   };
   el.addEventListener('click', close);
-  window.setTimeout(close, lite() ? 2600 : 4800);
+  window.setTimeout(close, lite() ? 2600 : o.mark ? 6200 : 4800);
   if (!lite()) window.setTimeout(() => sparks(el.querySelector('canvas') as HTMLCanvasElement, el), 560);
 }
 

@@ -4,6 +4,7 @@ import { blockById, WEEK, type Block } from './data/plan.ts';
 import { rowChallenge } from './data/row.ts';
 import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
 import { cycleAt, growPushups, habitGoal } from './logic/progress.ts';
+import { chapterCheck, ranksSheet } from './ui/show.ts';
 import { dayKey, esc, shortDay, uid, weekdayIdx, weekStart } from './logic/util.ts';
 import { initAudio, unlock } from './ui/audio.ts';
 import { closePlayer, closeSheet, ctx, openSheet, ask, save, sheetAct, toast, type Tab, type View } from './ui/ctx.ts';
@@ -172,6 +173,9 @@ function render(enter: Enter = ''): void {
     enterTimer = window.setTimeout(() => app.classList.remove('enter-tab', 'enter-seg'), 1100);
   }
   // each emphasis of the 12-week loop has its colour (beast.css, html[data-cycle]); before the loop, A
+  // the light of the hour on Azi's stage: cold in the morning, embers in the evening, darker at night (beast.css)
+  const hr = new Date().getHours();
+  document.documentElement.dataset.tod = hr >= 5 && hr < 10 ? 'morning' : hr < 17 && hr >= 10 ? 'day' : hr >= 17 && hr < 22 ? 'evening' : 'night';
   document.documentElement.dataset.cycle = cycleAt(ctx.S.cycle.start, dayKey(), ctx.S.cycle.repeats)?.id ?? 'A';
   app.innerHTML = screenHtml();
   syncNav();
@@ -179,6 +183,7 @@ function render(enter: Enter = ''): void {
   moveRings(app, !!enter);
   fitTitles(app);
   mountHero(app);
+  if (ctx.tab === 'today' && !views.length) chapterCheck();
   if (enter) for (const el of app.querySelectorAll<HTMLElement>('[data-count]')) countUp(el, 0, Number(el.dataset.count) || 0, 800);
   if (keepId) {
     const el = document.getElementById(keepId) as HTMLInputElement | null;
@@ -521,6 +526,8 @@ function act(a: string, el: HTMLElement): void {
       if (b) openPolar({ mode: 'run', block: b.id, target: jogTarget((liveBlock(b).min ?? 20) * 60) });
       return;
     }
+    case 'rank':
+      return openSheet(`<h2>Rangurile</h2>${ranksSheet()}<button class="btn" data-a="sh:close">Închide</button>`);
     case 'day':
       return pushView({ t: 'day', idx: Number(el.dataset.i) || 0 });
     case 'chapter': {

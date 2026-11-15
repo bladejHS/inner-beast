@@ -27,6 +27,7 @@ import { buzz, say, sfx, unlock, hush } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
 import { slam } from '../fx.ts';
 import { feed } from '../livefx.ts';
+import { walkIn } from '../show.ts';
 import { winHtml, winPlay, type WinStat } from '../win.ts';
 import { howHtml } from '../how.ts';
 import { chrome, ctrlBtn, field, setText, stepper, switchCtl } from './common.ts';
@@ -618,7 +619,8 @@ class RoundsPlayer implements Player {
         this.warm = (el as HTMLInputElement).checked;
         return;
       case 'p:start':
-        return this.start();
+        unlock();
+        return walkIn(c.name, c.rounds > 1 ? `${c.rounds} runde × ${mmss(c.work)}` : mmss(c.work), () => this.start());
       case 'p:pause':
         if (this.clock.running) {
           this.clock.pause();

@@ -4,6 +4,8 @@ import { loadState, saveState, type Entry, type State } from '../logic/store.ts'
 import { esc } from '../logic/util.ts';
 import { keepAwake, hush } from './audio.ts';
 import { celebrate } from './fx.ts';
+import { rankCheck } from './show.ts';
+import { trainingSessions } from '../logic/ranks.ts';
 import { WEEK } from '../data/plan.ts';
 import { dayComplete, weekDone, weekSince } from '../logic/progress.ts';
 import { dayKey, weekStart, weekdayIdx } from '../logic/util.ts';
@@ -65,9 +67,13 @@ export function addEntry(e: Entry): void {
   const day = e.block ? WEEK.find((d) => d.blocks.some((b) => b.id === e.block)) : undefined;
   const mon = weekStart(dayKey());
   const before = day ? dayComplete(day, weekDone(ctx.S.log, mon, weekSince(ctx.S.cycle, mon))) : true;
+  const had = trainingSessions(ctx.S.log);
   ctx.S.log.push(e);
   ctx.S.log.sort((a, b) => a.ts - b.ts);
   save();
+  // a new rank gets its ceremony, after the day's celebration when both happen
+  const dayDone = !!day && !before && dayComplete(day, weekDone(ctx.S.log, mon, weekSince(ctx.S.cycle, mon)));
+  rankCheck(had, trainingSessions(ctx.S.log), dayDone ? 5600 : 900);
   if (day && !before && dayComplete(day, weekDone(ctx.S.log, mon, weekSince(ctx.S.cycle, mon)))) {
     const today = day.idx === weekdayIdx(dayKey());
     window.setTimeout(() => celebrate(esc(day.title), today ? 'Ziua de azi e bifată' : 'Încă o zi bifată'), 600);

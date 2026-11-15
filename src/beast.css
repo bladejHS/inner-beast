@@ -1489,7 +1489,7 @@ html[data-motion='lite'] .pl-fx { display: none; }
 @media (prefers-reduced-motion: reduce) { .win *, .win *::after { animation: none !important; } .pl-fx { display: none; } }
 
 /* the mission stage as a broadcast */
-.bc { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.bcast { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .bc-c { position: absolute; width: 22px; height: 22px; border: 2px solid rgba(255, 255, 255, .55); }
 .bc-c.tl { left: 12px; top: 12px; border-right: 0; border-bottom: 0; border-top-left-radius: 10px; }
 .bc-c.tr { right: 12px; top: 12px; border-left: 0; border-bottom: 0; border-top-right-radius: 10px; }
@@ -1557,3 +1557,125 @@ html[data-cycle='C']:not([data-zone='cool']), html[data-cycle='C'][data-zone='co
 .cp-r.ok { stroke-dashoffset: 0; }
 html[data-motion='lite'] .cp-pulse, html[data-motion='lite'] .cp-n { animation: none; }
 @media (prefers-reduced-motion: reduce) { .cp-pulse, .cp-n { animation: none; } }
+
+/* ---------- 7.2 show pieces (2026-11-15) ---------- */
+/* the insignia */
+.ins { width: 54px; height: 60px; flex: none; overflow: visible; }
+.ins-sh { fill: var(--n3); stroke: var(--edge); stroke-width: 3; }
+.ins-in { fill: #0b0c12; stroke: rgba(255, 255, 255, .08); stroke-width: 1.5; }
+.ins-ch, .ins-ch path { fill: none; stroke: var(--red-hot); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 4px rgba(var(--glow), .8)); }
+.ins.gold .ins-sh { fill: #3a2a0c; stroke: var(--gold-2); }
+.ins.gold .ins-ch, .ins.gold .ins-ch path { stroke: var(--gold-2); filter: drop-shadow(0 0 5px rgba(242, 181, 68, .9)); }
+.ins.big { width: min(52vw, 220px); height: auto; }
+
+/* the rank plate on Azi */
+.rank { position: relative; display: flex; align-items: center; gap: 14px; width: 100%; margin: 14px 0 6px; padding: 12px 14px; border: 0; border-radius: 18px; text-align: left; color: var(--ink); background: linear-gradient(100deg, rgba(var(--glow-2), .16), var(--n2) 45%, var(--n1)); box-shadow: inset 0 0 0 1px var(--n4), inset 0 1px 0 rgba(255, 255, 255, .06); overflow: hidden; }
+.rank::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, .07) 50%, transparent 60%); transform: translateX(-100%); animation: rank-sh 6s var(--e-snap) 2s infinite; pointer-events: none; }
+@keyframes rank-sh { 0% { transform: translateX(-100%); } 25%, 100% { transform: translateX(100%); } }
+.rank.gold { background: linear-gradient(100deg, rgba(242, 181, 68, .2), var(--n2) 45%, var(--n1)); box-shadow: inset 0 0 0 1px rgba(242, 181, 68, .5); }
+.rank-t { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.rank-t small { font: 800 semi-condensed 10.5px/1 var(--font); letter-spacing: .22em; text-transform: uppercase; color: var(--label); }
+.rank-t b { font: 900 condensed 28px/.95 var(--font); letter-spacing: .02em; text-transform: uppercase; }
+.rank.gold .rank-t b { color: var(--gold-2); }
+.rank-bar { position: relative; display: block; height: 5px; margin-top: 4px; border-radius: 3px; background: var(--n4); overflow: hidden; }
+.rank-bar i { position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(90deg, var(--red-deep), var(--red-hot)); box-shadow: 0 0 10px rgba(var(--glow), .8); transform-origin: left; transform: scaleX(var(--f)); }
+.rank.gold .rank-bar i { background: linear-gradient(90deg, #7a5a14, var(--gold-2)); }
+.rank-t em { font: 600 12.5px/1.2 var(--font); font-style: normal; color: var(--mute); }
+
+/* the ranks sheet */
+.ranks { display: grid; gap: 10px; margin: 6px 0 14px; }
+.rk { display: flex; gap: 14px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--n1); box-shadow: inset 0 0 0 1px var(--n4); opacity: .55; }
+.rk.ok { opacity: .85; }
+.rk.now { opacity: 1; box-shadow: inset 0 0 0 1.5px var(--red-hot), 0 0 20px -6px rgba(var(--glow), .7); }
+.rk b { display: block; font: 900 condensed 22px/1 var(--font); text-transform: uppercase; }
+.rk span { display: block; margin-top: 2px; font: 700 semi-condensed 11px/1.2 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--label); }
+.rk p { margin: 4px 0 0; font-size: 13.5px; color: var(--ink-2); }
+
+/* the rank-up ceremony (the day's celebration, with the badge) */
+.cele-rank .cele-mark { display: grid; place-items: center; }
+.cele-rank .cele-t { color: var(--gold-2); font-size: clamp(54px, 16vw, 104px); }
+.cele-rank .cele-w { max-width: 300px; margin-inline: auto; text-transform: none; letter-spacing: .02em; }
+
+/* the new chapter */
+.chap { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 24px; background: #05060a; color: var(--ink); text-align: center; overflow: hidden; animation: fade .4s ease-out; }
+.chap.out { animation: chap-out .5s var(--e-in) both; }
+@keyframes chap-out { to { opacity: 0; transform: scale(1.04); } }
+.chap-flood { position: absolute; inset: -20%; background: radial-gradient(60% 45% at 50% 40%, rgba(var(--glow-2), .55), rgba(var(--glow-2), .12) 55%, transparent 75%); animation: chap-flood 1.6s var(--e-out) both; }
+@keyframes chap-flood { from { opacity: 0; transform: scale(.4); } }
+.chap-rays { position: absolute; left: 50%; top: 40%; width: 200vmax; height: 200vmax; margin: -100vmax 0 0 -100vmax; background: repeating-conic-gradient(from 0deg, rgba(var(--glow), .10) 0 6deg, transparent 6deg 18deg); -webkit-mask: radial-gradient(closest-side, #000, transparent 70%); mask: radial-gradient(closest-side, #000, transparent 70%); animation: chap-spin 40s linear infinite, fade 1.2s ease-out .3s both; }
+@keyframes chap-spin { to { transform: rotate(360deg); } }
+.chap-core { position: relative; max-width: 420px; }
+.chap-k { margin: 0; font: 800 semi-condensed 12px/1 var(--font); letter-spacing: .3em; text-transform: uppercase; color: var(--gold); animation: win-up .6s var(--e-out) .3s both; }
+.chap-id { margin: 8px 0 -6px; font: 900 extra-condensed 240px/.82 var(--font); color: transparent; -webkit-text-stroke: 3px var(--red-hot); text-shadow: 0 0 40px rgba(var(--glow), .7); animation: win-slam .9s var(--spring-hard) .45s both; }
+.chap-t { margin: 0; font: 900 condensed clamp(38px, 11vw, 56px)/.95 var(--font); text-transform: uppercase; animation: win-up .6s var(--e-out) .9s both; }
+.chap-w { margin: 12px 0 0; font: 600 15px/1.45 var(--font); color: var(--ink-2); animation: win-up .6s var(--e-out) 1.1s both; }
+.chap-wk { display: flex; justify-content: center; gap: 8px; margin: 22px 0 8px; animation: win-up .6s var(--e-out) 1.3s both; }
+.chap-wk i { width: 46px; height: 8px; border-radius: 4px; background: var(--n4); }
+.chap-wk i.ok { background: var(--ink-2); }
+.chap-wk i.on { background: var(--red-hot); box-shadow: 0 0 14px rgba(var(--glow), .9); }
+.chap-wk i.t { background: repeating-linear-gradient(-45deg, var(--gold) 0 3px, transparent 3px 6px); }
+.chap-s { margin: 0; font: 700 semi-condensed 12px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; color: var(--label); animation: win-up .6s var(--e-out) 1.4s both; }
+.chap .cele-tap { position: absolute; left: 0; right: 0; bottom: calc(28px + env(safe-area-inset-bottom)); }
+.chap.calm * { animation: none !important; }
+
+/* the walk to the ring */
+.walk { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; overflow: hidden; background: #020205; color: #fff; text-align: center; }
+.walk.out { animation: chap-out .38s var(--e-in) both; }
+.walk-tun { position: absolute; left: 50%; top: 46%; width: 220vmax; height: 220vmax; margin: -110vmax 0 0 -110vmax; background: repeating-radial-gradient(circle, transparent 0 34px, rgba(var(--glow), .16) 34px 36px, transparent 36px 70px); animation: walk-tun 2.7s cubic-bezier(.5, 0, .8, .4) both; }
+@keyframes walk-tun { from { transform: scale(.25); opacity: 0; } 15% { opacity: 1; } to { transform: scale(1.6); opacity: .9; } }
+.walk-sp { position: absolute; top: -10%; width: 70vw; height: 130%; background: linear-gradient(180deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, 0) 80%); clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%); mix-blend-mode: screen; filter: blur(6px); }
+.walk-sp.l { left: -18vw; transform-origin: 50% 0; animation: walk-sp-l 2.7s ease-in-out both; }
+.walk-sp.r { right: -18vw; transform-origin: 50% 0; animation: walk-sp-r 2.7s ease-in-out both; }
+@keyframes walk-sp-l { from { transform: rotate(-30deg); opacity: 0; } 30% { opacity: 1; } to { transform: rotate(14deg); } }
+@keyframes walk-sp-r { from { transform: rotate(30deg); opacity: 0; } 30% { opacity: 1; } to { transform: rotate(-14deg); } }
+.walk-floor { position: absolute; left: -20%; right: -20%; bottom: -10%; height: 40%; background: radial-gradient(50% 60% at 50% 30%, rgba(var(--glow-2), .5), transparent 70%); animation: fade 1s ease-out .6s both; }
+.walk-core { position: relative; padding: 0 24px; }
+.walk-k { margin: 0; font: 800 semi-condensed 13px/1 var(--font); letter-spacing: .4em; text-transform: uppercase; color: var(--red-text); animation: win-up .5s var(--e-out) .2s both; }
+.walk-t { display: block; margin: 12px 0 8px; font: 900 extra-condensed clamp(64px, 20vw, 120px)/.85 var(--font); text-transform: uppercase; text-shadow: 0 0 40px rgba(var(--glow), .8); animation: walk-t 1s var(--spring-hard) .55s both; }
+@keyframes walk-t { from { opacity: 0; transform: scale(2.2); filter: blur(12px); letter-spacing: .3em; } }
+.walk-s { margin: 0; font: 800 condensed 18px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; color: var(--label); animation: win-up .5s var(--e-out) 1.1s both; }
+.walk-flash { position: absolute; inset: 0; background: #fff; opacity: 0; animation: walk-flash .5s ease-out 2.35s both; pointer-events: none; }
+@keyframes walk-flash { 0% { opacity: 0; } 30% { opacity: .85; } 100% { opacity: 0; } }
+
+/* the wolf's mood, in the stage's top right */
+.wm { position: absolute; right: 42px; top: 18px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.wm-m { position: relative; display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #1c1016, #07070b); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .14), 0 6px 16px rgba(0, 0, 0, .5); overflow: hidden; }
+.wm-m img { width: 40px; height: auto; margin-top: 6px; filter: brightness(1.5) drop-shadow(0 0 3px rgba(var(--glow), .6)); }
+.wm b { font: 800 semi-condensed 9.5px/1 var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); text-shadow: 0 1px 4px #000; white-space: nowrap; }
+.wm.fierce .wm-m { box-shadow: inset 0 0 0 2px var(--red-hot), 0 0 18px rgba(var(--glow), .9); animation: wm-pulse 1.6s ease-in-out infinite; }
+.wm.fierce .wm-m img { filter: brightness(1.9) drop-shadow(0 0 6px rgba(var(--glow), 1)); }
+.wm.fierce b { color: var(--red-text); }
+@keyframes wm-pulse { 50% { box-shadow: inset 0 0 0 2px var(--red-hot), 0 0 30px rgba(var(--glow), 1); } }
+.wm.sleep .wm-m img { filter: grayscale(1) brightness(.9); opacity: .7; animation: wm-breathe 4s ease-in-out infinite; }
+.wm.sleep b { color: var(--label); }
+@keyframes wm-breathe { 50% { transform: scale(1.06); } }
+.wm-z { position: absolute; right: 6px; top: 2px; font: 900 13px/1 var(--font); font-style: normal; color: #9fd0ff; animation: wm-z 2.4s ease-in-out infinite; }
+.wm-z i { font-style: normal; font-size: 9px; margin-left: 1px; }
+@keyframes wm-z { 0% { opacity: 0; transform: translateY(6px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateY(-6px); } }
+.wm-sc { position: absolute; inset: 0; width: 100%; height: 100%; }
+.wm-sc path { fill: none; stroke: var(--red-hot); stroke-width: 1.6; opacity: .9; stroke-linecap: round; filter: drop-shadow(0 0 2px rgba(var(--glow), 1)); }
+
+/* the hour's light on the stage */
+.hero-stage::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; transition: background .6s; }
+html[data-tod='morning'] .hero-stage::before { background: linear-gradient(180deg, rgba(150, 190, 255, .16), transparent 55%); }
+html[data-tod='evening'] .hero-stage::before { background: linear-gradient(0deg, rgba(255, 120, 40, .2), transparent 60%); }
+html[data-tod='night'] .hero-stage::before { background: radial-gradient(70% 60% at 50% 45%, transparent 40%, rgba(0, 0, 0, .45)); }
+html[data-tod='night'] .mission::after { opacity: .6; }
+
+/* the charts draw themselves; a record pulses in gold */
+.spark .sp-a { opacity: .1; }
+.spark .sp-l { stroke-dasharray: 1; stroke-dashoffset: 0; }
+#app[class*=enter-] .spark .sp-l { animation: sp-draw 1.1s var(--e-out) both; }
+@keyframes sp-draw { from { stroke-dashoffset: 1; } }
+#app[class*=enter-] .spark .sp-a { animation: fade 1s ease-out .5s both; }
+.spark.best .sp-d { fill: var(--gold-2); }
+.spark .sp-p { fill: none; stroke: var(--gold-2); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: cp-pulse 1.8s var(--e-out) infinite; }
+.bars-plot i { transform-origin: bottom; }
+#app[class*=enter-] .bars-plot i { animation: bar-up .8s var(--e-out) both; }
+.bars-plot .bc:nth-child(2) i { animation-delay: .05s; } .bars-plot .bc:nth-child(3) i { animation-delay: .1s; } .bars-plot .bc:nth-child(4) i { animation-delay: .15s; }
+.bars-plot .bc:nth-child(5) i { animation-delay: .2s; } .bars-plot .bc:nth-child(6) i { animation-delay: .25s; } .bars-plot .bc:nth-child(7) i { animation-delay: .3s; } .bars-plot .bc:nth-child(8) i { animation-delay: .35s; }
+@keyframes bar-up { from { transform: scaleY(0); } }
+.win-post { width: 100%; margin-top: 12px; }
+
+html[data-motion='lite'] .rank::after, html[data-motion='lite'] .wm *, html[data-motion='lite'] .spark *, html[data-motion='lite'] .bars-plot i { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .rank::after, .wm *, .spark *, .bars-plot i, .chap * { animation: none !important; } }

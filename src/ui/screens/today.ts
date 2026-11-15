@@ -1,5 +1,6 @@
 // "Azi": today's mission from the plan (the fight poster), the day's rounds, then the 28-day routine, sleep and your why.
 
+import { wolfArt } from '../rankart.ts';
 import { HABIT_STEPS } from '../../data/book.ts';
 import { WEEK, type Day } from '../../data/plan.ts';
 import { cycleAt, dayProgress, deloadDue, deloadOn, lightOn, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, weekDone, weekSince } from '../../logic/progress.ts';
@@ -59,7 +60,7 @@ export function dayBody(day: Day, today: string, kicker: string): string {
       <p class="ms-k"><span>Today's Mission</span><b>${esc(kicker)}</b></p>
       <h1 class="ms-t"><span>${esc(day.title)}</span></h1>
       <div class="hero-stage" aria-hidden="true">
-        <img class="hero-wolf" src="${import.meta.env.BASE_URL}splash/umbra.webp" alt="" width="680" height="801" decoding="async">
+        <img class="hero-wolf" src="${wolfArt()}" alt="" width="680" height="801" decoding="async">
         <canvas class="hero-cv" data-kind="${HERO_KIND[day.idx] ?? 'fight'}"></canvas>
         ${broadcast(day, n, total, c ? `Ciclul ${c.id} · ${c.week}/4` : RO_DAYS[day.idx])}
       </div>

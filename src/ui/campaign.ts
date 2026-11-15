@@ -2,10 +2,10 @@
 // weeks, one row each, the path snaking down; the 4th week of each is the camp with the tests. Weeks behind are lit,
 // the wolf stands on this week, the road ahead is dashed. Each chapter has its colour (beast.css, html[data-cycle]).
 
+import { wolfBadge } from './rankart.ts';
 import { CYCLE_WEEKS, CYCLES } from '../logic/progress.ts';
 import { esc } from '../logic/util.ts';
 
-const BASE = import.meta.env.BASE_URL;
 const W = 340, ROW = [74, 178, 282], COLS = [44, 128, 212, 296];
 
 /** Where week i (0–11) stands on the map. */
@@ -42,7 +42,7 @@ export function campaignSvg(pos: number, lap: number): string {
   if (pos >= 0) {
     const [x, y] = node(pos);
     wolf = `<g class="cp-me"><circle class="cp-pulse" cx="${x}" cy="${y}" r="22"/><circle class="cp-pulse two" cx="${x}" cy="${y}" r="22"/>
-      <circle class="cp-medal" cx="${x}" cy="${y}" r="20"/><image href="${BASE}splash/umbra.webp" x="${x - 15}" y="${y - 17}" width="30" height="35"/></g>`;
+      <circle class="cp-medal" cx="${x}" cy="${y}" r="20"/><image href="${wolfBadge()}" x="${x - 15}" y="${y - 17}" width="30" height="35"/></g>`;
   }
   return `<svg class="camp" viewBox="0 0 ${W} 312" role="img" aria-label="${pos < 0 ? 'Campania începe luni' : `Săptămâna ${pos + 1} din 12${lap > 1 ? `, turul ${lap}` : ''}`}">
     ${titles}${roads}${nodes}${wolf}

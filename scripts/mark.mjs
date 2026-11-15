@@ -44,19 +44,48 @@ const SIZES = {
 
 /** 2026-11-15, the user: "la inner beast pune-i o bandană de luptător ninja". A red fighter's headband across the brow,
  *  above the eyes, knotted on the right with two tails flying out. Drawn over the head, on the same 240 grid. */
-function accessory(id) {
+function accessory(id, rank = 0) {
   const ink = 'stroke="#05060a" stroke-width="1.8" stroke-linejoin="round"';
-  return `<defs><linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4a5e"/><stop offset=".5" stop-color="#e5102c"/><stop offset="1" stop-color="#8a0a19"/></linearGradient></defs>
-  <path d="M203 93Q222 82 236 70L238 83Q224 95 205 101Z" fill="url(#${id}b)" ${ink}/>
-  <path d="M202 99Q220 108 231 128L219 133Q212 115 199 105Z" fill="#b50c22" ${ink}/>
-  <path d="M45 90Q120 64 195 90L197 105Q120 80 43 105Z" fill="url(#${id}b)" ${ink}/>
-  <path d="M60 91Q120 71 181 91" fill="none" stroke="#ffb3bb" stroke-opacity=".5" stroke-width="1.6" stroke-linecap="round"/>
-  <path d="M190 87L205 89L207 105L192 108Z" fill="#c00b24" ${ink}/>`;
+  const gold = rank >= 3;
+  const band = rank >= 1
+    // Luptător and up (2026-11-16): a wider band, longer tails
+    ? { tail1: 'M203 91Q222 79 233 66L238 80Q225 93 205 101Z', tail2: 'M202 99Q221 110 231 133L218 138Q212 117 199 105Z', band: 'M43 86Q120 58 197 86L199 108Q120 80 41 108Z', hl: 'M58 87Q120 66 182 87', knot: 'M189 82L206 85L208 107L191 111Z' }
+    : { tail1: 'M203 93Q222 82 236 70L238 83Q224 95 205 101Z', tail2: 'M202 99Q220 108 231 128L219 133Q212 115 199 105Z', band: 'M45 90Q120 64 195 90L197 105Q120 80 43 105Z', hl: 'M60 91Q120 71 181 91', knot: 'M190 87L205 89L207 105L192 108Z' };
+  const top = gold ? ['#ffe6a6', '#e5b04a', '#8a5a12'] : ['#ff4a5e', '#e5102c', '#8a0a19'];
+  return `<defs><linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top[0]}"/><stop offset=".5" stop-color="${top[1]}"/><stop offset="1" stop-color="${top[2]}"/></linearGradient></defs>
+  <path d="${band.tail1}" fill="url(#${id}b)" ${ink}/>
+  <path d="${band.tail2}" fill="${gold ? '#b8852a' : '#b50c22'}" ${ink}/>
+  <path d="${band.band}" fill="url(#${id}b)" ${ink}/>
+  <path d="${band.hl}" fill="none" stroke="${gold ? '#fff3cf' : '#ffb3bb'}" stroke-opacity=".5" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="${band.knot}" fill="${gold ? '#c99a3c' : '#c00b24'}" ${ink}/>
+  ${rank >= 2 ? scar() : ''}`;
+}
+
+/** Veteran and up: three claw marks across the left eye, healed pale over the dark fur. */
+function scar() {
+  return [['M70 108L90 150', 0], ['M80 104L100 146', 0], ['M90 104L106 138', 0]].map(([p]) => `<path d="${p}" fill="none" stroke="#05060a" stroke-width="5.5" stroke-linecap="round"/><path d="${p}" fill="none" stroke="#e59aa4" stroke-width="2.4" stroke-linecap="round"/>`).join('');
+}
+
+/** Campion and up: the rim turns gold and a gold medallion with a star sits on the band. */
+function armour(id) {
+  return `<defs><linearGradient id="${id}au" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0c2"/><stop offset=".45" stop-color="#e2ad48"/><stop offset="1" stop-color="#8a5a12"/></linearGradient></defs>
+  <path d="${OUTLINE_D}" fill="none" stroke="url(#${id}au)" stroke-width="4.2" stroke-linejoin="round"/>
+  <circle cx="120" cy="80" r="11" fill="url(#${id}au)" stroke="#05060a" stroke-width="1.8"/>
+  <path d="M120 72.5l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.5 5-.7Z" fill="#fff6dc" stroke="#7a4f10" stroke-width=".8"/>`;
+}
+
+/** Bestia: the head stands in a fire, behind it. */
+function aura(id) {
+  const tongues = [[120, 22, 26], [84, 34, 22], [156, 34, 22], [52, 70, 20], [188, 70, 20], [36, 120, 18], [204, 120, 18], [50, 170, 16], [190, 170, 16]];
+  return `<defs><radialGradient id="${id}fi" cx=".5" cy=".55" r=".55"><stop offset=".45" stop-color="#ffd27a"/><stop offset=".7" stop-color="#ff7a1f"/><stop offset="1" stop-color="#e5102c" stop-opacity="0"/></radialGradient>
+    <filter id="${id}fb" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4"/></filter></defs>
+  <g filter="url(#${id}fb)" opacity=".95"><ellipse cx="120" cy="136" rx="104" ry="112" fill="url(#${id}fi)"/>
+  ${tongues.map(([x, y, w]) => `<path d="M${x - w / 2} ${y + 40}Q${x - w / 3} ${y + 10} ${x} ${y}Q${x + w / 3} ${y + 12} ${x + w / 2} ${y + 40}Z" fill="#ff9a2e"/>`).join('')}</g>`;
 }
 
 let n = 0;
 /** The mark's body on the 240 grid; `id` keeps the gradient and filter names apart when several sit in one page. */
-export function umbra(size = 'medium', id = `u${++n}`) {
+export function umbra(size = 'medium', id = `u${++n}`, rank = 0) {
   const o = SIZES[size];
   const face = o.tones
     ? FACETS.flatMap(([poly, t]) => pair(poly).map((p, side) => {
@@ -73,13 +102,16 @@ export function umbra(size = 'medium', id = `u${++n}`) {
     <filter id="${id}h" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
     <filter id="${id}g" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="${o.glow}"/></filter>
   </defs>
+  ${rank >= 4 ? aura(id) : ''}
   <path d="${OUTLINE_D}" fill="#e5102c" opacity="${o.halo}" filter="url(#${id}h)"/>
   ${face}
   <path d="${OUTLINE_D}" fill="none" stroke="url(#${id}r)" stroke-opacity="${o.rimA}" stroke-width="${o.rim}" stroke-linejoin="round"/>
   <g filter="url(#${id}g)">${eyes.map((e) => `<path d="${d(e)}" fill="#ff2944"/>`).join('')}</g>
   ${eyes.map((e) => `<path d="${d(e)}" fill="#ff2944"/>`).join('')}
   ${eyes.map((e) => `<path d="${d(grow(e, 0.42))}" fill="#ffa3ad" opacity=".85"/>`).join('')}
-  ${accessory(id)}`;
+  ${rank >= 2 ? `<g filter="url(#${id}g)" opacity=".9">${eyes.map((e) => `<path d="${d(grow(e, 1.5))}" fill="#ff5a6e"/>`).join('')}</g>` : ''}
+  ${accessory(id, rank)}
+  ${rank >= 3 ? armour(id) : ''}`;
 }
 
 /** The icon's field: steel black under a cold spotlight, a red light behind the head, darker at the bottom. */
@@ -91,8 +123,8 @@ export function field(id = `f${++n}`) {
 }
 
 /** A whole SVG: the field (or none) and the head at `k` of the canvas, nudged down a little. */
-export function svg({ px, size = 'medium', bg = true, k = 0.76, rx = 0, w = px, h = px }) {
-  const body = `<g transform="translate(120 ${122 + (h / w - 1) * 120}) scale(${k}) translate(-120 -128)">${umbra(size)}</g>`;
+export function svg({ px, size = 'medium', bg = true, k = 0.76, rx = 0, w = px, h = px, rank = 0 }) {
+  const body = `<g transform="translate(120 ${122 + (h / w - 1) * 120}) scale(${k}) translate(-120 -128)">${umbra(size, undefined, rank)}</g>`;
   const vb = `0 0 240 ${(240 * h) / w}`;
   const clip = rx ? `<clipPath id="cl"><rect width="240" height="${(240 * h) / w}" rx="${rx}"/></clipPath>` : '';
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${vb}">${clip}<g${rx ? ' clip-path="url(#cl)"' : ''}>${bg ? field() : ''}${body}</g></svg>`;

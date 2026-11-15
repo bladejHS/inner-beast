@@ -1679,3 +1679,34 @@ html[data-tod='night'] .mission::after { opacity: .6; }
 
 html[data-motion='lite'] .rank::after, html[data-motion='lite'] .wm *, html[data-motion='lite'] .spark *, html[data-motion='lite'] .bars-plot i { animation: none !important; }
 @media (prefers-reduced-motion: reduce) { .rank::after, .wm *, .spark *, .bars-plot i, .chap * { animation: none !important; } }
+
+/* the calendar on fire (Progres, 2026-11-16) */
+.fire { margin: 4px 0 12px; padding: 14px 12px 12px; border-radius: 18px; background: radial-gradient(120% 80% at 50% 120%, rgba(255, 90, 20, .14), transparent 60%), linear-gradient(180deg, var(--n2), var(--n1)); box-shadow: inset 0 0 0 1px var(--n4); }
+.fc-m { display: grid; grid-template-columns: 22px repeat(12, 1fr); gap: 4px; margin-bottom: 4px; font: 700 semi-condensed 10px/1 var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.fc-m span:first-child { grid-column: 2; }
+.fc-g { display: grid; grid-template-columns: 22px repeat(12, 1fr); gap: 4px; }
+.fc-d { display: grid; grid-template-rows: repeat(7, 1fr); gap: 4px; font: 700 semi-condensed 9.5px/1 var(--font); color: var(--mute); align-items: center; }
+.fc-w { display: grid; grid-template-rows: repeat(7, 1fr); gap: 4px; }
+.fc-w i { aspect-ratio: 1; border-radius: 4px; background: #13161e; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .04); }
+.fc-w i.fut { background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .03); }
+.fc-w i.h1, .fc-k i.h1 { background: #4a1608; }
+.fc-w i.h2, .fc-k i.h2 { background: linear-gradient(180deg, #c2410c, #7c1d06); box-shadow: 0 0 6px rgba(234, 88, 12, .45); }
+.fc-w i.h3, .fc-k i.h3 { background: linear-gradient(180deg, #ff7a1f, #d4380d); box-shadow: 0 0 10px rgba(255, 106, 31, .7); }
+.fc-w i.h4, .fc-k i.h4 { background: radial-gradient(circle at 50% 70%, #fff6c8, #ffc24a 35%, #ff6a1f 75%); box-shadow: 0 0 14px rgba(255, 170, 50, .9); animation: fc-burn 1.6s ease-in-out infinite alternate; }
+.fc-w i.now { outline: 2px solid #fff; outline-offset: 1px; }
+.fc-w i { animation: fc-in .4s var(--e-out) var(--d) both; }
+.fc-w i.h4 { animation: fc-in .4s var(--e-out) var(--d) both, fc-burn 1.6s ease-in-out calc(var(--d) + .4s) infinite alternate; }
+@keyframes fc-in { from { opacity: 0; transform: scale(.4); } }
+@keyframes fc-burn { from { filter: brightness(1); } to { filter: brightness(1.35) saturate(1.2); } }
+.fc-k { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 10px; font: 700 semi-condensed 10px/1 var(--font); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.fc-k i { width: 12px; height: 12px; border-radius: 3px; background: #13161e; animation: none; }
+.fc-k span { margin: 0 4px; }
+.fc-s { margin-bottom: 8px; }
+html[data-motion='lite'] .fc-w i { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .fc-w i { animation: none !important; } }
+
+/* the wolf of the rank (2026-11-16) */
+.rk-w { width: 52px; height: 52px; flex: none; object-fit: contain; filter: drop-shadow(0 0 6px rgba(var(--glow), .5)); }
+.rk:not(.ok):not(.now) .rk-w { filter: grayscale(1) brightness(.6); }
+.cele-rank .cele-mark img { width: min(56vw, 240px); height: auto; }
+.cele-rank .cele-mark .rk-ins { position: absolute; right: 4%; bottom: 0; width: 64px; height: auto; }

@@ -2,9 +2,9 @@
 // All of it moves only transform and opacity (the sparks draw on one canvas), and all of it is skipped or cut short
 // when the phone asks for reduced motion or the user picked "Reduse" in Settings (html[data-motion=lite]).
 
+import { wolfArt } from './rankart.ts';
 import { CLAWS } from './claws.ts';
 
-const BASE = import.meta.env.BASE_URL;
 
 export function lite(): boolean {
   return document.documentElement.dataset.motion === 'lite' || matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -80,7 +80,7 @@ export function celebrate(title: string, sub: string, o: { mark?: string; word?:
     <div class="cele-core">
       <div class="cele-mark" aria-hidden="true">
         <i class="cele-halo"></i>
-        ${o.mark ?? `<img src="${BASE}splash/umbra.webp" alt="" width="680" height="801" decoding="async">
+        ${o.mark ?? `<img src="${wolfArt()}" alt="" width="680" height="801" decoding="async">
         <svg class="cele-claws" viewBox="0 0 100 100">${claws}</svg>`}
       </div>
       <p class="cele-k">${sub}</p>

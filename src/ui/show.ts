@@ -2,6 +2,7 @@
 // screen at the start of each emphasis, the walk to the ring before the rounds, and the wolf's mood on Azi.
 // Everything here is decoration over facts the app already shows; with reduced motion the entrances are skipped.
 
+import { wolfArt, wolfBadge } from './rankart.ts';
 import { CYCLES, CYCLE_WEEKS, cycleAt, loopWeek } from '../logic/progress.ts';
 import { rankOf, RANKS, trainingSessions } from '../logic/ranks.ts';
 import { dayKey, esc } from '../logic/util.ts';
@@ -37,7 +38,7 @@ export function rankPlate(): string {
 /** The ranks, opened from the plate. */
 export function ranksSheet(): string {
   const r = rankOf(trainingSessions(ctx.S.log));
-  return `<div class="ranks">${RANKS.map((x, i) => `<div class="rk ${i < r.i ? 'ok' : i === r.i ? 'now' : ''}">${insignia(i)}<div><b>${esc(x.name)}</b><span>${x.min ? `de la ${x.min} sesiuni` : 'de la prima sesiune'}</span><p>${esc(x.motto)}</p></div></div>`).join('')}</div>
+  return `<div class="ranks">${RANKS.map((x, i) => `<div class="rk ${i < r.i ? 'ok' : i === r.i ? 'now' : ''}"><img class="rk-w" src="${wolfBadge(i)}" alt="" width="56" height="56">${insignia(i)}<div><b>${esc(x.name)}</b><span>${x.min ? `de la ${x.min} sesiuni` : 'de la prima sesiune'}</span><p>${esc(x.motto)}</p></div></div>`).join('')}</div>
     <p class="small dim">Se numără antrenamentele: runde, forță, alergare, canotaj, mobilitate. Mersul, dușul și respirația rămân în istoric, dar nu urcă rangul.</p>`;
 }
 
@@ -48,7 +49,8 @@ export function rankCheck(before: number, after: number, delay: number): void {
   window.setTimeout(() => {
     sfx.bell(3);
     buzz([200, 80, 200, 80, 400]);
-    celebrate(esc(b.rank.name), 'Rang nou', { mark: insignia(b.i, 'big'), word: esc(b.rank.motto), cls: 'cele-rank' });
+    // the wolf of the new rank is the reveal: it changes with the rank (rankart.ts)
+    celebrate(esc(b.rank.name), 'Rang nou · lupul tău a evoluat', { mark: `<img src="${wolfArt(b.i)}" alt="" width="680" height="801">${insignia(b.i, 'rk-ins')}`, word: esc(b.rank.motto), cls: 'cele-rank' });
   }, delay);
 }
 
@@ -145,5 +147,5 @@ export function wolfMood(dayIdx: number): string {
   const fierce = !rest && s >= 3;
   const cls = [rest ? 'sleep' : fierce ? 'fierce' : '', scar ? 'scar' : ''].filter(Boolean).join(' ');
   const say = rest ? 'Se odihnește' : fierce ? `Flămând · ${s} zile` : scar ? 'Urme de luptă' : 'Pândește';
-  return `<span class="wm ${cls}"><span class="wm-m"><img src="${BASE}splash/umbra.webp" alt="" width="680" height="801" decoding="async">${scar ? '<svg class="wm-sc" viewBox="0 0 40 40"><path d="M22 12l4 11M26 11l4 11M30 12l3 9"/></svg>' : ''}${rest ? '<i class="wm-z">z<i>z</i></i>' : ''}</span><b>${say}</b></span>`;
+  return `<span class="wm ${cls}"><span class="wm-m"><img src="${wolfBadge()}" alt="" width="680" height="801" decoding="async">${scar ? '<svg class="wm-sc" viewBox="0 0 40 40"><path d="M22 12l4 11M26 11l4 11M30 12l3 9"/></svg>' : ''}${rest ? '<i class="wm-z">z<i>z</i></i>' : ''}</span><b>${say}</b></span>`;
 }

@@ -1,6 +1,7 @@
 // "Progres" in four sections: Săptămâna (the week, totals, sleep, steps), Antrenament (box, calisthenics, aerobic),
 // Teste (the test battery and the challenges) and Istoric (the latest entries; the full list opens on its own screen).
 
+import { fireCalendar } from '../fire.ts';
 import { WEEK } from '../../data/plan.ts';
 import { BW_SCHEMES, EMOM_GOAL, WORKOUTS } from '../../data/workouts.ts';
 import { activeStreak, allRecords, amrapBest, amrapTrend, dayProgress, exerciseTrend, stalled, totals, variationPath, weekDone, weekSince } from '../../logic/progress.ts';
@@ -156,6 +157,8 @@ function weekSeg(): string {
       ${stat(Math.round(t.coldMin), 'minute la rece')}
       ${stat(Math.round(t.breathMin), 'minute de respirație')}
     </div>
+    <h2 class="sec">Ultimele 12 săptămâni<small>Fiecare zi arde după minutele de antrenament: cu cât mai multe, cu atât mai fierbinte.</small></h2>
+    ${fireCalendar(S.log, today)}
     <h2 class="sec">Încărcare<small>Minute × efort la fiecare sesiune, pe săptămâni${lr.usual ? `. Obișnuitul tău: ${kSteps(lr.usual)}` : ''}</small></h2>
     ${bars(lr.weeks.map((w, i) => ({ v: w.load, label: dm(w.mon), today: i === lr.weeks.length - 1 })), lr.usual ?? undefined, { fmt: kSteps, goalLabel: 'obișnuit', name: 'Încărcarea pe ultimele 6 săptămâni' })}
     <p class="small dim" style="margin:12px 0 0">${esc(loadText(lr))}</p>

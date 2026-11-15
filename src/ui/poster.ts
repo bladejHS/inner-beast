@@ -1,9 +1,9 @@
 // The result as a poster to keep (2026-11-15): 1080 × 1920, the phone's story size, drawn on a canvas in the colour
 // of the loop's emphasis, then shared (on the iPhone: "Salvează imaginea") or downloaded.
 
+import { wolfArt } from './rankart.ts';
 import type { WinStat } from './win.ts';
 
-const BASE = import.meta.env.BASE_URL;
 
 export interface PosterData { title: string; by: string; name: string; stats: WinStat[]; date: string; recs: string[] }
 
@@ -73,7 +73,7 @@ export async function posterBlob(d: PosterData): Promise<Blob | null> {
   x.restore();
 
   // the wolf
-  const wolf = await img(`${BASE}splash/umbra.webp`);
+  const wolf = await img(wolfArt());
   if (wolf) {
     const ww = 560, wh = (wolf.height / wolf.width) * ww;
     x.save();

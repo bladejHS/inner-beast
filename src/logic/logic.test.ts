@@ -49,7 +49,7 @@ test('the week keeps the days of the book, reordered for an all-round athlete', 
   assert.equal(WEEK.length, 7);
   assert.deepEqual(WEEK.map((d) => d.title), ['Combat Training', 'Push Training', 'Off Day', 'Combat Training II', 'Pull Training', 'Leg Day', 'Mobility & Meditation Day']);
   const r = (id: string) => WEEK.flatMap((d) => d.blocks).find((b) => b.id === id)!;
-  assert.deepEqual(WEEK[0].blocks.map((b) => b.id), ['mon-shadow', 'mon-bag', 'mon-bw', 'mon-lower']); // the AMRAP, then the hack squat and curls, after the boxing
+  assert.deepEqual(WEEK[0].blocks.map((b) => b.id), ['mon-lower', 'mon-shadow', 'mon-bag', 'mon-bw']); // 2026-11-16: the hack squat and curls first, at the user's request
   assert.equal(r('mon-shadow').rounds, 5);
   assert.deepEqual(WEEK[3].blocks.map((b) => b.id), ['thu-rope', 'thu-shadow', 'thu-power', 'thu-bag']);
   assert.equal(r('thu-rope').rounds, 3);
@@ -796,10 +796,10 @@ test('Upper Strength: the second strength dose replaces the AMRAP on Monday in c
   const up = workoutById('upper');
   assert.deepEqual(up.ex.map((x) => [x.id, x.sets, x.lo, x.hi, x.rest]), [['pull-str', 3, 3, 5, 150], ['dips-str', 3, 3, 5, 150]]);
   assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['push', 45], ['pull', 56], ['legs', 66], ['upper', 15], ['lower', 14], ['knee', 8], ['kick', 10]]);
-  // Monday's hack squat and biceps curls, after the kickboxing; Tuesday has no lower-body block, Friday no curls
+  // Monday's hack squat and biceps curls, first since 2026-11-16 (the user's request); Tuesday has no lower-body block, Friday no curls
   const lower = workoutById('lower');
   assert.deepEqual(lower.ex.map((x) => x.id), ['hacksq', 'curls']);
-  assert.deepEqual(WEEK[0].blocks.map((b) => b.id), ['mon-shadow', 'mon-bag', 'mon-bw', 'mon-lower']);
+  assert.deepEqual(WEEK[0].blocks.map((b) => b.id), ['mon-lower', 'mon-shadow', 'mon-bag', 'mon-bw']);
   assert.ok(!workoutById('pull').ex.some((x) => x.id === 'curls') && exerciseById('hammer')!.opt, 'Friday keeps optional hammer curls');
   assert.ok(!exerciseById('curls')!.opt);
   // the machine has no dumbbell ceiling: 40 kg at the top of the range goes to 42.5

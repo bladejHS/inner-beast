@@ -130,6 +130,7 @@ export const WEEK: Day[] = [
     idx: 0,
     title: 'Combat Training',
     blocks: [
+      { id: 'mon-lower', kind: 'workout', name: 'Hack Squat & Biceps Curls', dose: '14 min', line: '14 min Hack Squat, Biceps Curls', workout: 'lower', min: 14, tip: 'Primul, cât ești proaspăt (2026-11-16, la cererea ta): a doua doză de picioare a săptămânii, la aparat, plus bicepșii. Începe cu 1–2 serii ușoare de încălzire; kickboxingul vine după, cu picioarele deja încălzite. Hack Squat 3 × 8–12, Biceps Curls 3 × 8–12, amândouă cu 1–2 repetări în rezervă.' },
       { id: 'mon-shadow', kind: 'rounds', name: 'Shadow Kickboxing', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'jab', warmup: true, tip: 'Jab, Teep & Footwork: jabul și teep-ul țin distanța, picioarele te duc unde vrei. Pentru omul mai lung, loviturile drepte sunt regele.',
         cues: ['Variezi jabul și teep-ul: simplu, dublu, la corp, din pas înainte și din retragere.', 'Teep când îți imaginezi că intră: îl oprești la capătul piciorului tău.', 'După fiecare serie ieși în cerc sau pivotezi; nu te retragi în linie dreaptă.', 'Stai înalt și lovești în jos: nu te apleca ca să-l ajungi.'] },
       { id: 'mon-bag', kind: 'rounds', name: 'Heavy Bag Training', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'move', tip: 'Strikes & Movement: pumni și low kick-uri legate de jocul de picioare, în ritm moderat.',
@@ -145,7 +146,6 @@ export const WEEK: Day[] = [
         },
         // VO2max on the rower, every other week of the power and capacity emphases (4 × 4 min, Helgerud 2007)
         cycleEven: { B: ROWER_4X4, C: ROWER_4X4 } },
-      { id: 'mon-lower', kind: 'workout', name: 'Hack Squat & Biceps Curls', dose: '14 min', line: '14 min Hack Squat, Biceps Curls', workout: 'lower', min: 14, tip: 'La final, după kickboxing: a doua doză de picioare a săptămânii, la aparat, plus bicepșii. Hack Squat 3 × 8–12, Biceps Curls 3 × 8–12, amândouă cu 1–2 repetări în rezervă.' },
     ],
   },
   {

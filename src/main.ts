@@ -18,7 +18,7 @@ import { openShower } from './ui/players/shower.ts';
 import { openWimHof } from './ui/players/wimhof.ts';
 import { dropWorkoutDraft, resumeWorkout, saveWorkoutDraft } from './ui/players/workout.ts';
 import { toggleFocus } from './ui/players/common.ts';
-import { fightHtml, setComboCat, startQuick } from './ui/screens/fight.ts';
+import { setComboCat, startQuick } from './ui/screens/fight.ts';
 import { toggleLearned } from './ui/screens/alex.ts';
 import { chapterHtml, mindHtml } from './ui/screens/mind.ts';
 import { planHtml } from './ui/screens/plan.ts';
@@ -45,17 +45,18 @@ initAudio(() => ctx.S.set);
 // off-centre, three on one side and two on the other), so the five tabs share the bar evenly and the wolf (Azi) is
 // the anchor at the trailing end: under a right thumb, where Material puts its main button, and on the diagonal from
 // the logo at the top left. The order left to right is also the direction the claw swipe takes between tabs.
+// 2026-11-20: Lupte left the bar with the kickboxing plan (the user: "elimină și tab-ul Lupte"); with four tabs the
+// mark (Azi) sits in the middle, two on each side.
 const ORDER: Array<[Tab, string, string]> = [
   ['plan', 'Plan', 'plan'],
-  ['fight', 'Lupte', 'fight'],
   ['challenge', 'Provocări', 'cup'],
+  ['today', 'Azi', ''],
   ['mind', 'Minte', 'mind'],
   ['progress', 'Progres', 'progress'],
-  ['today', 'Azi', ''],
 ];
 
 /** Screens that open from a tab: the bar keeps their tab marked, and their back button returns there. */
-export const PARENT: Partial<Record<Tab, Tab>> = { alex: 'fight', lab: 'mind', disc: 'challenge' };
+export const PARENT: Partial<Record<Tab, Tab>> = { lab: 'mind', disc: 'challenge' };
 
 /** Links into a section of a tab (data-to): the section that holds the anchor. */
 const ANCHOR_SEG: Record<string, [Tab, string]> = { tests: ['progress', 'tests'], why: ['mind', 'mental'], wins: ['mind', 'mental'] };
@@ -74,9 +75,6 @@ function screenHtml(): string {
   switch (ctx.tab) {
     case 'plan':
       return planHtml();
-    case 'fight':
-    case 'alex':
-      return fightHtml();
     case 'mind':
       return mindHtml();
     case 'disc':
@@ -468,12 +466,8 @@ function act(a: string, el: HTMLElement): void {
   switch (a) {
     case 'tab': {
       let k = (el.dataset.k as Tab) || 'today';
-      // Alex lives in Lupte now, as its third section; Discipline in Provocări
-      if (k === 'alex') {
-        k = 'fight';
-        ctx.seg.fight = 'alex';
-        saveSegs();
-      }
+      // Lupte and Alex are gone since 2026-11-20: old links land on Azi; Discipline lives in Provocări
+      if (k === 'alex' || k === 'fight') k = 'today';
       if (k === 'disc') {
         k = 'challenge';
         ctx.seg.challenge = 'disc';
@@ -742,7 +736,7 @@ function act(a: string, el: HTMLElement): void {
     case 'alt': {
       const blk = blockById(el.dataset.b ?? '');
       if (blk?.alt === 'aero') S.set.aero = el.dataset.v === 'row' ? 'row' : 'run';
-      else if (blk?.alt === 'cond') S.set.wedCond = el.dataset.v === 'b' ? 'b' : 'a';
+      else if (blk?.alt === 'cond') S.set.wedCond = (['a', 'b', 'c', 'd', 'e'] as const).find((v) => v === el.dataset.v) ?? 'a';
       save();
       return render();
     }

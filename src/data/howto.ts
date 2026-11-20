@@ -727,15 +727,6 @@ export const HOW: Record<string, How> = {
 };
 
 // ---------- Hybrid365 (2026-11-20): the lifts of the four strength sessions and the conditioning moves ----------
-const BENCH: How = {
-  steps: [
-    'Întins pe bancă, ochii sub bară, tălpile bine puse pe sol.',
-    'Strângi omoplații și îi cobori spre buzunare: pieptul sus, un arc mic în spate, fesierii pe bancă.',
-    'Priza puțin mai largă decât umerii. Cobori bara controlat pe piept, la nivelul mameloanelor, cu coatele la 45–70°.',
-    'Împingi bara în sus și ușor spre umeri, până la brațe întinse.',
-  ],
-  mistake: 'Să lași bara să sară din piept sau fesierii să se ridice de pe bancă.',
-};
 const PULL: How = {
   steps: [
     'La aparat: coapsele fixate sub suport, priza puțin mai largă decât umerii. La bară: atârni cu brațele întinse.',
@@ -789,8 +780,8 @@ const ROW_PULL_UP: How = {
   mistake: 'Să scurtezi coborârea ca să faci mai multe repetări.',
 };
 const HYBRID_HOW: Record<string, How> = {
-  bench: BENCH,
-  'bench-h': BENCH,
+  bench: DB_PRESS,
+  'bench-h': DB_PRESS,
   pullup: PULL,
   wpull: ROW_PULL_UP,
   'wpull-h': ROW_PULL_UP,

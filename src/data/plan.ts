@@ -94,8 +94,8 @@ export interface Picks {
   cycleWeek?: number;
   /** The easy and long runs: run (Hybrid365), or row on a day the knees ask for it. */
   aero?: 'run' | 'row';
-  /** Wednesday's conditioning: Option A Engine Builder (row), or Option B Hybrid Circuit. */
-  wedCond?: 'a' | 'b';
+  /** Wednesday's conditioning: A Engine Builder (row), B Hybrid Circuit, C Norwegian 4x4, D Hill Repeats, E 30/30s. */
+  wedCond?: 'a' | 'b' | 'c' | 'd' | 'e';
   /** Today's minutes for the blocks that grow (see Block.grow). */
   grown?: Record<string, number>;
 }
@@ -105,6 +105,26 @@ export interface Day {
   title: string;
   blocks: Block[];
 }
+
+/** Wednesday's extra conditioning options (2026-11-20, the user: "Norwegian 4x4, Hill repeats, 30/30s"), all hard
+ *  intervals on the rounds timer with the pulse window on screen, saved as cardio. */
+const COND: Partial<Record<string, Partial<Block>>> = {
+  c: {
+    kind: 'rounds', name: 'Norwegian 4x4', dose: '4 × 4 min', line: 'Conditioning: Norwegian 4x4, 4 × 4 min at 85–95% HRmax, 3 min easy', rounds: 4, work: 240, restSec: 180, hiit: true, thr: false, min: 28,
+    tip: 'Metoda norvegiană (Helgerud 2007): 4 intervale de 4 minute la 85–95% din pulsul maxim, cu 3 minute ușor între ele (jogging, vâslit sau bicicletă). Cea mai studiată metodă pentru VO2max. Pe vâslitor sau bicicletă genunchii nu iau impact.',
+    cues: ['Primul interval mai temperat: pulsul urcă în zonă abia în minutul doi.', 'Tare, dar egal: trebuie să poți termina al patrulea la fel.', 'În pauză nu te oprești: mișcare ușoară, pulsul coboară.'],
+  },
+  d: {
+    kind: 'rounds', name: 'Hill Repeats', dose: '8 × 60 s', line: 'Conditioning: Hill Repeats, 8 × 60 s uphill, walk/jog down', rounds: 8, work: 60, restSec: 90, hiit: true, thr: false, min: 22,
+    tip: '8 urcări de 60 de secunde, tare, pe pantă; cobori mergând sau la jogging ușor (90 s). Forță pentru picioare și motor, cu impact mai mic decât sprintul pe plat. Încălzește-te 10 minute înainte.',
+    cues: ['Pași scurți și rapizi, pieptul ușor înainte, brațele împing.', 'Același efort la fiecare urcare: dacă ultima e mult mai lentă, ai pornit prea tare.', 'La coborâre mergi: genunchii nu iau șocuri.'],
+  },
+  e: {
+    kind: 'rounds', name: '30/30s', dose: '16 × 30 s', line: 'Conditioning: 30/30s, 16 × 30 s hard / 30 s easy', rounds: 16, work: 30, restSec: 30, hiit: true, thr: false, min: 16,
+    tip: '30 de secunde tare, 30 de secunde ușor, de 16 ori (Billat): mult timp aproape de VO2max fără să te arzi. Alergare, vâslitor sau bicicletă. Ritmul tare e cel pe care l-ai putea ține 5–6 minute, nu sprint.',
+    cues: ['Tare, nu maxim: ultimele repetări la fel de rapide ca primele.', 'În cele 30 de secunde ușoare continui să te miști.', 'Dacă ritmul cade mult, oprește-te la 12.'],
+  },
+};
 
 /** Threshold pace, the key session: the reps grow over the 12-week loop as the slide says (add a rep, then longer reps
  *  with a shorter recovery). Before the loop starts, the slide's own 4 × 6 min. */
@@ -128,7 +148,7 @@ export const WEEK: Day[] = [
       { id: 'mon-run', kind: 'run', name: 'Easy Run (Zone 2)', dose: '30 min', min: 30, alt: 'aero', grow: { base: 30, step: 5, cap: 45 },
         tip: 'Session 1: 30–45 min în zona 2 (aerob). Construiește baza aerobă și rezistența și ajută recuperarea. Crește cu 5 minute la fiecare sesiune făcută, până la 45.',
         cues: [...EASY_CUES, 'Începi săptămâna construind elan, nu oboseală.'] },
-      { id: 'mon-upper', kind: 'workout', name: 'Upper Body (Strength)', dose: '55 min', line: '55 min Upper Body: Bench Press, Pull Up, Incline DB Press, Row, Raises, Arms', workout: 'upper', min: 55,
+      { id: 'mon-upper', kind: 'workout', name: 'Upper Body (Strength)', dose: '55 min', line: '55 min Upper Body: DB Bench Press, Pull Up, Incline DB Press, Row, Raises, Arms', workout: 'upper', min: 55,
         tip: 'Session 2: forță pentru partea de sus. Tempo controlat și amplitudine completă la fiecare repetare. Pauză 60–90 s între serii. Progresezi întâi prin repetări, apoi prin greutate.' },
     ],
   },
@@ -168,7 +188,7 @@ export const WEEK: Day[] = [
     idx: 4,
     title: 'Upper Strength + Power',
     blocks: [
-      { id: 'fri-upper', kind: 'workout', name: 'Upper Body (Strength + Power)', dose: '65 min', line: '65 min Upper Body: Bench Press 5 × 3–5, Weighted Pull Up, Push Press, Arms', workout: 'power', min: 65,
+      { id: 'fri-upper', kind: 'workout', name: 'Upper Body (Strength + Power)', dose: '65 min', line: '65 min Upper Body: DB Bench Press 5 × 3–5, Weighted Pull Up, Push Press, Arms', workout: 'power', min: 65,
         tip: 'Session 1: forță maximă plus putere explozivă. Intenție grea și explozivă la exercițiile principale, amplitudine completă, pauză 90 s. Pui greutate săptămânal și încerci să bați seria de top de săptămâna trecută.' },
       { id: 'fri-emom', kind: 'routine', name: 'Power Finisher', dose: 'EMOM × 10 min', line: 'Power Finisher: EMOM × 10 min (Med Ball Chest Throws / Plyo Push Ups)', routine: 'emom-power', min: 10,
         tip: 'Session 2: EMOM 10 minute, alternant. Minutele impare: 6 Med Ball Chest Throws. Minutele pare: 8 Plyo Push Ups. Ce rămâne din minut e pauză. Viteza contează, nu oboseala.' },
@@ -223,6 +243,7 @@ export function resolveBlock(b: Block, p: Picks): Block {
       cues: ['Ții pulsul în zona 2 de pe centură; dacă trece de ea, tragi mai ușor.', 'Împingi din picioare, apoi spatele, apoi brațele; revii în ordine inversă.'],
     };
   }
+  if (r.alt === 'cond' && p.wedCond && COND[p.wedCond]) return { ...r, ...COND[p.wedCond], rowCh: undefined };
   if (r.alt === 'cond' && p.wedCond === 'b') {
     return {
       ...r, kind: 'amrap', name: 'Hybrid Circuit (10 Min AMRAP)', dose: '10 min AMRAP', line: 'Conditioning: Hybrid Circuit, 10 Min AMRAP', min: 10, rowCh: undefined,

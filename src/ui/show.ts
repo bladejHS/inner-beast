@@ -12,14 +12,14 @@ import { celebrate, lite } from './fx.ts';
 
 const BASE = import.meta.env.BASE_URL;
 
-/** The rank's badge: a shield with one chevron per rank; Campion and Bestia in gold, Bestia with the wolf. */
+/** The rank's badge: a shield with one chevron per rank; Elite and Forged in gold, Forged with the mark. */
 export function insignia(i: number, cls = ''): string {
   const gold = i >= 3;
   const chev = Array.from({ length: Math.min(i + 1, 4) }, (_, k) => `<path d="M30 ${70 - k * 13}l20-11 20 11" />`).join('');
   return `<svg class="ins ${gold ? 'gold' : ''} ${cls}" viewBox="0 0 100 110" aria-hidden="true">
     <path class="ins-sh" d="M50 4 92 18v34c0 27-18 46-42 55C26 98 8 79 8 52V18Z"/>
     <path class="ins-in" d="M50 13 83 24v28c0 22-14 37-33 45C31 89 17 74 17 52V24Z"/>
-    ${i >= 4 ? `<image href="${BASE}splash/umbra.webp" x="27" y="20" width="46" height="54"/><path class="ins-ch" d="M30 86l20-9 20 9"/>` : `<g class="ins-ch">${chev}</g>`}
+    ${i >= 4 ? `<image href="${BASE}ui/mark.svg" x="28" y="24" width="44" height="44"/><path class="ins-ch" d="M30 86l20-9 20 9"/>` : `<g class="ins-ch">${chev}</g>`}
   </svg>`;
 }
 
@@ -50,7 +50,7 @@ export function rankCheck(before: number, after: number, delay: number): void {
     sfx.bell(3);
     buzz([200, 80, 200, 80, 400]);
     // the wolf of the new rank is the reveal: it changes with the rank (rankart.ts)
-    celebrate(esc(b.rank.name), 'Rang nou · lupul tău a evoluat', { mark: `<img src="${wolfArt(b.i)}" alt="" width="680" height="801">${insignia(b.i, 'rk-ins')}`, word: esc(b.rank.motto), cls: 'cele-rank' });
+    celebrate(esc(b.rank.name), 'Rang nou · emblema ta a evoluat', { mark: `<img src="${wolfArt(b.i)}" alt="" width="680" height="801">${insignia(b.i, 'rk-ins')}`, word: esc(b.rank.motto), cls: 'cele-rank' });
   }, delay);
 }
 
@@ -142,10 +142,10 @@ export function wolfMood(dayIdx: number): string {
   const today = dayKey();
   const week = new Set(ctx.S.log.filter((e) => e.date <= today && (Date.parse(today) - Date.parse(e.date)) / 864e5 < 7).map((e) => `${e.date}:${e.block ?? e.id}`)).size;
   const s = streak();
-  const rest = dayIdx === 2 || dayIdx === 6;
+  const rest = dayIdx === 6;
   const scar = week >= 6;
   const fierce = !rest && s >= 3;
   const cls = [rest ? 'sleep' : fierce ? 'fierce' : '', scar ? 'scar' : ''].filter(Boolean).join(' ');
-  const say = rest ? 'Se odihnește' : fierce ? `Flămând · ${s} zile` : scar ? 'Urme de luptă' : 'Pândește';
-  return `<span class="wm ${cls}"><span class="wm-m"><img src="${wolfBadge()}" alt="" width="680" height="801" decoding="async">${scar ? '<svg class="wm-sc" viewBox="0 0 40 40"><path d="M22 12l4 11M26 11l4 11M30 12l3 9"/></svg>' : ''}${rest ? '<i class="wm-z">z<i>z</i></i>' : ''}</span><b>${say}</b></span>`;
+  const say = rest ? 'Recuperare' : fierce ? `În formă · ${s} zile` : scar ? 'Săptămână grea' : 'Gata';
+  return `<span class="wm ${cls}"><span class="wm-m"><img src="${wolfBadge()}" alt="" width="680" height="801" decoding="async">${rest ? '<i class="wm-z">z<i>z</i></i>' : ''}</span><b>${say}</b></span>`;
 }

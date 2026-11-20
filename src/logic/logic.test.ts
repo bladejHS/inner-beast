@@ -12,7 +12,7 @@ import { CHALLENGES, challengeDays } from '../data/challenges.ts';
 import { addDays, dayKey, inWeek, mmss, num, paceStr, weekStart, weekdayIdx } from './util.ts';
 import { Clock, breath478Seq, burstAt, doneSec, locate, phaseStart, roundsSeq, showerSeq, totalSec } from './seq.ts';
 import { Track, haversine, routePath, simplify } from './geo.ts';
-import { activeStreak, advise, allRecords, bestSet, amrapBest, amrapUp, cycleAt, cycleStartFor, daysOff, repeatMonday, weekSince, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, growMinutes, growPushups, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
+import { activeStreak, advise, allRecords, bestSet, amrapBest, amrapUp, cycleAt, cycleStartFor, daysOff, repeatMonday, weekSince, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, growMinutes, growPushups, setKgAdvice, lastSame, crossKg, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
 import { defaultHabit, freshState, makeEntry, normalize, type Habit } from './store.ts';
 import { LAB, labSeq } from './breathlab.ts';
 import { roundThemes } from '../data/combos.ts';
@@ -62,10 +62,10 @@ test('the week is the Hybrid365 run-focused split: 3 runs, 3 upper lifts, 1 lowe
 });
 test('strength days: the Hybrid365 exercises, sets and reps, in order', () => {
   const plan = (w: 'upper' | 'upper2' | 'lower' | 'power') => workoutById(w).ex.map((e) => e.name + ' ' + e.sets + 'x' + e.lo + '-' + e.hi);
-  assert.deepEqual(plan('upper'), ['Bench Press 4x6-8', 'Pull Up / Lat Pulldown 4x6-10', 'Incline Dumbbell Press 3x8-10', 'Chest Supported Row 3x8-10', 'Lateral Raise 3x12-15', 'Tricep Pushdown 3x10-12', 'Bicep Curl 3x10-12']);
+  assert.deepEqual(plan('upper'), ['DB Bench Press 4x6-8', 'Pull Up / Lat Pulldown 4x6-10', 'Incline Dumbbell Press 3x8-10', 'Chest Supported Row 3x8-10', 'Lateral Raise 3x12-15', 'Tricep Pushdown 3x10-12', 'Bicep Curl 3x10-12']);
   assert.deepEqual(plan('upper2'), ['Weighted Pull Up 4x5-8', 'Flat Dumbbell Press 4x6-8', 'Chest Supported Row 4x8-10', 'Seated Overhead Press 3x8-10', 'Cable Face Pull 3x12-15', 'Dumbbell Lateral Raise 3x12-15', 'Tricep Rope Pushdown 3x10-12', 'Alternating Dumbbell Curl 3x10-12']);
   assert.deepEqual(plan('lower'), ['Hack Squat 4x4-6', 'Romanian Deadlift 4x6-8', 'Walking Lunge 3x8-10', 'Hip Thrust 3x8-10', 'Leg Press 3x10-12', 'Hamstring Curl 3x10-12', 'Calf Raise 3x12-15']);
-  assert.deepEqual(plan('power'), ['Bench Press 5x3-5', 'Weighted Pull Up 4x4-6', 'Incline Dumbbell Press 4x6-8', 'Chest Supported Row 4x6-8', 'Push Press 4x3-5', 'Close Grip Bench Press 3x8-10', 'Barbell Curl 3x8-10', 'Tricep Overhead Extension 3x10-12']);
+  assert.deepEqual(plan('power'), ['DB Bench Press 5x3-5', 'Weighted Pull Up 4x4-6', 'Incline Dumbbell Press 4x6-8', 'Chest Supported Row 4x6-8', 'Push Press 4x3-5', 'Close Grip Bench Press 3x8-10', 'Barbell Curl 3x8-10', 'Tricep Overhead Extension 3x10-12']);
   // every exercise is loaded; no squat with the bar (the user's rule)
   for (const w of WORKOUTS) for (const e of w.ex) {
     assert.ok(e.load, e.id);
@@ -362,7 +362,7 @@ test('records: the best bodyweight set on each variation, not the loaded sets', 
     w('2026-11-03', [{ id: 'pullup', name: 'Pull-ups', lvl: 2, unit: 'reps', sets: [6, 5, null] }]),
     w('2026-11-10', [{ id: 'pullup', name: 'Pull-ups', lvl: 2, unit: 'reps', sets: [7, 6, 5] }]),
     w('2026-11-10', [{ id: 'pullup', name: 'Lat Pulldown', lvl: 0, unit: 'reps', sets: [10, 10], kg: 60 }]),
-    w('2026-11-14', [{ id: 'bench', name: 'Barbell Bench Press', lvl: 0, unit: 'reps', sets: [8] }]),
+    w('2026-11-14', [{ id: 'cgbench', name: 'Close Grip Bench Press', lvl: 0, unit: 'reps', sets: [8] }]),
   ];
   assert.deepEqual(allRecords(log).map((r) => [r.id, r.lvl, r.v, r.sec]), [['pullup', 2, 7, false]]);
   assert.equal(bestSet(log, 'pullup', 2)?.v, 7);
@@ -500,7 +500,7 @@ test('30-day challenge counts days from the log; box stats add up', () => {
 });
 
 test('races: every event has all five levels, with real segments', () => {
-  assert.ok(RACES.length >= 6);
+  assert.ok(RACES.length >= 5 && !RACES.some((r) => r.id === 'fight'));
   for (const r of RACES) {
     assert.equal(r.levels.length, LEVEL_NAMES.length, r.id);
     for (const l of r.levels) assert.ok(l.segs.length > 1 && l.est > 0 && l.segs.every((s) => s.name), l.name);
@@ -608,18 +608,35 @@ test('progression: weight is noted on the hardest variation and goes up by 2.5 k
   assert.equal(advise(dips, lastOf('dips', [8, 8, 7], 3, 10), 3).kg, undefined);
 });
 
-test('equipment: dumbbells stop at 30 kg, then the variation or the tempo moves', () => {
+test('weights: no ceiling on the dumbbells, and the next set weight from the reps just done', () => {
   const bss = oldEx('splitsq')!;
-  assert.equal(advise(bss, lastOf('splitsq', [8, 8, 8, 8], 2, 27.5), 2).kg, 30);
-  assert.equal(advise(bss, lastOf('splitsq', [8, 8, 8, 8], 2, 28), 2).kg, 30);
-  const top = advise(bss, lastOf('splitsq', [8, 8, 8, 8], 2, 30), 2);
-  assert.deepEqual([top.kind, top.kg], ['top', undefined]);
-  assert.match(top.text, /cele mai grele gantere/);
-  const carry = advise(oldEx('carry')!, { log: { id: 'carry', name: 'c', sets: [45, 45, 45, 45], unit: 'sec' as const, kg: 30 }, lvl: 0, date: 'x' }, 0);
-  assert.deepEqual([carry.kind, carry.lvl], ['up', 1]);
+  assert.equal(advise(bss, lastOf('splitsq', [8, 8, 8, 8], 2, 30), 2).kg, 32.5);
+  assert.equal(advise(bss, lastOf('splitsq', [8, 8, 8, 8], 2, 8), 2).kg, 9);
   const rdl = oldEx('rdl')!;
-  assert.equal(rdl.bar, true);
   assert.equal(advise(rdl, lastOf('rdl', [8, 8, 8], 0, 100), 0).kg, 102.5);
+  // DB Bench Press 4 x 6-8 at 60 kg: 8 stays, 9 goes up a step, 11 jumps about 10 %, 5 comes down a step, 3 comes down 12 %
+  const bench = exerciseById('bench')!;
+  assert.deepEqual(setKgAdvice(bench, 60, 8), { kg: 60, text: '8 repetări, în interval: rămâi la 60 kg.' });
+  assert.equal(setKgAdvice(bench, 60, 9)!.kg, 62.5);
+  assert.equal(setKgAdvice(bench, 60, 11)!.kg, 65);
+  assert.equal(setKgAdvice(bench, 60, 5)!.kg, 57.5);
+  assert.equal(setKgAdvice(bench, 60, 3)!.kg, 52.5);
+  assert.equal(setKgAdvice(exerciseById('latraise')!, 8, 17)!.kg, 9);
+  assert.equal(setKgAdvice(bench, 0, 8), null);
+});
+
+test('the same movement on another day: Monday at 50 kg gives Friday its weight', () => {
+  const mon = makeEntry({ kind: 'workout', name: 'Upper', dur: 3000, date: '2026-11-23', ts: Date.parse('2026-11-23T18:00:00'), data: { wid: 'upper', ex: [{ id: 'bench', name: 'Dumbbell Bench Press', lvl: 0, unit: 'reps', sets: [8, 8, 7, 6], kg: 50, kgs: [50, 50, 50, 50] }] } });
+  const fri = exerciseById('bench-h')!;
+  const other = lastSame([mon], fri, undefined)!;
+  assert.equal(other.ex.id, 'bench');
+  const c = crossKg(fri, other)!;
+  assert.equal(c.kg, 55);
+  assert.match(c.text, /^Luni: 8 × 50 kg la DB Bench Press\. Pentru 3–5 repetări azi: 55 kg\.$/);
+  assert.equal(crossKg(exerciseById('dbpress')!, other)!.kg, 52.5);
+  // its own session, newer than Monday's, wins
+  assert.equal(lastSame([mon], fri, { log: { id: 'bench-h', name: 'x', sets: [5], unit: 'reps', kg: 55 }, lvl: 0, date: '2026-11-27', ts: Date.parse('2026-11-27T18:00:00') }), undefined);
+  assert.equal(lastSame([mon], exerciseById('hacksq')!, undefined), undefined);
 });
 
 test('stalling: three sessions that do not beat the one before them', () => {
@@ -703,9 +720,9 @@ test('Hybrid365 fitted to the user: Hack Squat for the Back Squat, machines with
   // the machine has no dumbbell ceiling: 40 kg at the top of the range goes to 42.5
   const lp = advise(exerciseById('hacksq')!, lastOf('hacksq', [6, 6, 6, 6], 1, 40), 1);
   assert.deepEqual([lp.kind, lp.kg], ['top', 42.5]);
-  // the dumbbells still stop at 30 kg
+  // no ceiling on the dumbbells any more (2026-11-20)
   const inc = advise(exerciseById('incline')!, lastOf('incline', [10, 10, 10], 0, 30), 0);
-  assert.deepEqual([inc.kind, inc.kg], ['top', undefined]);
+  assert.deepEqual([inc.kind, inc.kg], ['top', 32.5]);
   // ids shared with the old plan keep their variations, so the last session carries over
   assert.deepEqual(exerciseById('curls')!.vars, oldEx('curls').vars);
   assert.deepEqual(exerciseById('rdl')!.vars, oldEx('rdl').vars);
@@ -768,6 +785,11 @@ test('the runs: on foot by default, the rower when picked; the threshold pulse; 
   const b = resolveBlock(r('wed-cond'), { ...P, wedCond: 'b' });
   assert.deepEqual([b.kind, b.min, b.circuit], ['amrap', 10, { moves: ['Wall Balls', 'Burpee Broad Jumps', 'Kettlebell Swings', 'Push Ups'], reps: [10, 10, 10, 10] }]);
   assert.equal(normalize({}).set.aero, 'run');
+  // the user's extra conditioning (2026-11-20): Norwegian 4x4, Hill Repeats, 30/30s, all hard intervals on the timer
+  const c = (k: 'c' | 'd' | 'e') => resolveBlock(r('wed-cond'), { ...P, wedCond: k });
+  assert.deepEqual([c('c').name, c('c').kind, c('c').rounds, c('c').work, c('c').restSec, c('c').hiit, c('c').id], ['Norwegian 4x4', 'rounds', 4, 240, 180, true, 'wed-cond']);
+  assert.deepEqual([c('d').name, c('d').rounds, c('d').work, c('d').restSec], ['Hill Repeats', 8, 60, 90]);
+  assert.deepEqual([c('e').name, c('e').rounds, c('e').work, c('e').restSec], ['30/30s', 16, 30, 30]);
 });
 test('daily routine: push-ups from 10, three more every week, and the old routine turns into it once', () => {
   const h: Habit = { id: 'p', name: '50 Push-ups', type: 'count', goal: 50, start: '2026-10-20', days: { '2026-11-06': 50 } };

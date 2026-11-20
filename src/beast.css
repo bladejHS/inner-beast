@@ -1830,3 +1830,45 @@ input[type='text'], input[type='number'], input[type='time'], input[type='passwo
 
 /* claw marks between tabs and on the "Gata." screens become speed streaks: the same timing, yellow and white */
 .claw-sw path, .done-mark path { fill: var(--red-hot); }
+
+/* ---------- 8.1 HYBRID FORGE (2026-11-20): weights set by set, the framework count, the map's targets ---------- */
+/* a set row with its own weight: Seria · kg · reps · tick */
+.set.has-kg { grid-template-columns: 50px 82px 1fr 56px; gap: 8px; }
+.set.has-kg .sn { letter-spacing: .08em; }
+.set-kg { position: relative; display: block; }
+.set-kg input { width: 100%; height: 60px; padding: 0 26px 0 10px; border: 1px solid var(--hair); border-radius: 6px; background: rgba(245, 194, 17, .06); color: var(--ink); font: 800 condensed 22px/1 var(--font); text-align: right; }
+.set-kg span { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font: 700 semi-condensed 11px/1 var(--font); color: var(--red-text); letter-spacing: .06em; pointer-events: none; }
+.set.done .set-kg input { border-color: transparent; background: transparent; color: var(--mute); }
+.kg-rec { margin: 8px 0 0; }
+.advice.kg-rec { border-left: 3px solid var(--red); }
+.rest-kg { color: var(--red-hot); font-weight: 900; }
+
+/* Progres: the Hybrid365 framework this week, 3 runs, 3 upper, 1 lower, 1 conditioning */
+.fw { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 14px 0 6px; }
+.fw-i { position: relative; overflow: hidden; display: grid; justify-items: center; gap: 4px; padding: 12px 4px 14px; border: 1px solid rgba(255, 255, 255, .1); border-radius: 6px; background: var(--surf); }
+.fw-i b { font: 900 extra-condensed 34px/.9 var(--font); color: var(--ink); }
+.fw-i b small { font-size: 18px; color: var(--mute); }
+.fw-i span { font: 800 semi-condensed 10.5px/1 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--label); }
+.fw-i i { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--red); transform: scaleX(var(--f)); transform-origin: 0 50%; }
+.fw-i.full { border-color: var(--red); background: linear-gradient(180deg, rgba(var(--glow-2), .16), transparent 70%), var(--surf); }
+.fw-i.full b { color: var(--red-hot); }
+.sub-h { margin: 22px 0 6px; font: 900 extra-condensed 20px/1 var(--font); letter-spacing: .03em; text-transform: uppercase; color: var(--red-text); }
+
+/* the campaign map: each week's long run under its node, the threshold set in the chapter title */
+.cp-s { font: 800 semi-condensed 10.5px var(--font); text-anchor: middle; fill: var(--faint); letter-spacing: .04em; }
+.cp-n.now .cp-s, .cp-n.ok .cp-s { fill: var(--ink-2); }
+.cp-t .cp-thr { fill: var(--red-text); font-weight: 900; }
+.cp-goals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 4px 0 12px; }
+.cp-goals span { display: grid; justify-items: center; gap: 3px; padding: 10px 4px; border: 1px solid var(--hair); border-radius: 6px; font: 700 semi-condensed 10.5px/1 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--label); }
+.cp-goals b { font: 900 extra-condensed 24px/1 var(--font); letter-spacing: 0; text-transform: none; color: var(--ink); }
+
+/* the alternatives on a session card: five conditioning options wrap */
+.rd-alt { flex-wrap: wrap; }
+
+/* the 12-week calendar heats in the forge's yellow instead of orange */
+.fire { border-radius: var(--r); background: radial-gradient(120% 80% at 50% 120%, rgba(var(--glow-2), .12), transparent 60%), linear-gradient(180deg, var(--n2), var(--n1)); }
+.fc-w i { background: #151515; }
+.fc-w i.h1, .fc-k i.h1 { background: #3a2e05; }
+.fc-w i.h2, .fc-k i.h2 { background: linear-gradient(180deg, #a07a04, #5c4600); box-shadow: 0 0 6px rgba(245, 194, 17, .35); }
+.fc-w i.h3, .fc-k i.h3 { background: linear-gradient(180deg, #ffd43b, #d4a40a); box-shadow: 0 0 10px rgba(245, 194, 17, .6); }
+.fc-w i.h4, .fc-k i.h4 { background: radial-gradient(circle at 50% 70%, #ffffff, #fff1b0 35%, #f5c211 75%); box-shadow: 0 0 14px rgba(255, 212, 59, .9); }

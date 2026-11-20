@@ -1,4 +1,4 @@
-// Ranks (2026-11-15): the sessions add up to a rank, from Recrut to Bestia. Only training counts: walks, showers and
+// Ranks (2026-11-15, renamed 2026-11-20 with HYBRID FORGE): the sessions add up to a rank, from Rookie to Forged. Only training counts: walks, showers and
 // the breathing sessions are kept in the log but do not raise the rank.
 
 import type { Entry, Kind } from './store.ts';
@@ -6,11 +6,11 @@ import type { Entry, Kind } from './store.ts';
 export interface Rank { name: string; min: number; motto: string }
 
 export const RANKS: Rank[] = [
-  { name: 'Recrut', min: 0, motto: 'Ai intrat în sală. Restul se câștigă.' },
-  { name: 'Luptător', min: 10, motto: 'Zece sesiuni: nu mai e o încercare, e un obicei.' },
-  { name: 'Veteran', min: 40, motto: 'Patruzeci de sesiuni. Corpul știe drumul.' },
-  { name: 'Campion', min: 100, motto: 'O sută. Puțini ajung aici.' },
-  { name: 'Bestia', min: 200, motto: 'Două sute. Nu mai antrenezi lupul: ești el.' },
+  { name: 'Rookie', min: 0, motto: 'Ai intrat în sală. Restul se câștigă.' },
+  { name: 'Athlete', min: 10, motto: 'Zece sesiuni: nu mai e o încercare, e un obicei.' },
+  { name: 'Hybrid', min: 40, motto: 'Patruzeci de sesiuni. Alergi și ridici la fel de bine.' },
+  { name: 'Elite', min: 100, motto: 'O sută. Puțini ajung aici.' },
+  { name: 'Forged', min: 200, motto: 'Două sute. Nu te mai antrenezi pentru formă: ești forjat.' },
 ];
 
 const TRAINING: ReadonlySet<Kind> = new Set<Kind>(['rounds', 'amrap', 'workout', 'routine', 'run', 'row', 'coach', 'race', 'cardio']);

@@ -1,5 +1,5 @@
-// The wolf of your rank (2026-11-16): the pictures in public/ui/rank, drawn by scripts/ranks-art.mjs from the mark.
-// Recrut the headband, Luptător a wider band, Veteran a scar and burning eyes, Campion gold, Bestia in a fire.
+// The mark of your rank: the pictures in public/ui/rank, drawn by scripts/ranks-art.mjs from the HYBRID FORGE mark
+// (scripts/forge.mjs; the wolf until 2026-11-20). The names wolfArt/wolfBadge stay for the call sites.
 import { rankOf, trainingSessions } from '../logic/ranks.ts';
 import { ctx } from './ctx.ts';
 

@@ -1,21 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 240 240"><g><g transform="translate(120 122) scale(0.98) translate(-120 -128)"><defs>
-    <linearGradient id="u13r" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfe4ee"/><stop offset=".55" stop-color="#8d97aa"/><stop offset="1" stop-color="#4a5266"/></linearGradient>
-    <filter id="u13h" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
-    <filter id="u13g" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="5"/></filter>
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 240 240"><g><g transform="translate(120 120) scale(0.98) translate(-120 -120)"><defs>
+    <linearGradient id="m13p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd43b"/><stop offset=".55" stop-color="#f5c211"/><stop offset="1" stop-color="#a37e05"/></linearGradient>
+    <linearGradient id="m13f" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#f5c211"/><stop offset=".6" stop-color="#ffe9a0"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+    <filter id="m13g" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
+    <radialGradient id="m13fi" cx=".5" cy=".55" r=".55"><stop offset=".5" stop-color="#ffd27a"/><stop offset=".75" stop-color="#ff9a1f"/><stop offset="1" stop-color="#f5c211" stop-opacity="0"/></radialGradient>
   </defs>
   
-  <path d="M120 66L140 62L174 26L190 86L210 108L197 118L214 146L186 156L160 190L146 212L132 226L120 230L108 226L94 212L80 190L54 156L26 146L43 118L30 108L50 86L66 26L100 62Z" fill="#f5c211" opacity="0.63" filter="url(#u13h)"/>
-  <path d="M120 66L140 62L174 26L190 86L210 108L197 118L214 146L186 156L160 190L146 212L132 226L120 230L108 226L94 212L80 190L54 156L26 146L43 118L30 108L50 86L66 26L100 62Z" fill="#232835"/><path d="M151 61L172 38L182 75Z" fill="#11141b"/><path d="M58 75L68 38L89 61Z" fill="#11141b"/>
-  <path d="M120 66L140 62L174 26L190 86L210 108L197 118L214 146L186 156L160 190L146 212L132 226L120 230L108 226L94 212L80 190L54 156L26 146L43 118L30 108L50 86L66 26L100 62Z" fill="none" stroke="url(#u13r)" stroke-opacity="1" stroke-width="9" stroke-linejoin="round"/>
-  <g filter="url(#u13g)"><path d="M118.6 125L173.2 96.4L160.2 114.6Z" fill="#ffd43b"/><path d="M79.8 114.6L66.8 96.4L121.4 125Z" fill="#ffd43b"/></g>
-  <path d="M118.6 125L173.2 96.4L160.2 114.6Z" fill="#ffd43b"/><path d="M79.8 114.6L66.8 96.4L121.4 125Z" fill="#ffd43b"/>
-  <path d="M137.2 117.46L160.13 105.45L154.67 113.09Z" fill="#fff6d6" opacity=".9"/><path d="M85.33 113.09L79.87 105.45L102.8 117.46Z" fill="#fff6d6" opacity=".9"/>
+  <polygon points="120.00 16.00 210.07 68.00 210.07 172.00 120.00 224.00 29.93 172.00 29.93 68.00" fill="#0a0a0a"/>
+  <polygon points="120.00 22.00 204.87 71.00 204.87 169.00 120.00 218.00 35.13 169.00 35.13 71.00" fill="none" stroke="#f5c211" stroke-width="14" stroke-linejoin="round"/>
   
-  <defs><linearGradient id="u13b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset=".5" stop-color="#f5c211"/><stop offset="1" stop-color="#8a6a00"/></linearGradient></defs>
-  <path d="M203 93Q222 82 236 70L238 83Q224 95 205 101Z" fill="url(#u13b)" stroke="#05060a" stroke-width="1.8" stroke-linejoin="round"/>
-  <path d="M202 99Q220 108 231 128L219 133Q212 115 199 105Z" fill="#c99a00" stroke="#05060a" stroke-width="1.8" stroke-linejoin="round"/>
-  <path d="M45 90Q120 64 195 90L197 105Q120 80 43 105Z" fill="url(#u13b)" stroke="#05060a" stroke-width="1.8" stroke-linejoin="round"/>
-  <path d="M60 91Q120 71 181 91" fill="none" stroke="#fff3cf" stroke-opacity=".5" stroke-width="1.6" stroke-linecap="round"/>
-  <path d="M190 87L205 89L207 105L192 108Z" fill="#d9a90a" stroke="#05060a" stroke-width="1.8" stroke-linejoin="round"/>
+  <g>
+    <rect x="56" y="62" width="30" height="116" rx="6" fill="url(#m13p)"/>
+    <rect x="154" y="62" width="30" height="116" rx="6" fill="url(#m13p)"/>
+    
+    <rect x="84" y="111" width="72" height="18" rx="3" fill="#f6f5f0"/>
+  </g>
   
+  <path d="M120 58.0C136 76.0 142 96 129 108C128 100 124 95 120 91C116 95 112 100 111 108C98 96 104 76.0 120 58.0Z" fill="url(#m13f)"/>
   </g></g></svg>

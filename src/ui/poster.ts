@@ -152,7 +152,7 @@ export async function posterBlob(d: PosterData): Promise<Blob | null> {
   x.fillStyle = '#f3f5fa';
   x.font = '900 54px Saira, sans-serif';
   x.letterSpacing = '22px';
-  x.fillText('INNER BEAST', W / 2 + 11, 1800);
+  x.fillText('HYBRID FORGE', W / 2 + 11, 1800);
   x.letterSpacing = '0px';
   x.fillStyle = '#7d879a';
   x.font = '700 30px Saira, sans-serif';

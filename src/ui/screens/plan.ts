@@ -1,8 +1,7 @@
-// "Plan": the week as a fight card of seven days, where the 12-week loop stands, and the principles.
+// "Plan": the week as seven day cards and the 12-week Hybrid365 loop as a campaign map.
 
-import { PRINCIPLES } from '../../data/book.ts';
 import { WEEK, blockLine } from '../../data/plan.ts';
-import { CYCLE_WEEKS, CYCLES, cycleAt, dayComplete, dayProgress, daysOff, loopWeek, repeatMonday, weekDone, weekSince } from '../../logic/progress.ts';
+import { CYCLE_WEEKS, CYCLES, cycleAt, hybridWeek, dayComplete, dayProgress, daysOff, loopWeek, repeatMonday, weekDone, weekSince } from '../../logic/progress.ts';
 import { addDays, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { dayPoster } from '../art.ts';
@@ -52,6 +51,12 @@ export function repeatCard(today: string): string {
   return html ? `<section class="card lime" aria-label="Repetă săptămâna"><p class="label">Ciclul</p>${html}</section>` : '';
 }
 
+/** This week's Hybrid365 targets, under the map. */
+function weekTargets(i: number): string {
+  const w = hybridWeek(i);
+  return `<div class="cp-goals"><span><b>${w.thr}</b>Threshold</span><span><b>${w.easy}′</b>Easy Run</span><span><b>${w.long}′</b>Long Run</span></div>`;
+}
+
 /** The 12 weeks of the loop as a strip: three emphases of four, the fourth week lighter. */
 function cycleCard(today: string): string {
   const start = ctx.S.cycle.start;
@@ -63,10 +68,12 @@ function cycleCard(today: string): string {
   if (!c) {
     return `<section class="cycle"><p class="label">Campania · de luni</p><h3>Ciclul A: bază</h3>
       ${campaignSvg(-1, 1)}
+      ${weekTargets(0)}
       <p class="small dim">Trei etape de câte 4 săptămâni, a 4-a mereu ușoară și cu teste. Threshold Run crește de la o etapă la alta: 4 × 6, apoi 5 × 6, apoi 5 × 7 min cu pauză mai scurtă.</p></section>`;
   }
   return `<section class="cycle"><p class="label">Campania${lap > 1 ? ` · turul ${lap}` : ''} · ciclul ${c.id}, săptămâna ${c.week} din 4</p><h3>${esc(c.name)}</h3>
     ${campaignSvg(pos, lap)}
+    ${weekTargets(loopWeek(start, today, ctx.S.cycle.repeats) % loop)}
     <p class="small dim">${c.lighter ? 'Săptămâna ușoară, cu testele.' : esc(c.what)}</p>
     ${repeatHtml(today)}</section>`;
 }
@@ -112,7 +119,5 @@ export function planHtml(): string {
       }).join('')}</div>
     </section>
     ${cycleCard(today)}
-    <ol class="dcs">${days}</ol>
-    <h2 class="sec">Principiile<small>Din „Bazele fitnessului”, verificate.</small></h2>
-    <div class="pr-row">${PRINCIPLES.map((p, i) => `<div class="pr"><span class="pr-n num">${String(i + 1).padStart(2, '0')}</span><b>${esc(p.title)}</b><p>${esc(p.text)}</p><p class="small dim">${esc(p.note)}</p></div>`).join('')}</div>`;
+    <ol class="dcs">${days}</ol>`;
 }

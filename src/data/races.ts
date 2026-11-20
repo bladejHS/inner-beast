@@ -96,23 +96,6 @@ function run(dist: number): Seg[] {
   ];
 }
 
-function fight(rounds: number, min: number, bout = ''): Seg[] {
-  const focus = ['Jab, teep și distanță', 'Pumni, apoi piciorul', 'La corp: body kick și genunchi', 'Check, contră și ieșiri în cerc', 'Putere: combinațiile tale cele mai bune'];
-  return Array.from({ length: rounds }, (_, i) => [
-    { name: `${bout}Runda ${i + 1} din ${rounds}`, detail: focus[i % focus.length], alt: 'Shadow Kickboxing sau sac', sec: min * 60 },
-    ...(i < rounds - 1 ? [{ name: 'Pauză', detail: 'Respiră adânc, bei apă', sec: 60, rest: true }] : []),
-  ]).flat();
-}
-
-/** A K-1 tournament night: the same fighter goes 3 × 3 min up to three times, with a break between the bouts. */
-function tournament(bouts: number): Seg[] {
-  const names = bouts === 2 ? ['Semifinala', 'Finala'] : ['Sfertul de finală', 'Semifinala', 'Finala'];
-  return names.flatMap((n, i) => [
-    ...fight(3, 3, `${n}, `),
-    ...(i < names.length - 1 ? [{ name: 'Pauză între meciuri', detail: 'Te miști ușor, bei apă, rămâi cald', sec: 300, rest: true }] : []),
-  ]);
-}
-
 function murph(mile: number, pull: number, push: number, squat: number): Seg[] {
   return [
     { name: 'Run', detail: km(mile) },
@@ -166,17 +149,6 @@ export const RACES: Race[] = [
       { name: 'Half Marathon', est: 135, segs: run(21.1) },
       { name: 'Marathon', est: 300, segs: run(42.2) },
       { name: 'Ultra 50 km', est: 390, segs: run(50) },
-    ],
-  },
-  {
-    id: 'fight', name: 'Fight Night', sub: 'Gala ta de kickboxing, runde cronometrate', icon: 'fight',
-    note: 'Rundele trec singure, cu pauză de 1 minut. Ține ritmul până la ultimul gong. Un meci de kickboxing are 3 runde de 3 minute; cel pentru titlu, 5. La turneele K-1, același luptător urca în ring de până la trei ori în aceeași seară.',
-    levels: [
-      { name: '3 × 2 min', est: 8, segs: fight(3, 2) },
-      { name: '3 × 3 min', est: 11, segs: fight(3, 3) },
-      { name: '5 × 3 min, titlu', est: 19, segs: fight(5, 3) },
-      { name: 'Turneu: 2 meciuri', est: 27, segs: tournament(2) },
-      { name: 'Turneu K-1: 3 meciuri', est: 43, segs: tournament(3) },
     ],
   },
   {

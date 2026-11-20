@@ -24,7 +24,7 @@ function minutes(b: Block, r: Rests): number {
 
 function altOf(raw: Block, b: Block): PlanSession['alt'] {
   if (raw.alt === 'aero') return { other: b.kind === 'cardio' ? raw.name : raw.name.replace('Run', 'Row') };
-  if (raw.alt === 'cond') return b.kind === 'amrap' ? { other: raw.name } : { other: 'Hybrid Circuit (10 Min AMRAP)', detail: b.dose };
+  if (raw.alt === 'cond') return b.name === raw.name ? { other: 'Hybrid Circuit (10 Min AMRAP)', detail: b.dose } : { other: raw.name };
   return undefined;
 }
 

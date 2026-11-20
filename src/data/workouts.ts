@@ -1,11 +1,9 @@
 // Strength sessions since 2026-11-20: the four lifting sessions of the Hybrid365 run-focused split (Monday Upper
 // Strength, Wednesday Upper Strength, Thursday Lower Strength, Friday Upper Strength + Power), exercise for exercise,
-// sets x reps and rests as on the slides. Kept from before: the dumbbells stop at 30 kg, and the Back Squat is a Hack
+// sets x reps and rests as on the slides. Kept from before: the Back Squat is a Hack
 // Squat (the user does not squat with the bar). Ids shared with the old plan (curls, hacksq, rdl, hipthrust, calf)
 // keep their variations, so the last session and the kg carry over. Exercise names stay in English; cues are Romanian.
 
-/** The heaviest dumbbells the user owns: past this the weight can't go up, the variation or the tempo does. */
-export const DB_MAX_KG = 30;
 
 /** reps / time: logged numbers. max: one all-out set. emom: the pull-up clock. ytw and done: sets you tick off. */
 export type ExType = 'reps' | 'time' | 'max' | 'emom' | 'ytw' | 'done';
@@ -26,7 +24,7 @@ export interface Exercise {
   cue: string;
   alex?: string;
   opt?: boolean;
-  /** Weight is noted on every variation, not only the hardest: kg of one dumbbell, capped at DB_MAX_KG. */
+  /** Weight is noted on every variation, not only the hardest: kg of one dumbbell, no ceiling (since 2026-11-20). */
   load?: boolean;
   /** Loaded with the barbell: kg include the bar, and there is no dumbbell ceiling. */
   bar?: boolean;
@@ -34,6 +32,9 @@ export interface Exercise {
   machine?: boolean;
   /** For sets you tick off: what one set is. */
   label?: string;
+  /** The same movement on another day (2026-11-20, the user: what I lifted on Monday shows the next day, with the
+   *  weight to use): the newest session of any exercise in the group sets today's weight. */
+  same?: string;
 }
 
 export interface Workout {
@@ -52,9 +53,10 @@ export const WORKOUTS: Workout[] = [
     min: 55,
     ex: [
       {
-        id: 'bench', name: 'Bench Press', vars: ['Barbell Bench Press'], start: 0,
-        type: 'reps', sets: 4, lo: 6, hi: 8, rest: 90, load: true, bar: true, muscles: 'piept, umeri, triceps',
-        cue: 'Înainte de serii: 1–2 serii ușoare de încălzire. Omoplații strânși și coborâți, picioarele bine puse pe sol. Bara coboară controlat pe piept, la nivelul mameloanelor, și urcă puternic. Tempo controlat, amplitudine completă.',
+        // the user swapped the barbell for dumbbells (2026-11-20): "Barbell Bench Press îl înlocuiesc cu DB Bench Press"
+        id: 'bench', same: 'bench', name: 'DB Bench Press', vars: ['Dumbbell Bench Press'], start: 0,
+        type: 'reps', sets: 4, lo: 6, hi: 8, rest: 90, load: true, muscles: 'piept, umeri, triceps',
+        cue: 'Înainte de serii: 1–2 serii ușoare de încălzire. Omoplații strânși, tălpile pe sol, ganterele coboară controlat lângă piept și urcă puternic. Tempo controlat, amplitudine completă. Kg: o singură ganteră.',
       },
       {
         id: 'pullup', name: 'Pull Up / Lat Pulldown', vars: ['Lat Pulldown', 'Band-assisted Pull-ups', 'Pull-ups'], start: 0,
@@ -62,17 +64,17 @@ export const WORKOUTS: Workout[] = [
         cue: 'Pieptul sus, tragi coatele în jos spre coaste, până când bara ajunge la piept sau bărbia trece de bară. Cobori complet, controlat. Kg: greutatea de pe aparat; la tracțiuni, greutatea adăugată (0 fără).',
       },
       {
-        id: 'incline', name: 'Incline Dumbbell Press', vars: ['Incline Dumbbell Press'], start: 0,
+        id: 'incline', same: 'incline', name: 'Incline Dumbbell Press', vars: ['Incline Dumbbell Press'], start: 0,
         type: 'reps', sets: 3, lo: 8, hi: 10, rest: 75, load: true, muscles: 'pieptul de sus, umeri',
         cue: 'Banca la 30°. Ganterele coboară lateral de piept, coatele la 45–60°, apoi împingi în sus și ușor spre interior. Kg: o singură ganteră.',
       },
       {
-        id: 'csrow', name: 'Chest Supported Row', vars: ['Chest Supported Dumbbell Row', 'Chest Supported Machine Row'], start: 0,
+        id: 'csrow', same: 'csrow', name: 'Chest Supported Row', vars: ['Chest Supported Dumbbell Row', 'Chest Supported Machine Row'], start: 0,
         type: 'reps', sets: 3, lo: 8, hi: 10, rest: 75, load: true, muscles: 'spatele de mijloc, dorsali',
         cue: 'Cu pieptul pe banca înclinată: tragi coatele înapoi și strângi omoplații o secundă, cobori până la brațe întinse. Pieptul nu se ridică de pe bancă.',
       },
       {
-        id: 'latraise', name: 'Lateral Raise', vars: ['Dumbbell Lateral Raise'], start: 0,
+        id: 'latraise', same: 'latraise', name: 'Lateral Raise', vars: ['Dumbbell Lateral Raise'], start: 0,
         type: 'reps', sets: 3, lo: 12, hi: 15, rest: 60, load: true, muscles: 'umeri (deltoidul lateral)',
         cue: 'Brațele ușor îndoite, urci lateral până la nivelul umerilor, fără balans. Cobori în 2–3 secunde.',
       },
@@ -100,12 +102,12 @@ export const WORKOUTS: Workout[] = [
         cue: 'Greu, cu 1–2 repetări în rezervă. Până ajungi la tracțiuni cu greutate, varianta grea de pe aparat. Kg: greutatea de pe aparat sau cea adăugată la centură.',
       },
       {
-        id: 'dbpress', name: 'Flat Dumbbell Press', vars: ['Flat Dumbbell Press'], start: 0,
+        id: 'dbpress', same: 'bench', name: 'Flat Dumbbell Press', vars: ['Flat Dumbbell Press'], start: 0,
         type: 'reps', sets: 4, lo: 6, hi: 8, rest: 90, load: true, muscles: 'piept, umeri, triceps',
         cue: 'Pe banca dreaptă: ganterele coboară lângă piept, omoplații strânși, apoi împingi în sus. 1–2 repetări în rezervă. Kg: o singură ganteră.',
       },
       {
-        id: 'csrow-w', name: 'Chest Supported Row', vars: ['Chest Supported Dumbbell Row', 'Chest Supported Machine Row'], start: 0,
+        id: 'csrow-w', same: 'csrow', name: 'Chest Supported Row', vars: ['Chest Supported Dumbbell Row', 'Chest Supported Machine Row'], start: 0,
         type: 'reps', sets: 4, lo: 8, hi: 10, rest: 75, load: true, muscles: 'spatele de mijloc, dorsali',
         cue: 'Cu pieptul pe banca înclinată: tragi coatele înapoi și strângi omoplații o secundă, cobori până la brațe întinse.',
       },
@@ -120,7 +122,7 @@ export const WORKOUTS: Workout[] = [
         cue: 'Coarda la nivelul feței: tragi spre frunte, cu coatele sus și mâinile depărtându-se la final. Ții o secundă.',
       },
       {
-        id: 'latraise-w', name: 'Dumbbell Lateral Raise', vars: ['Dumbbell Lateral Raise'], start: 0,
+        id: 'latraise-w', same: 'latraise', name: 'Dumbbell Lateral Raise', vars: ['Dumbbell Lateral Raise'], start: 0,
         type: 'reps', sets: 3, lo: 12, hi: 15, rest: 60, load: true, muscles: 'umeri (deltoidul lateral)',
         cue: 'Brațele ușor îndoite, urci lateral până la nivelul umerilor, fără balans. Cobori în 2–3 secunde.',
       },
@@ -186,9 +188,9 @@ export const WORKOUTS: Workout[] = [
     min: 65,
     ex: [
       {
-        id: 'bench-h', name: 'Bench Press', vars: ['Barbell Bench Press'], start: 0,
-        type: 'reps', sets: 5, lo: 3, hi: 5, rest: 120, load: true, bar: true, muscles: 'piept, umeri, triceps',
-        cue: 'Greu și exploziv: 2–3 serii de încălzire, apoi bara coboară controlat și urcă cât de repede poți. Ținta e să bați seria de top de săptămâna trecută.',
+        id: 'bench-h', same: 'bench', name: 'DB Bench Press', vars: ['Dumbbell Bench Press'], start: 0,
+        type: 'reps', sets: 5, lo: 3, hi: 5, rest: 120, load: true, muscles: 'piept, umeri, triceps',
+        cue: 'Greu și exploziv: 2–3 serii de încălzire, apoi ganterele coboară controlat și urcă cât de repede poți. Ținta e să bați seria de top de săptămâna trecută. Kg: o singură ganteră.',
       },
       {
         id: 'wpull-h', name: 'Weighted Pull Up', vars: ['Lat Pulldown (heavy)', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 0,
@@ -196,12 +198,12 @@ export const WORKOUTS: Workout[] = [
         cue: 'Greu, cu intenție explozivă la urcare, coborâre controlată. Kg: greutatea de pe aparat sau cea de la centură.',
       },
       {
-        id: 'incline-h', name: 'Incline Dumbbell Press', vars: ['Incline Dumbbell Press'], start: 0,
+        id: 'incline-h', same: 'incline', name: 'Incline Dumbbell Press', vars: ['Incline Dumbbell Press'], start: 0,
         type: 'reps', sets: 4, lo: 6, hi: 8, rest: 90, load: true, muscles: 'pieptul de sus, umeri',
         cue: 'Banca la 30°, ganterele coboară controlat și urcă puternic. Kg: o singură ganteră.',
       },
       {
-        id: 'csrow-h', name: 'Chest Supported Row', vars: ['Chest Supported Dumbbell Row', 'Chest Supported Machine Row'], start: 0,
+        id: 'csrow-h', same: 'csrow', name: 'Chest Supported Row', vars: ['Chest Supported Dumbbell Row', 'Chest Supported Machine Row'], start: 0,
         type: 'reps', sets: 4, lo: 6, hi: 8, rest: 90, load: true, muscles: 'spatele de mijloc, dorsali',
         cue: 'Mai greu decât miercuri: tragi exploziv, cobori controlat, pieptul rămâne pe bancă.',
       },

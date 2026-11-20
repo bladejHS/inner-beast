@@ -15,8 +15,10 @@ export interface SetLog {
   sets: Array<number | null>;
   unit: 'reps' | 'sec' | 'ytw' | 'emom' | 'done';
   emom?: { min: number; reps: number; done: number };
-  /** Added weight, on the hardest variation. */
+  /** Added weight, on the hardest variation: the heaviest set of the session. */
   kg?: number;
+  /** The weight of each set (2026-11-20), when it was noted per set. */
+  kgs?: Array<number | null>;
 }
 
 export interface Entry {
@@ -78,7 +80,7 @@ export interface Settings {
   /** Hybrid365 (2026-11-20): the easy and long runs, on foot by default; the rower on a day the knees ask for it. */
   aero: 'run' | 'row';
   /** Wednesday's conditioning: Option A Engine Builder (row), Option B Hybrid Circuit. */
-  wedCond: 'a' | 'b';
+  wedCond: 'a' | 'b' | 'c' | 'd' | 'e';
 }
 
 /** A logged meal: name, kcal, protein, carbs, fat (g); pl = which plan meal it was ("t2"). */

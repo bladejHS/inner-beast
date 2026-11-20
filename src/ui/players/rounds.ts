@@ -324,7 +324,7 @@ class RoundsPlayer implements Player {
     const [lo, hi] = zoneHard(ctx.S.set.hrMax);
     return work
       ? `<div class="call-box"><h4>Puls, intervale</h4><div class="c-name">${lo}–${hi} bpm</div><p class="small" style="margin:0">Tare, dar egal: pulsul urcă spre ${lo} abia în minutul doi. Dacă nu-l mai poți ține, încetinești puțin, nu te oprești.</p></div>`
-      : `<div class="call-box"><h4>Ușor</h4><div class="c-name">Sub ${easy} bpm</div><p class="small" style="margin:0">Vâslești lejer, nu te oprești: pulsul coboară până la intervalul următor.</p></div>`;
+      : `<div class="call-box"><h4>Ușor</h4><div class="c-name">Sub ${easy} bpm</div><p class="small" style="margin:0">Mișcare lejeră, nu te oprești: pulsul coboară până la intervalul următor.</p></div>`;
   }
 
   /** The call, animated: the feet from above for a footwork drill, the boxer strike by strike for a combination. */

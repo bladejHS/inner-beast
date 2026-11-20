@@ -1,12 +1,13 @@
-// The 12-week loop as a campaign map (2026-11-15, the user: "fă punctul 2 și campania"). Three chapters of four
-// weeks, one row each, the path snaking down; the 4th week of each is the camp with the tests. Weeks behind are lit,
-// the wolf stands on this week, the road ahead is dashed. Each chapter has its colour (beast.css, html[data-cycle]).
+// The 12-week loop as a campaign map, since 2026-11-20 on the Hybrid365 progression (the user: "actualizează harta
+// conform progresului din hybrid365"): three chapters of four weeks, Bază 4×6′, Volum 5×6′, Ritm 5×7′ with 60″ jogs;
+// under every week its long run (60 → 90 min, five more each week, the 4th week lighter with the tests). Weeks behind
+// are lit, the mark stands on this week, the road ahead is dashed.
 
 import { wolfBadge } from './rankart.ts';
-import { CYCLE_WEEKS, CYCLES } from '../logic/progress.ts';
+import { CYCLE_WEEKS, CYCLES, hybridWeek } from '../logic/progress.ts';
 import { esc } from '../logic/util.ts';
 
-const W = 340, ROW = [74, 178, 282], COLS = [44, 128, 212, 296];
+const W = 340, ROW = [78, 194, 310], COLS = [44, 128, 212, 296];
 
 /** Where week i (0–11) stands on the map. */
 function node(i: number): [number, number] {
@@ -26,7 +27,7 @@ function road(i: number): string {
 export function campaignSvg(pos: number, lap: number): string {
   const n = CYCLES.length * CYCLE_WEEKS;
   const roads = Array.from({ length: n - 1 }, (_, i) => `<path class="cp-r ch-${CYCLES[Math.floor((i + 1) / CYCLE_WEEKS)]!.id}${i + 1 <= pos ? ' ok' : ''}" d="${road(i)}"/>`).join('');
-  const titles = CYCLES.map((c, r) => `<text class="cp-t ch-${c.id}${pos >= 0 && Math.floor(pos / CYCLE_WEEKS) === r ? ' on' : ''}" ${r > 0 && r % 2 === 0 ? `x="${W - 20}" text-anchor="end"` : 'x="20"'} y="${ROW[r]! - 34}"><tspan class="cp-id">${c.id}</tspan> ${esc(c.name)}</text>`).join('');
+  const titles = CYCLES.map((c, r) => `<text class="cp-t ch-${c.id}${pos >= 0 && Math.floor(pos / CYCLE_WEEKS) === r ? ' on' : ''}" ${r > 0 && r % 2 === 0 ? `x="${W - 20}" text-anchor="end"` : 'x="20"'} y="${ROW[r]! - 34}"><tspan class="cp-id">${c.id}</tspan> ${esc(c.name)} · <tspan class="cp-thr">${esc(c.thr)}</tspan></text>`).join('');
   const nodes = Array.from({ length: n }, (_, i) => {
     const [x, y] = node(i);
     const camp = (i + 1) % CYCLE_WEEKS === 0;
@@ -36,6 +37,7 @@ export function campaignSvg(pos: number, lap: number): string {
     return `<g class="cp-n ch-${ch} ${st}${camp ? ' camp' : ''}" style="--i:${i}">
       ${camp ? `<rect x="${x - 15}" y="${y - 15}" width="30" height="30" rx="7" transform="rotate(45 ${x} ${y})"/>` : `<circle cx="${x}" cy="${y}" r="15"/>`}
       ${st === 'ok' ? `<path class="cp-ck" d="M${x - 6} ${y}l4 4 8-9"/>` : st === 'now' ? '' : `<text x="${x}" y="${y + 5}">${label}</text>`}
+      <text class="cp-s" x="${x}" y="${y + 34}">${hybridWeek(i).long}′</text>
     </g>`;
   }).join('');
   let wolf = '';
@@ -44,7 +46,7 @@ export function campaignSvg(pos: number, lap: number): string {
     wolf = `<g class="cp-me"><circle class="cp-pulse" cx="${x}" cy="${y}" r="22"/><circle class="cp-pulse two" cx="${x}" cy="${y}" r="22"/>
       <circle class="cp-medal" cx="${x}" cy="${y}" r="20"/><image href="${wolfBadge()}" x="${x - 15}" y="${y - 17}" width="30" height="35"/></g>`;
   }
-  return `<svg class="camp" viewBox="0 0 ${W} 312" role="img" aria-label="${pos < 0 ? 'Campania începe luni' : `Săptămâna ${pos + 1} din 12${lap > 1 ? `, turul ${lap}` : ''}`}">
+  return `<svg class="camp" viewBox="0 0 ${W} 350" role="img" aria-label="${pos < 0 ? 'Campania începe luni' : `Săptămâna ${pos + 1} din 12${lap > 1 ? `, turul ${lap}` : ''}`}">
     ${titles}${roads}${nodes}${wolf}
   </svg>`;
 }

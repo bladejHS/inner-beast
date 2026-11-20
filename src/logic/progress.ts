@@ -1,7 +1,7 @@
 // "Progression is mandatory": what to do next time, streaks, weekly completion and totals.
 
 import type { Exercise } from '../data/workouts.ts';
-import { BW_SCHEMES, DB_MAX_KG, EMOM_GOAL, exerciseById, RECORD_WIDS, recordable } from '../data/workouts.ts';
+import { BW_SCHEMES, EMOM_GOAL, exerciseById, RECORD_WIDS, recordable, WORKOUTS } from '../data/workouts.ts';
 import type { CycleId, Day } from '../data/plan.ts';
 import type { Entry, Habit, SetLog } from './store.ts';
 import { addDays, daysBetween, inWeek, weekStart } from './util.ts';
@@ -77,6 +77,59 @@ export function loadable(ex: Exercise, lvl: number): boolean {
   return (ex.type === 'reps' || ex.type === 'emom') && ex.vars.length > 1 && lvl === ex.vars.length - 1;
 }
 
+/** The jump between two weights: 1 kg under 10 kg, 2.5 kg above (the plates and the dumbbell racks). */
+export const kgStep = (kg: number): number => (kg < 10 ? 1 : KG_STEP);
+
+/** The weight for the next set, from the reps just done at `kg` against the target range: past the top, more; in the
+ *  range, the same; short of it, less (2026-11-20, the user: "recomandă pentru următoarea serie ce greutăți să folosesc").
+ *  Reps-only exercises with a target range; null when there is nothing to say. */
+export function setKgAdvice(ex: Exercise, kg: number, reps: number): { kg: number; text: string } | null {
+  if (!kg || kg <= 0 || ex.type !== 'reps' || ex.lo == null) return null;
+  const lo = ex.lo, hi = ex.hi ?? ex.lo, st = kgStep(kg);
+  const round = (v: number): number => Math.max(st, Math.round(v / st) * st);
+  const range = lo === hi ? `${lo}` : `${lo}–${hi}`;
+  if (reps >= hi + 3) {
+    const k = Math.max(kg + st, round(kg * 1.1));
+    return { kg: k, text: `${reps} repetări cu ${kgStr(kg)} kg, mult peste ${range}: următoarea serie cu ${kgStr(k)} kg.` };
+  }
+  if (reps > hi) return { kg: kg + st, text: `${reps} repetări, peste ${range}: următoarea serie cu ${kgStr(kg + st)} kg.` };
+  if (reps >= lo) return { kg, text: `${reps} repetări, în interval: rămâi la ${kgStr(kg)} kg.` };
+  const k = reps >= lo - 2 ? Math.max(st, kg - st) : Math.min(kg - st, round(kg * 0.88));
+  return { kg: Math.max(0, k), text: `${reps} repetări, sub ${range}: următoarea serie cu ${kgStr(Math.max(0, k))} kg.` };
+}
+
+/** The newest session of the same movement on another exercise of its group, when it is newer than this exercise's
+ *  own last session. */
+export function lastSame(log: Entry[], ex: Exercise, own?: LastEx): (LastEx & { ex: Exercise }) | undefined {
+  if (!ex.same) return undefined;
+  let best: (LastEx & { ex: Exercise }) | undefined;
+  for (const w of WORKOUTS) for (const o of w.ex) {
+    if (o.id === ex.id || o.same !== ex.same) continue;
+    const l = lastExercise(log, o.id);
+    if (l && (l.log.kg ?? 0) > 0 && (!best || (l.ts ?? 0) > (best.ts ?? 0))) best = { ...l, ex: o };
+  }
+  if (!best || (own && (own.ts ?? 0) >= (best.ts ?? 0))) return undefined;
+  return best;
+}
+
+/** Today's weight from another day's session of the same movement: the best set as an estimated 1RM (Epley), brought
+ *  to the middle of today's rep range, rounded to the plates. */
+export function crossKg(ex: Exercise, from: LastEx & { ex: Exercise }): { kg: number; text: string } | null {
+  const sets = from.log.sets;
+  let top = 0, at = 0, reps = 0;
+  sets.forEach((r, j) => {
+    const kg = from.log.kgs?.[j] ?? from.log.kg ?? 0;
+    if (r && r > 0 && kg > 0 && kg * (1 + r / 30) > top) { top = kg * (1 + r / 30); at = kg; reps = r; }
+  });
+  if (!top || ex.lo == null) return null;
+  const mid = ((ex.lo ?? 1) + (ex.hi ?? ex.lo ?? 1)) / 2;
+  const raw = top / (1 + mid / 30), st = kgStep(raw);
+  const kg = Math.max(st, Math.round(raw / st) * st);
+  const day = ['luni', 'marți', 'miercuri', 'joi', 'vineri', 'sâmbătă', 'duminică'][(new Date(`${from.date}T12:00:00`).getDay() + 6) % 7];
+  const range = ex.lo === ex.hi ? `${ex.lo}` : `${ex.lo}–${ex.hi}`;
+  return { kg, text: `${day[0]!.toUpperCase()}${day.slice(1)}: ${reps} × ${kgStr(at)} kg la ${from.ex.name}. Pentru ${range} repetări azi: ${kgStr(kg)} kg.` };
+}
+
 /** Sets that are ticked off rather than counted. */
 export const ticked = (ex: Exercise): boolean => ex.type === 'ytw' || ex.type === 'done';
 
@@ -113,13 +166,8 @@ export function advise(ex: Exercise, last: LastEx | undefined, lvl: number, prev
   if (atTop(last)) {
     const lkg = last.log.kg;
     if (ex.load && lkg) {
-      // Dumbbells stop at DB_MAX_KG: past that, a harder variation or a slower tempo takes over.
-      const next = ex.bar || ex.machine ? lkg + KG_STEP : Math.min(lkg + KG_STEP, DB_MAX_KG);
-      if (next <= lkg) {
-        const heaviest = `Ai atins ${hi}${ex.type === 'time' ? ' s' : ''} la toate seriile cu ${kgStr(lkg)} kg, cele mai grele gantere.`;
-        if (lvl < ex.vars.length - 1) return { kind: 'up', lvl: lvl + 1, text: `${heaviest} Treci la ${ex.vars[lvl + 1]}.` };
-        return { kind: 'top', text: `${heaviest} De aici crești altfel: cobori în 3 secunde și ții o secundă jos, la aceleași repetări.` };
-      }
+      // no ceiling on the weights since 2026-11-20 (the user: "elimină limita de gantere")
+      const next = lkg + kgStep(lkg);
       return { kind: 'top', kg: next, text: `Ai atins ${hi} la toate seriile cu ${kgStr(lkg)} kg. Mergi pe ${kgStr(next)} kg și pornești din nou de la ${lo}.` };
     }
     if (lvl < ex.vars.length - 1) {
@@ -228,11 +276,20 @@ export const lightWord = (s: { easy?: string }, today: string): string => (s.eas
 
 export const CYCLE_WEEKS = 4;
 
-export const CYCLES: Array<{ id: CycleId; name: string; what: string }> = [
-  { id: 'A', name: 'Bază', what: 'Threshold Run 4 × 6 min, cu 90 s de jogging. Alergările ușoare și cea lungă cresc cu 5 minute pe sesiune; la forță, întâi repetări, apoi greutate.' },
-  { id: 'B', name: 'Volum', what: 'Threshold Run 5 × 6 min: o repetare în plus. Greutatea urcă la exercițiile principale, condiționarea mai densă.' },
-  { id: 'C', name: 'Ritm', what: 'Threshold Run 5 × 7 min, cu doar 60 s de jogging. Încerci să bați seria de top de vineri și timpii de miercuri.' },
+export const CYCLES: Array<{ id: CycleId; name: string; what: string; thr: string }> = [
+  { id: 'A', name: 'Bază', thr: '4×6′ · 90″', what: 'Threshold Run 4 × 6 min, cu 90 s de jogging. Alergările ușoare și cea lungă cresc cu 5 minute pe sesiune; la forță, întâi repetări, apoi greutate.' },
+  { id: 'B', name: 'Volum', thr: '5×6′ · 90″', what: 'Threshold Run 5 × 6 min: o repetare în plus. Greutatea urcă la exercițiile principale, condiționarea mai densă.' },
+  { id: 'C', name: 'Ritm', thr: '5×7′ · 60″', what: 'Threshold Run 5 × 7 min, cu doar 60 s de jogging. Încerci să bați seria de top de vineri și timpii de miercuri.' },
 ];
+
+/** The Hybrid365 targets of loop week i (0–11): the long run, grown by 5 min each week from 60 to 90 (the lighter 4th
+ *  week back at 60), and the threshold set of the chapter. For the campaign map. */
+export function hybridWeek(i: number): { long: number; easy: number; thr: string; light: boolean } {
+  const light = (i + 1) % CYCLE_WEEKS === 0;
+  const grown = i - Math.floor(i / CYCLE_WEEKS);
+  const c = CYCLES[Math.floor(i / CYCLE_WEEKS) % CYCLES.length]!;
+  return { long: light ? 60 : Math.min(90, 60 + 5 * grown), easy: light ? 30 : Math.min(45, 30 + 5 * grown), thr: c.thr, light };
+}
 
 export interface CycleNow {
   id: CycleId;

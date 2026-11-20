@@ -1,12 +1,12 @@
-// "Progres" in four sections: Săptămâna (the week, totals, sleep, steps), Antrenament (box, calisthenics, aerobic),
+// "Progres" in four sections: Săptămâna (the Hybrid365 framework, totals, sleep, steps), Antrenament (strength by lift,
+// runs, conditioning),
 // Teste (the test battery and the challenges) and Istoric (the latest entries; the full list opens on its own screen).
 
 import { fireCalendar } from '../fire.ts';
 import { WEEK } from '../../data/plan.ts';
-import { BW_SCHEMES, EMOM_GOAL, WORKOUTS } from '../../data/workouts.ts';
-import { activeStreak, allRecords, amrapBest, amrapTrend, dayProgress, exerciseTrend, stalled, totals, variationPath, weekDone, weekSince } from '../../logic/progress.ts';
+import { BW_SCHEMES, WORKOUTS } from '../../data/workouts.ts';
+import { activeStreak, allRecords, dayProgress, exerciseTrend, stalled, totals, weekDone, weekSince } from '../../logic/progress.ts';
 import { runAdvice, zone2 } from '../../logic/runlog.ts';
-import { KNEE_RUN, kneeStreak, legDays } from '../../logic/knee.ts';
 import { loadReport, loadText } from '../../logic/ready.ts';
 import type { Entry } from '../../logic/store.ts';
 import { addDays, dayKey, esc, km, mmss, raceTime, num, paceStr, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
@@ -15,10 +15,8 @@ import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { ic } from '../icons.ts';
 import { healthRow, pageHead, segBar, segOf, top, heroBand } from './shared.ts';
-import { boxCycle, boxScore, boxStats } from '../../logic/boxstats.ts';
-import { COMBOS } from '../../data/combos.ts';
+import { boxScore } from '../../logic/boxstats.ts';
 import { bestOf, TESTS, UNIT_LABEL, type FitTest } from '../../data/tests.ts';
-import { learned } from './alex.ts';
 import { goalHtml } from './goal.ts';
 
 /** A test result in its unit: 10:59, 34 cm, 41 repetări. */
@@ -96,28 +94,6 @@ function entryLine(e: Entry, del = false): string {
   return `<li><div><b>${esc(e.name)}</b><span>${shortDay(e.date)}${what ? `, ${esc(what)}` : ''}${e.block ? '' : ', în afara planului'}</span></div>${del ? `<button class="icon-btn" data-a="hist-del" data-id="${e.id}" aria-label="Șterge">${ic('trash')}</button>` : ''}</li>`;
 }
 
-function boxHtml(today: string): string {
-  const b = boxStats(ctx.S.log, today);
-  if (!b.rounds && !b.punches) return '<h2 class="sec first">Kickboxing</h2><p class="dim">După primele runde vezi aici statisticile.</p>';
-  const diff = Math.round(b.min30 - b.minPrev30);
-  const known = learned();
-  const cy = boxCycle(ctx.S.log, today);
-  const rare = COMBOS.filter((c) => known.has(c.id)).sort((x, y) => (b.called[x.name] ?? 0) - (b.called[y.name] ?? 0)).slice(0, 3);
-  return `<h2 class="sec first">Kickboxing<small>Ultimele 30 de zile: ${Math.round(b.min30)} min, ${diff >= 0 ? '+' : '−'}${Math.abs(diff)} față de cele 30 dinainte</small></h2>
-    <div class="stats">
-      <div class="stat"><b>${b.rounds}</b><span>runde în total</span></div>
-      <div class="stat"><b>${Math.round(b.bagMin)}</b><span>minute la sac</span></div>
-      <div class="stat"><b>${Math.round(b.shadowMin)}</b><span>minute de shadow</span></div>
-      <div class="stat"><b>${known.size} din ${COMBOS.length}</b><span>combinații învățate</span></div>
-      ${b.punches ? `<div class="stat"><b>${b.punches}</b><span>lovituri numărate cu camera</span></div>` : ''}
-    </div>
-    ${cy
-      ? `<div class="ex-line"><div><b>Scor de kickboxing, săptămâna ${cy.week} din 8</b><span>Ținta la săptămâna ${cy.check}: ${cy.target}. Acum: ${cy.now ?? '–'}, ai pornit de la ${cy.base}.</span></div>${spark(cy.scores)}</div>`
-      : '<p class="small dim">Notează tehnica și efortul la finalul a 3 sesiuni și primești scorul de kickboxing, cu ținte la săptămânile 4 și 8.</p>'}
-    ${b.guard.length > 1 ? `<p class="small dim" style="margin-bottom:0">Garda sus, % din timp</p>${spark(b.guard)}` : ''}
-    ${rare.length ? `<p class="small dim">Exersate cel mai rar dintre cele învățate: ${rare.map((c) => esc(c.name)).join(', ')}.</p>` : ''}`;
-}
-
 export const PROGRESS_SEGS: Array<[string, string]> = [['week', 'Săptămâna'], ['train', 'Antrenament'], ['tests', 'Teste'], ['log', 'Istoric']];
 
 const day2 = (d: string) => RO_DAYS[weekdayIdx(d)].slice(0, 2);
@@ -149,10 +125,11 @@ function weekSeg(): string {
   const stat = (v: number, label: string, cls = '', shown = String(v)) => `<div class="stat ${cls}"><b class="num" data-count="${Math.round(v)}">${shown}</b><span>${label}</span></div>`;
   return `<h2 class="sec first">Săptămâna asta<small>${full} din 7 zile complete</small></h2>
     <div class="week7">${week}</div>
+    ${frameworkHtml(done)}
     <div class="stats">
       ${stat(streak, streak === 1 ? 'zi activă la rând' : 'zile active la rând', streak > 0 ? 'hot' : '')}
       ${stat(t.sessions, 'sesiuni în total')}
-      ${stat(Math.round(t.boxingMin), 'minute de runde')}
+      ${stat(S.log.filter((e) => e.kind === 'workout').length, 'sesiuni de forță')}
       <div class="stat"><b class="num">${t.runKm.toFixed(1).replace('.', ',')}</b><span>km alergați</span></div>
       ${stat(Math.round(t.coldMin), 'minute la rece')}
       ${stat(Math.round(t.breathMin), 'minute de respirație')}
@@ -195,63 +172,79 @@ function recordsHtml(): string {
     <ul class="hist">${recs.map((r) => `<li><div><b>${esc(r.name)}</b><span>${r.v} ${r.sec ? 's' : 'repetări'}, ${shortDay(r.date)}</span></div></li>`).join('')}</ul>`;
 }
 
-/** Antrenament: boxing, calisthenics and the aerobic work. */
-function trainSeg(): string {
-  const S = ctx.S;
-  const today = dayKey();
+/** The Hybrid365 framework this week: 3 runs, 3 upper lifts, 1 lower lift, 1 conditioning, as on the first slide. */
+const FRAMEWORK: Array<[string, string[]]> = [
+  ['Runs', ['mon-run', 'tue-thr', 'thu-run', 'sat-long']],
+  ['Upper', ['mon-upper', 'wed-upper', 'fri-upper']],
+  ['Lower', ['thu-lower']],
+  ['Conditioning', ['wed-cond']],
+];
+const FRAMEWORK_GOAL: Record<string, number> = { Runs: 3, Upper: 3, Lower: 1, Conditioning: 1 };
 
-  // calisthenics
-  const exLines: string[] = [];
-  for (const w of WORKOUTS) {
-    for (const ex of w.ex) {
-      if (ex.type === 'emom' || ex.type === 'done') continue;
-      const tr = exerciseTrend(S.log, ex.id, 12);
-      if (!tr.length) continue;
-      const last = tr[tr.length - 1];
-      const unit = ex.type === 'time' || ex.id === 'hang' ? ' s' : '';
-      const same = tr.filter((x) => x.lvl === last.lvl);
-      const kg = Math.max(...same.map((x) => x.kg));
-      const best = ex.type === 'ytw' ? `${last.total} × 5-5-5 data trecută` : `Cel mai bun: ${Math.max(...same.filter((x) => x.kg === kg).map((x) => x.best))}${unit}${kg ? ` cu ${String(kg).replace('.', ',')} kg` : ''}`;
-      const path = variationPath(S.log, ex.id);
-      const road = path.length > 1 ? `, drumul: ${path.map((p) => `${esc(ex.vars[p.lvl] ?? '')} (${shortDay(p.date)})`).join(', ')}` : '';
-      const stuck = ex.type !== 'ytw' && stalled(S.log, ex.id, last.lvl, last.kg) ? ', fără progres la ultimele 3 sesiuni' : '';
-      exLines.push(`<div class="ex-line"><div><b>${esc(ex.vars[last.lvl] ?? ex.name)}</b><span>${best}, ultima dată ${shortDay(last.date)}${road}${stuck}</span></div>${spark(same.map((x) => x.total))}</div>`);
-    }
-  }
-  const emomPct = Math.round(((S.emom.min * S.emom.reps) / (EMOM_GOAL.min * EMOM_GOAL.reps)) * 100);
-  const amraps = S.log.filter((e) => e.kind === 'amrap');
-  const sch = S.set.bwScheme;
-  const amBest = amrapBest(S.log, sch);
-
-  // runs and easy cardio
-  const runs = S.log.filter((e) => e.kind === 'run');
-  const aerobic = S.log.filter((e) => e.kind === 'run' || e.kind === 'cardio');
-  const paces = runs.map((e) => Number(e.data.pace) || 0).filter((p) => p > 0).slice(-12);
-
-  return `${boxHtml(today)}
-
-    <h2 class="sec">Calistenie<small>Totalul de repetări pe sesiune, la varianta curentă</small></h2>
-    <div class="ex-line"><div><b>Pull-up EMOM</b><span>Următoarea țintă: ${S.emom.min} min × ${S.emom.reps}. Spre ${EMOM_GOAL.min} × ${EMOM_GOAL.reps}: ${emomPct}%.</span></div><div class="bar" style="margin:0;--fill:${Math.min(1, emomPct / 100).toFixed(3)}"><i></i></div></div>
-    ${amraps.length ? `<div class="ex-line"><div><b>Bodyweight Workout</b><span>Ultima dată ${amraps[amraps.length - 1].data.rounds} runde${amBest ? `, recordul la ${esc(BW_SCHEMES[sch].name)}: ${amBest.data.rounds} runde + ${amBest.data.extra}` : ''}</span></div>${spark(amrapTrend(S.log, sch))}</div>` : ''}
-    ${exLines.join('') || '<p class="dim">După primul antrenament de push, pull sau picioare vezi aici fiecare exercițiu.</p>'}
-    ${recordsHtml()}
-    ${kneeLine()}
-
-    <h2 class="sec">Aerob<small>Alergarea de duminică și canotajul de marți, ușor</small></h2>
-    ${runAdvice(S.log, zone2(S.set.hrMax)) ? `<p class="small dim">${esc(runAdvice(S.log, zone2(S.set.hrMax)))}</p>` : ''}
-    ${aerobic.length ? `${paces.length > 1 ? `<p class="small dim" style="margin:0">Ritmul mediu la alergare (mai jos e mai rapid)</p>${spark(paces, true)}` : ''}<ul class="hist">${aerobic.slice(-6).reverse().map((e) => entryLine(e)).join('')}</ul>` : '<p class="dim">Duminică: alergare ușoară, de la 20 la 30 de minute. Marți: canotaj ușor.</p>'}`;
+function frameworkHtml(done: Set<string>): string {
+  return `<div class="fw">${FRAMEWORK.map(([name, ids]) => {
+    const goal = FRAMEWORK_GOAL[name] ?? 1;
+    const n = Math.min(goal, ids.filter((id) => done.has(id)).length);
+    return `<div class="fw-i${n >= goal ? ' full' : ''}"><b class="num">${n}<small>/${goal}</small></b><span>${name}</span><i style="--f:${(n / goal).toFixed(3)}"></i></div>`;
+  }).join('')}</div>`;
 }
 
-/** The knees after Leg Day: the last notes and how far the jumps are. */
-function kneeLine(): string {
-  const days = legDays(ctx.S.log, ctx.S.knee);
-  const noted = days.filter((l) => l.d !== undefined).slice(0, 6);
-  if (!noted.length) return '';
-  const { clean, jump } = kneeStreak(days);
-  const lvl = ctx.S.lvl.cmj ?? 0;
-  const next = lvl === 0 ? `Box Jump: ${Math.min(clean, KNEE_RUN)} din ${KNEE_RUN} Leg Day-uri la rând fără durere` : lvl === 1 ? `Countermovement Jump: ${Math.min(jump, KNEE_RUN)} din ${KNEE_RUN} cu Box Jump fără durere` : 'Săriturile sunt înapoi';
-  const notes = noted.map((l) => `${shortDay(l.date)}: ${l.d}/10${l.m !== undefined ? `, dimineața ${l.m}/10` : ''}`).join('; ');
-  return `<div class="ex-line"><div><b>Genunchii după Leg Day</b><span>${esc(next)}. ${esc(notes)}.</span></div>${spark([...noted].reverse().map((l) => Math.max(l.d ?? 0, l.m ?? 0)), true)}</div>`;
+/** Estimated one-rep max (Epley): a common yardstick across rep ranges, for the strength trend. */
+const e1rm = (kg: number, reps: number): number => (kg > 0 && reps > 0 ? kg * (1 + reps / 30) : 0);
+const kgS = (v: number): string => String(Math.round(v * 2) / 2).replace('.', ',');
+
+/** Antrenament (since 2026-11-20): Hybrid365 strength by lift, the runs, the conditioning, the records. */
+function trainSeg(): string {
+  const S = ctx.S;
+
+  // strength: per session the best set as an estimated 1RM, per lift, grouped by day
+  const blocks = WORKOUTS.map((w) => {
+    const lines: string[] = [];
+    for (const ex of w.ex) {
+      const tr = exerciseTrend(S.log, ex.id, 12);
+      if (!tr.length) continue;
+      const last = tr[tr.length - 1]!;
+      const loaded = tr.some((x) => x.kg > 0);
+      const series = loaded ? tr.map((x) => Math.round(e1rm(x.kg, x.best))) : tr.filter((x) => x.lvl === last.lvl).map((x) => x.total);
+      const top = loaded ? tr.reduce((b, x) => (e1rm(x.kg, x.best) > e1rm(b.kg, b.best) ? x : b)) : null;
+      const stuck = stalled(S.log, ex.id, last.lvl, last.kg) ? ' · fără progres la ultimele 3 sesiuni' : '';
+      const info = loaded
+        ? `Ultima: ${last.best} × ${kgS(last.kg)} kg (${shortDay(last.date)}) · cel mai bun: ${top!.best} × ${kgS(top!.kg)} kg, 1RM estimat ${kgS(e1rm(top!.kg, top!.best))} kg${stuck}`
+        : `Ultima: ${last.total} repetări în total (${shortDay(last.date)})${stuck}`;
+      lines.push(`<div class="ex-line"><div><b>${esc(ex.vars[last.lvl] ?? ex.name)}</b><span>${info}</span></div>${spark(series)}</div>`);
+    }
+    return lines.length ? `<h3 class="sub-h">${esc(WEEK.find((d) => d.blocks.some((b) => b.workout === w.id))?.title ?? w.name)}</h3>${lines.join('')}` : '';
+  }).join('');
+
+  // runs: the long run's minutes, the easy runs, the threshold sets, the pace
+  const runMin = (id: string) => S.log.filter((e) => e.block === id && e.dur > 0).map((e) => Math.round(e.dur / 60)).slice(-12);
+  const longs = runMin('sat-long'), easies = [...S.log.filter((e) => (e.block === 'mon-run' || e.block === 'thu-run') && e.dur > 0)].map((e) => Math.round(e.dur / 60)).slice(-12);
+  const thr = S.log.filter((e) => e.block === 'tue-thr' && e.data.hiit).slice(-8);
+  const runs = S.log.filter((e) => e.kind === 'run');
+  const paces = runs.map((e) => Number(e.data.pace) || 0).filter((v) => v > 0).slice(-12);
+  const runLine = (name: string, vals: number[], goal: string) => `<div class="ex-line"><div><b>${name}</b><span>${vals.length ? `Ultima: ${vals[vals.length - 1]} min · cea mai lungă: ${Math.max(...vals)} min · ${goal}` : `Încă nimic · ${goal}`}</span></div>${vals.length > 1 ? spark(vals) : ''}</div>`;
+
+  // conditioning: Engine Builder times, circuit rounds, the interval sessions
+  const engine = S.log.filter((e) => e.kind === 'row' && e.data.ch === 'd' && Number(e.data.meters) >= 2000).slice(-10);
+  const circuits = S.log.filter((e) => e.kind === 'amrap' && e.data.circuit).slice(-10);
+  const intervals = S.log.filter((e) => e.block === 'wed-cond' && e.kind === 'cardio').slice(-6);
+  const bestEngine = engine.length ? Math.min(...engine.map((e) => e.dur)) : 0;
+
+  return `<h2 class="sec first">Forță<small>Cea mai bună serie din fiecare sesiune, ca 1RM estimat (greutate × repetări). Hybrid365: întâi repetări, apoi greutate.</small></h2>
+    ${blocks || '<p class="dim">După primul antrenament de upper sau lower vezi aici fiecare exercițiu, cu greutățile.</p>'}
+    ${recordsHtml()}
+
+    <h2 class="sec">Alergare<small>Zona 2 la alergările ușoare și la cea lungă; pragul marțea</small></h2>
+    ${runAdvice(S.log, zone2(S.set.hrMax)) ? `<p class="small dim">${esc(runAdvice(S.log, zone2(S.set.hrMax)))}</p>` : ''}
+    ${runLine('Long Run', longs, 'ținta crește spre 90 min')}
+    ${runLine('Easy Runs', easies, 'luni 30→45, joi 30→40 min')}
+    <div class="ex-line"><div><b>Threshold Run</b><span>${thr.length ? `Ultima: ${thr[thr.length - 1]!.data.rounds} × ${Math.round(Number(thr[thr.length - 1]!.data.work) / 60)} min (${shortDay(thr[thr.length - 1]!.date)}) · ${thr.length} sesiuni de prag` : 'Încă nimic · 4 × 6 min, apoi 5 × 6, apoi 5 × 7'}</span></div>${thr.length > 1 ? spark(thr.map((e) => Math.round(Number(e.data.workDone) / 60))) : ''}</div>
+    ${paces.length > 1 ? `<p class="small dim" style="margin:10px 0 0">Ritmul mediu la alergare (mai jos e mai rapid)</p>${spark(paces, true)}` : ''}
+
+    <h2 class="sec">Condiționare<small>Miercuri: timpii și rundele, ca să le bați</small></h2>
+    <div class="ex-line"><div><b>Engine Builder 8 × 250 m</b><span>${engine.length ? `Ultima: ${mmss(engine[engine.length - 1]!.dur)} · cel mai bun: ${mmss(bestEngine)}` : 'Încă nimic · notează timpul și încearcă să-l bați'}</span></div>${engine.length > 1 ? spark(engine.map((e) => Math.round(e.dur)), true) : ''}</div>
+    <div class="ex-line"><div><b>Hybrid Circuit (10 Min AMRAP)</b><span>${circuits.length ? `Ultima: ${circuits[circuits.length - 1]!.data.rounds} runde + ${circuits[circuits.length - 1]!.data.extra} · cel mai bun: ${Math.max(...circuits.map((e) => Number(e.data.rounds) || 0))} runde` : 'Încă nimic · cât mai multe runde în 10 minute'}</span></div>${circuits.length > 1 ? spark(circuits.map((e) => Number(e.data.rounds) || 0)) : ''}</div>
+    ${intervals.length ? `<ul class="hist">${intervals.reverse().map((e) => entryLine(e)).join('')}</ul>` : '<p class="small dim">Norwegian 4x4, Hill Repeats și 30/30s apar aici după prima sesiune.</p>'}`;
 }
 
 export function historyHtml(): string {

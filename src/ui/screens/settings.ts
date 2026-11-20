@@ -69,12 +69,12 @@ export function settingsHtml(): string {
     </div>
     <h2 class="sec">Surse</h2>
     <ul class="ticks small">
-      <li>Programul și capitolele: e-book-ul „Unleash Your Inner Beast” de Alex. Nutriția nu e inclusă.</li>
-      <li>Planul săptămânal pornește de la carte și a fost refăcut pe 7 noiembrie 2026 pentru un atlet complet, după studii: ordinea blocurilor, forța de picioare, sprinturile, săriturile, punch-out-ul, aerobul ușor, ciclurile de 4 săptămâni și testele. Unde cartea și studiile se contrazic, aplicația spune ce spun studiile.</li>
+      <li>Programul: Hybrid365 (@hybrid.365), split-ul run-focused: 3 alergări, 3 zile de upper, 1 de lower, 1 condiționare. Capitolele din Minte: e-book-ul „Unleash Your Inner Beast” de Alex.</li>
+      <li>Planul săptămânal e cel din postările Hybrid365 (sesiuni, serii, repetări, pauze, progresii), potrivit pe tine doar unde ai cerut: Hack Squat în loc de Back Squat, alergările ușoare pot merge pe vâslitor. Greutatea pentru seria următoare se calculează din repetările făcute la seria de dinainte.</li>
       <li>Combinațiile, rutina de spate, mobilitatea și sfaturile: canalul lui Alex Hanma, <a href="https://www.tiktok.com/@alexhanma___" target="_blank" rel="noopener">TikTok @alexhanma___</a> și <a href="https://www.instagram.com/alexhanma_/" target="_blank" rel="noopener">Instagram @alexhanma_</a>.</li>
       <li>Meditația: metoda de respirație Wim Hof. Respirația 4-7-8: metoda din carte.</li>
     </ul>
     <h2 class="sec">Versiunea<small>Aplicația se actualizează singură când o deschizi cu internet. Dacă vezi totuși ceva vechi, apasă butonul: datele tale rămân.</small></h2>
     <button class="btn ghost sm" style="width:100%" data-a="force-update">${ic('refresh')}Actualizează acum</button>
-    <p class="small dim" style="text-align:center;margin-top:28px">Inner Beast 3.0 · versiunea ${__BUILD__}</p>`;
+    <p class="small dim" style="text-align:center;margin-top:28px">HYBRID FORGE 4.0 · versiunea ${__BUILD__}</p>`;
 }

@@ -6,12 +6,12 @@
 <meta name="theme-color" content="#080808">
 <meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Inner Beast: planul Hybrid365 zi de zi (alergare, forță, condiționare), timere și tracking.">
+<meta name="description" content="HYBRID FORGE: planul Hybrid365 zi de zi (alergare, forță, condiționare), timere și tracking.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Beast">
-<title>Inner Beast</title>
+<meta name="apple-mobile-web-app-title" content="Hybrid Forge">
+<title>HYBRID FORGE</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -46,7 +46,7 @@
 html{--sp-bg:#05060a;--sp-fg:#f3f5fa}html[data-theme=dark]{--sp-bg:#05060a;--sp-fg:#f3f5fa}
 html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 /* THE SPLIT since 2026-11-20 (BeastArena.hybrid in splash/arena.js, the Hybrid365 plan in yellow): a runner breaks the
-   finish beam between a bench press and a deadlift, the wolf watching from the dark; INNER BEAST and RUN FAST. BUILD
+   finish beam between a bench press and a deadlift, the forge mark glowing behind; HYBRID FORGE and RUN FAST. BUILD
    MUSCLE. are stamped at the moment he breaks it. Before that, THE ARENA, about 3.3 s, on the first run and after a new version (engine: splash/arena.js, shared with Beast Nutrition).
    In the dark the wolf's eyes light up; the light rises and the wolf watches over the arena: two fighters trade punches,
    someone does pull-ups, someone push-ups, a runner crosses behind. At 2.0 s the high kick lands (flash, sparks, the
@@ -63,13 +63,13 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 .sp-emb{position:absolute;inset:0;opacity:0}
 .sp-emb img{display:block;width:100%;height:100%;filter:brightness(.78) contrast(1.08) drop-shadow(0 0 2px rgba(255,212,59,.7)) drop-shadow(0 0 30px rgba(200,150,10,.45))}
 .sp-eye{position:absolute;width:19%;aspect-ratio:2.4;margin:-3.96% 0 0 -9.5%;border-radius:50%;transform:rotate(var(--r));opacity:0;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(closest-side,#fff 0,#fff2c4 9%,#ffd43b 22%,rgba(255,212,59,.32) 42%,transparent 70%)}
-.sp-eye.l{left:36.6%;top:42%;--r:27deg}.sp-eye.r{left:63.4%;top:42%;--r:-27deg}
+.sp-eye.l{left:50%;top:37%;--r:0deg;width:22%;aspect-ratio:1;margin:-11% 0 0 -11%}.sp-eye.r{display:none}
 #sp-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .sp-flash,.sp-vig{position:absolute;inset:0;pointer-events:none}
 .sp-vig{background:radial-gradient(130% 95% at 50% 42%,transparent 45%,rgba(0,0,0,.8) 100%)}
 .sp-flash{background:radial-gradient(circle at var(--ix,50%) var(--iy,55%),#fff 0,#fff 3%,rgba(255,244,200,.85) 10%,rgba(255,212,59,.38) 26%,rgba(5,6,10,0) 50%);opacity:0}
 .sp-id{position:absolute;left:0;right:0;bottom:max(7vh,calc(env(safe-area-inset-bottom) + 34px));display:grid;justify-items:center;gap:clamp(8px,1.4vh,13px);pointer-events:none}
-.sp-name{margin:0;font:900 extra-condensed clamp(50px,15vw,88px)/.9 'Saira','Arial Narrow',sans-serif;letter-spacing:.06em;margin-right:-.06em;text-transform:uppercase;white-space:nowrap}
+.sp-name{margin:0;font:900 extra-condensed clamp(46px,13.5vw,84px)/.9 'Saira','Arial Narrow',sans-serif;letter-spacing:.06em;margin-right:-.06em;text-transform:uppercase;white-space:nowrap}
 .sp-name i{display:inline-block;font-style:normal;opacity:0;color:#f3f5fa;text-shadow:0 0 0 transparent}
 .sp-name .b{color:#ffd43b}
 .sp-name .sp-gap{width:.28em}
@@ -126,7 +126,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
   <canvas id="sp-cv" aria-hidden="true"></canvas>
   <div class="sp-vig" aria-hidden="true"></div>
   <div class="sp-id">
-    <p class="sp-name" aria-label="Inner Beast"><i style="--d:.16s">I</i><i style="--d:.2s">N</i><i style="--d:.24s">N</i><i style="--d:.28s">E</i><i style="--d:.32s">R</i><i class="sp-gap"></i><i class="b" style="--d:.4s">B</i><i class="b" style="--d:.44s">E</i><i class="b" style="--d:.48s">A</i><i class="b" style="--d:.52s">S</i><i class="b" style="--d:.56s">T</i></p>
+    <p class="sp-name" aria-label="Hybrid Forge"><i style="--d:0.16s">H</i><i style="--d:0.20s">Y</i><i style="--d:0.24s">B</i><i style="--d:0.28s">R</i><i style="--d:0.32s">I</i><i style="--d:0.36s">D</i><i class="sp-gap"></i><i class="b" style="--d:0.44s">F</i><i class="b" style="--d:0.48s">O</i><i class="b" style="--d:0.52s">R</i><i class="b" style="--d:0.56s">G</i><i class="b" style="--d:0.60s">E</i></p>
     <i class="sp-rule" aria-hidden="true"></i>
     <p class="sp-tag">RUN FAST. BUILD MUSCLE.</p>
   </div>
@@ -147,7 +147,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 (function () {
   var sp = document.getElementById('splash'), tear = document.getElementById('sp-tear');
   if (!sp) return;
-  var VERSION = '2026-11-20', mode = 'auto', seen = false, known = '', boot = performance.now();
+  var VERSION = '2026-11-20b', mode = 'auto', seen = false, known = '', boot = performance.now();
   try { mode = localStorage.getItem('beast:opening') || 'auto'; known = localStorage.getItem('beast:opened-v') || ''; } catch (e) { /* storage blocked */ }
   try { seen = sessionStorage.getItem('beast:opened') === '1'; sessionStorage.setItem('beast:opened', '1'); } catch (e) { /* storage blocked */ }
   var forge = null;

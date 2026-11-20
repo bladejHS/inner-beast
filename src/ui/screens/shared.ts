@@ -34,7 +34,7 @@ export function top(back: boolean | Tab = false): string {
       ? `<button class="back" data-a="tab" data-k="${back}" aria-label="Înapoi la ${esc(TAB_NAME[back] ?? back)}">${ic('back')}<span>${esc(TAB_NAME[back] ?? 'Înapoi')}</span></button>`
       : back
         ? `<button class="back" data-a="back" aria-label="Înapoi">${ic('back')}<span>Înapoi</span></button>`
-        : `<div class="brand"><img class="brand-mark" src="${BASE}ui/mark.svg" alt="" width="30" height="30"><span>Inner <b>Beast</b></span></div>`;
+        : `<div class="brand"><img class="brand-mark" src="${BASE}ui/mark.svg" alt="" width="30" height="30"><span>Hybrid <b>Forge</b></span></div>`;
   const run = streak > 1 ? `<button class="streak${streak >= 7 ? ' hot' : ''}" data-a="tab" data-k="progress" aria-label="${streak} zile active la rând">${ic('claw')}<b class="num">${streak}</b><span>zile</span></button>` : '';
   return `<header class="top">${left}<div class="top-r">${run}<button class="icon-btn" data-a="settings" aria-label="Setări">${ic('gear')}</button></div></header>`;
 }
@@ -177,6 +177,7 @@ export function blockIcon(raw: Block): string {
   const b = liveBlock(raw);
   if (b.focus === 'ladder' || b.focus === 'plate') return 'ladder';
   if (b.thr) return 'timer';
+  if (b.alt === 'cond') return 'pulse';
   if (b.kind === 'amrap') return 'bolt';
   if (b.kind === 'row' || b.hiit || (b.kind === 'cardio' && b.alt === 'aero')) return 'row';
   return ICON_BY_ID[b.id] ?? 'timer';
@@ -201,7 +202,7 @@ function altPicker(b: Block): string {
   const s = ctx.S.set;
   const opts: Array<[string, string, boolean]> =
     b.alt === 'cond'
-      ? [['a', 'A · Engine Builder', s.wedCond !== 'b'], ['b', 'B · Hybrid Circuit', s.wedCond === 'b']]
+      ? [['a', 'A · Engine Builder', !s.wedCond || s.wedCond === 'a'], ['b', 'B · Hybrid Circuit', s.wedCond === 'b'], ['c', 'Norwegian 4x4', s.wedCond === 'c'], ['d', 'Hill Repeats', s.wedCond === 'd'], ['e', '30/30s', s.wedCond === 'e']]
       : [['run', 'Alergare', s.aero !== 'row'], ['row', 'Vâslitor', s.aero === 'row']];
   const chips = (act: string, list: Array<[string, string, boolean]>, label: string) =>
     `<div class="chips rd-alt" role="group" aria-label="${esc(label)}">${list.map(([v, l, on]) => `<button class="chip" aria-pressed="${on}" data-a="${act}" data-b="${b.id}" data-v="${v}">${esc(l)}</button>`).join('')}</div>`;
@@ -288,7 +289,7 @@ export function importHealthSteps(): void {
 /** How to set up the Shortcut once. */
 export function healthHow(): void {
   openSheet(`<h2>Pașii din Sănătate</h2>
-    <p class="small">iPhone-ul numără pașii toată ziua, cu cipul de mișcare, și îi pune în aplicația Sănătate. E cel mai precis număr pe care îl poți avea, mai precis decât orice aplicație web. O aplicație web nu poate citi Sănătate direct, așa că o scurtătură îl copiază, iar Inner Beast îl lipește.</p>
+    <p class="small">iPhone-ul numără pașii toată ziua, cu cipul de mișcare, și îi pune în aplicația Sănătate. E cel mai precis număr pe care îl poți avea, mai precis decât orice aplicație web. O aplicație web nu poate citi Sănătate direct, așa că o scurtătură îl copiază, iar Hybrid Forge îl lipește.</p>
     <h3>O singură dată: scurtătura</h3>
     <ol class="how-list">
       <li>Deschide aplicația <b>Scurtături</b> și apasă <b>+</b>. Numește-o „Pași azi”.</li>
@@ -300,7 +301,7 @@ export function healthHow(): void {
     <h3>Zilnic</h3>
     <ol class="how-list">
       <li>Rulezi „Pași azi”: din widget, din Siri sau cu <b>Atingere pe spate</b> (Configurări → Accesibilitate → Atingere → Atingere pe spate → dublu → „Pași azi”).</li>
-      <li>Deschizi Inner Beast și apeși <b>Din Sănătate</b>, apoi <b>Lipește</b>.</li>
+      <li>Deschizi Hybrid Forge și apeși <b>Din Sănătate</b>, apoi <b>Lipește</b>.</li>
     </ol>
     <p class="small dim">Numărul înlocuiește pașii de azi; peste 10.000 bifează plimbarea de miercuri.</p>
     <button class="btn" data-a="m:close">Am înțeles</button>`, { 'm:close': () => closeSheet() });

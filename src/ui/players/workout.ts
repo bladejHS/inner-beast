@@ -3,7 +3,7 @@
 // Azi and the next start of the same workout offer to carry on, or to save what was done.
 
 import { EMOM_GOAL, RECORD_WIDS, recordable, workoutById, type Exercise, type Workout } from '../../data/workouts.ts';
-import { advise, bestSet, lightOn, lightWord, emomAdvice, emomNext, lastExercise, lighter, loadable, stalled, STALL_TEXT, ticked, type Advice, type LastEx } from '../../logic/progress.ts';
+import { advise, bestSet, lightOn, lightWord, emomAdvice, emomNext, lastExercise, lighter, loadable, stalled, STALL_TEXT, ticked, type Advice, type LastEx, setKgAdvice, lastSame, crossKg } from '../../logic/progress.ts';
 import { Clock } from '../../logic/seq.ts';
 import { makeEntry, type Entry, type SetLog } from '../../logic/store.ts';
 import { KNEE_STEPS, kneeAdvice, legDays } from '../../logic/knee.ts';
@@ -35,6 +35,12 @@ interface XS {
   /** The session before `last`. */
   prev?: LastEx;
   kg: number;
+  /** The weight of each set; the recommendation for the next set fills the ones not done yet. */
+  kgs: number[];
+  /** The same movement done more recently on another day, and the weight it gives for today. */
+  cross?: { text: string; line: string };
+  /** The last recommendation, after a set: which set it came from and what it says. */
+  rec?: { k: number; text: string };
   emom?: EmomState;
   /** The best set of this session so far, for records. */
   best?: number;
@@ -64,6 +70,7 @@ interface DraftX {
   vals: number[];
   done: boolean[];
   kg: number;
+  kgs?: number[];
   emom?: { min: number; reps: number; marks: boolean[]; st: EmomState['st'] };
 }
 
@@ -147,6 +154,8 @@ class WorkoutPlayer implements Player {
       x.vals = x.vals.map((v, j) => (typeof dx.vals[j] === 'number' ? dx.vals[j] : v));
       x.done = x.done.map((_, j) => !!dx.done[j]);
       x.kg = dx.kg || x.kg;
+      if (Array.isArray(dx.kgs)) x.kgs = x.kgs.map((v, j) => (typeof dx.kgs![j] === 'number' ? dx.kgs![j]! : v));
+      else if (dx.kg) x.kgs = x.kgs.map(() => dx.kg);
       // a running EMOM cannot pick up its clock again: it keeps the minutes marked and counts as finished
       if (x.emom && dx.emom) x.emom = { ...x.emom, min: dx.emom.min, reps: dx.emom.reps, marks: dx.emom.marks, st: dx.emom.st === 'setup' ? 'setup' : 'done' };
       this.xs[k] = x;
@@ -172,7 +181,7 @@ class WorkoutPlayer implements Player {
       start: this.startTs || this.t0,
       elapsed: Math.round((Date.now() - this.t0) / 1000),
       i: this.i,
-      xs: this.xs.map((x) => ({ id: x.ex.id, lvl: x.lvl, vals: [...x.vals], done: [...x.done], kg: x.kg, ...(x.emom ? { emom: { min: x.emom.min, reps: x.emom.reps, marks: [...x.emom.marks], st: x.emom.st } } : {}) })),
+      xs: this.xs.map((x) => ({ id: x.ex.id, lvl: x.lvl, vals: [...x.vals], done: [...x.done], kg: x.kg, kgs: [...x.kgs], ...(x.emom ? { emom: { min: x.emom.min, reps: x.emom.reps, marks: [...x.emom.marks], st: x.emom.st } } : {}) })),
     });
   }
 
@@ -190,7 +199,19 @@ class WorkoutPlayer implements Player {
     });
     const top = Math.min(lvl, ex.vars.length - 1);
     const kg = loadable(ex, top) ? nextKg ?? (last?.lvl === lvl ? last.log.kg ?? 0 : 0) : 0;
-    const xs: XS = { ex, lvl: top, vals, done: Array(ex.sets).fill(false), last, prev, kg };
+    // each set starts at the session's weight; when last time was noted set by set on this variation, at those weights
+    const lastKgs = !nextKg && last && last.lvl === top && Array.isArray(last.log.kgs) ? last.log.kgs : [];
+    const kgs = Array.from({ length: ex.sets }, (_, j) => { const v = lastKgs[j]; return typeof v === 'number' && v > 0 ? v : kg; });
+    const xs: XS = { ex, lvl: top, vals, done: Array(ex.sets).fill(false), last, prev, kg, kgs };
+    // done more recently on another day (Monday's DB Bench Press before Friday's): that weight, brought to today's reps
+    const other = loadable(ex, top) ? lastSame(ctx.S.log, ex, last) : undefined;
+    const cx = other ? crossKg(ex, other) : null;
+    if (other && cx) {
+      xs.kg = cx.kg;
+      xs.kgs = xs.kgs.map(() => cx.kg);
+      const done = other.log.sets.map((r, j) => (r && r > 0 ? `${r}×${String(other.log.kgs?.[j] ?? other.log.kg ?? 0).replace('.', ',')}` : '')).filter(Boolean);
+      xs.cross = { text: cx.text, line: `${shortDay(other.date)}, ${other.ex.vars[other.lvl] ?? other.ex.name}: ${done.join(', ')} kg` };
+    }
     if (ex.type === 'emom') xs.emom = { min: this.deload ? lighter(ctx.S.emom.min) : ctx.S.emom.min, reps: ctx.S.emom.reps, st: 'setup', marks: [], clock: new Clock(), lastSec: -1, lastMin: -1 };
     return xs;
   }
@@ -259,10 +280,10 @@ class WorkoutPlayer implements Player {
       ex.vars.length > 1
         ? `<div class="vars" role="group" aria-label="Variante">${ex.vars.map((v, k) => `<button class="chip" aria-pressed="${k === x.lvl}" data-a="p:lvl" data-k="${k}">${esc(v)}</button>`).join('')}</div>`
         : '';
-    const adv = this.advice(x);
+    const adv: Advice = x.cross && !x.done.some(Boolean) ? { kind: 'top', text: x.cross.text } : this.advice(x);
     const advHtml = adv.text ? `<div class="advice ${adv.kind === 'up' ? 'up' : ''}">${esc(adv.text)}${adv.lvl !== undefined && adv.lvl !== x.lvl ? ` <button class="link" style="color:inherit;padding:0" data-a="p:lvl" data-k="${adv.lvl}">Alege</button>` : ''}</div>` : '';
     const lastVals = x.last ? (ticked(ex) ? `${x.last.log.sets.filter((v) => v).length} serii` : `${x.last.log.sets.filter((v) => v !== null && v > 0).join(', ')}${isSec(ex) ? ' s' : ''}${x.last.log.kg ? ` cu ${String(x.last.log.kg).replace('.', ',')} kg` : ''}`) : '';
-    const lastLine = x.last && ex.type !== 'emom' ? `<p class="prev">Data trecută (${shortDay(x.last.date)}, ${esc(ex.vars[x.last.lvl] ?? '')}): ${lastVals}</p>` : '';
+    const lastLine = (x.last && ex.type !== 'emom' ? `<p class="prev">Data trecută (${shortDay(x.last.date)}, ${esc(ex.vars[x.last.lvl] ?? '')}): ${lastVals}</p>` : '') + (x.cross ? `<p class="prev">Cel mai recent (${esc(x.cross.line)})</p>` : '');
     const isLast = this.i === this.xs.length - 1;
     // between sets the thumb goes to the sets, so they come right after the goal; the instructions follow them
     const body = `
@@ -292,8 +313,14 @@ class WorkoutPlayer implements Player {
 
   kgHtml(x: XS): string {
     if (!loadable(x.ex, x.lvl)) return '';
-    const unit = x.ex.machine ? 'kg pe aparat, opțional' : x.ex.bar ?'kg cu tot cu bara (20 kg), opțional' : x.ex.load ? 'kg pe o ganteră, opțional' : 'kg, opțional';
-    return `<div class="field"><div class="field-l">Greutate<small>${unit}</small></div><input type="number" inputmode="decimal" step="0.5" min="0" max="300" value="${x.kg || ''}" data-a="p:kg" aria-label="Greutate în kg" style="width:96px"></div>`;
+    const unit = x.ex.machine ? 'kg pe aparat' : x.ex.bar ? 'kg cu tot cu bara (20 kg)' : x.ex.load ? 'kg pe o ganteră' : 'kg';
+    if (x.ex.type !== 'emom') {
+      // set by set: the weight sits in each row; after a set the app says what to put on for the next one
+      const next = x.done.findIndex((d) => !d);
+      const rec = x.rec ? `<div class="advice up kg-rec">${esc(x.rec.text)}</div>` : next === 0 && x.kgs[0] ? `<p class="small dim kg-rec">Seria 1 cu ${String(x.kgs[0]).replace('.', ',')} kg; după fiecare serie îți spun cu cât continui.</p>` : `<p class="small dim kg-rec">Scrie greutatea la seria 1; după fiecare serie îți spun cu cât continui.</p>`;
+      return `<p class="label" style="margin:14px 0 0">Greutate · ${unit}</p>${rec}`;
+    }
+    return `<div class="field"><div class="field-l">Greutate<small>${unit}, opțional</small></div><input type="number" inputmode="decimal" step="0.5" min="0" max="500" value="${x.kg || ''}" data-a="p:kg" aria-label="Greutate în kg" style="width:96px"></div>`;
   }
 
   setsHtml(x: XS): string {
@@ -306,7 +333,8 @@ class WorkoutPlayer implements Player {
             ? `<span class="dim" style="font-weight:600">${esc(tickLabel(ex))}</span>`
             : `<div class="stepper" role="group" aria-label="Seria ${k + 1}"><button data-a="p:v" data-k="${k}" data-d="-1" aria-label="Scade">−</button>${isSec(ex) ? `<output>${v} s</output>` : `<input type="number" inputmode="numeric" pattern="[0-9]*" min="0" max="999" value="${v}" data-a="p:vin" data-k="${k}" aria-label="Repetări, seria ${k + 1}">`}<button data-a="p:v" data-k="${k}" data-d="1" aria-label="Crește">+</button></div>`;
         const okLabel = d ? 'Anulează seria' : isSec(ex) && !d ? 'Pornește cronometrul' : 'Bifează seria';
-        return `<div class="set ${d ? 'done' : ''}"><span class="sn">Seria ${k + 1}</span>${ctl}<button class="ok" data-a="p:set" data-k="${k}" aria-label="${okLabel}">${ic(isSec(ex) && !d ? 'play' : 'check')}</button></div>`;
+        const kgIn = loadable(ex, x.lvl) ? `<label class="set-kg"><input type="number" inputmode="decimal" step="0.5" min="0" max="500" value="${x.kgs[k] || ''}" placeholder="kg" data-a="p:kgs" data-k="${k}" aria-label="Kg, seria ${k + 1}"><span>kg</span></label>` : '';
+        return `<div class="set ${d ? 'done' : ''}${kgIn ? ' has-kg' : ''}"><span class="sn">Seria ${k + 1}</span>${kgIn}${ctl}<button class="ok" data-a="p:set" data-k="${k}" aria-label="${okLabel}">${ic(isSec(ex) && !d ? 'play' : 'check')}</button></div>`;
       })
       .join('');
     return `${this.kgHtml(x)}<div class="sets">${rows}</div>`;
@@ -354,7 +382,15 @@ class WorkoutPlayer implements Player {
   restHtml(): string {
     const r = this.rest!;
     const left = Math.max(0, (r.end - performance.now()) / 1000);
-    return `<div class="rest-ov" role="timer"><p class="phase-lbl">Pauză</p><div class="big-time" id="rt">${mmss(Math.ceil(left))}</div><p class="pl-sub">Urmează: ${esc(r.next)}</p><div class="btn-row" style="width:100%;max-width:420px"><button class="btn ghost" data-a="p:rest15">+15 s</button><button class="btn" data-a="p:restskip">Gata</button></div></div>`;
+    return `<div class="rest-ov" role="timer"><p class="phase-lbl">Pauză</p><div class="big-time" id="rt">${mmss(Math.ceil(left))}</div><p class="pl-sub">Urmează: ${esc(r.next)}${this.restKg()}</p><div class="btn-row" style="width:100%;max-width:420px"><button class="btn ghost" data-a="p:rest15">+15 s</button><button class="btn" data-a="p:restskip">Gata</button></div></div>`;
+  }
+
+  /** On the rest screen: the weight for the next set, when the exercise is loaded. */
+  restKg(): string {
+    const x = this.x;
+    if (!loadable(x.ex, x.lvl) || x.ex.type === 'emom') return '';
+    const n = x.done.findIndex((d) => !d);
+    return n >= 0 && x.kgs[n] ? ` · <b class="rest-kg">${String(x.kgs[n]).replace('.', ',')} kg</b>` : '';
   }
 
   holdHtml(): string {
@@ -643,7 +679,15 @@ class WorkoutPlayer implements Player {
 
   input(el: HTMLElement): void {
     if (el.dataset.a === 'p:vin') this.typeReps(Number(el.dataset.k), (el as HTMLInputElement).value);
-    if (el.dataset.a === 'p:kg') this.x.kg = Math.max(0, Math.min(300, parseFloat((el as HTMLInputElement).value) || 0));
+    if (el.dataset.a === 'p:kg') this.x.kg = Math.max(0, Math.min(500, parseFloat((el as HTMLInputElement).value) || 0));
+    if (el.dataset.a === 'p:kgs') {
+      const x = this.x, k = Number(el.dataset.k) || 0;
+      x.kgs[k] = Math.max(0, Math.min(500, parseFloat((el as HTMLInputElement).value) || 0));
+      // a weight typed for a set carries down to the sets after it that are not done yet
+      for (let j = k + 1; j < x.kgs.length; j++) if (!x.done[j]) x.kgs[j] = x.kgs[k]!;
+      this.syncKg(x);
+      ovEl().querySelectorAll<HTMLInputElement>('.set-kg input').forEach((inp, j) => { if (j > k && document.activeElement !== inp) inp.value = x.kgs[j] ? String(x.kgs[j]) : ''; });
+    }
     this.persist();
   }
 
@@ -678,9 +722,34 @@ class WorkoutPlayer implements Player {
     else slam('Record', what);
   }
 
+  /** The session's weight for the exercise: the heaviest set done, or the first set's before any is done. */
+  syncKg(x: XS): void {
+    if (x.ex.type === 'emom') return;
+    const done = x.kgs.filter((v, j) => x.done[j] && v > 0);
+    x.kg = done.length ? Math.max(...done) : x.kgs[0] || 0;
+  }
+
+  /** After a set: the weight for the next ones, from the reps just done. */
+  recommend(x: XS, k: number): void {
+    if (!loadable(x.ex, x.lvl) || x.ex.type !== 'reps') return;
+    const r = setKgAdvice(x.ex, x.kgs[k] ?? 0, x.vals[k] ?? 0);
+    if (!r) { x.rec = undefined; return; }
+    const next = x.done.findIndex((d, j) => !d && j > k);
+    if (next < 0) {
+      const head = r.text.split(':')[0];
+      x.rec = { k, text: `${head}. Data viitoare pornești cu ${String(r.kg).replace('.', ',')} kg.` };
+      this.syncKg(x);
+      return;
+    }
+    for (let j = next; j < x.kgs.length; j++) if (!x.done[j]) x.kgs[j] = r.kg;
+    x.rec = { k, text: r.text };
+    this.syncKg(x);
+  }
+
   afterSet(k: number): void {
     this.checkRecord(k);
     const x = this.x;
+    this.recommend(x, k);
     const allDone = x.done.every(Boolean);
     const lastEx = this.i === this.xs.length - 1;
     if (allDone && lastEx) return;
@@ -710,7 +779,9 @@ class WorkoutPlayer implements Player {
       }
       if (!x.done.some(Boolean)) continue;
       const sets = x.vals.map((v, k) => (x.done[k] ? v : null));
-      ex.push({ id: x.ex.id, name: x.ex.vars[x.lvl], lvl: x.lvl, unit: unitOf(x.ex), sets, ...(x.kg ? { kg: x.kg } : {}) });
+      this.syncKg(x);
+      const kgs = loadable(x.ex, x.lvl) && x.kgs.some((v, j) => x.done[j] && v > 0) ? x.kgs.map((v, j) => (x.done[j] ? v : null)) : undefined;
+      ex.push({ id: x.ex.id, name: x.ex.vars[x.lvl], lvl: x.lvl, unit: unitOf(x.ex), sets, ...(x.kg ? { kg: x.kg } : {}), ...(kgs ? { kgs } : {}) });
       const adv = this.advise(x, sets);
       // Progression is mandatory: the next session opens on the harder variation (the chips can still go back).
       ctx.S.lvl[x.ex.id] = adv.kind === 'up' && adv.lvl !== undefined && !this.deload ? adv.lvl : x.lvl;

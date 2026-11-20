@@ -23,7 +23,7 @@ const stamp = (d: Date): string => `${d.getFullYear()}${pad2(d.getMonth() + 1)}$
 export function icsText(time: string, alarm: number, today = dayKey()): string {
   const m = /^(\d{1,2}):(\d{2})$/.exec(time) ?? ['', '18', '00'];
   const now = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
-  const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Inner Beast//Plan//RO', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:Inner Beast'];
+  const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Hybrid Forge//Plan//RO', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:Hybrid Forge'];
   const alarmLines = (text: string, trigger: string): string[] => ['BEGIN:VALARM', 'ACTION:DISPLAY', `TRIGGER:${trigger}`, fold(`DESCRIPTION:${icsEsc(text)}`), 'END:VALARM'];
   for (let i = 0; i < 28; i++) {
     const k = addDays(today, i);
@@ -33,7 +33,7 @@ export function icsText(time: string, alarm: number, today = dayKey()): string {
     const mins = Math.max(15, day.blocks.reduce((s, b) => s + blockMinutes(b), 0));
     const en = new Date(st.getTime() + mins * 60000);
     // the UID stays the same for a day, so exporting again updates the events instead of doubling them
-    L.push('BEGIN:VEVENT', `UID:beast-${k}@inner-beast`, `DTSTAMP:${now}`, `DTSTART:${stamp(st)}`, `DTEND:${stamp(en)}`, fold(`SUMMARY:${icsEsc(`Inner Beast · ${day.title}`)}`), fold(`DESCRIPTION:${icsEsc(day.blocks.map((b) => `• ${blockLine(b, ctx.S.set)}`).join('\n'))}`));
+    L.push('BEGIN:VEVENT', `UID:beast-${k}@inner-beast`, `DTSTAMP:${now}`, `DTSTART:${stamp(st)}`, `DTEND:${stamp(en)}`, fold(`SUMMARY:${icsEsc(`Hybrid Forge · ${day.title}`)}`), fold(`DESCRIPTION:${icsEsc(day.blocks.map((b) => `• ${blockLine(b, ctx.S.set)}`).join('\n'))}`));
     if (alarm > 0) L.push(...alarmLines(`În ${alarm} de minute: ${day.title}`, `-PT${alarm}M`));
     L.push('END:VEVENT');
   }
@@ -46,7 +46,7 @@ export async function icsExport(time: string, alarm: number): Promise<void> {
   const file = new File([blob], 'inner-beast.ics', { type: 'text/calendar' });
   try {
     if (navigator.canShare?.({ files: [file] }) && matchMedia('(pointer: coarse)').matches) {
-      await navigator.share({ files: [file], title: 'Inner Beast · antrenamente' });
+      await navigator.share({ files: [file], title: 'Hybrid Forge · antrenamente' });
       return;
     }
   } catch (e) {

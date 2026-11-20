@@ -41,7 +41,7 @@ export interface Exercise {
 }
 
 export interface Workout {
-  id: 'upper' | 'upper2' | 'lower' | 'power';
+  id: 'upper' | 'upper2' | 'lower' | 'power' | 'core';
   name: string;
   /** About how long it takes, rests included. */
   min: number;
@@ -232,10 +232,35 @@ export const WORKOUTS: Workout[] = [
       },
     ],
   },
+  {
+    // Not in Hybrid365: the core the user's test circuits need (60 and 40 sit-ups, a 90 s dead hang), added at the
+    // user's request on 2026-11-20, last on Monday and Friday. Sit-ups go for a max you beat each time; the knee raises
+    // climb their variations (and build the grip for the hang); the plank grows to 60 s, then the long lever.
+    id: 'core',
+    name: 'Core (Circuits)',
+    min: 9,
+    ex: [
+      {
+        id: 'situps', name: 'Sit-ups', vars: ['Sit-ups'], start: 0,
+        type: 'max', sets: 2, hi: 60, rest: 60, muscles: 'abdomen, flexorii șoldului',
+        cue: 'Două serii la maxim, în ritmul din circuit. Ținta: 60 la rând. Bate data trecută cu cel puțin o repetare.',
+      },
+      {
+        id: 'hkr', name: 'Hanging Knee Raises', vars: ['Lying Leg Raises', 'Hanging Knee Raises', 'Hanging Leg Raises'], start: 1,
+        type: 'reps', sets: 3, lo: 8, hi: 15, rest: 60, muscles: 'abdomenul de jos, priza',
+        cue: 'Atârnat cu umerii activi, ridici genunchii spre piept fără balans și cobori controlat. Atârnatul construiește și priza pentru cele 90 de secunde.',
+      },
+      {
+        id: 'plank', name: 'Plank', vars: ['Forearm Plank', 'Long-lever Plank'], start: 0,
+        type: 'time', sets: 2, lo: 30, hi: 60, rest: 45, muscles: 'tot trunchiul',
+        cue: 'Pe antebrațe, corpul drept din cap până în călcâie, fesierii și abdomenul strânși. La 2 × 60 s treci la varianta lungă (coatele în fața umerilor).',
+      },
+    ],
+  },
 ];
 
 /** Where records count: the strength days, bodyweight sets only (reps or seconds, no weight noted). */
-export const RECORD_WIDS = ['upper', 'upper2', 'lower', 'power'];
+export const RECORD_WIDS = ['upper', 'upper2', 'lower', 'power', 'core'];
 
 export const recordable = (ex: Exercise): boolean => (ex.type === 'reps' || ex.type === 'time' || ex.type === 'max') && !ex.bar && (!ex.load || !!ex.machine);
 

@@ -173,6 +173,7 @@ export function toggleMark(raw: Block): void {
 
 const ICON_BY_ID: Record<string, string> = {
   'mon-run': 'run', 'thu-run': 'run', 'sat-long': 'run', 'tue-wu': 'run', 'tue-cd': 'run', 'tue-thr': 'timer',
+  'mon-core': 'bolt', 'fri-core': 'bolt',
   'mon-upper': 'lift', 'wed-upper': 'lift', 'thu-lower': 'lift', 'fri-upper': 'lift', 'fri-emom': 'bolt', 'wed-cond': 'pulse',
   'sun-walk': 'walk', 'sun-flow': 'stretch', 'sun-stretch': 'stretch', 'sun-foam': 'stretch', 'sun-breath': 'wind',
 };

@@ -856,7 +856,20 @@ const HYBRID_HOW: Record<string, How> = {
     mistake: 'Șoldurile căzute când obosești.',
   },
 };
-Object.assign(HOW, HYBRID_HOW);
+Object.assign(HOW, HYBRID_HOW, {
+  situps: {
+    steps: ['Pe spate, genunchii îndoiți, tălpile pe sol (prinse sub ceva dacă ai nevoie).', 'Mâinile la tâmple sau încrucișate pe piept.', 'Te ridici până când pieptul ajunge la genunchi, apoi cobori controlat până când omoplații ating solul.'],
+    mistake: 'Să tragi de ceafă cu mâinile.',
+  },
+  hkr: {
+    steps: ['Atârnat la bară, brațele întinse, umerii trași în jos.', 'Ridici genunchii spre piept, cu bazinul rotit ușor în sus.', 'Cobori în 2 secunde, fără să te balansezi. Varianta ușoară: întins pe spate, ridici picioarele.'],
+    mistake: 'Balansul: repetarea trebuie să pornească din abdomen, nu din elan.',
+  },
+  plank: {
+    steps: ['Pe antebrațe, coatele sub umeri, tălpile la lățimea șoldurilor.', 'Corpul drept din cap până în călcâie: strângi fesierii și abdomenul.', 'Respiri scurt, fără să lași șoldurile să cadă.'],
+    mistake: 'Șoldurile căzute sau ridicate prea sus.',
+  },
+});
 
 
 /**

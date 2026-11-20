@@ -8,7 +8,7 @@ const week = (o: Record<string, unknown> = {}) => planSnapshot({ ...base, ...o }
 test('the Hybrid365 week: 3 runs, 3 upper lifts, 1 lower lift, 1 conditioning, Sunday for recovery', () => {
   const w = week();
   assert.equal(w.length, 7);
-  assert.equal(w.flat().filter((s) => s.kind === 'workout').length, 4);
+  assert.equal(w.flat().filter((s) => s.kind === 'workout').length, 6);
   assert.deepEqual(w[1]!.map((s) => s.kind), ['run', 'run', 'run']);
   assert.deepEqual([w[1]![1]!.name, w[1]![1]!.min], ['Threshold Run', 29]);
   assert.deepEqual([w[5]![0]!.name, w[5]![0]!.min], ['Long Run (Endurance)', 60]);

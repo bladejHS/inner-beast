@@ -50,13 +50,13 @@ test('the week is the Hybrid365 run-focused split: 3 runs, 3 upper lifts, 1 lowe
   assert.equal(WEEK.length, 7);
   assert.deepEqual(WEEK.map((d) => d.title), ['Easy Run + Upper', 'Threshold Run', 'Upper + Conditioning', 'Easy Run + Lower', 'Upper Strength + Power', 'Long Run', 'Recovery & Mobility']);
   assert.deepEqual(WEEK.map((d) => d.blocks.map((b) => b.id)), [
-    ['mon-run', 'mon-upper'], ['tue-wu', 'tue-thr', 'tue-cd'], ['wed-upper', 'wed-cond'], ['thu-run', 'thu-lower'],
-    ['fri-upper', 'fri-emom'], ['sat-long'], ['sun-walk', 'sun-flow', 'sun-stretch', 'sun-foam', 'sun-breath'],
+    ['mon-run', 'mon-upper', 'mon-core'], ['tue-wu', 'tue-thr', 'tue-cd'], ['wed-upper', 'wed-cond'], ['thu-run', 'thu-lower'],
+    ['fri-upper', 'fri-emom', 'fri-core'], ['sat-long'], ['sun-walk', 'sun-flow', 'sun-stretch', 'sun-foam', 'sun-breath'],
   ]);
   const r = (id: string) => WEEK.flatMap((d) => d.blocks).find((b) => b.id === id)!;
   assert.deepEqual([r('mon-run').grow, r('thu-run').grow, r('sat-long').grow], [{ base: 30, step: 5, cap: 45 }, { base: 30, step: 5, cap: 40 }, { base: 60, step: 5, cap: 90 }]);
   assert.deepEqual([r('tue-thr').rounds, r('tue-thr').work, r('tue-thr').restSec, r('tue-thr').thr], [4, 360, 90, true]);
-  assert.deepEqual(WEEK.flatMap((d) => d.blocks).filter((b) => b.kind === 'workout').map((b) => b.workout), ['upper', 'upper2', 'lower', 'power']);
+  assert.deepEqual(WEEK.flatMap((d) => d.blocks).filter((b) => b.kind === 'workout').map((b) => b.workout), ['upper', 'core', 'upper2', 'lower', 'power', 'core']);
   const ids = WEEK.flatMap((d) => d.blocks.map((b) => b.id));
   assert.equal(new Set(ids).size, ids.length);
 });
@@ -68,7 +68,7 @@ test('strength days: the Hybrid365 exercises, sets and reps, in order', () => {
   assert.deepEqual(plan('power'), ['DB Bench Press 5x3-5', 'Weighted Pull Up 4x4-6', 'Incline Dumbbell Press 4x6-8', 'Chest Supported Row 4x6-8', 'Push Press 4x3-5', 'Close Grip Bench Press 3x8-10', 'Barbell Curl 3x8-10', 'Tricep Overhead Extension 3x10-12']);
   // every exercise is loaded; no squat with the bar (the user's rule)
   for (const w of WORKOUTS) for (const e of w.ex) {
-    assert.ok(e.load, e.id);
+    assert.ok(e.load || w.id === 'core', e.id);
     assert.ok(e.start < e.vars.length, e.id);
     assert.ok(!/Back Squat|Barbell Squat/.test(e.vars.join()), e.id);
   }
@@ -244,6 +244,7 @@ test('weekly completion, streaks and habit milestones', () => {
   const add = (block: string, date: string) => s.log.push(makeEntry({ kind: 'rounds', block, name: 'x', dur: 60, data: {}, date }));
   add('mon-run', '2026-10-26');
   add('mon-upper', '2026-10-27');
+  add('mon-core', '2026-10-27');
   add('tue-thr', '2026-10-27');
   add('wed-upper', '2026-10-25'); // previous week
   const done = weekDone(s.log, '2026-10-26');
@@ -580,7 +581,7 @@ test('the plan published for Beast Nutrition follows the real week and the user 
   const base = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a', rest3: 60, rest1: 60 } as const;
   const week = planSnapshot(base);
   assert.equal(week.length, 7);
-  assert.deepEqual(week[0]!.map((s) => [s.id, s.kind, s.min]), [['mon-run', 'run', 30], ['mon-upper', 'workout', 55]]);
+  assert.deepEqual(week[0]!.map((s) => [s.id, s.kind, s.min]), [['mon-run', 'run', 30], ['mon-upper', 'workout', 55], ['mon-core', 'workout', 9]]);
   assert.equal(week[1]!.find((s) => s.id === 'tue-thr')!.kind, 'run'); // threshold intervals count as a run in Beast Nutrition
   assert.equal(week[6]!.find((s) => s.id === 'sun-walk')!.kind, 'run');
   assert.equal(planSnapshot({ ...base, grown: { 'sat-long': 75 } } as never)[5]!.find((s) => s.id === 'sat-long')!.min, 75);
@@ -737,7 +738,13 @@ test('run advice: no pace target, pulse at the same pace, a check every 4th run'
 });
 
 test('Hybrid365 fitted to the user: Hack Squat for the Back Squat, machines with no dumbbell ceiling, kg carried over', () => {
-  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['upper', 55], ['upper2', 60], ['lower', 55], ['power', 65]]);
+  assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['upper', 55], ['upper2', 60], ['lower', 55], ['power', 65], ['core', 9]]);
+  // the core for the circuits: sit-ups to a max, knee raises up their variations, the plank to 60 s
+  assert.deepEqual(workoutById('core').ex.map((e) => [e.id, e.type, e.sets]), [['situps', 'max', 2], ['hkr', 'reps', 3], ['plank', 'time', 2]]);
+  const sit = advise(exerciseById('situps')!, { log: { id: 'situps', name: 's', sets: [42, 35], unit: 'reps' }, lvl: 0, date: 'x' }, 0);
+  assert.match(sit.text, /42/);
+  const hk = advise(exerciseById('hkr')!, lastOf('hkr', [15, 15, 15], 1), 1);
+  assert.deepEqual([hk.kind, hk.lvl], ['up', 2]);
   assert.equal(workoutById('lower').ex[0]!.id, 'hacksq');
   // the machine has no dumbbell ceiling: 40 kg at the top of the range goes to 42.5
   const lp = advise(exerciseById('hacksq')!, lastOf('hacksq', [6, 6, 6, 6], 1, 40), 1);

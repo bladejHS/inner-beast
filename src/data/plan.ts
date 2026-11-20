@@ -35,7 +35,7 @@ export interface Block {
   /** Fixed rest in seconds, for intervals the settings don't cover. */
   restSec?: number;
   focus?: ComboFocus;
-  workout?: 'upper' | 'upper2' | 'lower' | 'power';
+  workout?: 'upper' | 'upper2' | 'lower' | 'power' | 'core';
   routine?: 'stretch-push' | 'stretch-pull' | 'mobility' | 'legwarm' | 'cooldown' | 'flow' | 'stretch' | 'foam' | 'emom-power';
   min?: number;
   /** Quick-timer block: Wall Sit or Jumping Squats, as the user picks. */
@@ -172,6 +172,8 @@ export const WEEK: Day[] = [
         cues: [...EASY_CUES, 'Începi săptămâna construind elan, nu oboseală.'] },
       { id: 'mon-upper', kind: 'workout', name: 'Upper Body (Strength)', dose: '55 min', line: '55 min Upper Body: DB Bench Press, Pull Up, Incline DB Press, Row, Raises, Arms', workout: 'upper', min: 55,
         tip: 'Session 2: forță pentru partea de sus. Tempo controlat și amplitudine completă la fiecare repetare. Pauză 60–90 s între serii. Progresezi întâi prin repetări, apoi prin greutate.' },
+      { id: 'mon-core', kind: 'workout', name: 'Core (Circuits)', dose: '9 min', line: '9 min Core: Sit-ups, Hanging Knee Raises, Plank', workout: 'core', min: 9,
+        tip: 'În plus față de Hybrid365, la cererea ta (2026-11-20): abdomenul pentru circuite (60 și 40 de abdomene, atârnatul de 90 s). Sit-ups la maxim, ridicări de genunchi atârnat (și priza pentru atârnat), plank. Ultimul, ca să nu obosească trunchiul înainte de forță.' },
     ],
   },
   {
@@ -214,6 +216,8 @@ export const WEEK: Day[] = [
         tip: 'Session 1: forță maximă plus putere explozivă. Intenție grea și explozivă la exercițiile principale, amplitudine completă, pauză 90 s. Pui greutate săptămânal și încerci să bați seria de top de săptămâna trecută.' },
       { id: 'fri-emom', kind: 'routine', name: 'Power Finisher', dose: 'EMOM × 10 min', line: 'Power Finisher: EMOM × 10 min (Med Ball Chest Throws / Plyo Push Ups)', routine: 'emom-power', min: 10,
         tip: 'Session 2: EMOM 10 minute, alternant. Minutele impare: 6 Med Ball Chest Throws. Minutele pare: 8 Plyo Push Ups. Ce rămâne din minut e pauză. Viteza contează, nu oboseala.' },
+      { id: 'fri-core', kind: 'workout', name: 'Core (Circuits)', dose: '9 min', line: '9 min Core: Sit-ups, Hanging Knee Raises, Plank', workout: 'core', min: 9,
+        tip: 'În plus față de Hybrid365, la cererea ta (2026-11-20): abdomenul pentru circuite (60 și 40 de abdomene, atârnatul de 90 s). Sit-ups la maxim, ridicări de genunchi atârnat (și priza pentru atârnat), plank. Ultimul, ca să nu obosească trunchiul înainte de forță și înainte de finisherul de putere.' },
     ],
   },
   {

@@ -3,7 +3,7 @@
 import { wolfArt } from '../rankart.ts';
 import { focusCombos, usesLegs } from '../../data/combos.ts';
 import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks, type RestKey } from '../../data/plan.ts';
-import { activeStreak, cycleAt, deloadOn, growMinutes, weekSince } from '../../logic/progress.ts';
+import { activeStreak, cycleAt, deloadOn, growMinutes, weekSince, fullSessions } from '../../logic/progress.ts';
 import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
 import { zone2, zoneHard, zoneThr } from '../../logic/runlog.ts';
 import { kickPower, kickWeek, kneeNotes, kneeSore, type KneeNote } from '../../logic/knee.ts';
@@ -101,7 +101,9 @@ export function planPicks(today = dayKey()): Settings & Picks {
   for (const b of ALL_BLOCKS) if (b.grow) grown[b.id] = light ? b.grow.base : growMinutes(S.log, b.id, S.cycle.start, b.grow);
   picksKey = key;
   const c = cycleAt(S.cycle.start, today, S.cycle.repeats);
-  picksVal = { ...S.set, cycle: c?.id, cycleWeek: c?.week, grown };
+  // the Hybrid365 progressions move one step per full session; a lighter week holds them
+  const thrStep = fullSessions(S.log, 'tue-thr'), engStep = S.log.filter((e) => e.block === 'wed-cond' && e.kind === 'row').length;
+  picksVal = { ...S.set, cycle: c?.id, cycleWeek: c?.week, grown, thrStep, engStep };
   return picksVal;
 }
 
@@ -118,7 +120,7 @@ export function startBlock(raw: Block): void {
     case 'cardio':
       return openRounds({ name: b.name, rounds: 1, work: (b.min ?? 20) * 60, rest: 0, block: b.id, tip: b.tip, cues: b.cues, cardio: true });
     case 'row':
-      return openRow(b.id, b.rowCh);
+      return openRow(b.id, b.rowCh, b.rowDose);
     case 'amrap':
       return openAmrap(b.id, b.min ?? 10, b.circuit ? { name: b.name, ...b.circuit } : undefined);
     case 'workout':

@@ -66,6 +66,8 @@ export interface Block {
   circuit?: { moves: string[]; reps: number[] };
   /** A fixed Machine Row challenge (see data/row.ts), whatever the Settings say. */
   rowCh?: string;
+  /** The challenge's rounds and rest for this session, when its progression moves them (Engine Builder). */
+  rowDose?: { reps: number; rest: number };
 }
 
 /** 7-minute warm-up before the first fighting block (Monday, Thursday): the hips open for the kicks, no jumping. */
@@ -94,6 +96,9 @@ export interface Picks {
   cycleWeek?: number;
   /** The easy and long runs: run (Hybrid365), or row on a day the knees ask for it. */
   aero?: 'run' | 'row';
+  /** Where the Hybrid365 progressions stand: the threshold step (THR_STEPS) and the Engine Builder step (ENGINE_STEPS). */
+  thrStep?: number;
+  engStep?: number;
   /** Wednesday's conditioning: A Engine Builder (row), B Hybrid Circuit, C Norwegian 4x4, D Hill Repeats, E 30/30s. */
   wedCond?: 'a' | 'b' | 'c' | 'd' | 'e';
   /** Today's minutes for the blocks that grow (see Block.grow). */
@@ -126,16 +131,23 @@ const COND: Partial<Record<string, Partial<Block>>> = {
   },
 };
 
-/** Threshold pace, the key session: the reps grow over the 12-week loop as the slide says (add a rep, then longer reps
- *  with a shorter recovery). Before the loop starts, the slide's own 4 × 6 min. */
+/** Tuesday's progression, exactly as the slide gives it: "Add 1 rep (up to 5–6 total). Extend reps to 7–8 min. Or
+ *  reduce recovery to 60 sec between reps." One step after each full threshold session (Picks.thrStep). */
+export const THR_STEPS: Array<{ reps: number; min: number; rest: number }> = [
+  { reps: 4, min: 6, rest: 90 }, { reps: 5, min: 6, rest: 90 }, { reps: 6, min: 6, rest: 90 },
+  { reps: 6, min: 7, rest: 90 }, { reps: 6, min: 8, rest: 90 }, { reps: 6, min: 8, rest: 60 },
+];
+/** Wednesday's Engine Builder, as the slide says: "Increase density on conditioning (less rest or more rounds)": the
+ *  rest comes down 5 s a session to 30 s, then a round more, up to 10. */
+export const ENGINE_STEPS: Array<{ rounds: number; rest: number }> = [
+  { rounds: 8, rest: 45 }, { rounds: 8, rest: 40 }, { rounds: 8, rest: 35 }, { rounds: 8, rest: 30 }, { rounds: 9, rest: 30 }, { rounds: 10, rest: 30 },
+];
+
+/** Threshold pace, the key session. Its reps, their length and the jog between them follow THR_STEPS. */
 const THRESHOLD: Block = {
   id: 'tue-thr', kind: 'rounds', name: 'Threshold Run', dose: '4 × 6 min', line: '4 × 6 min @ Threshold Pace, 90 s easy jog', rounds: 4, work: 360, restSec: 90, hiit: true, thr: true,
-  tip: 'Sesiunea-cheie a săptămânii: 4 repetări de 6 minute în ritm de prag, cu 90 de secunde de jogging ușor între ele. Îmbunătățește pragul de lactat: ții un ritm mai rapid pentru mai mult timp.',
+  tip: 'Sesiunea-cheie a săptămânii: repetări în ritm de prag, cu jogging ușor între ele. Îmbunătățește pragul de lactat: ții un ritm mai rapid pentru mai mult timp. Progresia Hybrid365: o repetare în plus până la 6, apoi repetări de 7–8 minute, apoi pauză de 60 s.',
   cues: ['Ritm controlat și puternic la fiecare repetare, nu sprint.', 'Relaxat: nu forța efortul.', 'Splituri egale: ultima repetare la fel de rapidă ca prima.', 'Calitate peste cantitate.'],
-  cycle: {
-    B: { rounds: 5, dose: '5 × 6 min', line: '5 × 6 min @ Threshold Pace, 90 s easy jog' },
-    C: { rounds: 5, work: 420, restSec: 60, dose: '5 × 7 min', line: '5 × 7 min @ Threshold Pace, 60 s easy jog' },
-  },
 };
 
 const EASY_CUES = ['Alergarea rămâne UȘOARĂ: zona 2, poți vorbi în propoziții întregi.', 'Dacă pulsul iese din zonă, încetinești sau mergi până coboară.', 'Pași scurți și relaxați, umerii jos.'];
@@ -233,6 +245,15 @@ export function resolveBlock(b: Block, p: Picks): Block {
   if (v) r = { ...r, ...v };
   const ev = p.cycle && p.cycleWeek && p.cycleWeek % 2 === 0 ? b.cycleEven?.[p.cycle] : undefined;
   if (ev) r = { ...r, ...ev };
+  if (b.id === 'tue-thr') {
+    const s = THR_STEPS[Math.min(THR_STEPS.length - 1, Math.max(0, p.thrStep ?? 0))]!;
+    r = { ...r, rounds: s.reps, work: s.min * 60, restSec: s.rest, dose: `${s.reps} × ${s.min} min`, line: `${s.reps} × ${s.min} min @ Threshold Pace, ${s.rest} s easy jog` };
+  }
+  if (b.id === 'wed-cond' && (!p.wedCond || p.wedCond === 'a')) {
+    const s = ENGINE_STEPS[Math.min(ENGINE_STEPS.length - 1, Math.max(0, p.engStep ?? 0))]!;
+    r = { ...r, rowDose: { reps: s.rounds, rest: s.rest }, dose: `${s.rounds} × 250 m`, line: `Conditioning: Engine Builder ${s.rounds} × 250 m Row, ${s.rest} s rest`,
+      tip: `Session 2, Option A: ${s.rounds} runde pe timp de 250 m pe vâslitor (sau SkiErg), cu ${s.rest} s pauză. Provocator, nu maximal. Progresia Hybrid365: densitate mai mare (pauza scade cu 5 s până la 30 s, apoi o rundă în plus), notezi timpul și încerci să-l bați.` };
+  }
   const grown = b.grow ? p.grown?.[b.id] : undefined;
   if (grown && grown !== b.min) r = { ...r, min: grown, dose: `${grown} min` };
   if (r.legSwap) return { ...r, name: p.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit' };

@@ -1872,3 +1872,106 @@ input[type='text'], input[type='number'], input[type='time'], input[type='passwo
 .fc-w i.h2, .fc-k i.h2 { background: linear-gradient(180deg, #a07a04, #5c4600); box-shadow: 0 0 6px rgba(245, 194, 17, .35); }
 .fc-w i.h3, .fc-k i.h3 { background: linear-gradient(180deg, #ffd43b, #d4a40a); box-shadow: 0 0 10px rgba(245, 194, 17, .6); }
 .fc-w i.h4, .fc-k i.h4 { background: radial-gradient(circle at 50% 70%, #ffffff, #fff1b0 35%, #f5c211 75%); box-shadow: 0 0 14px rgba(255, 212, 59, .9); }
+
+/* ---------- 8.2 FORGED (2026-11-20 evening): less yellow ----------
+   The user: "reducem din galben, parcă e prea obositor". The yellow becomes the crest's warm gold, darker and calmer,
+   and it no longer fills the big surfaces: buttons, the open tab, the chosen chip and day are forged steel (graphite
+   with a gold edge and gold icons), white letters. Gold stays for what is small and meaningful: the edges, the play
+   discs, the numbers that matter, the bullets, the bars that fill. Glows are halved. */
+:root, html[data-zone='cool'], #ov.cool, html[data-zone='cool'] #ov:not(.cool),
+html[data-cycle='B']:not([data-zone='cool']), html[data-cycle='C']:not([data-zone='cool']) {
+  --bg: #0a0a0b; --n1: #101012; --n2: #16171a; --n3: #1d1e22; --n4: #292a2f; --n5: #3c3d43;
+  --brand: #e2ae38; --gold: #e2ae38; --gold-2: #f3d27e;
+  --red: #e2ae38; --red-press: #b88a22; --red-deep: #3d2e0b; --red-hot: #f1c45a; --red-text: #f0c869; --blood: #17120a; --red-0: #c9962a;
+  --glow: 241, 196, 90; --glow-2: 226, 174, 56; --glow-d: 90, 66, 14;
+  --ph-work: #3a3f4a; --ph-work-hi: #4a505d; --ph-work-lo: #16181d; --ph-last: #f1c45a;
+  --on-act: var(--ink);
+  --hair: rgba(226, 174, 56, .24);
+  --steelfill: linear-gradient(180deg, #2c2d32, #1a1b1e 60%, #141518);
+  --edge-gold: inset 0 0 0 1px rgba(226, 174, 56, .55), inset 0 1px 0 rgba(255, 255, 255, .09);
+}
+body::before {
+  background:
+    radial-gradient(110% 40% at 50% -14%, rgba(180, 186, 200, .08), transparent 66%),
+    radial-gradient(80% 36% at 50% 112%, rgba(var(--glow-2), .07), transparent 70%);
+}
+
+/* the big surfaces: forged steel with a gold edge, white letters, gold icons */
+.btn, .cta, .go, .rd.next .rd-go, .pl-ctrl button.main, .tap-big, .timer-row.plan .tr-go {
+  background: var(--steelfill); background-image: var(--steelfill); color: var(--ink); box-shadow: var(--edge-gold), 0 14px 28px -18px rgba(0, 0, 0, .9);
+}
+.btn svg, .go svg, .rd.next .rd-go svg, .pl-ctrl button.main svg, .tr-go svg { color: var(--red-hot); }
+.btn:active, .cta:active { background: #111214; }
+.btn.ghost, .btn.danger { background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14); }
+.cta { box-shadow: var(--edge-gold), 0 20px 40px -24px rgba(var(--glow-2), .45); }
+.cta-l small { color: var(--red-text); }
+.cta-ic { background: radial-gradient(circle at 50% 35%, #f6d684, #d79e2a 70%, #9a6b12); color: #141414; box-shadow: 0 0 18px -4px rgba(var(--glow), .55); }
+.cta-ic svg { color: #141414; }
+
+/* the open tab, the section switcher, chips, the chosen day: steel plates with a gold edge */
+.nav-b[aria-current]:not(.nav-wolf) { background: var(--steelfill); color: var(--ink); box-shadow: var(--edge-gold); }
+.nav-b[aria-current]:not(.nav-wolf) svg { color: var(--red-hot); }
+.nav-b[aria-current] svg .f { fill: rgba(var(--glow-2), .18); }
+.nav-plate { background: linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .04)); }
+.nav-wolf[aria-current] .nw-hex { background: linear-gradient(180deg, #f3d27e, #9a6b12); box-shadow: 0 0 18px -4px rgba(var(--glow), .5); }
+.nav-wolf[aria-current] .nw-hex::before { background: radial-gradient(120% 90% at 50% 12%, #2a2b30, #0e0e10 76%); }
+.seg-ink { background: var(--steelfill); box-shadow: var(--edge-gold); }
+.seg-b[aria-current] { color: var(--ink); }
+.chip[aria-pressed='true'], .chip.on { background: var(--steelfill); color: var(--ink); border-color: rgba(var(--glow-2), .7); }
+.wk-d.on, .wk-d.now.on { background: var(--steelfill); color: var(--ink); border-color: rgba(var(--glow-2), .75); }
+.wk-d.on span { color: var(--red-text); }
+
+/* the small gold that stays */
+.rd.next { border-color: rgba(var(--glow-2), .55); background: linear-gradient(90deg, rgba(var(--glow-2), .06), transparent 55%), var(--surf); box-shadow: none; }
+.rd.next .rd-node::before { background: var(--red); border-color: var(--red); }
+.rd.next .rd-node { color: #141414; }
+.bc-tag, .bc-live { background: var(--steelfill); color: var(--ink); box-shadow: var(--edge-gold); }
+.card { border-color: rgba(255, 255, 255, .08); }
+.card.lime { border-color: var(--hair); }
+.hero-stage { background: radial-gradient(80% 70% at 50% -5%, rgba(180, 186, 200, .1), transparent 70%), radial-gradient(70% 50% at 50% 110%, rgba(var(--glow-2), .14), transparent 70%), linear-gradient(180deg, #111215, #09090a 80%); box-shadow: inset 0 -1px 0 rgba(var(--glow-2), .6), 0 30px 50px -40px rgba(var(--glow-2), .35); }
+.hero-wolf { opacity: .1; filter: grayscale(.3) brightness(.9); }
+.brand b { color: var(--red); }
+.fw-i.full { border-color: rgba(var(--glow-2), .6); background: var(--surf); }
+.set-kg input { background: rgba(255, 255, 255, .04); border-color: rgba(255, 255, 255, .14); }
+.advice.kg-rec { border-left-color: var(--red); }
+.win-t span { background: linear-gradient(180deg, #fff 0%, #fff 45%, var(--gold-2) 72%, var(--gold) 100%); -webkit-background-clip: text; background-clip: text; }
+.g-v, .segs i.next, .wk-d.now::before, .sec::before { filter: none; box-shadow: none; }
+
+/* ---------- 8.3 BLACK, OBSIDIAN & FORGED GOLD (2026-11-20, the user's own palette) ----------
+   Black & Obsidian: #000000 pure, #070707 background, #0D0D0D secondary, #141414 cards, #1B1B1B elevated, #292929
+   borders. Forged Gold: #B89443 primary, #927535 muted, #80652D antique, #D5B45D light, #44351B deep bronze.
+   Type: #F0EFEA primary, #AAA69D secondary, #77736C muted, #514E48 disabled. */
+:root, html[data-zone='cool'], #ov.cool, html[data-zone='cool'] #ov:not(.cool),
+html[data-cycle='B']:not([data-zone='cool']), html[data-cycle='C']:not([data-zone='cool']) {
+  --black: #000000; --bg: #070707; --n1: #0d0d0d; --n2: #141414; --n3: #1b1b1b; --n4: #292929; --n5: #3a3936; --edge: #77736c;
+  --ink: #f0efea; --ink-2: #d6d3cb; --label: #aaa69d; --mute: #aaa69d; --faint: #77736c; --disabled: #514e48;
+  --brand: #b89443; --gold: #b89443; --gold-2: #d5b45d;
+  --red: #b89443; --red-press: #927535; --red-deep: #44351b; --red-hot: #d5b45d; --red-text: #d5b45d; --blood: #17120a; --red-0: #80652d;
+  --glow: 213, 180, 93; --glow-2: 184, 148, 67; --glow-d: 68, 53, 27;
+  --ph-work: #2a2721; --ph-work-hi: #3a352b; --ph-work-lo: #0d0d0d; --ph-last: #d5b45d;
+  --surf: #141414;
+  --hair: rgba(184, 148, 67, .26);
+  --steelfill: linear-gradient(180deg, #1f1f1f, #141414 60%, #0d0d0d);
+  --edge-gold: inset 0 0 0 1px rgba(184, 148, 67, .6), inset 0 1px 0 rgba(255, 255, 255, .06);
+  --ch-A: #b89443; --ch-B: #d5b45d; --ch-C: #927535;
+}
+html { background: var(--bg); }
+body::before {
+  background:
+    radial-gradient(110% 40% at 50% -14%, rgba(240, 239, 234, .05), transparent 66%),
+    radial-gradient(80% 36% at 50% 112%, rgba(var(--glow-2), .06), transparent 70%);
+}
+.card, .rd, .tile, .stat, .row-link, .timer-row, .wk-d, .fw-i, .win-s { border-color: var(--n4); }
+.card, .rd { background: var(--n2); }
+.rd.next { background: linear-gradient(90deg, rgba(var(--glow-2), .07), transparent 55%), var(--n2); }
+.cta-ic { background: radial-gradient(circle at 50% 35%, #e9d395, #b89443 65%, #80652d); color: #0d0d0d; }
+.nav-wolf[aria-current] .nw-hex { background: linear-gradient(180deg, #d5b45d, #80652d); }
+.nav-plate::before { background: linear-gradient(180deg, rgba(27, 27, 27, .82), rgba(7, 7, 7, .92) 72%); }
+.top::before { background: rgba(7, 7, 7, .78); }
+.hero-stage { background: radial-gradient(80% 70% at 50% -5%, rgba(240, 239, 234, .06), transparent 70%), radial-gradient(70% 50% at 50% 110%, rgba(var(--glow-2), .14), transparent 70%), linear-gradient(180deg, #0d0d0d, #070707 80%); border-color: var(--n4); }
+.fc-w i { background: #141414; }
+.fc-w i.h1, .fc-k i.h1 { background: #2a2113; }
+.fc-w i.h2, .fc-k i.h2 { background: linear-gradient(180deg, #80652d, #44351b); box-shadow: none; }
+.fc-w i.h3, .fc-k i.h3 { background: linear-gradient(180deg, #b89443, #927535); box-shadow: 0 0 8px rgba(184, 148, 67, .45); }
+.fc-w i.h4, .fc-k i.h4 { background: radial-gradient(circle at 50% 70%, #f0efea, #d5b45d 45%, #b89443 80%); box-shadow: 0 0 12px rgba(213, 180, 93, .7); }
+:disabled, [disabled] { color: var(--disabled); }

@@ -98,10 +98,17 @@ test('the loop: three emphases of four weeks, the 4th lighter, and blocks that f
   assert.equal(cycleStartFor('2026-11-04'), '2026-11-02');
   const r = (id: string) => WEEK.flatMap((d) => d.blocks).find((b) => b.id === id)!;
   const P: Picks = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a' };
-  // the threshold reps grow with the loop, as the slide's progression says
-  const thr = (c?: 'A' | 'B' | 'C') => resolveBlock(r('tue-thr'), { ...P, cycle: c });
-  assert.deepEqual([thr().rounds, thr('A').rounds, thr('B').rounds, thr('C').rounds, thr('C').work, thr('C').restSec], [4, 4, 5, 5, 420, 60]);
-  assert.equal(blockLine(r('tue-thr'), { ...P, cycle: 'C' }), '5 × 7 min @ Threshold Pace, 60 s easy jog');
+  // the threshold follows the slide, one step per full session: +1 rep up to 6, then 7 and 8 min, then 60 s jogs
+  const thr = (n: number) => resolveBlock(r('tue-thr'), { ...P, cycle: 'C', thrStep: n });
+  assert.deepEqual([0, 1, 2, 3, 4, 5, 9].map((n) => [thr(n).rounds, (thr(n).work ?? 0) / 60, thr(n).restSec]), [[4, 6, 90], [5, 6, 90], [6, 6, 90], [6, 7, 90], [6, 8, 90], [6, 8, 60], [6, 8, 60]]);
+  assert.equal(blockLine(r('tue-thr'), { ...P, thrStep: 5 }), '6 × 8 min @ Threshold Pace, 60 s easy jog');
+  // Wednesday's Engine Builder gets denser: less rest, then more rounds
+  const eng = (n: number) => resolveBlock(r('wed-cond'), { ...P, engStep: n }).rowDose;
+  assert.deepEqual([0, 3, 4, 5, 8].map(eng), [{ reps: 8, rest: 45 }, { reps: 8, rest: 30 }, { reps: 9, rest: 30 }, { reps: 10, rest: 30 }, { reps: 10, rest: 30 }]);
+  // Friday's main lifts: more weight every week once all the sets were inside the range
+  const fri = advise(exerciseById('bench-h')!, lastOf('bench-h', [4, 3, 3, 3, 3], 0, 40), 0);
+  assert.deepEqual([fri.kind, fri.kg], ['top', 42.5]);
+  assert.equal(advise(exerciseById('bench-h')!, lastOf('bench-h', [4, 3, 2, 2, 2], 0, 40), 0).kg, undefined);
   assert.equal(resolveBlock(r('sat-long'), { ...P, grown: { 'sat-long': 70 } }).dose, '70 min');
   assert.equal(resolveBlock(r('sat-long'), { ...P, grown: { 'sat-long': 70 } }).min, 70);
   const jog = (date: string) => makeEntry({ kind: 'run', block: 'sun-jog', name: 'Jogging', dur: 1200, data: {}, date });

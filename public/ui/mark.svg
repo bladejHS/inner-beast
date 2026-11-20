@@ -1,19 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 240 240"><g><g transform="translate(120 120) scale(0.98) translate(-120 -120)"><defs>
-    <linearGradient id="m13p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd43b"/><stop offset=".55" stop-color="#f5c211"/><stop offset="1" stop-color="#a37e05"/></linearGradient>
-    <linearGradient id="m13f" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#f5c211"/><stop offset=".6" stop-color="#ffe9a0"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
-    <filter id="m13g" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
-    <radialGradient id="m13fi" cx=".5" cy=".55" r=".55"><stop offset=".5" stop-color="#ffd27a"/><stop offset=".75" stop-color="#ff9a1f"/><stop offset="1" stop-color="#f5c211" stop-opacity="0"/></radialGradient>
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 240 240"><g><g transform="translate(120 120) scale(0.98) translate(-120 -121)"><defs>
+    <linearGradient id="m13rim" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#f3f1ea"/><stop offset=".45" stop-color="#9b9890"/><stop offset="1" stop-color="#3c3a36"/></linearGradient>
+    <linearGradient id="m13au" x1="0" y1="0" x2=".2" y2="1"><stop offset="0" stop-color="#f3e6bd"/><stop offset=".26" stop-color="#d5b45d"/><stop offset=".6" stop-color="#b89443"/><stop offset=".85" stop-color="#80652d"/><stop offset="1" stop-color="#44351b"/></linearGradient>
+    <linearGradient id="m13aul" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ead39a"/><stop offset="1" stop-color="#b89443"/></linearGradient>
+    <linearGradient id="m13aud" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#80652d"/><stop offset="1" stop-color="#44351b"/></linearGradient>
+    <linearGradient id="m13bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#c9c8c2"/><stop offset="1" stop-color="#55534e"/></linearGradient>
+    <linearGradient id="m13fo" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c8742a"/><stop offset=".55" stop-color="#dfa14a"/><stop offset="1" stop-color="#ecd08a" stop-opacity=".9"/></linearGradient>
+    <linearGradient id="m13fi" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#f6ead0"/><stop offset="1" stop-color="#e2c27c"/></linearGradient>
+    <radialGradient id="m13hot" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff"/><stop offset=".25" stop-color="#f1dca6"/><stop offset=".55" stop-color="#c8842e" stop-opacity=".6"/><stop offset="1" stop-color="#80652d" stop-opacity="0"/></radialGradient>
+    <radialGradient id="m13fire" cx=".5" cy=".6" r=".55"><stop offset=".55" stop-color="#ffcf6a"/><stop offset=".78" stop-color="#ff7a1a"/><stop offset="1" stop-color="#c03a00" stop-opacity="0"/></radialGradient>
+    <filter id="m13gl" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2"/></filter>
+    <filter id="m13big" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="10"/></filter>
   </defs>
   
-  <polygon points="120.00 16.00 210.07 68.00 210.07 172.00 120.00 224.00 29.93 172.00 29.93 68.00" fill="#0a0a0a"/>
-  <polygon points="120.00 22.00 204.87 71.00 204.87 169.00 120.00 218.00 35.13 169.00 35.13 71.00" fill="none" stroke="#f5c211" stroke-width="14" stroke-linejoin="round"/>
+  <polygon points="120,9.88 201.6,38.44 213.84,124.12 120,232.24 26.16,124.12 38.4,38.44" fill="#000" opacity=".55" filter="url(#m13gl)" transform="translate(0 6)"/>
+  <polygon points="120,12 200,40 212,124 120,230 28,124 40,40" fill="#1b1b1b"/>
+  <polygon points="120,12 200,40 212,124 120,230 28,124 40,40" fill="none" stroke="url(#m13rim)" stroke-width="14" stroke-linejoin="miter"/>
   
-  <g>
-    <rect x="56" y="62" width="30" height="116" rx="6" fill="url(#m13p)"/>
-    <rect x="154" y="62" width="30" height="116" rx="6" fill="url(#m13p)"/>
-    
-    <rect x="84" y="111" width="72" height="18" rx="3" fill="#f6f5f0"/>
-  </g>
   
-  <path d="M120 58.0C136 76.0 142 96 129 108C128 100 124 95 120 91C116 95 112 100 111 108C98 96 104 76.0 120 58.0Z" fill="url(#m13f)"/>
+  <g filter="url(#m13gl)" opacity="0.5"><circle cx="120" cy="114" r="26" fill="url(#m13hot)"/></g>
+  <path d="M120 26C129 44 141 55 140 76C146 70 148 62 147 52C159 65 161 84 153 99C147 109 135 113 120 113C105 113 93 109 87 99C79 84 81 65 93 52C92 62 94 70 100 76C99 55 111 44 120 26Z" fill="url(#m13fo)"/>
+  
+  <rect x="90" y="111" width="60" height="16" rx="2" fill="url(#m13bar)"/>
+  
+  <rect x="56" y="58" width="42" height="124" rx="4" fill="#b89443"/><rect x="142" y="58" width="42" height="124" rx="4" fill="#b89443"/>
+  
+  <g filter="url(#m13gl)" opacity=".9"><circle cx="120" cy="117" r="7" fill="#fff8e8"/></g>
+  <path d="M92 190L120 212L148 190" fill="none" stroke="#b89443" stroke-width="12" stroke-linecap="square" stroke-linejoin="miter"/>
+  
   </g></g></svg>

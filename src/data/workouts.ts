@@ -35,6 +35,9 @@ export interface Exercise {
   /** The same movement on another day (2026-11-20, the user: what I lifted on Monday shows the next day, with the
    *  weight to use): the newest session of any exercise in the group sets today's weight. */
   same?: string;
+  /** Friday's main lifts (Hybrid365: "Add load to main lifts weekly"): more weight every week once all the sets were
+   *  done inside the range, not only at its top. */
+  weekly?: boolean;
 }
 
 export interface Workout {
@@ -188,27 +191,27 @@ export const WORKOUTS: Workout[] = [
     min: 65,
     ex: [
       {
-        id: 'bench-h', same: 'bench', name: 'DB Bench Press', vars: ['Dumbbell Bench Press'], start: 0,
+        id: 'bench-h', weekly: true, same: 'bench', name: 'DB Bench Press', vars: ['Dumbbell Bench Press'], start: 0,
         type: 'reps', sets: 5, lo: 3, hi: 5, rest: 120, load: true, muscles: 'piept, umeri, triceps',
         cue: 'Greu și exploziv: 2–3 serii de încălzire, apoi ganterele coboară controlat și urcă cât de repede poți. Ținta e să bați seria de top de săptămâna trecută. Kg: o singură ganteră.',
       },
       {
-        id: 'wpull-h', name: 'Weighted Pull Up', vars: ['Lat Pulldown (heavy)', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 0,
+        id: 'wpull-h', weekly: true, name: 'Weighted Pull Up', vars: ['Lat Pulldown (heavy)', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 0,
         type: 'reps', sets: 4, lo: 4, hi: 6, rest: 120, load: true, machine: true, muscles: 'spate, biceps',
         cue: 'Greu, cu intenție explozivă la urcare, coborâre controlată. Kg: greutatea de pe aparat sau cea de la centură.',
       },
       {
-        id: 'incline-h', same: 'incline', name: 'Incline Dumbbell Press', vars: ['Incline Dumbbell Press'], start: 0,
+        id: 'incline-h', weekly: true, same: 'incline', name: 'Incline Dumbbell Press', vars: ['Incline Dumbbell Press'], start: 0,
         type: 'reps', sets: 4, lo: 6, hi: 8, rest: 90, load: true, muscles: 'pieptul de sus, umeri',
         cue: 'Banca la 30°, ganterele coboară controlat și urcă puternic. Kg: o singură ganteră.',
       },
       {
-        id: 'csrow-h', same: 'csrow', name: 'Chest Supported Row', vars: ['Chest Supported Dumbbell Row', 'Chest Supported Machine Row'], start: 0,
+        id: 'csrow-h', weekly: true, same: 'csrow', name: 'Chest Supported Row', vars: ['Chest Supported Dumbbell Row', 'Chest Supported Machine Row'], start: 0,
         type: 'reps', sets: 4, lo: 6, hi: 8, rest: 90, load: true, muscles: 'spatele de mijloc, dorsali',
         cue: 'Mai greu decât miercuri: tragi exploziv, cobori controlat, pieptul rămâne pe bancă.',
       },
       {
-        id: 'pushpress', name: 'Push Press', vars: ['Dumbbell Push Press', 'Barbell Push Press'], start: 1,
+        id: 'pushpress', weekly: true, name: 'Push Press', vars: ['Dumbbell Push Press', 'Barbell Push Press'], start: 1,
         type: 'reps', sets: 4, lo: 3, hi: 5, rest: 120, load: true, bar: true, muscles: 'umeri, triceps, picioare',
         cue: 'O mică flexie din genunchi și împingi bara deasupra capului folosind impulsul picioarelor. Bara pleacă exploziv, aterizează controlat pe umeri.',
       },

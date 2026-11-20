@@ -1,7 +1,7 @@
 // "Plan": the week as seven day cards and the 12-week Hybrid365 loop as a campaign map.
 
-import { WEEK, blockLine } from '../../data/plan.ts';
-import { CYCLE_WEEKS, CYCLES, cycleAt, hybridWeek, dayComplete, dayProgress, daysOff, loopWeek, repeatMonday, weekDone, weekSince } from '../../logic/progress.ts';
+import { WEEK, blockLine, resolveBlock } from '../../data/plan.ts';
+import { CYCLE_WEEKS, CYCLES, cycleAt, dayComplete, dayProgress, daysOff, loopWeek, repeatMonday, weekDone, weekSince } from '../../logic/progress.ts';
 import { addDays, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { dayPoster } from '../art.ts';
@@ -51,10 +51,12 @@ export function repeatCard(today: string): string {
   return html ? `<section class="card lime" aria-label="Repetă săptămâna"><p class="label">Ciclul</p>${html}</section>` : '';
 }
 
-/** This week's Hybrid365 targets, under the map. */
-function weekTargets(i: number): string {
-  const w = hybridWeek(i);
-  return `<div class="cp-goals"><span><b>${w.thr}</b>Threshold</span><span><b>${w.easy}′</b>Easy Run</span><span><b>${w.long}′</b>Long Run</span></div>`;
+/** This week's Hybrid365 targets, under the map: the threshold set and the run minutes as the plan gives them now. */
+function weekTargets(): string {
+  const picks = planPicks();
+  const at = (id: string) => { const b = WEEK.flatMap((d) => d.blocks).find((x) => x.id === id); return b ? resolveBlock(b, picks) : undefined; };
+  const thr = at('tue-thr'), easy = at('mon-run'), long = at('sat-long');
+  return `<div class="cp-goals"><span><b>${thr ? `${thr.rounds}×${Math.round((thr.work ?? 0) / 60)}′ · ${thr.restSec}″` : ''}</b>Threshold</span><span><b>${easy?.min ?? 30}′</b>Easy Run</span><span><b>${long?.min ?? 60}′</b>Long Run</span></div>`;
 }
 
 /** The 12 weeks of the loop as a strip: three emphases of four, the fourth week lighter. */
@@ -68,12 +70,12 @@ function cycleCard(today: string): string {
   if (!c) {
     return `<section class="cycle"><p class="label">Campania · de luni</p><h3>Ciclul A: bază</h3>
       ${campaignSvg(-1, 1)}
-      ${weekTargets(0)}
+      ${weekTargets()}
       <p class="small dim">Trei etape de câte 4 săptămâni, a 4-a mereu ușoară și cu teste. Threshold Run crește de la o etapă la alta: 4 × 6, apoi 5 × 6, apoi 5 × 7 min cu pauză mai scurtă.</p></section>`;
   }
   return `<section class="cycle"><p class="label">Campania${lap > 1 ? ` · turul ${lap}` : ''} · ciclul ${c.id}, săptămâna ${c.week} din 4</p><h3>${esc(c.name)}</h3>
     ${campaignSvg(pos, lap)}
-    ${weekTargets(loopWeek(start, today, ctx.S.cycle.repeats) % loop)}
+    ${weekTargets()}
     <p class="small dim">${c.lighter ? 'Săptămâna ușoară, cu testele.' : esc(c.what)}</p>
     ${repeatHtml(today)}</section>`;
 }

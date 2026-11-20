@@ -28,9 +28,11 @@ class RowPlayer implements Player {
   lastSec = -1;
   saved = false;
 
-  constructor(block: string, ch?: string) {
+  constructor(block: string, ch?: string, dose?: { reps: number; rest: number }) {
     this.block = block;
-    this.ch = rowChallenge(ch ?? ctx.S.set.rowCh);
+    const base = rowChallenge(ch ?? ctx.S.set.rowCh);
+    // the Engine Builder's progression sets today's rounds and rest
+    this.ch = dose ? { ...base, reps: dose.reps, rest: dose.rest, label: `${base.meters} m × ${dose.reps}`, min: Math.round((dose.reps * 60 + (dose.reps - 1) * dose.rest) / 60) } : base;
     this.render();
   }
 
@@ -258,6 +260,6 @@ class RowPlayer implements Player {
   }
 }
 
-export function openRow(block: string, ch?: string): void {
-  mountPlayer(new RowPlayer(block, ch));
+export function openRow(block: string, ch?: string, dose?: { reps: number; rest: number }): void {
+  mountPlayer(new RowPlayer(block, ch, dose));
 }

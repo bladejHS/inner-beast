@@ -341,7 +341,7 @@
     var N = J.N, P = [N[0] + mix(5.5, 2, up), N[1] + mix(1.5, -UP - FORE + 0.6, up)];
     var E = ik(N, P, UP, FORE, function (e1, e2) { return e1[0] > e2[0]; });
     J.E = [E, [E[0] - 0.7, E[1]]]; J.P = [P, [P[0] - 0.7, P[1]]];
-    J.bar = P; J.lock = up;
+    J.bar = P; J.lock = up; J.behind = true;
     return J;
   }
 
@@ -362,9 +362,11 @@
   function lifter(c, J, bx, by, s, dir, o, hot, pale) {
     function P(p) { return [bx + dir * p[0] * s, by + p[1] * s]; }
     if (J.bench) rimmed(c, [[P([-17, 20.2]), P([21, 20.2]), 3.6], [P([-12, 21]), P([-12, FLOOR]), 1.8], [P([16, 21]), P([16, FLOOR]), 1.8]], o, s);
-    figure(c, J, bx, by, s, dir, o);
     var q = P(J.bar);
-    plate(c, q[0], q[1], s, o, hot, pale);
+    // overhead the plate passes the head: it goes behind the figure, so the head stays readable
+    if (J.behind) plate(c, q[0], q[1], s, o, hot, pale);
+    figure(c, J, bx, by, s, dir, o);
+    if (!J.behind) plate(c, q[0], q[1], s, o, hot, pale);
   }
 
   // ---------------------------------------------------------------------------------------------------------------

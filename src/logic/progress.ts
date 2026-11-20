@@ -1,6 +1,7 @@
 // "Progression is mandatory": what to do next time, streaks, weekly completion and totals.
 
 import type { Exercise } from '../data/workouts.ts';
+import { THR_STEPS } from '../data/plan.ts';
 import { BW_SCHEMES, EMOM_GOAL, exerciseById, RECORD_WIDS, recordable, WORKOUTS } from '../data/workouts.ts';
 import type { CycleId, Day } from '../data/plan.ts';
 import type { Entry, Habit, SetLog } from './store.ts';
@@ -130,6 +131,11 @@ export function crossKg(ex: Exercise, from: LastEx & { ex: Exercise }): { kg: nu
   return { kg, text: `${day[0]!.toUpperCase()}${day.slice(1)}: ${reps} × ${kgStr(at)} kg la ${from.ex.name}. Pentru ${range} repetări azi: ${kgStr(kg)} kg.` };
 }
 
+/** Full sessions of a plan block (not the lighter week's): what moves the Hybrid365 progressions one step. */
+export function fullSessions(log: Entry[], block: string): number {
+  return log.filter((e) => e.block === block && !e.data.deload && (e.kind !== 'rounds' && e.kind !== 'cardio' ? true : Number(e.data.rounds) >= Number(e.data.planned || 0))).length;
+}
+
 /** Sets that are ticked off rather than counted. */
 export const ticked = (ex: Exercise): boolean => ex.type === 'ytw' || ex.type === 'done';
 
@@ -163,6 +169,11 @@ export function advise(ex: Exercise, last: LastEx | undefined, lvl: number, prev
     const v = l.log.sets.filter((x): x is number => x !== null && x > 0);
     return v.length >= ex.sets && v.every((x) => x >= hi);
   };
+  // Friday's main lifts: the load goes up every week, once every set was done inside the range
+  if (ex.weekly && ex.load && last.log.kg && done.length >= ex.sets && done.every((v) => v >= lo)) {
+    const next = last.log.kg + kgStep(last.log.kg);
+    return { kind: 'top', kg: next, text: `Hybrid365: greutate în plus în fiecare săptămână. Ai făcut toate seriile cu ${kgStr(last.log.kg)} kg: azi ${kgStr(next)} kg și bate seria de top de data trecută.` };
+  }
   if (atTop(last)) {
     const lkg = last.log.kg;
     if (ex.load && lkg) {
@@ -277,18 +288,19 @@ export const lightWord = (s: { easy?: string }, today: string): string => (s.eas
 export const CYCLE_WEEKS = 4;
 
 export const CYCLES: Array<{ id: CycleId; name: string; what: string; thr: string }> = [
-  { id: 'A', name: 'Bază', thr: '4×6′ · 90″', what: 'Threshold Run 4 × 6 min, cu 90 s de jogging. Alergările ușoare și cea lungă cresc cu 5 minute pe sesiune; la forță, întâi repetări, apoi greutate.' },
-  { id: 'B', name: 'Volum', thr: '5×6′ · 90″', what: 'Threshold Run 5 × 6 min: o repetare în plus. Greutatea urcă la exercițiile principale, condiționarea mai densă.' },
-  { id: 'C', name: 'Ritm', thr: '5×7′ · 60″', what: 'Threshold Run 5 × 7 min, cu doar 60 s de jogging. Încerci să bați seria de top de vineri și timpii de miercuri.' },
+  { id: 'A', name: 'Bază', thr: '4×6′ → 6×6′', what: 'Progresia Hybrid365, sesiune cu sesiune: la Threshold Run o repetare în plus până la 6; alergările ușoare și cea lungă +5 minute; la forță întâi repetări, apoi greutate; vineri greutate în plus în fiecare săptămână.' },
+  { id: 'B', name: 'Volum', thr: '6×7′ → 6×8′', what: 'Threshold Run: repetările se lungesc la 7, apoi 8 minute. Long Run spre 90 de minute. Miercuri, Engine Builder mai dens: pauza scade spre 30 s.' },
+  { id: 'C', name: 'Ritm', thr: '6×8′ · 60″', what: 'Threshold Run cu pauză de 60 s între repetări. Engine Builder cu runde în plus. Bate seria de top de vineri și timpii de miercuri.' },
 ];
 
 /** The Hybrid365 targets of loop week i (0–11): the long run, grown by 5 min each week from 60 to 90 (the lighter 4th
  *  week back at 60), and the threshold set of the chapter. For the campaign map. */
 export function hybridWeek(i: number): { long: number; easy: number; thr: string; light: boolean } {
   const light = (i + 1) % CYCLE_WEEKS === 0;
+  // one session a week: the steps a week reaches if none is missed (the lighter week holds)
   const grown = i - Math.floor(i / CYCLE_WEEKS);
-  const c = CYCLES[Math.floor(i / CYCLE_WEEKS) % CYCLES.length]!;
-  return { long: light ? 60 : Math.min(90, 60 + 5 * grown), easy: light ? 30 : Math.min(45, 30 + 5 * grown), thr: c.thr, light };
+  const s = THR_STEPS[Math.min(THR_STEPS.length - 1, grown)]!;
+  return { long: light ? 60 : Math.min(90, 60 + 5 * grown), easy: light ? 30 : Math.min(45, 30 + 5 * grown), thr: `${s.reps}×${s.min}′ · ${s.rest}″`, light };
 }
 
 export interface CycleNow {

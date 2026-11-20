@@ -25,13 +25,13 @@ export type ArtName = keyof typeof RATIO;
 
 /** The day's motto, as the e-book's banners had them (the last word is the one in red). */
 export const DAY_MOTTO: Array<[string, string]> = [
-  ['Hard work beats talent when talent', "doesn't work hard"],
-  ['Discipline builds', 'freedom'],
-  ['Better than', 'yesterday'],
-  ['No', 'excuses'],
-  ['Small steps,', 'big results'],
-  ['Pain today,', 'power tomorrow'],
-  ['Same you,', 'but stronger'],
+  ['Run fast.', 'Build muscle.'],
+  ['Quality over', 'quantity.'],
+  ['Build strength and', 'work capacity.'],
+  ['Move well, lift strong,', 'recover smart.'],
+  ['Fuel hard,', 'train hard.'],
+  ['Build your engine.', 'Perform when it counts.'],
+  ['This is where you', 'get better.'],
 ];
 
 /** The day's poster (2026-11-11, in place of the stock photos): the motto set in Saira over a steel plate, the wolf's

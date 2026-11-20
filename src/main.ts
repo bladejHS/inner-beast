@@ -3,7 +3,7 @@ import { publishPlan } from './logic/bridge.ts';
 import { blockById, WEEK, type Block } from './data/plan.ts';
 import { rowChallenge } from './data/row.ts';
 import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
-import { cycleAt, growPushups, habitGoal } from './logic/progress.ts';
+import { growPushups, habitGoal } from './logic/progress.ts';
 import { chapterCheck, ranksSheet } from './ui/show.ts';
 import { forceUpdate } from './ui/update.ts';
 import { wolfBadge } from './ui/rankart.ts';
@@ -177,7 +177,8 @@ function render(enter: Enter = ''): void {
   // the light of the hour on Azi's stage: cold in the morning, embers in the evening, darker at night (beast.css)
   const hr = new Date().getHours();
   document.documentElement.dataset.tod = hr >= 5 && hr < 10 ? 'morning' : hr < 17 && hr >= 10 ? 'day' : hr >= 17 && hr < 22 ? 'evening' : 'night';
-  document.documentElement.dataset.cycle = cycleAt(ctx.S.cycle.start, dayKey(), ctx.S.cycle.repeats)?.id ?? 'A';
+  // since the Hybrid365 plan (2026-11-20) one colour, the yellow: the loop no longer recolours the app
+  delete document.documentElement.dataset.cycle;
   app.innerHTML = screenHtml();
   syncNav();
   // the wolf in the tab bar is the wolf of your rank
@@ -204,7 +205,7 @@ function mountHero(root: ParentNode): void {
   // the zone's own light: red, or ice in Minte
   const css = getComputedStyle(document.documentElement);
   const rgb = (v: string, d: number[]) => { const p = css.getPropertyValue(v).split(',').map((x) => Number(x.trim())); return p.length === 3 && p.every((x) => x >= 0) ? p : d; };
-  const color = rgb('--glow-2', [229, 16, 44]), hot = rgb('--glow', [255, 41, 68]);
+  const color = rgb('--glow-2', [245, 194, 17]), hot = rgb('--glow', [255, 212, 59]);
   for (const cv of root.querySelectorAll<HTMLCanvasElement>('canvas.hero-cv')) {
     try {
       arena.hero(cv, { kind: cv.dataset.kind, color, hot, still });
@@ -738,13 +739,13 @@ function act(a: string, el: HTMLElement): void {
       S.set.legMode = el.dataset.v === 'jump' ? 'jump' : 'wall';
       save();
       return render();
-    case 'alt':
-      if (el.dataset.b === 'thu-rope') S.set.thuFeet = el.dataset.v === 'ladder' ? 'ladder' : el.dataset.v === 'plate' ? 'plate' : 'rope';
-      else if (el.dataset.b === 'thu-shadow') S.set.thuPartner = el.dataset.v === 'spar' ? 'spar' : 'shadow';
-      else if (el.dataset.b === 'sun-jog') S.set.sunAero = el.dataset.v === 'run' ? 'run' : 'row';
-      else S.set.thuMain = el.dataset.v === 'row' ? 'row' : 'bag';
+    case 'alt': {
+      const blk = blockById(el.dataset.b ?? '');
+      if (blk?.alt === 'aero') S.set.aero = el.dataset.v === 'row' ? 'row' : 'run';
+      else if (blk?.alt === 'cond') S.set.wedCond = el.dataset.v === 'b' ? 'b' : 'a';
       save();
       return render();
+    }
     case 'row-ch':
       S.set.rowCh = rowChallenge(el.dataset.v).id;
       save();

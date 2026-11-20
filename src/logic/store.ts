@@ -75,6 +75,10 @@ export interface Settings {
   hrMax: number;
   /** Sunday's easy aerobic slot. Row by default: kinder to the knees while they hurt. */
   sunAero: 'run' | 'row';
+  /** Hybrid365 (2026-11-20): the easy and long runs, on foot by default; the rower on a day the knees ask for it. */
+  aero: 'run' | 'row';
+  /** Wednesday's conditioning: Option A Engine Builder (row), Option B Hybrid Circuit. */
+  wedCond: 'a' | 'b';
 }
 
 /** A logged meal: name, kcal, protein, carbs, fat (g); pl = which plan meal it was ("t2"). */
@@ -216,6 +220,8 @@ export const DEFAULT_SETTINGS: Settings = {
   bellThroughMute: false,
   hrMax: 192,
   sunAero: 'row',
+  aero: 'run',
+  wedCond: 'a',
 };
 
 export function defaultHabit(today: string): Habit {

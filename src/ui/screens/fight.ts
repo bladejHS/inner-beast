@@ -83,7 +83,7 @@ function timersSeg(): string {
     </div>
     <section class="card lime" style="margin-top:28px"><p class="label">Partener</p><h3>Ce nu poți antrena singur</h3>
       <p class="dim">Shadow-ul, sacul și timerele construiesc tehnica și condiția. Reacția la un om, distanța reală, check-ul la o lovitură adevărată și apărarea sub presiune se învață doar cu cineva în față: Thai pads cu un antrenor sau sparring tehnic, controlat, cu tibiere și cască.</p>
-      <p class="dim" style="margin:0">O singură sesiune pe săptămână cu un antrenor de kickboxing schimbă cel mai mult. Joi poți alege „Cu partener” în locul shadow-ului.</p>
+      <p class="dim" style="margin:0">O singură sesiune pe săptămână cu un antrenor de kickboxing schimbă cel mai mult.</p>
     </section>`;
 }
 

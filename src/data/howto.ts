@@ -726,6 +726,148 @@ export const HOW: Record<string, How> = {
   },
 };
 
+// ---------- Hybrid365 (2026-11-20): the lifts of the four strength sessions and the conditioning moves ----------
+const BENCH: How = {
+  steps: [
+    'Întins pe bancă, ochii sub bară, tălpile bine puse pe sol.',
+    'Strângi omoplații și îi cobori spre buzunare: pieptul sus, un arc mic în spate, fesierii pe bancă.',
+    'Priza puțin mai largă decât umerii. Cobori bara controlat pe piept, la nivelul mameloanelor, cu coatele la 45–70°.',
+    'Împingi bara în sus și ușor spre umeri, până la brațe întinse.',
+  ],
+  mistake: 'Să lași bara să sară din piept sau fesierii să se ridice de pe bancă.',
+};
+const PULL: How = {
+  steps: [
+    'La aparat: coapsele fixate sub suport, priza puțin mai largă decât umerii. La bară: atârni cu brațele întinse.',
+    'Pieptul sus, umerii trași în jos, departe de urechi.',
+    'Tragi coatele în jos spre coaste până când bara ajunge la piept (sau bărbia trece de bară).',
+    'Revii controlat până la brațe complet întinse.',
+  ],
+  mistake: 'Să tragi cu balans din spate sau doar pe jumătate de amplitudine.',
+};
+const DB_PRESS: How = {
+  steps: [
+    'Te așezi cu ganterele pe coapse, apoi te lași pe spate și le aduci lângă piept.',
+    'Omoplații strânși, tălpile pe sol.',
+    'Cobori ganterele lateral de piept, coatele la 45–60° de corp.',
+    'Împingi în sus până la brațe întinse, ganterele se apropie ușor sus.',
+  ],
+  mistake: 'Coatele deschise la 90°: încarcă umărul.',
+};
+const CS_ROW: How = {
+  steps: [
+    'Banca înclinată la 30–45°, te întinzi cu pieptul pe spătar, câte o ganteră în fiecare mână.',
+    'Brațele atârnă întinse, umerii jos.',
+    'Tragi coatele înapoi, pe lângă corp, și strângi omoplații o secundă sus.',
+    'Cobori controlat până la brațe întinse.',
+  ],
+  mistake: 'Să ridici pieptul de pe bancă ca să tragi mai greu.',
+};
+const LATERAL: How = {
+  steps: [
+    'În picioare, câte o ganteră ușoară în fiecare mână, coatele ușor îndoite.',
+    'Urci brațele lateral până la nivelul umerilor, cu degetul mic puțin mai sus.',
+    'Cobori în 2–3 secunde.',
+  ],
+  mistake: 'Balansul din trunchi: greutatea prea mare.',
+};
+const PUSHDOWN: How = {
+  steps: [
+    'La scripete sus, cu bara sau coarda, coatele lipite de corp.',
+    'Împingi în jos până la brațe întinse și strângi tricepsul.',
+    'Revii controlat până când antebrațele sunt orizontale; coatele nu se mișcă.',
+  ],
+  mistake: 'Coatele care pleacă în față sau corpul care se apleacă peste cablu.',
+};
+const ROW_PULL_UP: How = {
+  steps: [
+    'Centura cu greutate sau gantera între glezne, când ai ajuns la tracțiuni curate; până atunci varianta de la aparat.',
+    'Atârni cu brațele întinse, umerii trași în jos.',
+    'Tragi până când bărbia trece de bară, fără balans.',
+    'Cobori controlat până la brațe complet întinse.',
+  ],
+  mistake: 'Să scurtezi coborârea ca să faci mai multe repetări.',
+};
+const HYBRID_HOW: Record<string, How> = {
+  bench: BENCH,
+  'bench-h': BENCH,
+  pullup: PULL,
+  wpull: ROW_PULL_UP,
+  'wpull-h': ROW_PULL_UP,
+  incline: { ...DB_PRESS, steps: ['Banca înclinată la 30°.', ...DB_PRESS.steps.slice(1)] },
+  'incline-h': { ...DB_PRESS, steps: ['Banca înclinată la 30°.', ...DB_PRESS.steps.slice(1)] },
+  dbpress: DB_PRESS,
+  csrow: CS_ROW,
+  'csrow-w': CS_ROW,
+  'csrow-h': CS_ROW,
+  latraise: LATERAL,
+  'latraise-w': LATERAL,
+  tripush: PUSHDOWN,
+  rope: { ...PUSHDOWN, steps: ['La scripete sus, cu coarda, coatele lipite de corp.', 'Împingi în jos și, la final, desfaci capetele corzii spre exterior.', 'Revii controlat; coatele nu se mișcă.'] },
+  ohp: {
+    steps: ['Așezat pe banca cu spătarul drept, ganterele la nivelul urechilor.', 'Abdomenul strâns, spatele lipit de spătar.', 'Împingi în sus până la brațe întinse, deasupra capului.', 'Cobori controlat până la nivelul urechilor.'],
+    mistake: 'Să arcuiești spatele ca să împingi greutatea.',
+  },
+  facepull: {
+    steps: ['Scripetele la nivelul feței, coarda prinsă cu degetele mari spre tine.', 'Tragi coarda spre frunte, cu coatele sus și mâinile depărtându-se.', 'Ții o secundă cu omoplații strânși, apoi revii controlat.'],
+    mistake: 'Să tragi spre piept, cu coatele jos: lucrează alt mușchi.',
+  },
+  altcurl: {
+    steps: ['În picioare, ganterele pe lângă corp, palmele spre corp.', 'Urci un braț pe rând, rotind palma în sus pe drum.', 'Cobori în 2–3 secunde, apoi celălalt braț.'],
+    mistake: 'Balansul din spate și coatele care pleacă în față.',
+  },
+  wlunge: {
+    steps: ['În picioare, câte o ganteră în fiecare mână (sau fără).', 'Faci un pas lung înainte și cobori până când genunchiul din spate e aproape de sol.', 'Împingi prin călcâiul din față și aduci piciorul din spate în pasul următor.', 'Trunchiul rămâne drept tot timpul.'],
+    mistake: 'Genunchiul din față care cade spre interior.',
+  },
+  legpress: {
+    steps: ['Spatele și bazinul lipite de spătar, picioarele la lățimea umerilor pe platformă.', 'Deblochezi și cobori platforma până când genunchii sunt la aproximativ 90°.', 'Împingi prin toată talpa, fără să blochezi genunchii sus.'],
+    mistake: 'Să cobori atât de mult încât bazinul se ridică de pe spătar.',
+  },
+  hamcurl: {
+    steps: ['Pe aparat, cu genunchii în dreptul axului, rola deasupra călcâielor.', 'Tragi călcâiele spre fesieri și ții o secundă.', 'Cobori în 2–3 secunde, fără să lași greutatea să cadă.'],
+    mistake: 'Să ridici șoldurile de pe aparat ca să tragi.',
+  },
+  pushpress: {
+    steps: ['Bara (sau ganterele) pe umeri, priza puțin mai largă decât umerii, coatele ușor în față.', 'O flexie scurtă din genunchi, trunchiul drept.', 'Te împingi exploziv din picioare și duci bara deasupra capului, cu brațele întinse.', 'O cobori controlat pe umeri.'],
+    mistake: 'Flexia prea adâncă: devine genuflexiune, nu impuls.',
+  },
+  cgbench: {
+    steps: ['Ca la bench press, dar priza la lățimea umerilor.', 'Coatele rămân aproape de corp.', 'Bara coboară pe partea de jos a pieptului și urcă până la brațe întinse.'],
+    mistake: 'Priza prea îngustă: încarcă încheieturile.',
+  },
+  bbcurl: {
+    steps: ['În picioare, bara în mâini, palmele în sus, la lățimea umerilor.', 'Coatele lipite de corp; urci bara până la piept.', 'Cobori în 2–3 secunde până la brațe întinse.'],
+    mistake: 'Balansul din șold ca să pornească bara.',
+  },
+  ohext: {
+    steps: ['Așezat sau în picioare, gantera ținută cu ambele mâini deasupra capului.', 'Coatele spre tavan, aproape de cap.', 'Cobori gantera în spatele capului, apoi întinzi brațele la loc.'],
+    mistake: 'Coatele care se deschid larg în lateral.',
+  },
+  'Threshold Run': {
+    steps: ['Încălzirea făcută: 10–15 minute ușor și câteva accelerări.', 'Fiecare repetare în ritm de prag: confortabil de greu, poți spune doar câteva cuvinte.', 'Între repetări, 90 de secunde de jogging ușor, nu te oprești.', 'La final, 10 minute ușor.'],
+    mistake: 'Prima repetare prea rapidă: ultimele nu mai ies la același ritm.',
+  },
+  'Wall Balls': {
+    steps: ['Mingea medicinală la piept, cu fața la perete, la un pas de el.', 'Cobori într-o genuflexiune până la paralel, pieptul sus.', 'Te ridici exploziv și arunci mingea spre o țintă sus pe perete.', 'O prinzi și intri direct în repetarea următoare.'],
+    mistake: 'Genuflexiunea pe jumătate: aruncarea vine doar din brațe.',
+  },
+  'Burpee Broad Jumps': {
+    steps: ['Din picioare, mâinile pe sol, picioarele sar (sau pășesc) înapoi în poziție de flotare.', 'Pieptul la sol, apoi revii cu picioarele sub tine.', 'Sari în lungime cu ambele picioare și aterizezi moale.', 'Cât timp săriturile te dor la genunchi: pășești înapoi și faci un pas lung înainte în loc de săritură.'],
+    mistake: 'Aterizarea pe genunchi întinși.',
+  },
+  'Kettlebell Swings': {
+    steps: ['Kettlebell-ul (sau o ganteră) ținut cu ambele mâini, picioarele puțin mai late decât umerii.', 'Împingi șoldurile înapoi, greutatea trece printre picioare.', 'Împingi exploziv șoldurile înainte: greutatea urcă până la nivelul pieptului.', 'O lași să cadă și reiei mișcarea din șold.'],
+    mistake: 'Să ridici greutatea din brațe sau să faci genuflexiune în loc de balans din șold.',
+  },
+  'Push Ups': {
+    steps: ['Palmele sub umeri, corpul drept din cap până în călcâie.', 'Cobori cu coatele la 45° până când pieptul aproape atinge solul.', 'Împingi până la brațe întinse.'],
+    mistake: 'Șoldurile căzute când obosești.',
+  },
+};
+Object.assign(HOW, HYBRID_HOW);
+
+
 /**
  * Full steps for a variation that is a different movement from its exercise: the throws that stand in for the jumps
  * while the knees don't take landings. The jump variations fall back to the exercise's own steps (cmj, broad).

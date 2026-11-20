@@ -51,13 +51,13 @@ function accessory(id, rank = 0) {
     // Luptător and up (2026-11-16): a wider band, longer tails
     ? { tail1: 'M203 91Q222 79 233 66L238 80Q225 93 205 101Z', tail2: 'M202 99Q221 110 231 133L218 138Q212 117 199 105Z', band: 'M43 86Q120 58 197 86L199 108Q120 80 41 108Z', hl: 'M58 87Q120 66 182 87', knot: 'M189 82L206 85L208 107L191 111Z' }
     : { tail1: 'M203 93Q222 82 236 70L238 83Q224 95 205 101Z', tail2: 'M202 99Q220 108 231 128L219 133Q212 115 199 105Z', band: 'M45 90Q120 64 195 90L197 105Q120 80 43 105Z', hl: 'M60 91Q120 71 181 91', knot: 'M190 87L205 89L207 105L192 108Z' };
-  const top = gold ? ['#ffe6a6', '#e5b04a', '#8a5a12'] : ['#ff4a5e', '#e5102c', '#8a0a19'];
+  const top = gold ? ['#ffe6a6', '#e5b04a', '#8a5a12'] : ['#ffe27a', '#f5c211', '#8a6a00'];
   return `<defs><linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top[0]}"/><stop offset=".5" stop-color="${top[1]}"/><stop offset="1" stop-color="${top[2]}"/></linearGradient></defs>
   <path d="${band.tail1}" fill="url(#${id}b)" ${ink}/>
-  <path d="${band.tail2}" fill="${gold ? '#b8852a' : '#b50c22'}" ${ink}/>
+  <path d="${band.tail2}" fill="${gold ? '#b8852a' : '#c99a00'}" ${ink}/>
   <path d="${band.band}" fill="url(#${id}b)" ${ink}/>
-  <path d="${band.hl}" fill="none" stroke="${gold ? '#fff3cf' : '#ffb3bb'}" stroke-opacity=".5" stroke-width="1.6" stroke-linecap="round"/>
-  <path d="${band.knot}" fill="${gold ? '#c99a3c' : '#c00b24'}" ${ink}/>
+  <path d="${band.hl}" fill="none" stroke="${gold ? '#fff3cf' : '#fff3cf'}" stroke-opacity=".5" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="${band.knot}" fill="${gold ? '#c99a3c' : '#d9a90a'}" ${ink}/>
   ${rank >= 2 ? scar() : ''}`;
 }
 
@@ -103,28 +103,43 @@ export function umbra(size = 'medium', id = `u${++n}`, rank = 0) {
     <filter id="${id}g" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="${o.glow}"/></filter>
   </defs>
   ${rank >= 4 ? aura(id) : ''}
-  <path d="${OUTLINE_D}" fill="#e5102c" opacity="${o.halo}" filter="url(#${id}h)"/>
+  <path d="${OUTLINE_D}" fill="#f5c211" opacity="${o.halo * 0.7}" filter="url(#${id}h)"/>
   ${face}
   <path d="${OUTLINE_D}" fill="none" stroke="url(#${id}r)" stroke-opacity="${o.rimA}" stroke-width="${o.rim}" stroke-linejoin="round"/>
-  <g filter="url(#${id}g)">${eyes.map((e) => `<path d="${d(e)}" fill="#ff2944"/>`).join('')}</g>
-  ${eyes.map((e) => `<path d="${d(e)}" fill="#ff2944"/>`).join('')}
-  ${eyes.map((e) => `<path d="${d(grow(e, 0.42))}" fill="#ffa3ad" opacity=".85"/>`).join('')}
-  ${rank >= 2 ? `<g filter="url(#${id}g)" opacity=".9">${eyes.map((e) => `<path d="${d(grow(e, 1.5))}" fill="#ff5a6e"/>`).join('')}</g>` : ''}
+  <g filter="url(#${id}g)">${eyes.map((e) => `<path d="${d(e)}" fill="#ffd43b"/>`).join('')}</g>
+  ${eyes.map((e) => `<path d="${d(e)}" fill="#ffd43b"/>`).join('')}
+  ${eyes.map((e) => `<path d="${d(grow(e, 0.42))}" fill="#fff6d6" opacity=".9"/>`).join('')}
+  ${rank >= 2 ? `<g filter="url(#${id}g)" opacity=".9">${eyes.map((e) => `<path d="${d(grow(e, 1.5))}" fill="#ffe27a"/>`).join('')}</g>` : ''}
   ${accessory(id, rank)}
   ${rank >= 3 ? armour(id) : ''}`;
 }
 
 /** The icon's field: steel black under a cold spotlight, a red light behind the head, darker at the bottom. */
 export function field(id = `f${++n}`) {
-  return `<defs><radialGradient id="${id}s" cx=".5" cy=".02" r=".85"><stop offset="0" stop-color="#9fb0cf" stop-opacity=".36"/><stop offset=".55" stop-color="#1b2130" stop-opacity=".45"/><stop offset="1" stop-color="#05060a" stop-opacity="0"/></radialGradient>
-    <radialGradient id="${id}r" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#e5102c" stop-opacity=".5"/><stop offset=".6" stop-color="#6e0715" stop-opacity=".26"/><stop offset="1" stop-color="#05060a" stop-opacity="0"/></radialGradient>
+  return `<defs><radialGradient id="${id}s" cx=".5" cy=".02" r=".85"><stop offset="0" stop-color="#d8d2bd" stop-opacity=".26"/><stop offset=".55" stop-color="#1a1812" stop-opacity=".45"/><stop offset="1" stop-color="#05060a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="${id}r" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f5c211" stop-opacity=".42"/><stop offset=".6" stop-color="#4d3c04" stop-opacity=".26"/><stop offset="1" stop-color="#05060a" stop-opacity="0"/></radialGradient>
     <linearGradient id="${id}v" x1="0" y1="0" x2="0" y2="1"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".4"/></linearGradient></defs>
     <rect width="240" height="240" fill="#05060a"/><rect width="240" height="240" fill="url(#${id}s)"/><circle cx="120" cy="132" r="112" fill="url(#${id}r)"/><rect width="240" height="240" fill="url(#${id}v)"/>`;
 }
 
+/** 2026-11-20, the Hybrid365 plan: the icon carries a yellow plate with 365 in blocky black digits (drawn as
+ *  rectangles, so no font is needed), the way the Hybrid365 posts set their day plates. */
+const DIGITS = { 3: ['111', '001', '111', '001', '111'], 6: ['111', '100', '111', '101', '111'], 5: ['111', '100', '111', '001', '111'] };
+function plate365(k) {
+  const c = 5.2, gap = 5, dw = 3 * c, total = 3 * dw + 2 * gap, x0 = 120 - total / 2, y0 = 196 - 2.5 * c;
+  let cells = '';
+  '365'.split('').forEach((ch, i) => DIGITS[ch].forEach((row, r) => row.split('').forEach((v, col) => {
+    if (v === '1') cells += `<rect x="${(x0 + i * (dw + gap) + col * c).toFixed(2)}" y="${(y0 + r * c).toFixed(2)}" width="${(c + 0.3).toFixed(2)}" height="${(c + 0.3).toFixed(2)}"/>`;
+  })));
+  const pw = total + 26, ph = 5 * c + 16;
+  return `<g transform="translate(120 120) scale(${(k / 0.76).toFixed(4)}) translate(-120 -120)"><rect x="${120 - pw / 2}" y="${196 - ph / 2}" width="${pw}" height="${ph}" rx="3" fill="#f5c211"/><g fill="#0a0a0a">${cells}</g></g>`;
+}
+
 /** A whole SVG: the field (or none) and the head at `k` of the canvas, nudged down a little. */
-export function svg({ px, size = 'medium', bg = true, k = 0.76, rx = 0, w = px, h = px, rank = 0 }) {
-  const body = `<g transform="translate(120 ${122 + (h / w - 1) * 120}) scale(${k}) translate(-120 -128)">${umbra(size, undefined, rank)}</g>`;
+export function svg({ px, size = 'medium', bg = true, k = 0.76, rx = 0, w = px, h = px, rank = 0, badge = false }) {
+  const body = badge
+    ? `<g transform="translate(120 ${108 + (h / w - 1) * 120}) scale(${k * 0.8}) translate(-120 -128)">${umbra(size, undefined, rank)}</g>${plate365(k)}`
+    : `<g transform="translate(120 ${122 + (h / w - 1) * 120}) scale(${k}) translate(-120 -128)">${umbra(size, undefined, rank)}</g>`;
   const vb = `0 0 240 ${(240 * h) / w}`;
   const clip = rx ? `<clipPath id="cl"><rect width="240" height="${(240 * h) / w}" rx="${rx}"/></clipPath>` : '';
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${vb}">${clip}<g${rx ? ' clip-path="url(#cl)"' : ''}>${bg ? field() : ''}${body}</g></svg>`;

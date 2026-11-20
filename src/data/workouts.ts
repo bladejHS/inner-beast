@@ -1,19 +1,8 @@
-// Strength sessions for PUSH (Tue), PULL (Fri), LEGS (Sat), UPPER (Mon in cycle A) and the 10-minute bodyweight block (Mon).
-// Base from the e-book (push-up variations + dips, pull-up variations, legs), filled out with Alex Hanma's own training
-// (pull-up EMOM, rear shoulders, explosive work) and reworked on 2026-11-07 after the research: explosive work first,
-// strength sets 1-3 reps short of failure, longer rests on heavy moves, a second leg dose on Tuesday, sprints,
-// throws and loaded single-leg work on Saturday, carries on Friday.
-// Fitted to the user on 2026-11-07: jumps hurt the knees at the current body weight, so Saturday's power work starts
-// with medicine ball throws and hill sprints, and the jumps come back as later variations. Equipment: an Olympic bar
-// (no squats with it), dumbbells up to 30 kg, a medicine ball, a partner now and then.
-// The user approved on 2026-11-07 a second strength dose for pulling and pressing: in the strength emphasis (cycle A)
-// Monday's AMRAP becomes Upper Strength, short heavy sets of pull-ups and dips.
-// Reviewed on 2026-11-08 against the specialists, all approved: no Bench Dips (the shoulder ends far back and turned in,
-// a load physiotherapists avoid, heavier still at 134 kg; assisted dips open the progression instead); TRX Rows on
-// Friday for a horizontal pull that keeps progressing without weights (the user wants no weights for the back);
-// neck isometrics for the strikes to the head, as their own routine outside the plan (Lupte → Timere, the user's
-// choice); a barbell Hip Thrust on Saturday, glute strength with the knee barely working.
-// Exercise names stay in English; cues are Romanian.
+// Strength sessions since 2026-11-20: the four lifting sessions of the Hybrid365 run-focused split (Monday Upper
+// Strength, Wednesday Upper Strength, Thursday Lower Strength, Friday Upper Strength + Power), exercise for exercise,
+// sets x reps and rests as on the slides. Kept from before: the dumbbells stop at 30 kg, and the Back Squat is a Hack
+// Squat (the user does not squat with the bar). Ids shared with the old plan (curls, hacksq, rdl, hipthrust, calf)
+// keep their variations, so the last session and the kg carry over. Exercise names stay in English; cues are Romanian.
 
 /** The heaviest dumbbells the user owns: past this the weight can't go up, the variation or the tempo does. */
 export const DB_MAX_KG = 30;
@@ -48,7 +37,7 @@ export interface Exercise {
 }
 
 export interface Workout {
-  id: 'push' | 'pull' | 'legs' | 'upper' | 'lower' | 'knee' | 'kick';
+  id: 'upper' | 'upper2' | 'lower' | 'power';
   name: string;
   /** About how long it takes, rests included. */
   min: number;
@@ -57,281 +46,193 @@ export interface Workout {
 
 export const WORKOUTS: Workout[] = [
   {
-    id: 'push',
-    name: 'Push Training',
-    min: 45,
-    ex: [
-      {
-        id: 'explosive', name: 'Explosive Push-ups', vars: ['Incline Explosive Push-ups', 'Explosive Push-ups', 'Clap Push-ups', 'Superman Push-ups'], start: 0,
-        type: 'reps', sets: 3, lo: 3, hi: 5, rest: 120, muscles: 'piept, triceps, putere',
-        cue: 'Cobori controlat, împingi cât de exploziv poți. Seria se termină când o repetare încetinește, nu când nu mai poți.',
-        alex: 'Antrenează mușchii și pentru viteză, nu doar pentru forță. Le faci primele, cât ești proaspăt.',
-      },
-      {
-        id: 'splitsq-tue', name: 'Bulgarian Split Squat', vars: ['Split Squats', 'Bulgarian Split Squats', 'Dumbbell Bulgarian Split Squats'], start: 2,
-        type: 'reps', sets: 3, lo: 5, hi: 5, perSide: true, rest: 90, load: true, muscles: 'cvadricepși, fesieri',
-        cue: 'A doua doză de picioare a săptămânii, scurtă: te oprești cu 2–3 repetări înainte de limită. Dacă picioarele sunt încă febrile de luni, o sari.',
-      },
-      {
-        id: 'dips', name: 'Dips', vars: ['Assisted Dips', 'Negative Dips', 'Parallel Bar Dips', 'Weighted Dips'], start: 0,
-        type: 'reps', sets: 3, lo: 5, hi: 8, rest: 165, muscles: 'piept, triceps',
-        cue: 'Umerii jos, departe de urechi. Cobori până când cotul ajunge la 90°. Ajungi la 3 × 8 curat, apoi adaugi greutate.',
-      },
-      {
-        id: 'pushups', name: 'Push-ups', vars: ['Incline Push-ups', 'Push-ups', 'Decline Push-ups', 'Archer Push-ups', 'Pseudo Planche Push-ups'], start: 1,
-        type: 'reps', sets: 3, lo: 6, hi: 12, rest: 90, muscles: 'piept, umeri, triceps',
-        cue: 'Corpul drept din cap până în călcâie, coatele la aproximativ 45°, pieptul aproape de sol. Te oprești cu 1–2 repetări înainte de eșec.',
-      },
-      {
-        id: 'pallof', name: 'Pallof Press', vars: ['Band Pallof Press', 'Band Pallof Press (split stance)'], start: 0,
-        type: 'reps', sets: 3, lo: 8, hi: 12, perSide: true, rest: 60, muscles: 'trunchi, anti-rotație',
-        cue: 'Banda trage lateral; tu împingi mâinile în față și nu lași trunchiul să se rotească. Ții o secundă cu brațele întinse.',
-      },
-      {
-        id: 'pike', name: 'Pike Push-ups', vars: ['Pike Push-ups', 'Elevated Pike Push-ups', 'Wall Handstand Push-up Negatives', 'Wall Handstand Push-ups'], start: 0,
-        type: 'reps', sets: 3, lo: 6, hi: 10, rest: 120, muscles: 'umeri',
-        cue: 'Șoldurile sus, capul coboară în fața mâinilor. Toată munca e în umeri.',
-      },
-      {
-        id: 'hollow', name: 'Hollow Body Hold', vars: ['Tuck Hollow Hold', 'Hollow Body Hold', 'Hollow Body Rocks'], start: 0,
-        type: 'time', sets: 3, lo: 20, hi: 45, rest: 45, muscles: 'abdomen',
-        cue: 'Zona lombară lipită de sol, abdomenul strâns, respiri scurt.',
-        alex: 'Când folosești core-ul, pumnii au mult mai multă forță.',
-      },
-      {
-        id: 'diamond', name: 'Diamond Push-ups', vars: ['Incline Diamond Push-ups', 'Diamond Push-ups', 'Decline Diamond Push-ups'], start: 0,
-        type: 'reps', sets: 2, lo: 8, hi: 15, rest: 60, opt: true, muscles: 'triceps',
-        cue: 'Opțional, primul de tăiat când timpul e scurt. Mâinile formează un romb sub piept, coatele rămân lângă corp.',
-      },
-    ],
-  },
-  {
-    id: 'pull',
-    name: 'Pull Training',
-    min: 56,
-    ex: [
-      {
-        id: 'emom', name: 'Pull-up EMOM', vars: ['Negative Pull-ups', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 2,
-        type: 'emom', sets: 1, rest: 0, muscles: 'spate, biceps',
-        cue: 'La începutul fiecărui minut faci repetările. Ce rămâne din minut e pauză. Ținta crește doar după două sesiuni complete la rând.',
-        alex: 'Își începe ziua de spate cu 30 × 10. Aplicația urcă doar până la 15 × 8, apoi trece la tracțiuni cu greutate: volumul acela ar urca de zece ori în câteva luni.',
-      },
-      {
-        id: 'rows', name: 'Inverted Rows', vars: ['Inverted Rows (high bar)', 'Inverted Rows', 'Feet-elevated Inverted Rows', 'Archer Rows'], start: 1,
-        type: 'reps', sets: 3, lo: 8, hi: 12, rest: 75, muscles: 'spate',
-        cue: 'Corpul drept, tragi pieptul la bară și strângi omoplații. Merge și la TRX: cu cât ești mai orizontal, cu atât e mai greu.',
-        alex: 'Ramat 4 × 10–12, ca în ziua lui de spate.',
-      },
-      {
-        id: 'trxrow', name: 'TRX Rows', vars: ['TRX Rows (upright)', 'TRX Rows', 'TRX Rows (feet elevated)', 'TRX Single-arm Rows'], start: 1,
-        type: 'reps', sets: 3, lo: 8, hi: 12, rest: 75, muscles: 'spate, omoplați, biceps',
-        cue: 'Fără greutăți: greutatea o reglezi din unghiul corpului. Cu picioarele mai în față e mai greu. Varianta cu un braț e cea mai grea: repetările sunt pe fiecare braț, iar trunchiul nu se rotește.',
-      },
-      {
-        id: 'face', name: 'Face Pulls', vars: ['Band Pull-Aparts', 'Band Face Pulls', 'TRX Face Pulls', 'TRX Rear Delt Flys'], start: 2,
-        type: 'reps', sets: 3, lo: 12, hi: 15, rest: 60, muscles: 'umeri posteriori',
-        cue: 'Coatele sus, tragi spre față și strângi spatele umerilor. La TRX: cu cât picioarele sunt mai în față, cu atât e mai greu.',
-        alex: 'Își încheie ziua de spate cu umărul posterior, 4 × 10–12.',
-      },
-      {
-        id: 'chin', name: 'Chin-ups', vars: ['Negative Chin-ups', 'Band-assisted Chin-ups', 'Chin-ups', 'Weighted Chin-ups'], start: 2,
-        type: 'reps', sets: 2, lo: 3, hi: 6, rest: 120, opt: true, muscles: 'biceps, spate',
-        cue: 'Doar dacă EMOM-ul n-a fost greu. Palmele spre tine, pieptul spre bară, te oprești cu 2 repetări înainte de limită.',
-      },
-      {
-        id: 'carry', name: "Farmer's Carry", vars: ["Farmer's Carry", 'Suitcase Carry'], start: 0,
-        type: 'time', sets: 4, lo: 30, hi: 45, rest: 75, load: true, muscles: 'priză, trunchi, umeri',
-        cue: 'Cele mai grele gantere pe care le ții drept. Umerii jos, pași scurți și controlați, respiri. La Suitcase Carry ții doar într-o mână și nu te lași într-o parte.',
-      },
-      {
-        id: 'core', name: 'Hanging Knee Raises', vars: ['Lying Leg Raises', 'Hanging Knee Raises', 'Hanging Leg Raises', 'Toes-to-Bar'], start: 1,
-        type: 'reps', sets: 3, lo: 8, hi: 12, rest: 60, muscles: 'abdomen',
-        cue: 'Fără balans: ridici din abdomen și cobori lent. După un EMOM lung, alege Lying Leg Raises.',
-      },
-      {
-        id: 'hang', name: 'Dead Hang', vars: ['Dead Hang', 'Active Hang', 'One-arm Assisted Hang'], start: 0,
-        type: 'time', sets: 3, lo: 20, hi: 60, rest: 60, muscles: 'priză, umeri',
-        cue: 'Atârni relaxat, umerii activi, și te dai jos înainte să cedeze priza. Ținta pe termen lung e 90 s dintr-o bucată (proba SRI), dar testul de maxim îl faci doar în săptămâna de teste. Priza ține și în clinch, la tracțiuni și la cărat.',
-      },
-      {
-        // back on Friday at the user's request (2026-11-13), next to Monday's Biceps Curls: hammer grip here, for the forearms
-        id: 'hammer', name: 'Hammer Curls', vars: ['Bodyweight Biceps Curls', 'Band Hammer Curls', 'Dumbbell Hammer Curls'], start: 2,
-        type: 'reps', sets: 2, lo: 10, hi: 12, rest: 60, opt: true, muscles: 'biceps, antebrațe',
-        cue: 'Opțional. Palmele una spre alta, coatele lipite de corp, fără balans.',
-        alex: 'Face hammer curls și biceps curls, 4 × 10–12 fiecare.',
-      },
-      {
-        id: 'ytw', name: 'Y-T-W Raises', vars: ['Band Y-T-W Raises', 'TRX Y-T-W Raises'], start: 1,
-        type: 'ytw', sets: 3, rest: 60, opt: true, muscles: 'umeri posteriori',
-        cue: 'Opțional. O serie înseamnă 5 repetări cu brațele în Y, 5 în T și 5 în W, fără pauză.',
-        alex: 'Face 4 × 5-5-5 la TRX: umerii din spate trebuie întăriți ca să nu ajungi cu „umeri de boxer”, aduși în față.',
-      },
-    ],
-  },
-  {
-    id: 'legs',
-    name: 'Leg Day',
-    min: 66,
-    ex: [
-      {
-        id: 'sprint', name: 'Sprints', vars: ['Hill Sprints (8–10 s)', 'Accelerations (10–20 m)'], start: 0,
-        type: 'done', sets: 4, label: '1 sprint la ~85%', rest: 90, muscles: 'viteză, ischiogambieri',
-        cue: 'În pantă impactul și frânarea sunt mai mici decât pe plat, așa că genunchii primesc mai puțin. Urci 8–10 s, cobori mergând. Fără pantă: accelerări de 10–15 m pe iarbă. Efortul urcă de la o săptămână la alta: 85%, 90%, 95%.',
-      },
-      {
-        id: 'cmj', name: 'Lower-body Power', vars: ['Medicine Ball Scoop Toss', 'Box Jump', 'Countermovement Jump'], start: 0,
-        type: 'done', sets: 3, label: '3 repetări maxime, pauză completă', rest: 75, muscles: 'putere, șolduri',
-        cue: 'Puterea vine din șold, ca la săritură, dar fără aterizare pe genunchi. Săriturile revin pe rând: Box Jump după 3 săptămâni de Leg Day fără durere de genunchi (sub 3 din 10, nici a doua zi), Countermovement Jump după încă 3 săptămâni la fel.',
-      },
-      {
-        id: 'broad', name: 'Total-body Power', vars: ['Medicine Ball Slam', 'Broad Jump'], start: 0,
-        type: 'done', sets: 2, label: '3 repetări maxime, pauză completă', rest: 75, muscles: 'putere, trunchi',
-        cue: 'Tot corpul trimite mingea în sol, cât de tare poți: te întinzi pe vârfuri cu ea sus, apoi abdomenul și dorsalii o aruncă. Broad Jump revine odată cu Countermovement Jump.',
-      },
-      {
-        id: 'rot', name: 'Rotational Throws', vars: ['Band Rotational Punches', 'Rotational Med Ball Throws'], start: 1,
-        type: 'reps', sets: 3, lo: 5, hi: 8, perSide: true, rest: 60, muscles: 'rotație, trunchi, putere',
-        cue: 'Rotația pornește din piciorul din spate și din șold, brațele doar o termină. Fiecare repetare la viteză maximă.',
-      },
-      {
-        id: 'splitsq', name: 'Bulgarian Split Squat', vars: ['Split Squats', 'Bulgarian Split Squats', 'Dumbbell Bulgarian Split Squats'], start: 2,
-        type: 'reps', sets: 4, lo: 5, hi: 8, perSide: true, rest: 180, load: true, muscles: 'cvadricepși, fesieri',
-        cue: 'Cele mai grele gantere pe care le poți controla. Cobori până când genunchiul din spate aproape atinge solul, trunchiul ușor înainte. Te oprești cu 1–2 repetări înainte de limită. Genunchiul din față: până la 3 din 10 durere e acceptabil dacă a doua zi nu e mai rău; altfel alegi varianta mai ușoară.',
-      },
-      {
-        id: 'rdl', name: 'Romanian Deadlift', vars: ['Barbell Romanian Deadlift'], start: 0,
-        type: 'reps', sets: 3, lo: 5, hi: 8, rest: 150, load: true, bar: true, muscles: 'ischiogambieri, fesieri, spate',
-        cue: 'Cu bara olimpică: șoldul pleacă înapoi, bara alunecă pe coapse până sub genunchi, spatele rămâne drept. Genunchii stau ușor îndoiți și aproape nemișcați, de aceea îi încarcă puțin. Te oprești cu 1–2 repetări înainte de limită.',
-      },
-      {
-        id: 'hipthrust', name: 'Hip Thrust', vars: ['Glute Bridge', 'Barbell Glute Bridge', 'Barbell Hip Thrust'], start: 1,
-        type: 'reps', sets: 3, lo: 8, hi: 12, rest: 90, load: true, bar: true, muscles: 'fesieri, ischiogambieri',
-        cue: 'Bara pe șold, cu un prosop împăturit sub ea. Împingi prin călcâie până când corpul e drept de la umeri la genunchi, strângi fesierii o secundă sus și cobori controlat. Genunchiul abia lucrează; bărbia spre piept, coastele jos.',
-      },
-      {
-        id: 'sldl', name: 'Single-leg Romanian Deadlift', vars: ['Single-leg RDL (bodyweight)', 'Dumbbell Single-leg RDL'], start: 1,
-        type: 'reps', sets: 2, lo: 6, hi: 10, perSide: true, rest: 90, load: true, opt: true, muscles: 'ischiogambieri, fesieri, echilibru',
-        cue: 'Opțional, după Romanian Deadlift: echilibru pe un picior. Împingi șoldul înapoi, spatele drept, piciorul liber urcă în linie cu trunchiul.',
-      },
-      {
-        id: 'latlunge', name: 'Lateral Lunge', vars: ['Lateral Lunge', 'Dumbbell Lateral Lunge'], start: 1,
-        type: 'reps', sets: 3, lo: 6, hi: 10, perSide: true, rest: 90, load: true, muscles: 'adductori, fesieri, lateral',
-        cue: 'Pas larg lateral, te așezi pe piciorul care pășește, celălalt rămâne întins. Forța laterală de care ai nevoie în ring. Cobori doar cât genunchiul nu protestează.',
-      },
-      {
-        id: 'calf', name: 'Calf Raises', vars: ['Calf Raises', 'Single-leg Calf Raises'], start: 1,
-        type: 'reps', sets: 3, lo: 8, hi: 12, perSide: true, rest: 60, load: true, muscles: 'gambe, tendonul lui Ahile',
-        cue: 'Urci pe vârfuri, ții o secundă sus, cobori lent în 3 secunde. Gleznele puternice ajută la coardă, sprint și în ring.',
-      },
-      {
-        id: 'cossack', name: 'Cossack Squats', vars: ['Assisted Cossack Squats', 'Cossack Squats'], start: 0,
-        type: 'reps', sets: 2, lo: 6, hi: 8, perSide: true, rest: 45, opt: true, muscles: 'șolduri, adductori',
-        cue: 'Te muți de pe un picior pe altul, cu piciorul întins pe vârf. Doar cât de jos merge fără durere de genunchi.',
-        alex: 'Mobilitate de șold ca în rutina lui „Dagestan”.',
-      },
-      {
-        id: 'wallsit', name: 'Wall Sit', vars: ['Wall Sit'], start: 0,
-        type: 'time', sets: 2, lo: 45, hi: 60, rest: 60, opt: true, muscles: 'cvadricepși',
-        cue: 'Opțional, la final. Spatele lipit de perete, genunchii la 90°, respiri calm. Ținutele fără mișcare sunt de obicei bine tolerate de genunchi.',
-      },
-    ],
-  },
-  {
-    // The second strength dose of the week for pulling and pressing, on Monday in the strength emphasis (cycle A):
-    // strength grows better with two sessions a week than with one. Short heavy sets, 2 reps in reserve.
+    // Monday, Session 2: Upper Body (Strength). Rest 60-90 s.
     id: 'upper',
-    name: 'Upper Strength',
-    min: 15,
+    name: 'Upper Body (Strength)',
+    min: 55,
     ex: [
       {
-        id: 'pull-str', name: 'Pull-ups', vars: ['Negative Pull-ups', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 2,
-        type: 'reps', sets: 3, lo: 3, hi: 5, rest: 150, muscles: 'spate, biceps',
-        cue: 'Serii scurte și grele, cu 2 repetări în rezervă: nu e EMOM-ul de vineri, e forță. Când faci 3 × 5 curat, treci la Weighted Pull-ups, cu un rucsac sau o ganteră între picioare.',
+        id: 'bench', name: 'Bench Press', vars: ['Barbell Bench Press'], start: 0,
+        type: 'reps', sets: 4, lo: 6, hi: 8, rest: 90, load: true, bar: true, muscles: 'piept, umeri, triceps',
+        cue: 'Înainte de serii: 1–2 serii ușoare de încălzire. Omoplații strânși și coborâți, picioarele bine puse pe sol. Bara coboară controlat pe piept, la nivelul mameloanelor, și urcă puternic. Tempo controlat, amplitudine completă.',
       },
       {
-        id: 'dips-str', name: 'Dips', vars: ['Negative Dips', 'Parallel Bar Dips', 'Weighted Dips'], start: 1,
-        type: 'reps', sets: 3, lo: 3, hi: 5, rest: 150, muscles: 'piept, triceps',
-        cue: 'La fel: serii scurte, grele, cu 2 repetări în rezervă. Umerii jos, cotul la 90°. La 3 × 5 curat adaugi greutate.',
+        id: 'pullup', name: 'Pull Up / Lat Pulldown', vars: ['Lat Pulldown', 'Band-assisted Pull-ups', 'Pull-ups'], start: 0,
+        type: 'reps', sets: 4, lo: 6, hi: 10, rest: 90, load: true, machine: true, muscles: 'spate, biceps',
+        cue: 'Pieptul sus, tragi coatele în jos spre coaste, până când bara ajunge la piept sau bărbia trece de bară. Cobori complet, controlat. Kg: greutatea de pe aparat; la tracțiuni, greutatea adăugată (0 fără).',
+      },
+      {
+        id: 'incline', name: 'Incline Dumbbell Press', vars: ['Incline Dumbbell Press'], start: 0,
+        type: 'reps', sets: 3, lo: 8, hi: 10, rest: 75, load: true, muscles: 'pieptul de sus, umeri',
+        cue: 'Banca la 30°. Ganterele coboară lateral de piept, coatele la 45–60°, apoi împingi în sus și ușor spre interior. Kg: o singură ganteră.',
+      },
+      {
+        id: 'csrow', name: 'Chest Supported Row', vars: ['Chest Supported Dumbbell Row', 'Chest Supported Machine Row'], start: 0,
+        type: 'reps', sets: 3, lo: 8, hi: 10, rest: 75, load: true, muscles: 'spatele de mijloc, dorsali',
+        cue: 'Cu pieptul pe banca înclinată: tragi coatele înapoi și strângi omoplații o secundă, cobori până la brațe întinse. Pieptul nu se ridică de pe bancă.',
+      },
+      {
+        id: 'latraise', name: 'Lateral Raise', vars: ['Dumbbell Lateral Raise'], start: 0,
+        type: 'reps', sets: 3, lo: 12, hi: 15, rest: 60, load: true, muscles: 'umeri (deltoidul lateral)',
+        cue: 'Brațele ușor îndoite, urci lateral până la nivelul umerilor, fără balans. Cobori în 2–3 secunde.',
+      },
+      {
+        id: 'tripush', name: 'Tricep Pushdown', vars: ['Band Tricep Pushdown', 'Cable Tricep Pushdown'], start: 1,
+        type: 'reps', sets: 3, lo: 10, hi: 12, rest: 60, load: true, machine: true, muscles: 'triceps',
+        cue: 'Coatele lipite de corp, nemișcate. Împingi până la brațe întinse, strângi tricepsul, revii controlat până la 90°.',
+      },
+      {
+        id: 'curls', name: 'Bicep Curl', vars: ['Bodyweight Biceps Curls', 'Band Hammer Curls', 'Dumbbell Hammer Curls', 'Dumbbell Biceps Curls'], start: 3,
+        type: 'reps', sets: 3, lo: 10, hi: 12, rest: 60, load: true, muscles: 'biceps, antebrațe',
+        cue: 'Coatele lipite de corp, fără balans din spate: urci în 1 secundă, cobori în 2–3.',
       },
     ],
   },
   {
-    // Monday, after the kickboxing (the user's call, 2026-11-13: Tuesday's Lower Strength is gone). The hack squat is the
-    // week's second leg dose, on a machine that guides the path with the back on the pad, so not the barbell squat the
-    // plan avoids; depth is capped by knee pain. The biceps curls moved here from Friday and are no longer optional.
+    // Wednesday, Session 1: Upper Body (Strength). Rest 60-90 s, 1-2 reps in reserve on the main lifts.
+    id: 'upper2',
+    name: 'Upper Body (Strength)',
+    min: 60,
+    ex: [
+      {
+        id: 'wpull', name: 'Weighted Pull Up', vars: ['Lat Pulldown (heavy)', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 0,
+        type: 'reps', sets: 4, lo: 5, hi: 8, rest: 90, load: true, machine: true, muscles: 'spate, biceps',
+        cue: 'Greu, cu 1–2 repetări în rezervă. Până ajungi la tracțiuni cu greutate, varianta grea de pe aparat. Kg: greutatea de pe aparat sau cea adăugată la centură.',
+      },
+      {
+        id: 'dbpress', name: 'Flat Dumbbell Press', vars: ['Flat Dumbbell Press'], start: 0,
+        type: 'reps', sets: 4, lo: 6, hi: 8, rest: 90, load: true, muscles: 'piept, umeri, triceps',
+        cue: 'Pe banca dreaptă: ganterele coboară lângă piept, omoplații strânși, apoi împingi în sus. 1–2 repetări în rezervă. Kg: o singură ganteră.',
+      },
+      {
+        id: 'csrow-w', name: 'Chest Supported Row', vars: ['Chest Supported Dumbbell Row', 'Chest Supported Machine Row'], start: 0,
+        type: 'reps', sets: 4, lo: 8, hi: 10, rest: 75, load: true, muscles: 'spatele de mijloc, dorsali',
+        cue: 'Cu pieptul pe banca înclinată: tragi coatele înapoi și strângi omoplații o secundă, cobori până la brațe întinse.',
+      },
+      {
+        id: 'ohp', name: 'Seated Overhead Press', vars: ['Seated Dumbbell Overhead Press'], start: 0,
+        type: 'reps', sets: 3, lo: 8, hi: 10, rest: 75, load: true, muscles: 'umeri, triceps',
+        cue: 'Așezat, cu spătarul drept: ganterele pornesc la nivelul urechilor și urcă deasupra capului fără să arcuiești spatele.',
+      },
+      {
+        id: 'facepull', name: 'Cable Face Pull', vars: ['Band Face Pulls', 'Cable Face Pulls'], start: 1,
+        type: 'reps', sets: 3, lo: 12, hi: 15, rest: 60, load: true, machine: true, muscles: 'umărul posterior, omoplați',
+        cue: 'Coarda la nivelul feței: tragi spre frunte, cu coatele sus și mâinile depărtându-se la final. Ții o secundă.',
+      },
+      {
+        id: 'latraise-w', name: 'Dumbbell Lateral Raise', vars: ['Dumbbell Lateral Raise'], start: 0,
+        type: 'reps', sets: 3, lo: 12, hi: 15, rest: 60, load: true, muscles: 'umeri (deltoidul lateral)',
+        cue: 'Brațele ușor îndoite, urci lateral până la nivelul umerilor, fără balans. Cobori în 2–3 secunde.',
+      },
+      {
+        id: 'rope', name: 'Tricep Rope Pushdown', vars: ['Band Tricep Pushdown', 'Cable Rope Pushdown'], start: 1,
+        type: 'reps', sets: 3, lo: 10, hi: 12, rest: 60, load: true, machine: true, muscles: 'triceps',
+        cue: 'Coatele lipite de corp. Jos desfaci capetele corzii spre exterior și strângi tricepsul.',
+      },
+      {
+        id: 'altcurl', name: 'Alternating Dumbbell Curl', vars: ['Alternating Dumbbell Curl'], start: 0,
+        type: 'reps', sets: 3, lo: 10, hi: 12, perSide: true, rest: 60, load: true, muscles: 'biceps',
+        cue: 'Un braț pe rând, palma se rotește în sus pe drum. Coatele stau lângă corp, fără balans.',
+      },
+    ],
+  },
+  {
+    // Thursday, Session 2: Lower Body (Strength). Rest 60-90 s, 1-2 reps in reserve on the compounds.
     id: 'lower',
-    name: 'Hack Squat & Biceps Curls',
-    min: 14,
+    name: 'Lower Body (Strength)',
+    min: 55,
     ex: [
       {
         id: 'hacksq', name: 'Hack Squat', vars: ['Hack Squat (partial range)', 'Hack Squat'], start: 0,
-        type: 'reps', sets: 3, lo: 8, hi: 12, rest: 120, load: true, machine: true, muscles: 'cvadricepși, fesieri',
-        cue: 'Pe aparat. Spatele lipit de spătar, picioarele la lățimea umerilor, puțin mai în față pe platformă. Începi cu amplitudine parțială, până la aproximativ 90° la genunchi; Hack Squat complet doar după 3 săptămâni fără durere peste 3 din 10, nici a doua zi. Cobori în 2–3 secunde, urci fără să blochezi genunchii, te oprești cu 1–2 repetări înainte de limită. Aparatul ocupat: Leg Press, la fel.',
+        type: 'reps', sets: 4, lo: 4, hi: 6, rest: 120, load: true, machine: true, muscles: 'cvadricepși, fesieri',
+        cue: 'În Hybrid365 aici e Back Squat 4 × 4–6; la tine Hack Squat, fiindcă nu vrei genuflexiuni cu bara. 1–2 serii de încălzire, apoi greu, cu 1–2 repetări în rezervă. Spatele lipit de spătar, cobori în 2–3 secunde, urci fără să blochezi genunchii.',
       },
       {
-        id: 'curls', name: 'Biceps Curls', vars: ['Bodyweight Biceps Curls', 'Band Hammer Curls', 'Dumbbell Hammer Curls', 'Dumbbell Biceps Curls'], start: 3,
-        type: 'reps', sets: 3, lo: 8, hi: 12, rest: 60, muscles: 'biceps, antebrațe',
-        cue: 'Coatele lipite de corp, fără balans din spate: urci în 1 secundă, cobori în 2–3. Te oprești cu 1–2 repetări înainte de limită. Greutatea o notezi la gantere.',
-        alex: 'Face hammer curls și biceps curls, 4 × 10–12 fiecare.',
+        id: 'rdl', name: 'Romanian Deadlift', vars: ['Barbell Romanian Deadlift'], start: 0,
+        type: 'reps', sets: 4, lo: 6, hi: 8, rest: 120, load: true, bar: true, muscles: 'ischiogambieri, fesieri, spate',
+        cue: 'Șoldul pleacă înapoi, bara alunecă pe coapse până sub genunchi, spatele rămâne drept, genunchii ușor îndoiți. 1–2 repetări în rezervă.',
+      },
+      {
+        id: 'wlunge', name: 'Walking Lunge', vars: ['Walking Lunge', 'Dumbbell Walking Lunge'], start: 1,
+        type: 'reps', sets: 3, lo: 8, hi: 10, perSide: true, rest: 90, load: true, muscles: 'cvadricepși, fesieri',
+        cue: 'Pas lung, genunchiul din spate coboară aproape de sol, trunchiul drept. Împingi prin călcâiul din față și treci în pasul următor. Kg: o ganteră în fiecare mână.',
+      },
+      {
+        id: 'hipthrust', name: 'Hip Thrust', vars: ['Glute Bridge', 'Barbell Glute Bridge', 'Barbell Hip Thrust'], start: 2,
+        type: 'reps', sets: 3, lo: 8, hi: 10, rest: 90, load: true, bar: true, muscles: 'fesieri, ischiogambieri',
+        cue: 'Bara pe șold, cu un prosop sub ea. Împingi prin călcâie până când corpul e drept de la umeri la genunchi, strângi fesierii o secundă sus.',
+      },
+      {
+        id: 'legpress', name: 'Leg Press', vars: ['Leg Press'], start: 0,
+        type: 'reps', sets: 3, lo: 10, hi: 12, rest: 90, load: true, machine: true, muscles: 'cvadricepși, fesieri',
+        cue: 'Picioarele la lățimea umerilor pe platformă. Cobori până când genunchii sunt la aproximativ 90°, fără ca bazinul să se ridice de pe spătar.',
+      },
+      {
+        id: 'hamcurl', name: 'Hamstring Curl', vars: ['Lying Hamstring Curl', 'Seated Hamstring Curl'], start: 0,
+        type: 'reps', sets: 3, lo: 10, hi: 12, rest: 60, load: true, machine: true, muscles: 'ischiogambieri',
+        cue: 'Tragi călcâiele spre fesieri, ții o secundă, cobori în 2–3 secunde. Șoldul rămâne lipit de aparat.',
+      },
+      {
+        id: 'calf', name: 'Calf Raise', vars: ['Calf Raises', 'Single-leg Calf Raises'], start: 1,
+        type: 'reps', sets: 3, lo: 12, hi: 15, perSide: true, rest: 60, load: true, muscles: 'gambe, tendonul lui Ahile',
+        cue: 'Urci pe vârfuri, ții o secundă sus, cobori lent sub nivelul treptei. Gambe puternice, alergare mai ușoară.',
       },
     ],
   },
   {
-    // Eight minutes for the knees, after Tuesday's push session and after Leg Day, while jumps hurt them.
-    // Isometric holds ease tendon pain for a while (Rio 2015; later trials are mixed), slow loaded work builds the
-    // tendon (heavy slow resistance, Kongsgaard 2009), and the front of the shin takes part of the braking.
-    id: 'knee',
-    name: 'Knee Armor',
-    min: 8,
+    // Friday, Session 1: Upper Body (Strength + Power). Rest 90 s.
+    id: 'power',
+    name: 'Upper Body (Strength + Power)',
+    min: 65,
     ex: [
       {
-        id: 'knee-iso', name: 'Isometric Hold', vars: ['Wall Sit Hold', 'Spanish Squat Hold'], start: 0,
-        type: 'time', sets: 4, lo: 30, hi: 45, rest: 45, muscles: 'cvadriceps, tendonul rotulian',
-        cue: 'Cobori până unde durerea e cel mult 3 din 10, nu mai jos de 90°, și ții. Spanish Squat: o bandă groasă în spatele genunchilor, prinsă de un stâlp; te lași pe spate cu tibiile verticale.',
+        id: 'bench-h', name: 'Bench Press', vars: ['Barbell Bench Press'], start: 0,
+        type: 'reps', sets: 5, lo: 3, hi: 5, rest: 120, load: true, bar: true, muscles: 'piept, umeri, triceps',
+        cue: 'Greu și exploziv: 2–3 serii de încălzire, apoi bara coboară controlat și urcă cât de repede poți. Ținta e să bați seria de top de săptămâna trecută.',
       },
       {
-        id: 'knee-step', name: 'Slow Step-downs', vars: ['Step-down (low step)', 'Step-down (high step)', 'Weighted Step-down'], start: 0,
-        type: 'reps', sets: 2, lo: 6, hi: 10, perSide: true, rest: 45, muscles: 'cvadriceps, controlul genunchiului',
-        cue: 'Pe un picior, cobori în 3 secunde până când călcâiul celuilalt atinge ușor solul, apoi urci. Genunchiul merge în linie cu degetele, nu spre interior.',
+        id: 'wpull-h', name: 'Weighted Pull Up', vars: ['Lat Pulldown (heavy)', 'Band-assisted Pull-ups', 'Pull-ups', 'Weighted Pull-ups'], start: 0,
+        type: 'reps', sets: 4, lo: 4, hi: 6, rest: 120, load: true, machine: true, muscles: 'spate, biceps',
+        cue: 'Greu, cu intenție explozivă la urcare, coborâre controlată. Kg: greutatea de pe aparat sau cea de la centură.',
       },
       {
-        id: 'tib', name: 'Tibialis Raises', vars: ['Wall Tibialis Raises'], start: 0,
-        type: 'reps', sets: 2, lo: 15, hi: 25, rest: 30, muscles: 'tibia anterioară',
-        cue: 'Spatele la perete, călcâiele la o palmă de el: ridici vârfurile cât de sus poți și cobori lent. Arde pe față, e normal.',
-      },
-    ],
-  },
-  {
-    // Ten minutes for kicking, on Friday (approved 2026-11-07). The adductors take every kick and every check: a
-    // programme built on the Copenhagen adduction exercise cut groin problems by 41 % in footballers (Harøy 2019).
-    // The glute medius keeps the knee in line while the supporting foot pivots; the hip airplane trains that leg.
-    id: 'kick',
-    name: 'Kick Armor',
-    min: 10,
-    ex: [
-      {
-        id: 'cph', name: 'Copenhagen Plank', vars: ['Copenhagen Plank (Short Lever)', 'Copenhagen Plank (Long Lever)'], start: 0,
-        type: 'time', sets: 2, lo: 15, hi: 30, perSide: true, rest: 30, muscles: 'adductori',
-        cue: 'Pe o parte, pe antebraț. Pârghie scurtă: genunchiul de sus pe o bancă; lungă: laba piciorului. Ridici șoldul până corpul e drept și ții. Când ții 30 s curat pe ambele părți, treci la pârghia lungă.',
+        id: 'incline-h', name: 'Incline Dumbbell Press', vars: ['Incline Dumbbell Press'], start: 0,
+        type: 'reps', sets: 4, lo: 6, hi: 8, rest: 90, load: true, muscles: 'pieptul de sus, umeri',
+        cue: 'Banca la 30°, ganterele coboară controlat și urcă puternic. Kg: o singură ganteră.',
       },
       {
-        id: 'sp-abd', name: 'Side Plank Abduction', vars: ['Side Plank (Knees)', 'Side Plank', 'Side Plank + Leg Raise'], start: 1,
-        type: 'time', sets: 2, lo: 20, hi: 40, perSide: true, rest: 30, muscles: 'fesierul mijlociu, trunchiul lateral',
-        cue: 'Corpul drept din cap până în călcâie, șoldul sus. La varianta grea ții piciorul de sus ridicat cât un pumn, fără să cadă șoldul. Mușchiul ăsta ține genunchiul aliniat când pivotezi.',
+        id: 'csrow-h', name: 'Chest Supported Row', vars: ['Chest Supported Dumbbell Row', 'Chest Supported Machine Row'], start: 0,
+        type: 'reps', sets: 4, lo: 6, hi: 8, rest: 90, load: true, muscles: 'spatele de mijloc, dorsali',
+        cue: 'Mai greu decât miercuri: tragi exploziv, cobori controlat, pieptul rămâne pe bancă.',
       },
       {
-        id: 'airplane', name: 'Hip Airplane', vars: ['Supported Hip Airplane', 'Hip Airplane'], start: 0,
-        type: 'reps', sets: 2, lo: 5, hi: 8, perSide: true, rest: 30, muscles: 'piciorul de sprijin: șold, fesieri, gleznă',
-        cue: 'Pe un picior, aplecat în față cu spatele drept, ca la Single-leg RDL: rotești bazinul încet în afară și înapoi, fără ca genunchiul să fugă spre interior. Varianta ușoară: o mână pe perete.',
+        id: 'pushpress', name: 'Push Press', vars: ['Dumbbell Push Press', 'Barbell Push Press'], start: 1,
+        type: 'reps', sets: 4, lo: 3, hi: 5, rest: 120, load: true, bar: true, muscles: 'umeri, triceps, picioare',
+        cue: 'O mică flexie din genunchi și împingi bara deasupra capului folosind impulsul picioarelor. Bara pleacă exploziv, aterizează controlat pe umeri.',
+      },
+      {
+        id: 'cgbench', name: 'Close Grip Bench Press', vars: ['Close Grip Bench Press'], start: 0,
+        type: 'reps', sets: 3, lo: 8, hi: 10, rest: 90, load: true, bar: true, muscles: 'triceps, piept',
+        cue: 'Priza la lățimea umerilor, coatele aproape de corp. Bara coboară pe partea de jos a pieptului.',
+      },
+      {
+        id: 'bbcurl', name: 'Barbell Curl', vars: ['Barbell Curl'], start: 0,
+        type: 'reps', sets: 3, lo: 8, hi: 10, rest: 60, load: true, bar: true, muscles: 'biceps',
+        cue: 'Coatele fixe lângă corp, fără balans din șold. Urci în 1 secundă, cobori în 2–3.',
+      },
+      {
+        id: 'ohext', name: 'Tricep Overhead Extension', vars: ['Dumbbell Overhead Extension', 'Cable Overhead Extension'], start: 0,
+        type: 'reps', sets: 3, lo: 10, hi: 12, rest: 60, load: true, muscles: 'triceps (capul lung)',
+        cue: 'Gantera ținută cu ambele mâini deasupra capului: cobori în spatele capului cu coatele spre tavan, apoi întinzi brațele.',
       },
     ],
   },
 ];
 
-/** Where records count: the strength days, bodyweight sets only (reps or seconds, no dumbbells, no bar). */
-export const RECORD_WIDS = ['push', 'pull', 'legs', 'upper', 'lower'];
+/** Where records count: the strength days, bodyweight sets only (reps or seconds, no weight noted). */
+export const RECORD_WIDS = ['upper', 'upper2', 'lower', 'power'];
 
-export const recordable = (ex: Exercise): boolean => (ex.type === 'reps' || ex.type === 'time' || ex.type === 'max') && !ex.load && !ex.bar;
+export const recordable = (ex: Exercise): boolean => (ex.type === 'reps' || ex.type === 'time' || ex.type === 'max') && !ex.bar && (!ex.load || !!ex.machine);
 
 export function workoutById(id: string): Workout {
   return WORKOUTS.find((w) => w.id === id) ?? WORKOUTS[0];

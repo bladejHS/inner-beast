@@ -61,9 +61,9 @@ function cycleCard(today: string): string {
   const pos = w < 0 ? -1 : w % loop;
   const lap = w < 0 ? 1 : Math.floor(w / loop) + 1;
   if (!c) {
-    return `<section class="cycle"><p class="label">Campania · de luni</p><h3>Ciclul A: forță și bază aerobă</h3>
+    return `<section class="cycle"><p class="label">Campania · de luni</p><h3>Ciclul A: bază</h3>
       ${campaignSvg(-1, 1)}
-      <p class="small dim">Trei emfaze de câte 4 săptămâni, a 4-a mereu ușoară și cu teste. Toate calitățile se lucrează în fiecare săptămână; una primește doza mare.</p></section>`;
+      <p class="small dim">Trei etape de câte 4 săptămâni, a 4-a mereu ușoară și cu teste. Threshold Run crește de la o etapă la alta: 4 × 6, apoi 5 × 6, apoi 5 × 7 min cu pauză mai scurtă.</p></section>`;
   }
   return `<section class="cycle"><p class="label">Campania${lap > 1 ? ` · turul ${lap}` : ''} · ciclul ${c.id}, săptămâna ${c.week} din 4</p><h3>${esc(c.name)}</h3>
     ${campaignSvg(pos, lap)}
@@ -101,7 +101,7 @@ export function planHtml(): string {
   }).join('');
   return `${top()}
     ${pageHead('Planul', `Săptămâna ${weekRange(mon)}`)}
-    ${heroBand('push')}
+    ${heroBand('bench')}
     <p class="obj-plate"><b>Obiectiv</b><span>SRI · Brigada Antiteroristă</span></p>
     <section class="plan-sum">
       <div class="ps-n"><b class="num" data-count="${full}">${full}</b><span>din 7 zile</span></div>

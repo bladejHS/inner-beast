@@ -1710,3 +1710,123 @@ html[data-motion='lite'] .fc-w i { animation: none !important; }
 .rk:not(.ok):not(.now) .rk-w { filter: grayscale(1) brightness(.6); }
 .cele-rank .cele-mark img { width: min(56vw, 240px); height: auto; }
 .cele-rank .cele-mark .rk-ins { position: absolute; right: 4%; bottom: 0; width: 64px; height: auto; }
+
+/* ---------- 8.0 HYBRID (2026-11-20): Inner Beast in the yellow of Hybrid365 ----------
+   The user: "transformă Inner Beast în tematica galbenă ca hybrid365", with the Hybrid365 plan in place of the old one.
+   The look of the Hybrid365 slides: a black page, one warm yellow (#f5c211) for what matters, white for the rest; heavy
+   condensed caps for the titles, yellow plates with black letters for the days (MON, TUE...), thin yellow rules and
+   boxes with a hairline yellow border ("Coaching points"), small square bullets. Corners tighten from the arena's 20 px
+   to 8. Yellow is too light for white letters, so every yellow fill carries black text (--on-act). The loop no longer
+   recolours the app and Minte keeps the same yellow (data-cycle and data-zone are neutralised here). */
+:root, html[data-zone='cool'], #ov.cool, html[data-zone='cool'] #ov:not(.cool),
+html[data-cycle='B']:not([data-zone='cool']), html[data-cycle='C']:not([data-zone='cool']) {
+  --bg: #080808; --n1: #0f0f0f; --n2: #151515; --n3: #1c1c1c; --n4: #282828; --n5: #3b3b3b; --edge: #6e6c66;
+  --ink: #f6f5f0; --ink-2: #dddbd3; --label: #b7b4a9; --mute: #9d9a90; --faint: #88857b;
+  --brand: #f5c211; --gold: #f5c211; --gold-2: #ffe27a;
+  --red: #f5c211; --red-press: #d4a40a; --red-deep: #4d3c04; --red-hot: #ffd43b; --red-text: #ffd43b; --blood: #1b1503; --red-0: #e6ad0b;
+  --glow: 255, 212, 59; --glow-2: 245, 194, 17; --glow-d: 110, 84, 4;
+  --ph-work: #5c4600; --ph-work-hi: #7a5d00; --ph-work-lo: #241b00; --ph-last: #ffd43b;
+  --on-act: #0a0a0a;
+  --steel: linear-gradient(180deg, #fff, #c9c6bb);
+  --r: 8px; --r-sm: 6px; --surf: #0d0d0d;
+  --glass: linear-gradient(160deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, 0) 45%);
+  --hair: rgba(245, 194, 17, .32);
+}
+html { background: var(--bg); }
+body::before {
+  background:
+    radial-gradient(110% 40% at 50% -14%, rgba(var(--glow-2), .14), transparent 66%),
+    radial-gradient(90% 50% at 50% 118%, rgba(0, 0, 0, .75), transparent 72%);
+}
+::selection { background: var(--red); color: var(--on-act); }
+
+/* black letters on every yellow fill */
+.btn, .cta, .go, .rd.next .rd-go, .dc.now .dc-tag, .timer-row.plan .tr-go, .wc-n, .pl-ctrl button.main, .obj-plate b,
+.bc-tag, .brand b, .bc-live, .seg-b[aria-current], .nav-b[aria-current]:not(.nav-wolf), .tap-big { color: var(--on-act); }
+.btn.ghost, .btn.danger { color: var(--ink); background: transparent; border-radius: var(--r-sm); box-shadow: inset 0 0 0 1px var(--hair); }
+.btn.danger { color: var(--red-text); }
+.nav-b[aria-current] svg .f { fill: rgba(0, 0, 0, .25); }
+.btn, .cta, .go { background-image: linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, .08)), linear-gradient(90deg, var(--red-0), var(--red) 55%, var(--red-hot)); }
+.btn.ghost, .btn.danger { background-image: none; }
+.btn, .btn.sm, .cta { border-radius: var(--r-sm); }
+.cta { box-shadow: 0 18px 36px -20px rgba(var(--glow-2), .8), inset 0 1px 0 rgba(255, 255, 255, .35); }
+.cta-ic { background: rgba(0, 0, 0, .85); color: var(--red-hot); box-shadow: none; }
+.cta-l small { color: rgba(0, 0, 0, .7); }
+
+/* the wordmark: INNER white, BEAST yellow, the way HYBRID365 is set */
+.brand b { background: none; color: var(--red); padding: 0; margin-left: 4px; clip-path: none; font-weight: 900; }
+
+/* titles: solid white heavy caps, no metal; numbers white */
+.ph-t span, .ms-t span { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--ink); }
+.stat b, .ms-m b, .rdy-n b { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--ink); }
+.ph-k, .kicker, .ms-k span { color: var(--red); }
+.ph-blade, .sec::before { border-radius: 0; height: 3px; background: var(--red); box-shadow: none; }
+.sec { font: 900 extra-condensed 30px/.95 var(--font); letter-spacing: .02em; text-transform: uppercase; }
+.sec::before { width: 10px; height: 10px; }
+
+/* boxes with a hairline yellow border, as the slides' "Coaching points" */
+.card, .rd, .tile, .stat, .row-link, .timer-row, .tip-card, .combo, .win-s { border-radius: var(--r); }
+.card { border: 1px solid var(--hair); background: var(--glass), var(--surf); }
+.card.lime::before { height: 3px; width: 48px; transform: none; background: var(--red); }
+.rd { border: 1px solid rgba(255, 255, 255, .09); background: var(--glass), var(--surf); box-shadow: none; }
+.rd.next { border-color: var(--red); background: linear-gradient(90deg, rgba(var(--glow-2), .1), transparent 55%), var(--surf); box-shadow: 0 18px 36px -26px rgba(var(--glow-2), .7); }
+.rd-node::before, .rd.next .rd-node::after { border-radius: 4px; }
+.rd.next .rd-node { color: var(--on-act); }
+.go, .rd-go { border-radius: var(--r-sm); }
+.rd-name { text-transform: uppercase; font: 900 extra-condensed 26px/.95 var(--font); letter-spacing: .01em; }
+.rd-meta { color: var(--red-text); }
+
+/* the week: day plates, yellow with black letters for the chosen day, as MON/TUE on the slides */
+.wk-d { border-radius: 4px; border-color: rgba(255, 255, 255, .1); background: var(--surf); }
+.wk-d span { font-weight: 900; }
+.wk-d.now { border-color: var(--red); box-shadow: none; }
+.wk-d.on, .wk-d.now.on { background: var(--red); border-color: var(--red); color: var(--on-act); }
+.wk-d.on span { color: var(--on-act); }
+.wk-d.now::before { display: none; }
+
+/* the section switcher: a yellow plate slides under the open one */
+.seg-in { border-radius: 6px; background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
+.seg-b, .seg-ink { border-radius: 4px; }
+.seg-ink { background: var(--red); box-shadow: 0 8px 18px -10px rgba(var(--glow), .8); }
+
+/* the living picture: a black stage with a yellow rule at its foot */
+.hero-stage { border-radius: var(--r); border-color: rgba(255, 255, 255, .08); background: radial-gradient(80% 70% at 50% -5%, rgba(var(--glow-2), .2), transparent 70%), linear-gradient(180deg, #0e0c06, #070707 80%); box-shadow: inset 0 -2px 0 var(--red), 0 30px 50px -36px rgba(var(--glow-2), .5); }
+.hero-stage.band { border-radius: var(--r); }
+.hero-wolf { opacity: .14; filter: grayscale(1) brightness(.9); }
+
+/* the dock: a black bar with a yellow plate for the open tab */
+.nav-plate { border-radius: 14px; background: linear-gradient(180deg, rgba(245, 194, 17, .4), rgba(255, 255, 255, .06)); }
+.nav-plate::before { border-radius: 13px; }
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .nav-plate::before { background: linear-gradient(180deg, rgba(24, 22, 16, .78), rgba(6, 6, 6, .9) 72%); }
+  .top::before { background: rgba(8, 8, 8, .74); }
+}
+.nav-b { border-radius: 8px; }
+.nav-b[aria-current]:not(.nav-wolf) { background: var(--red); box-shadow: 0 10px 22px -12px rgba(var(--glow), .9); }
+.nav-wolf:not([aria-current]) .nw-hex { background: linear-gradient(180deg, #3b3b3b, #151515); }
+.nav-wolf[aria-current] .nw-hex { background: var(--red); }
+
+/* chips: the chosen one a yellow plate */
+.chip { border-radius: 6px; }
+.chip[aria-pressed='true'], .chip.on { border-color: var(--red); background: var(--red); color: var(--on-act); box-shadow: none; }
+
+/* fields and steppers */
+input[type='text'], input[type='number'], input[type='time'], input[type='password'], textarea, select, .nfld input, .nfld select, input[type='date'], .stepper { border-radius: 6px; }
+
+/* bullets: small yellow squares, as on the slides */
+.tip-card li::before, .ticks li::before { width: 7px; height: 7px; top: 8px; transform: none; background: var(--red); }
+
+/* the broadcast overlay on Azi: plates with black letters */
+.bc-live { background: var(--red); box-shadow: none; }
+.bc-tag { background: var(--red); }
+
+/* the result card and records */
+.win-rec { border-radius: var(--r); background: linear-gradient(180deg, rgba(245, 194, 17, .14), rgba(245, 194, 17, .03)); }
+.streak { border-radius: 6px; }
+.pl-ctrl button.main { border-radius: var(--r); }
+.nav-wolf[aria-current] .nw-hex::before { background: radial-gradient(120% 90% at 50% 12%, #3a2e05, #0d0b04 76%); }
+.rd-slash i { background: linear-gradient(180deg, transparent, var(--red-hot) 28%, #fff6d6 50%, var(--red-hot) 72%, transparent); }
+:root { --ch-A: #f5c211; --ch-B: #ffd43b; --ch-C: #ffe27a; }
+
+/* claw marks between tabs and on the "Gata." screens become speed streaks: the same timing, yellow and white */
+.claw-sw path, .done-mark path { fill: var(--red-hot); }

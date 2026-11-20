@@ -28,9 +28,9 @@ class RowPlayer implements Player {
   lastSec = -1;
   saved = false;
 
-  constructor(block: string) {
+  constructor(block: string, ch?: string) {
     this.block = block;
-    this.ch = rowChallenge(ctx.S.set.rowCh);
+    this.ch = rowChallenge(ch ?? ctx.S.set.rowCh);
     this.render();
   }
 
@@ -258,6 +258,6 @@ class RowPlayer implements Player {
   }
 }
 
-export function openRow(block: string): void {
-  mountPlayer(new RowPlayer(block));
+export function openRow(block: string, ch?: string): void {
+  mountPlayer(new RowPlayer(block, ch));
 }

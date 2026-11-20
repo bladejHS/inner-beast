@@ -23,15 +23,13 @@ function minutes(b: Block, r: Rests): number {
 }
 
 function altOf(raw: Block, b: Block): PlanSession['alt'] {
-  if (raw.alt === 'feet') return { other: b.focus === 'ladder' || b.focus === 'plate' ? 'Jumping Rope' : 'Agility Ladder' };
-  if (raw.alt === 'partner') return { other: b.name === raw.name ? 'Technical Sparring / Pads' : raw.name };
-  if (raw.alt === 'main') return b.kind === 'row' ? { other: raw.name, detail: b.dose } : { other: 'Machine Row' };
-  if (raw.alt === 'aero') return { other: b.kind === 'cardio' ? raw.name : 'Easy Row' };
+  if (raw.alt === 'aero') return { other: b.kind === 'cardio' ? raw.name : raw.name.replace('Run', 'Row') };
+  if (raw.alt === 'cond') return b.kind === 'amrap' ? { other: raw.name } : { other: 'Hybrid Circuit (10 Min AMRAP)', detail: b.dose };
   return undefined;
 }
 
 /** Beast Nutrition knows the session kinds of the first plan; easy cardio counts there as a run. */
-const kindFor = (b: Block): string => (b.kind === 'cardio' ? 'run' : b.kind);
+const kindFor = (b: Block): string => (b.kind === 'cardio' || b.thr ? 'run' : b.kind);
 
 export function planSnapshot(set: Picks & Rests): PlanSession[][] {
   return WEEK.map((d) => d.blocks.map((raw) => {

@@ -96,7 +96,7 @@ function frame(now: number): void {
   const calm = k === 'rest' || k === 'prep' || k === 'easy';
   // on the bright red screens the light reads dark; on the dark ones, fire
   const ink = hot ? '20, 4, 8' : '255, 236, 214';
-  const fire = hot ? '25, 5, 10' : calm ? '255, 70, 70' : '255, 196, 120';
+  const fire = hot ? '25, 5, 10' : calm ? '255, 212, 59' : '255, 214, 110';
   const c = x!;
   c.clearRect(0, 0, W, H);
 
@@ -149,8 +149,8 @@ function frame(now: number): void {
     c.roundRect(inset, inset, W - inset * 2, H - inset * 2, rad);
     c.stroke();
     if (frac > 0.001) {
-      c.strokeStyle = calm && k !== 'easy' ? 'rgba(255, 92, 112, .95)' : `rgba(${ink}, ${hot ? 0.85 : 0.9})`;
-      c.shadowColor = hot ? 'rgba(0,0,0,0)' : calm ? 'rgba(255,60,60,.9)' : 'rgba(255,190,120,.95)';
+      c.strokeStyle = calm && k !== 'easy' ? 'rgba(255, 212, 59, .95)' : `rgba(${ink}, ${hot ? 0.85 : 0.9})`;
+      c.shadowColor = hot ? 'rgba(0,0,0,0)' : calm ? 'rgba(255,200,40,.9)' : 'rgba(255,190,120,.95)';
       c.shadowBlur = hot ? 0 : 14 * dpr;
       c.beginPath();
       const n = Math.max(2, Math.ceil(steps * frac));

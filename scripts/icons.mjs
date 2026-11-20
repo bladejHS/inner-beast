@@ -20,12 +20,12 @@ const icons = [
   ['public/favicon-32.png', 32, 'small', 0.86],
 ];
 for (const [file, px, size, k] of icons) {
-  await png(svg({ px, size, k })).png().toFile(file);
+  await png(svg({ px, size, k, badge: px >= 180 })).png().toFile(file);
   console.log('wrote', file);
 }
 
 // the browser tab: the real vector, rounded like the app icon
-writeFileSync('public/icon.svg', svg({ px: 512, size: 'small', k: 0.84, rx: 52 }));
+writeFileSync('public/icon.svg', svg({ px: 512, size: 'small', k: 0.84, rx: 52, badge: true }));
 console.log('wrote public/icon.svg');
 
 // the header (30 px) and the tab bar's hexagon (40 px): the head alone, no field

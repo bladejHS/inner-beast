@@ -50,13 +50,15 @@ function claw(p0: number[], p1: number[], bend: number, width: number): Claw {
   return { fill, center, len: Math.ceil(len) };
 }
 
+// Since 2026-11-20 (the Hybrid365 look) the marks are straight speed stripes, "///" like a track's start line, not
+// curved claws: no bend, the same taper and timing.
 export const CLAWS: Claw[] = [
-  claw([52, 12], [16, 84], 4, 8.5),
-  claw([71, 7], [35, 91], 4.5, 10),
-  claw([90, 14], [54, 86], 4, 8.5),
+  claw([50, 12], [22, 88], 0, 9),
+  claw([69, 8], [41, 92], 0, 10.5),
+  claw([88, 12], [60, 88], 0, 9),
 ];
 
-const GASH = 'M30 0C27 30 20 65 8 100C22 70 33 35 36 0Z';
+const GASH = 'M31 0L13 100L21 100L39 0Z';
 const RAKE_AT: [number, number][] = [[0, 0], [19, -6], [38, -2], [57, -4]];
 
 /** Four solid claw gashes; the box sets the size, so the shape stretches with it. */

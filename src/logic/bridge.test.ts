@@ -3,34 +3,23 @@ import assert from 'node:assert/strict';
 import { planSnapshot } from './bridge.ts';
 
 const base = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a', rest3: 60, rest1: 60 } as const;
-const thursday = (o: Partial<typeof base> | { thuFeet?: 'ladder'; thuMain?: 'row'; rowCh?: string; thuPartner?: 'spar' }) => planSnapshot({ ...base, ...o } as never)[3]!;
+const week = (o: Record<string, unknown> = {}) => planSnapshot({ ...base, ...o } as never);
 
-test('Thursday publishes only the picked options and names the one left out', () => {
-  const rope = thursday({});
-  assert.equal(rope.length, 4);
-  assert.equal(rope[0]!.name, 'Jumping Rope');
-  assert.deepEqual(rope[0]!.alt, { other: 'Agility Ladder' });
-  assert.deepEqual(rope[1]!.alt, { other: 'Technical Sparring / Pads' });
-  assert.deepEqual(rope[3]!.alt, { other: 'Machine Row' });
-  const ladder = thursday({ thuFeet: 'ladder' });
-  assert.equal(ladder.length, 4);
-  assert.deepEqual([ladder[0]!.id, ladder[0]!.name, ladder[0]!.focus], ['thu-rope', 'Agility Ladder', 'ladder']);
-  assert.deepEqual(ladder[0]!.alt, { other: 'Jumping Rope' });
-  const spar = thursday({ thuPartner: 'spar' });
-  assert.deepEqual([spar[1]!.name, spar[1]!.alt], ['Technical Sparring / Pads', { other: 'Shadow Kickboxing' }]);
+test('the Hybrid365 week: 3 runs, 3 upper lifts, 1 lower lift, 1 conditioning, Sunday for recovery', () => {
+  const w = week();
+  assert.equal(w.length, 7);
+  assert.equal(w.flat().filter((s) => s.kind === 'workout').length, 4);
+  assert.deepEqual(w[1]!.map((s) => s.kind), ['run', 'run', 'run']);
+  assert.deepEqual([w[1]![1]!.name, w[1]![1]!.min], ['Threshold Run', 29]);
+  assert.deepEqual([w[5]![0]!.name, w[5]![0]!.min], ['Long Run (Endurance)', 60]);
 });
 
-test('a rowing pick carries its challenge and its own workload; the punch-out goes to shadow boxing', () => {
-  const minutes = (rowCh: string) => thursday({ thuMain: 'row', rowCh })[3]!;
-  assert.deepEqual([minutes('a').kind, minutes('a').min], ['row', 5]);
-  assert.equal(minutes('c').min, 45);
-  assert.deepEqual(minutes('b').alt, { other: 'Heavy Bag Training', detail: 'Challenge B: 5.000 m' });
-  assert.equal(thursday({ thuMain: 'row' })[2]!.name, 'Punch-out Shadow');
-});
-
-test('the other boxing days keep their sessions and only Thursday has alternatives', () => {
-  const week = planSnapshot(base);
-  assert.deepEqual([0, 1, 4].map((d) => week[d]!.filter((s) => s.kind === 'rounds').length), [2, 1, 1]);
-  assert.ok(week.flat().filter((s) => s.alt).every((s) => s.id.startsWith('thu-') || s.id === 'sun-jog'));
-  assert.deepEqual(week[6]!.find((s) => s.id === 'sun-jog')!.alt, { other: 'Jogging' });
+test('the easy runs can go on the rower, and Wednesday names the conditioning left out', () => {
+  const run = week();
+  assert.deepEqual(run[0]![0]!.alt, { other: 'Easy Row (Zone 2)' });
+  const row = week({ aero: 'row' });
+  assert.deepEqual([row[0]![0]!.name, row[0]![0]!.kind, row[0]![0]!.alt], ['Easy Row (Zone 2)', 'run', { other: 'Easy Run (Zone 2)' }]);
+  assert.deepEqual(run[2]![1]!.alt, { other: 'Hybrid Circuit (10 Min AMRAP)', detail: '8 × 250 m' });
+  const b = week({ wedCond: 'b' })[2]![1]!;
+  assert.deepEqual([b.name, b.kind, b.min, b.alt], ['Hybrid Circuit (10 Min AMRAP)', 'amrap', 10, { other: 'Engine Builder (Ski/Row)' }]);
 });

@@ -1,14 +1,10 @@
-// The weekly plan. Built on "Unleash Your Inner Beast" (pages 15-16) and reworked on 2026-11-07 for an all-round
-// athlete (strength, power, speed, endurance, mobility and fighting), after the research in research_notes/.
-// Inside a day: skill and power first, then strength, then conditioning, and long static stretching last.
-// While jumps hurt the user's knees (2026-11-07), the power work has no landings: see the legs workout.
-// The fighting blocks are kickboxing since 2026-11-07, for the user's 2 m (see data/combos.ts): block ids, rounds and
-// rests are the e-book's, the names, tips and cues are kickboxing ones.
-// Session and exercise names stay in English, as in the e-book; tips are in Romanian.
-// Block ids are stable keys in saved logs and in Beast Nutrition, so they do not name the weekday:
-// sun-legs and sun-lunges are on Saturday, sat-mob, sat-med and sat-breath on Sunday.
-
-import { rowChallenge, rowTotal } from './row.ts';
+// The weekly plan since 2026-11-20: the Hybrid365 run-focused split (@hybrid.365, "Hybrid Training Split - Lift, Run &
+// Perform"), which the user asked for in place of the e-book's kickboxing week: 3 runs + 3 upper lifts + 1 lower lift +
+// 1 hybrid conditioning, Sunday for recovery and mobility. Sessions, sets, reps, rests, coaching points and
+// progressions are the ones on the eleven Hybrid365 slides (Desktop\hybrid365); tips and cues are in Romanian.
+// Fitted to the user only where they asked before: no squats with the bar (the Hack Squat takes the Back Squat's
+// place), dumbbells up to 30 kg, and the easy runs can go on the rower on a day the knees ask for it.
+// Block ids are stable keys in saved logs and in Beast Nutrition.
 
 export type BlockKind = 'rounds' | 'amrap' | 'workout' | 'routine' | 'run' | 'walk' | 'shower' | 'wimhof' | 'breath' | 'row' | 'cardio';
 export type ComboFocus = 'jab' | 'move' | 'combo' | 'power' | 'slow' | 'distance' | 'rope' | 'ladder' | 'plate' | 'legs' | 'week' | 'pads';
@@ -39,15 +35,15 @@ export interface Block {
   /** Fixed rest in seconds, for intervals the settings don't cover. */
   restSec?: number;
   focus?: ComboFocus;
-  workout?: 'push' | 'pull' | 'legs' | 'upper' | 'lower' | 'knee' | 'kick';
-  routine?: 'stretch-push' | 'stretch-pull' | 'mobility' | 'legwarm' | 'cooldown';
+  workout?: 'upper' | 'upper2' | 'lower' | 'power';
+  routine?: 'stretch-push' | 'stretch-pull' | 'mobility' | 'legwarm' | 'cooldown' | 'flow' | 'stretch' | 'foam' | 'emom-power';
   min?: number;
   /** Quick-timer block: Wall Sit or Jumping Squats, as the user picks. */
   legSwap?: boolean;
   /** What to focus on during the block, a few short cues (Romanian). */
   cues?: string[];
   /** A slot with two alternatives the user picks from (Thursday, Sunday): see resolveBlock. */
-  alt?: 'feet' | 'main' | 'partner' | 'aero';
+  alt?: 'feet' | 'main' | 'partner' | 'aero' | 'cond';
   /** First boxing block of the day: offers the warm-up before round 1. */
   warmup?: boolean;
   /** From this round on (1-based), every round is a punch-out (see BURST). */
@@ -64,6 +60,12 @@ export interface Block {
   grow?: { base: number; step: number; cap: number };
   /** A reaction drill (see REACT_CUES): one whole round, or the last seconds of a single long round. */
   react?: { round?: number; lastSec?: number };
+  /** Threshold intervals on foot: the pulse window is the threshold one, not the rower's 4 × 4. */
+  thr?: boolean;
+  /** A circuit for the AMRAP timer, in place of the bodyweight schemes. */
+  circuit?: { moves: string[]; reps: number[] };
+  /** A fixed Machine Row challenge (see data/row.ts), whatever the Settings say. */
+  rowCh?: string;
 }
 
 /** 7-minute warm-up before the first fighting block (Monday, Thursday): the hips open for the kicks, no jumping. */
@@ -90,8 +92,10 @@ export interface Picks {
   /** The emphasis running this week, if the loop has started, and its week (1-4). */
   cycle?: CycleId;
   cycleWeek?: number;
-  /** Sunday's easy aerobic slot: run, or row (kinder to the knees). */
-  sunAero?: 'run' | 'row';
+  /** The easy and long runs: run (Hybrid365), or row on a day the knees ask for it. */
+  aero?: 'run' | 'row';
+  /** Wednesday's conditioning: Option A Engine Builder (row), or Option B Hybrid Circuit. */
+  wedCond?: 'a' | 'b';
   /** Today's minutes for the blocks that grow (see Block.grow). */
   grown?: Record<string, number>;
 }
@@ -102,120 +106,92 @@ export interface Day {
   blocks: Block[];
 }
 
-const WRAPS = 'Bandaje și mănuși la fiecare sesiune de sac. Tibia se obișnuiește treptat: primele săptămâni lovești ușor cu picioarele, apoi crești puterea de la o săptămână la alta.';
-/** The knee rule for every kick (FightCamp; the pivot foot carries the risk, JSSM 2021). */
-const PIVOT = 'La fiecare kick: pivot pe vârful piciorului de sprijin, până când călcâiul ajunge spre țintă. Pe o talpă care se agață (adidași, cauciuc) genunchiul se răsucește: lovești desculț, pe o suprafață pe care piciorul se poate roti.';
-
-/** Eight minutes for the knees, after Tuesday's push session and after Leg Day, while jumps hurt them. */
-const KNEE_ARMOR = (id: string): Block => ({
-  id, kind: 'workout', name: 'Knee Armor', dose: '8 min', line: '8 min Knee Armor: Isometric Hold, Step-downs, Tibialis', workout: 'knee', min: 8,
-  tip: 'Pentru genunchi: ținute izometrice, coborâri lente de pe treaptă și tibia. Durerea poate fi cel mult 3 din 10; dacă trece, cobori mai puțin.',
-});
-
-/** Ten minutes for kicking, on Friday: the adductors, the hip that keeps the knee in line, the supporting leg. */
-const KICK_ARMOR: Block = {
-  id: 'kick-fri', kind: 'workout', name: 'Kick Armor', dose: '10 min', line: '10 min Kick Armor: Copenhagen Plank, Side Plank, Hip Airplane', workout: 'kick', min: 10,
-  tip: 'Pentru kick-uri: adductorii, care lucrează la fiecare kick și check (un program construit pe Copenhagen Plank a scăzut cu 41% problemele inghinale la fotbaliști), fesierul mijlociu, care ține genunchiul aliniat când pivotezi, și piciorul de sprijin.',
+/** Threshold pace, the key session: the reps grow over the 12-week loop as the slide says (add a rep, then longer reps
+ *  with a shorter recovery). Before the loop starts, the slide's own 4 × 6 min. */
+const THRESHOLD: Block = {
+  id: 'tue-thr', kind: 'rounds', name: 'Threshold Run', dose: '4 × 6 min', line: '4 × 6 min @ Threshold Pace, 90 s easy jog', rounds: 4, work: 360, restSec: 90, hiit: true, thr: true,
+  tip: 'Sesiunea-cheie a săptămânii: 4 repetări de 6 minute în ritm de prag, cu 90 de secunde de jogging ușor între ele. Îmbunătățește pragul de lactat: ții un ritm mai rapid pentru mai mult timp.',
+  cues: ['Ritm controlat și puternic la fiecare repetare, nu sprint.', 'Relaxat: nu forța efortul.', 'Splituri egale: ultima repetare la fel de rapidă ca prima.', 'Calitate peste cantitate.'],
+  cycle: {
+    B: { rounds: 5, dose: '5 × 6 min', line: '5 × 6 min @ Threshold Pace, 90 s easy jog' },
+    C: { rounds: 5, work: 420, restSec: 60, dose: '5 × 7 min', line: '5 × 7 min @ Threshold Pace, 60 s easy jog' },
+  },
 };
 
-/** Hard intervals on the rower: 4 × 4 min at 85–95 % of the maximum heart rate, 3 min easy between. */
-const ROWER_4X4: CycleVariant = {
-  kind: 'rounds', name: 'Rower Intervals', dose: '4 × 4 min', line: '4 × 4 min Rower Intervals, 3 min ușor între ele', rounds: 4, work: 240, restSec: 180, hiit: true,
-  tip: 'VO2max: patru intervale de 4 minute, tare dar egal, la 85–95% din pulsul maxim, cu 3 minute de vâslit ușor între ele. Pe vâslitor genunchii nu iau impact.',
-  cues: ['Primul interval mai temperat: pulsul urcă abia în minutul doi.', 'Tragi cu picioarele, apoi spatele, apoi brațele; ritm egal, nu sprint.', 'În pauză nu te oprești: vâslești ușor, pulsul coboară.'],
-};
+const EASY_CUES = ['Alergarea rămâne UȘOARĂ: zona 2, poți vorbi în propoziții întregi.', 'Dacă pulsul iese din zonă, încetinești sau mergi până coboară.', 'Pași scurți și relaxați, umerii jos.'];
 
 export const WEEK: Day[] = [
   {
     idx: 0,
-    title: 'Combat Training',
+    title: 'Easy Run + Upper',
     blocks: [
-      { id: 'mon-lower', kind: 'workout', name: 'Hack Squat & Biceps Curls', dose: '14 min', line: '14 min Hack Squat, Biceps Curls', workout: 'lower', min: 14, tip: 'Primul, cât ești proaspăt (2026-11-16, la cererea ta): a doua doză de picioare a săptămânii, la aparat, plus bicepșii. Începe cu 1–2 serii ușoare de încălzire; kickboxingul vine după, cu picioarele deja încălzite. Hack Squat 3 × 8–12, Biceps Curls 3 × 8–12, amândouă cu 1–2 repetări în rezervă.' },
-      { id: 'mon-shadow', kind: 'rounds', name: 'Shadow Kickboxing', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'jab', warmup: true, tip: 'Jab, Teep & Footwork: jabul și teep-ul țin distanța, picioarele te duc unde vrei. Pentru omul mai lung, loviturile drepte sunt regele.',
-        cues: ['Variezi jabul și teep-ul: simplu, dublu, la corp, din pas înainte și din retragere.', 'Teep când îți imaginezi că intră: îl oprești la capătul piciorului tău.', 'După fiecare serie ieși în cerc sau pivotezi; nu te retragi în linie dreaptă.', 'Stai înalt și lovești în jos: nu te apleca ca să-l ajungi.'] },
-      { id: 'mon-bag', kind: 'rounds', name: 'Heavy Bag Training', dose: '5 × 3 min', rounds: 5, work: 180, rest: 'r3', focus: 'move', tip: 'Strikes & Movement: pumni și low kick-uri legate de jocul de picioare, în ritm moderat.',
-        cues: [WRAPS, PIVOT, 'Jab și cross întinse complet, apoi piciorul: 1-2-low kick și ieși în unghi.', 'Nu lovi din loc și nu urmări doar puterea: tehnica și poziția primează.'],
-        cycle: {
-          B: { dose: '2 × 3 min + 3 punch-out', line: '5 runde Heavy Bag: 2 × 3 min, apoi 3 runde punch-out', burstFrom: 3 },
-          C: { dose: '2 × 3 min + 3 punch-out', line: '5 runde Heavy Bag: 2 × 3 min, apoi 3 runde punch-out', burstFrom: 3 },
-        } },
-      { id: 'mon-bw', kind: 'amrap', name: 'Bodyweight Workout', dose: '10 min', min: 10, tip: 'La final, după kickboxing, ca oboseala să nu strice tehnica. Pull-ups, push-ups și squats, cât mai multe runde în 10 minute.',
-        cycle: {
-          // the second strength dose for pulling and pressing, in the strength emphasis (approved by the user on 2026-11-07)
-          A: { kind: 'workout', workout: 'upper', name: 'Upper Strength', dose: '15 min', line: '15 min Upper Strength: Pull-ups, Dips', min: 15, tip: 'A doua doză de forță a săptămânii pentru tras și împins: tracțiuni și dips, 3 × 3–5 grele, cu 2 repetări în rezervă și 150 s pauză. La final, după kickboxing.' },
-        },
-        // VO2max on the rower, every other week of the power and capacity emphases (4 × 4 min, Helgerud 2007)
-        cycleEven: { B: ROWER_4X4, C: ROWER_4X4 } },
+      { id: 'mon-run', kind: 'run', name: 'Easy Run (Zone 2)', dose: '30 min', min: 30, alt: 'aero', grow: { base: 30, step: 5, cap: 45 },
+        tip: 'Session 1: 30–45 min în zona 2 (aerob). Construiește baza aerobă și rezistența și ajută recuperarea. Crește cu 5 minute la fiecare sesiune făcută, până la 45.',
+        cues: [...EASY_CUES, 'Începi săptămâna construind elan, nu oboseală.'] },
+      { id: 'mon-upper', kind: 'workout', name: 'Upper Body (Strength)', dose: '55 min', line: '55 min Upper Body: Bench Press, Pull Up, Incline DB Press, Row, Raises, Arms', workout: 'upper', min: 55,
+        tip: 'Session 2: forță pentru partea de sus. Tempo controlat și amplitudine completă la fiecare repetare. Pauză 60–90 s între serii. Progresezi întâi prin repetări, apoi prin greutate.' },
     ],
   },
   {
     idx: 1,
-    title: 'Push Training',
+    title: 'Threshold Run',
     blocks: [
-      { id: 'tue-stretch', kind: 'routine', name: 'Dynamic Warm-up', dose: '10 min', routine: 'stretch-push', min: 10, tip: 'Încălzire în mișcare pentru umeri și șolduri. Întinderile lungi vin la final: ținute înainte de exercițiile explozive, scad puterea.' },
-      { id: 'tue-cal', kind: 'workout', name: 'Calisthenics: Chest, Shoulders, Triceps', dose: '45 min', line: '45 min Calisthenics (Chest, Shoulders, Triceps) + Split Squat', workout: 'push', min: 45, tip: 'Push-ups (variante) și dips, cu explozivele primele, plus a doua doză de picioare a săptămânii.' },
-      KNEE_ARMOR('knee-tue'),
-      { id: 'tue-easy', kind: 'rounds', name: 'Easy Shadow Kickboxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'slow', tip: 'Slow, Clean Technique: fiecare lovitură de picior lentă, pe bucăți, ca să-i înveți mecanica.',
-        cues: ['Kick-urile la jumătate de viteză: genunchiul sus, pivot pe vârf, șoldul prin țintă, revii în gardă.', 'Echilibrul înaintea vitezei: dacă nu revii stabil, încetinești.', 'Check-ul: genunchiul din față sus, tibia ușor în afară, garda sus.', 'Pumnii întinși complet, iar mâna revine la bărbie după fiecare lovitură.'] },
-      { id: 'tue-row', kind: 'cardio', name: 'Easy Row', dose: '20 min', min: 20, grow: { base: 20, step: 5, cap: 30 }, tip: 'Aerob ușor pe vâslitor, în zona 2 de puls: ritm de conversație. Crește cu 5 minute la fiecare sesiune făcută, până la 30.',
-        cues: ['Ții pulsul în zona 2 de pe centură; dacă trece de ea, tragi mai ușor.', 'Împingi din picioare, apoi spatele, apoi brațele; revii în ordine inversă.', 'Vine după forță, nu înainte.'] },
-      { id: 'tue-cool', kind: 'routine', name: 'Cool-down Stretch', dose: '5 min', routine: 'cooldown', min: 5, tip: 'A doua zi de flexibilitate a săptămânii: piept, dorsali și flexorii șoldului, câte 60 de secunde.' },
+      { id: 'tue-wu', kind: 'run', name: 'Warm Up: Easy Run + Drills', dose: '12 min', min: 12,
+        tip: '10–15 minute de alergare ușoară, apoi câteva exerciții de alergare (genunchi sus din mers, pendulări, 2–3 accelerări scurte). Te pregătește pentru ritmul de prag.' },
+      THRESHOLD,
+      { id: 'tue-cd', kind: 'run', name: 'Cool Down: Easy Run', dose: '10 min', min: 10, tip: '10 minute de alergare ușoară: pulsul coboară, picioarele se descarcă.' },
     ],
   },
   {
     idx: 2,
-    title: 'Off Day',
+    title: 'Upper + Conditioning',
     blocks: [
-      { id: 'wed-walk', kind: 'walk', name: 'Walk (10K Steps)', dose: '10.000 de pași', line: 'Going for a Walk (10K Steps)', tip: 'Mergi prin natură, în ritmul tău. E singura zi liberă: o păstrezi ușoară.' },
-      { id: 'wed-shower', kind: 'shower', name: 'Cold & Warm Showers', dose: '1 min rece, 1 min cald', line: 'Cold & Warm Showers', tip: 'Duș alternativ: îți antrenează toleranța la frig și te trezește. Nu e dovedit că grăbește recuperarea. E bine plasat aici, departe de zilele de forță.' },
-      { id: 'wed-med', kind: 'wimhof', name: 'Meditation', dose: 'Wim Hof', line: 'Meditation', tip: 'Găsește un loc liniștit. Wim Hof doar așezat sau întins, niciodată în duș, în apă sau la volan.' },
+      { id: 'wed-upper', kind: 'workout', name: 'Upper Body (Strength)', dose: '60 min', line: '60 min Upper Body: Weighted Pull Up, DB Press, Row, Overhead Press, Face Pull, Raises, Arms', workout: 'upper2', min: 60,
+        tip: 'Session 1: greu, cu intenție. Lași 1–2 repetări în rezervă la exercițiile principale, repetări de calitate și amplitudine completă. Pauză 60–90 s.' },
+      { id: 'wed-cond', kind: 'row', name: 'Engine Builder (Ski/Row)', dose: '8 × 250 m', line: 'Conditioning: Engine Builder 8 × 250 m Row, 45 s rest', alt: 'cond', rowCh: 'd', min: 14,
+        tip: 'Session 2, Option A: 8 runde pe timp de 250 m pe vâslitor (sau SkiErg), cu 45 s pauză. Provocator, nu maximal. 2–3 minute de pauză după forță, înainte să începi.',
+        cues: ['Condiționarea trebuie să fie provocatoare, nu maximală.', 'Construiești forță și capacitate de lucru.', 'Notezi timpul și încerci să-l bați.'] },
     ],
   },
   {
     idx: 3,
-    title: 'Combat Training II',
+    title: 'Easy Run + Lower',
     blocks: [
-      { id: 'thu-rope', kind: 'rounds', name: 'Jumping Rope', dose: '3 × 3 min', rounds: 3, work: 180, rest: 'r3', focus: 'rope', alt: 'feet', warmup: true, tip: 'Încălzire pentru picioare: joc ușor, pe vârfuri, sărituri de 1–2 cm pe o suprafață care amortizează. Dacă simți genunchii, alege Agility Ladder.' },
-      { id: 'thu-shadow', kind: 'rounds', name: 'Shadow Kickboxing', dose: '4 × 3 min', line: '4 × 3 min Shadow Kickboxing: 3 runde de combinații, 1 de reacție', rounds: 4, work: 180, rest: 'r3', focus: 'combo', alt: 'partner', react: { round: 4 },
-        tip: 'Combinations: pumni și picioare legate, cu pregătire, ordine clară și ieșire controlată. Runda a patra e de reacție: îți strig atacul lui când nu te aștepți și răspunzi imediat.',
-        cues: ['Fiecare combinație are un scop: o pregătești cu jabul, cu teep-ul sau cu o fentă.', 'Stil olandez: pumnii pregătesc, piciorul închide; după kick ieși în unghi.', 'Lovitura de după vine din șoldul pe care l-a încărcat cea dinainte (Ernesto Hoost).', 'Garda rămâne sus și când lovești cu piciorul: o mână e mereu la bărbie.'] },
-      { id: 'thu-power', kind: 'rounds', name: 'Punch-out', dose: '3 × 14 × 3 s', line: '3 runde punch-out: 14 × 3 s la maxim, 10 s ușor', rounds: 3, work: BURST_SEC, restSec: 60, focus: 'power', burstFrom: 1, bagOnly: true,
-        tip: 'Protocolul testat pe boxeri: 14 explozii de 3 secunde la maxim, cu 10 secunde ușor între ele, de trei ori. Cam 2 minute de efort maxim în total.',
-        cues: [WRAPS, 'Lovește prin sac, nu în el: ținta e la o palmă în spatele suprafeței.', 'Mâna pleacă și se întoarce ca un bici; în cele 10 secunde doar respiri și te miști.', 'Dacă exploziile încetinesc vizibil, oprește runda.'] },
-      { id: 'thu-bag', kind: 'rounds', name: 'Heavy Bag Training', dose: '6 × 3 min', rounds: 6, work: 180, rest: 'r3', focus: 'power', alt: 'main', tip: 'Dutch Combinations & Power: pumnii pregătesc, piciorul închide. Putere tehnică, nu la maxim.',
-        cues: [WRAPS, PIVOT, 'Kick-ul trece prin sac, cu tibia, nu cu laba; brațul de pe partea lui coboară, cealaltă mână stă la bărbie.', 'Nicio lovitură puternică pe tehnică proastă sau din poziție greșită.'],
-        cycle: { C: { rounds: 8, dose: '8 × 3 min' } } },
+      { id: 'thu-run', kind: 'run', name: 'Easy Run (Zone 2)', dose: '30 min', min: 30, alt: 'aero', grow: { base: 30, step: 5, cap: 40 },
+        tip: 'Session 1: 30–40 min în zona 2. Ajută recuperarea, crește baza aerobă și pregătește picioarele pentru forță. E o sesiune de „flush”, nu un antrenament.',
+        cues: EASY_CUES },
+      { id: 'thu-lower', kind: 'workout', name: 'Lower Body (Strength)', dose: '55 min', line: '55 min Lower Body: Hack Squat, RDL, Walking Lunge, Hip Thrust, Leg Press, Hamstring Curl, Calf Raise', workout: 'lower', min: 55,
+        tip: 'Session 2: forță și calitate, nu volum. 1–2 repetări în rezervă la exercițiile compuse. Pui greutate când ai făcut toate seriile și repetările. Te miști bine, ridici puternic, te recuperezi inteligent.' },
     ],
   },
   {
     idx: 4,
-    title: 'Pull Training',
+    title: 'Upper Strength + Power',
     blocks: [
-      { id: 'fri-stretch', kind: 'routine', name: 'Dynamic Warm-up', dose: '10 min', routine: 'stretch-pull', min: 10, tip: 'Încălzire în mișcare pentru umeri, omoplați și priză, înainte de tracțiuni.' },
-      { id: 'fri-cal', kind: 'workout', name: 'Calisthenics: Back, Biceps, Shoulders', dose: '56 min', line: "56 min Calisthenics (Back, Biceps, Shoulders) + TRX Rows, Farmer's Carry, Dead Hang", workout: 'pull', min: 56, tip: 'Pull-ups (variante), ramat, umărul posterior, plus cărat greutăți și atârnat la bară pentru priză și trunchi.' },
-      KICK_ARMOR,
-      { id: 'fri-easy', kind: 'rounds', name: 'Easy Shadow Kickboxing', dose: '10 min', rounds: 1, work: 600, rest: 'none', focus: 'distance', react: { lastSec: 180 },
-        tip: 'Distance Work: controlul distanței e obiectivul principal. La 2 m, distanța lungă e a ta. Ultimele 3 minute sunt de reacție: atacul lui strigat la întâmplare, răspunsul tău imediat.',
-        cues: ['Stai la capătul jabului și al teep-ului: tu ajungi la el, el nu ajunge la tine.', 'Pe pasul lui: teep sau low kick exact când pune piciorul jos.', 'Când te presează, ieși în cerc; înapoi în linie dreaptă ajungi la corzi.', 'Dacă ajunge aproape: genunchi, antebrațele pe umerii lui, apoi ieși.'] },
+      { id: 'fri-upper', kind: 'workout', name: 'Upper Body (Strength + Power)', dose: '65 min', line: '65 min Upper Body: Bench Press 5 × 3–5, Weighted Pull Up, Push Press, Arms', workout: 'power', min: 65,
+        tip: 'Session 1: forță maximă plus putere explozivă. Intenție grea și explozivă la exercițiile principale, amplitudine completă, pauză 90 s. Pui greutate săptămânal și încerci să bați seria de top de săptămâna trecută.' },
+      { id: 'fri-emom', kind: 'routine', name: 'Power Finisher', dose: 'EMOM × 10 min', line: 'Power Finisher: EMOM × 10 min (Med Ball Chest Throws / Plyo Push Ups)', routine: 'emom-power', min: 10,
+        tip: 'Session 2: EMOM 10 minute, alternant. Minutele impare: 6 Med Ball Chest Throws. Minutele pare: 8 Plyo Push Ups. Ce rămâne din minut e pauză. Viteza contează, nu oboseala.' },
     ],
   },
   {
     idx: 5,
-    title: 'Leg Day',
+    title: 'Long Run',
     blocks: [
-      { id: 'sun-legs', kind: 'routine', name: 'Leg Day Warm-up', dose: '10 min', routine: 'legwarm', min: 10, tip: 'Ridici pulsul, mobilizezi șoldurile și termini cu accelerări progresive, ca să fii gata de sprinturi și aruncări. Fără sărituri.' },
-      { id: 'sun-lunges', kind: 'workout', name: 'Speed, Power & Leg Strength', dose: '66 min', line: '66 min Sprints, Med Ball Power, Leg Strength, Hip Thrust', workout: 'legs', min: 66, tip: 'Viteza și puterea primele, cât ești proaspăt: sprinturi în pantă și aruncări cu mingea medicinală, fără aterizări pe genunchi. Apoi forța: Bulgarian Split Squat cu gantere și Romanian Deadlift cu bara. Forța de picioare e legată cel mai direct de impactul pumnului.' },
-      KNEE_ARMOR('knee-sat'),
+      { id: 'sat-long', kind: 'run', name: 'Long Run (Endurance)', dose: '60 min', min: 60, alt: 'aero', grow: { base: 60, step: 5, cap: 90 },
+        tip: '60–90 min în zona 2: 10–15 min încălzire ușoară, 45–60 min alergare constantă în ritm de conversație, 5–10 min revenire ușoară. Crește cu 5 minute la fiecare sesiune făcută, până la 90.',
+        cues: ['Pulsul în zona 2.', 'Respirație relaxată, ritm lin.', 'Constant: nu urmări ritmul și nu o transforma în tempo.', 'Hidratează-te înainte și după.', 'Termini simțindu-te mai bine decât ai început.'] },
     ],
   },
   {
     idx: 6,
-    title: 'Mobility & Meditation Day',
+    title: 'Recovery & Mobility',
     blocks: [
-      { id: 'sun-jog', kind: 'run', name: 'Jogging', dose: '20 min', min: 20, alt: 'aero', grow: { base: 20, step: 2, cap: 40 }, tip: 'Ritm de conversație, în zona 2 de puls, fără țintă de ritm: dacă pulsul trece de zonă, încetinești sau mergi până coboară. Crește cu 2 minute la fiecare sesiune făcută, până la 40. Cât timp genunchii se plâng, alegi vâslitul.' },
-      { id: 'sat-mob', kind: 'routine', name: 'Mobility Training', dose: '30 min', routine: 'mobility', min: 30, tip: 'Stretching pentru picioare, șolduri și partea de sus a corpului. Crește amplitudinea, nu viteza recuperării.' },
-      { id: 'sat-med', kind: 'wimhof', name: 'Meditation', dose: '10 min', min: 10, tip: 'Respirația Wim Hof, așezat sau întins, apoi liniște.' },
-      { id: 'sat-breath', kind: 'breath', name: 'Breathing Exercises', dose: '10 min', min: 10, tip: 'Metoda de respirație 4-7-8.' },
+      { id: 'sun-walk', kind: 'cardio', name: 'Light Walk / Easy Bike', dose: '8 min', min: 8, tip: '5–10 minute de mers ușor sau bicicletă ușoară: sângele circulă, corpul se încălzește pentru mobilitate.' },
+      { id: 'sun-flow', kind: 'routine', name: 'Mobility Flow (Full Body)', dose: '12 min', routine: 'flow', min: 12, tip: '10–15 minute de mobilitate pe tot corpul. Te miști cu intenție, nu cu intensitate. Insiști pe zonele tensionate sau febrile.' },
+      { id: 'sun-stretch', kind: 'routine', name: 'Stretching', dose: '12 min', routine: 'stretch', min: 12, tip: '10–15 minute de întinderi, fiecare ținută 45–60 de secunde.' },
+      { id: 'sun-foam', kind: 'routine', name: 'Foam Roll / Trigger Point', dose: '6 min', routine: 'foam', min: 6, tip: 'După nevoie: rola sau mingea pe zonele încărcate ale săptămânii.' },
+      { id: 'sun-breath', kind: 'breath', name: 'Deep Breathing / Mindset Reset', dose: '5 min', min: 5, tip: 'Aici te faci mai bun: nu sări peste ea. Respirație lentă, apoi te gândești la săptămâna care vine. Hidratează-te, mănâncă bine și prioritizează somnul.' },
     ],
   },
 ];
@@ -240,35 +216,18 @@ export function resolveBlock(b: Block, p: Picks): Block {
   const grown = b.grow ? p.grown?.[b.id] : undefined;
   if (grown && grown !== b.min) r = { ...r, min: grown, dose: `${grown} min` };
   if (r.legSwap) return { ...r, name: p.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit' };
-  if (r.bagOnly && p.thuMain === 'row') {
-    return { ...r, name: 'Punch-out Shadow', tip: 'Fără sac azi: același protocol în shadow, lovituri drepte cât de rapid poți, cu șoldul și trunchiul în fiecare pumn.', cues: ['Brațul se întinde complet, pe toată distanța.', 'În cele 10 secunde doar respiri și te miști.', 'Dacă exploziile încetinesc vizibil, oprește runda.'] };
-  }
-  if (r.alt === 'feet' && p.thuFeet === 'ladder') {
-    return { ...r, name: 'Agility Ladder', focus: 'ladder', tip: 'Pași rapizi și preciși prin scară, pe vârfuri, cu garda sus. Fiecare exercițiu are animația pașilor.', cues: undefined };
-  }
-  if (r.alt === 'feet' && p.thuFeet === 'plate') {
-    return { ...r, name: 'Plate Footwork', focus: 'plate', tip: 'Joc de picioare în jurul unui disc de greutăți pus pe sol, pe cinci niveluri. Fără scară și fără coardă; pe vârfuri, cu garda sus.', cues: undefined };
-  }
-  if (r.alt === 'partner' && p.thuPartner === 'spar') {
+  if (r.alt === 'aero' && p.aero === 'row') {
     return {
-      // with a partner the pads take the slot: three rounds, no solo reaction round
-      ...r, name: 'Technical Sparring / Pads', focus: 'pads', rounds: 3, dose: '3 × 3 min', line: undefined, react: undefined,
-      tip: 'Partea pe care niciun timer nu o înlocuiește: reacționezi la un om. Thai pads: partenerul ține, tu lovești, iar în runda a treia atacă el, lent, și tu răspunzi. Aplicația vă strigă amândurora ce urmează. La sparring tehnic oprești combinațiile strigate.',
-      cues: ['Tibiere amândoi la exercițiile cu low kick și check; el atacă lent și controlat.', 'Pernele ținute ferm, cu cotul îndoit, aduse puțin în lovitură.', 'Sparring doar cu un antrenor de față, cu cască, proteză și mănuși de sparring.'],
-    };
-  }
-  if (r.alt === 'aero' && (p.sunAero ?? 'row') === 'row') {
-    return {
-      ...r, kind: 'cardio', name: 'Easy Row',
-      tip: 'Aerob ușor pe vâslitor, în zona 2 de puls: ritm de conversație. Cruță genunchii cât timp alergarea îi supără. Crește cu 2 minute la fiecare sesiune făcută, până la 40.',
+      ...r, kind: 'cardio', name: r.name.replace('Run', 'Row'),
+      tip: `${r.tip} Azi pe vâslitor, aceeași durată și aceeași zonă 2: cruță genunchii.`,
       cues: ['Ții pulsul în zona 2 de pe centură; dacă trece de ea, tragi mai ușor.', 'Împingi din picioare, apoi spatele, apoi brațele; revii în ordine inversă.'],
     };
   }
-  if (r.alt === 'main' && p.thuMain === 'row') {
-    const c = rowChallenge(p.rowCh);
+  if (r.alt === 'cond' && p.wedCond === 'b') {
     return {
-      ...r, kind: 'row', name: 'Machine Row', dose: `${c.name}: ${c.label}`, rounds: undefined, work: undefined, rest: undefined, focus: undefined, cues: undefined, cycle: undefined, min: c.min,
-      tip: c.reps > 1 ? `${c.reps} intervale de ${c.meters} m (${rowTotal(c)} m), ${c.rest} s pauză între ele.` : `${c.label} continuu, într-un ritm pe care îl poți ține.`,
+      ...r, kind: 'amrap', name: 'Hybrid Circuit (10 Min AMRAP)', dose: '10 min AMRAP', line: 'Conditioning: Hybrid Circuit, 10 Min AMRAP', min: 10, rowCh: undefined,
+      circuit: { moves: ['Wall Balls', 'Burpee Broad Jumps', 'Kettlebell Swings', 'Push Ups'], reps: [10, 10, 10, 10] },
+      tip: 'Session 2, Option B: 10 minute, cât mai multe runde din 10 Wall Balls, 10 Burpee Broad Jumps, 10 Kettlebell Swings, 10 Push Ups. Provocator, nu maximal. 2–3 minute de pauză după forță.',
     };
   }
   return r;

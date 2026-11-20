@@ -10,7 +10,7 @@ export interface Move {
 }
 
 export interface Routine {
-  id: 'stretch-push' | 'stretch-pull' | 'legwarm' | 'cooldown' | 'mobility' | 'daily' | 'dagestan' | 'peekaboo' | 'abs' | 'splits' | 'homebox' | 'neck';
+  id: 'stretch-push' | 'stretch-pull' | 'legwarm' | 'cooldown' | 'mobility' | 'flow' | 'stretch' | 'foam' | 'emom-power' | 'daily' | 'dagestan' | 'peekaboo' | 'abs' | 'splits' | 'homebox' | 'neck';
   name: string;
   intro: string;
   moves: Move[];
@@ -95,6 +95,72 @@ export const ROUTINES: Routine[] = [
       { name: 'Doorway Chest Stretch', sec: 60, cue: 'Antebrațul pe tocul ușii, pășești înainte până simți pieptul. Respiri lent.' },
       { name: 'Lat Stretch', sec: 120, sides: true, cue: 'Te ții de tocul ușii și împingi șoldul în spate: se întinde dorsalul.' },
       { name: 'Hip Flexor Stretch', sec: 120, sides: true, cue: 'Genunchiul din spate pe sol, strângi fesierul și împingi șoldul înainte.' },
+    ],
+  },
+  {
+    // Hybrid365, Sunday: Mobility Flow (Full Body Focus), 10-15 min. Move with intention, not intensity.
+    id: 'flow',
+    name: 'Mobility Flow (Full Body)',
+    intro: '12 minute de mobilitate pe tot corpul, în mișcare. Te miști cu intenție, nu cu intensitate, și insiști pe zonele tensionate.',
+    moves: [
+      { name: 'Cat-Cow', sec: 60, cue: 'În patru labe: arcuiești și rotunjești spatele odată cu respirația.' },
+      { name: 'Thoracic Rotations', sec: 90, sides: true, cue: 'În patru labe, cu mâna la ceafă: deschizi cotul spre tavan.' },
+      { name: "World's Greatest Stretch", sec: 120, sides: true, cue: 'Fandare adâncă, cotul spre sol, apoi rotești brațul spre tavan. Intri și ieși din poziție.' },
+      { name: '90/90 Hip Switches', sec: 90, cue: 'Așezat, cu ambii genunchi la 90°: rotești genunchii dintr-o parte în alta.' },
+      { name: 'Leg Swings (front-back)', sec: 60, sides: true, cue: 'Te ții de perete și balansezi piciorul înainte-înapoi.' },
+      { name: 'Hip Circles', sec: 45, cue: 'Mâinile pe șolduri, cercuri mari în ambele sensuri.' },
+      { name: 'Deep Squat Hold', sec: 60, cue: 'Ghemuit adânc, călcâiele jos, pieptul sus; te ții de ceva dacă e nevoie.' },
+      { name: 'Arm Circles', sec: 45, cue: 'Cercuri mari cu brațele, înainte și înapoi.' },
+      { name: 'Shoulder Dislocates', sec: 60, cue: 'Cu un prosop sau o bandă: brațele întinse trec peste cap, în spate, și revin.' },
+      { name: 'Wrist & Ankle Circles', sec: 60, cue: 'Încheieturile și gleznele, cercuri lente în ambele sensuri.' },
+    ],
+  },
+  {
+    // Hybrid365, Sunday: Stretching, 10-15 min, each stretch held 45-60 s.
+    id: 'stretch',
+    name: 'Stretching',
+    intro: '12 minute de întinderi, fiecare ținută 45–60 de secunde. Respiri lent și te relaxezi în poziție.',
+    moves: [
+      { name: 'Hip Flexor Stretch', sec: 100, sides: true, cue: 'Genunchiul din spate pe sol, strângi fesierul și împingi șoldul înainte. 50 s pe fiecare parte.' },
+      { name: 'Hamstring Stretch', sec: 100, sides: true, cue: 'Călcâiul pe o treaptă joasă, spatele drept, te apleci din șold. 50 s pe parte.' },
+      { name: 'Calf Stretch', sec: 100, sides: true, cue: 'Mâinile pe perete, piciorul din spate întins, călcâiul pe sol. 50 s pe parte.' },
+      { name: 'Pigeon Stretch', sec: 100, sides: true, cue: 'Gamba în fața ta, piciorul din spate întins. Respiri și cobori. 50 s pe parte.' },
+      { name: 'Doorway Chest Stretch', sec: 60, cue: 'Antebrațul pe tocul ușii, pășești înainte până simți pieptul.' },
+      { name: 'Lat Stretch', sec: 100, sides: true, cue: 'Te ții de tocul ușii și împingi șoldul în spate: se întinde dorsalul.' },
+      { name: 'Cross-body Shoulder Stretch', sec: 100, sides: true, cue: 'Brațul întins trece prin fața pieptului, cealaltă mână îl apropie.' },
+      { name: "Child's Pose", sec: 60, cue: 'Stai pe călcâie, brațele întinse înainte, fruntea jos. Respiri lent.' },
+    ],
+  },
+  {
+    // Hybrid365, Sunday: Foam Roll / Trigger Point Work, as needed.
+    id: 'foam',
+    name: 'Foam Roll / Trigger Point',
+    intro: 'După nevoie: rola sau o minge pe zonele încărcate ale săptămânii. Lent, cu pauze de câteva secunde pe punctele sensibile.',
+    moves: [
+      { name: 'Foam Roll: Calves', sec: 60, cue: 'Gambele pe rolă, mâinile în spate; rulezi de la gleznă la genunchi.' },
+      { name: 'Foam Roll: Quads', sec: 60, cue: 'Pe burtă, coapsele pe rolă; rulezi de deasupra genunchiului până la șold.' },
+      { name: 'Foam Roll: Hamstrings', sec: 60, cue: 'Așezat, spatele coapselor pe rolă; rulezi lent.' },
+      { name: 'Foam Roll: Glutes', sec: 60, cue: 'Așezat pe rolă, glezna pe genunchiul opus; te lași pe fesierul de sus.' },
+      { name: 'Foam Roll: Upper Back', sec: 60, cue: 'Rola sub omoplați, mâinile la ceafă; rulezi doar spatele de sus, nu zona lombară.' },
+      { name: 'Trigger Point: Chest & Shoulders', sec: 60, cue: 'O minge între piept și perete; ții câteva secunde pe punctele tensionate.' },
+    ],
+  },
+  {
+    // Hybrid365, Friday Session 2: Power Finisher, EMOM x 10 min, alternating.
+    id: 'emom-power',
+    name: 'Power Finisher',
+    intro: 'EMOM 10 minute, alternant: în minutele impare 6 Med Ball Chest Throws, în cele pare 8 Plyo Push Ups. La începutul fiecărui minut faci repetările, restul minutului e pauză. Viteză și explozie, nu oboseală.',
+    moves: [
+      { name: 'Min 1: 6 Med Ball Chest Throws', sec: 60, cue: 'Minut impar: 6 aruncări de la piept, cât de exploziv poți (în perete sau la partener). Ce rămâne din minut e pauză.' },
+      { name: 'Min 2: 8 Plyo Push Ups', sec: 60, cue: 'Minut par: 8 flotări pliometrice, mâinile se desprind de sol. Aterizezi moale. Ce rămâne din minut e pauză.' },
+      { name: 'Min 3: 6 Med Ball Chest Throws', sec: 60, cue: 'Minut impar: 6 aruncări de la piept, cât de exploziv poți (în perete sau la partener). Ce rămâne din minut e pauză.' },
+      { name: 'Min 4: 8 Plyo Push Ups', sec: 60, cue: 'Minut par: 8 flotări pliometrice, mâinile se desprind de sol. Aterizezi moale. Ce rămâne din minut e pauză.' },
+      { name: 'Min 5: 6 Med Ball Chest Throws', sec: 60, cue: 'Minut impar: 6 aruncări de la piept, cât de exploziv poți (în perete sau la partener). Ce rămâne din minut e pauză.' },
+      { name: 'Min 6: 8 Plyo Push Ups', sec: 60, cue: 'Minut par: 8 flotări pliometrice, mâinile se desprind de sol. Aterizezi moale. Ce rămâne din minut e pauză.' },
+      { name: 'Min 7: 6 Med Ball Chest Throws', sec: 60, cue: 'Minut impar: 6 aruncări de la piept, cât de exploziv poți (în perete sau la partener). Ce rămâne din minut e pauză.' },
+      { name: 'Min 8: 8 Plyo Push Ups', sec: 60, cue: 'Minut par: 8 flotări pliometrice, mâinile se desprind de sol. Aterizezi moale. Ce rămâne din minut e pauză.' },
+      { name: 'Min 9: 6 Med Ball Chest Throws', sec: 60, cue: 'Minut impar: 6 aruncări de la piept, cât de exploziv poți (în perete sau la partener). Ce rămâne din minut e pauză.' },
+      { name: 'Min 10: 8 Plyo Push Ups', sec: 60, cue: 'Minut par: 8 flotări pliometrice, mâinile se desprind de sol. Aterizezi moale. Ce rămâne din minut e pauză.' },
     ],
   },
   {

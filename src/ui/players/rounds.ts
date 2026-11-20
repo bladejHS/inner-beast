@@ -21,7 +21,7 @@ import { burstAt, Clock, doneSec, locate, phaseStart, roundsSeq, type Phase } fr
 import { lighter, lightOn, lightWord } from '../../logic/progress.ts';
 import { makeEntry, type Entry } from '../../logic/store.ts';
 import { dayKey, esc, mmss } from '../../logic/util.ts';
-import { zone2, zoneHard } from '../../logic/runlog.ts';
+import { zone2, zoneHard, zoneThr } from '../../logic/runlog.ts';
 import { kickPower, kickWeek, KNEE_STEPS, kneeNotes, kneeSore, type KneeNote } from '../../logic/knee.ts';
 import { buzz, say, sfx, unlock, hush } from '../audio.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
@@ -50,6 +50,8 @@ export interface RoundsCfg {
   cardio?: boolean;
   /** Hard intervals on the rower (4 × 4): no combinations, the pulse window on screen, saved as cardio. */
   hiit?: boolean;
+  /** Threshold intervals on foot (Hybrid365's Tuesday): the threshold pulse window, the rest is an easy jog. */
+  thr?: boolean;
   /** Reaction drill: a whole round (1-based), or the last seconds of a single round. */
   react?: { round?: number; lastSec?: number };
 }
@@ -312,8 +314,14 @@ class RoundsPlayer implements Player {
 
   /** Hard intervals: the window to hold while working, and the easy pace between. */
   hardHtml(work: boolean): string {
-    const [lo, hi] = zoneHard(ctx.S.set.hrMax);
     const easy = zone2(ctx.S.set.hrMax)[1];
+    if (this.cfg.thr) {
+      const [lo, hi] = zoneThr(ctx.S.set.hrMax);
+      return work
+        ? `<div class="call-box"><h4>Ritm de prag</h4><div class="c-name">${lo}–${hi} bpm</div><p class="small" style="margin:0">Controlat și puternic, relaxat, nu forțat. Splituri egale: ultima repetare la fel de rapidă ca prima.</p></div>`
+        : `<div class="call-box"><h4>Jogging ușor</h4><div class="c-name">Sub ${easy} bpm</div><p class="small" style="margin:0">Nu te oprești: alergi ușor până la repetarea următoare.</p></div>`;
+    }
+    const [lo, hi] = zoneHard(ctx.S.set.hrMax);
     return work
       ? `<div class="call-box"><h4>Puls, intervale</h4><div class="c-name">${lo}–${hi} bpm</div><p class="small" style="margin:0">Tare, dar egal: pulsul urcă spre ${lo} abia în minutul doi. Dacă nu-l mai poți ține, încetinești puțin, nu te oprești.</p></div>`
       : `<div class="call-box"><h4>Ușor</h4><div class="c-name">Sub ${easy} bpm</div><p class="small" style="margin:0">Vâslești lejer, nu te oprești: pulsul coboară până la intervalul următor.</p></div>`;
@@ -574,7 +582,7 @@ class RoundsPlayer implements Player {
       data: this.cfg.cardio
         ? { min: Math.round(work / 60), workDone: Math.round(work), ...(this.deload ? { deload: true } : {}) }
         : this.cfg.hiit
-          ? { hiit: true, rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), ...(this.deload ? { deload: true } : {}) }
+          ? { hiit: true, ...(this.cfg.thr ? { thr: true } : {}), rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), ...(this.deload ? { deload: true } : {}) }
         : { rounds: r, planned: this.cfg.rounds, work: this.cfg.work, rest: this.cfg.rest, workDone: Math.round(work), focus: this.cfg.focus ?? '', called: this.called, ...(bursts ? { bursts } : {}), ...(this.kickW ? { kicks: true } : {}), ...(this.reactN ? { react: this.reactN } : {}) },
     });
     addEntry(this.entry);

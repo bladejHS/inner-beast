@@ -12,6 +12,12 @@ import { chrome, ctrlBtn, setText, stepper } from './common.ts';
 
 const PREP = 5;
 
+export interface Circuit {
+  name: string;
+  moves: string[];
+  reps: number[];
+}
+
 class AmrapPlayer implements Player {
   st: 'ready' | 'run' | 'done' = 'ready';
   min: number;
@@ -27,21 +33,33 @@ class AmrapPlayer implements Player {
   /** Lighter week: a shorter block that counts for neither the records nor the next scheme. */
   deload = lightOn(ctx.S, dayKey());
 
-  constructor(block?: string, min = 10) {
+  /** A named circuit (Hybrid365's Wednesday Option B) in place of the bodyweight schemes. */
+  circuit?: Circuit;
+
+  constructor(block?: string, min = 10, circuit?: Circuit) {
     this.block = block;
+    this.circuit = circuit;
     this.min = this.deload ? lighter(min) : min;
     this.scheme = ctx.S.set.bwScheme;
     this.render();
   }
 
   get reps(): number[] {
-    return BW_SCHEMES[this.scheme].reps;
+    return this.circuit ? this.circuit.reps : BW_SCHEMES[this.scheme].reps;
+  }
+
+  get moves(): string[] {
+    return this.circuit ? this.circuit.moves : BW_MOVES;
+  }
+
+  get title(): string {
+    return this.circuit ? this.circuit.name : 'Bodyweight Workout';
   }
 
   last(): { rounds: number; extra: number; date: string; scheme: number } | null {
     for (let i = ctx.S.log.length - 1; i >= 0; i--) {
       const e = ctx.S.log[i];
-      if (e.kind === 'amrap' && !e.data.deload) return { rounds: Number(e.data.rounds) || 0, extra: Number(e.data.extra) || 0, date: e.date, scheme: Number(e.data.scheme) || 0 };
+      if (e.kind === 'amrap' && !e.data.deload && (e.data.circuit ?? '') === (this.circuit?.name ?? '')) return { rounds: Number(e.data.rounds) || 0, extra: Number(e.data.extra) || 0, date: e.date, scheme: Number(e.data.scheme) || 0 };
     }
     return null;
   }
@@ -49,20 +67,20 @@ class AmrapPlayer implements Player {
   render(): void {
     const el = ovEl();
     const moves = (big: boolean) =>
-      `<ul class="amrap-moves">${BW_MOVES.map((m, i) => `<li><span>${esc(m)}</span><b${big ? '' : ' style="font-size:22px"'}>${this.reps[i]}</b></li>`).join('')}</ul>`;
+      `<ul class="amrap-moves">${this.moves.map((m, i) => `<li><span>${esc(m)}</span><b${big ? '' : ' style="font-size:22px"'}>${this.reps[i]}</b></li>`).join('')}</ul>`;
     if (this.st === 'ready') {
       const l = this.last();
-      const best = amrapBest(ctx.S.log, this.scheme);
-      const up = amrapUp(ctx.S.log, this.scheme);
+      const best = this.circuit ? undefined : amrapBest(ctx.S.log, this.scheme);
+      const up = this.circuit ? null : amrapUp(ctx.S.log, this.scheme);
       el.innerHTML = chrome(
-        'Bodyweight Workout',
-        `<h1 class="pl-h">Bodyweight Workout</h1>
+        this.title,
+        `<h1 class="pl-h">${esc(this.title)}</h1>
         <p class="pl-sub">${this.min} minute, cât mai multe runde</p>
-        <p class="dim">O rundă înseamnă toate trei exercițiile, în ordine. Numeri rundele, apoi repetările din runda neterminată.</p>
+        <p class="dim">O rundă înseamnă toate ${this.moves.length === 3 ? 'trei' : 'cele ' + this.moves.length} exercițiile, în ordine. Numeri rundele, apoi repetările din runda neterminată.</p>
         ${this.deload ? `<div class="advice">${lightWord(ctx.S, dayKey())}: mai scurt și fără să forțezi. Sesiunea nu se numără la recorduri.</div>` : ''}
-        <div class="chips" style="margin:14px 0 4px">${BW_SCHEMES.map((s, i) => `<button class="chip" aria-pressed="${i === this.scheme}" data-a="p:scheme" data-i="${i}">${esc(s.name)} ${s.reps.join('-')}</button>`).join('')}</div>
+        ${this.circuit ? '' : `<div class="chips" style="margin:14px 0 4px">${BW_SCHEMES.map((s, i) => `<button class="chip" aria-pressed="${i === this.scheme}" data-a="p:scheme" data-i="${i}">${esc(s.name)} ${s.reps.join('-')}</button>`).join('')}</div>`}
         ${moves(true)}
-        ${BW_MOVES.map((m) => howHtml(m, undefined, { title: `Cum se face: ${m}` })).join('')}
+        ${this.moves.map((m) => howHtml(m, undefined, { title: `Cum se face: ${m}` })).join('')}
         ${l ? `<p class="prev">Data trecută (${shortDay(l.date)}): ${l.rounds} runde + ${l.extra} repetări${l.scheme !== this.scheme ? ', altă variantă' : ''}. Progresia e obligatorie: bate-l.</p>` : ''}
         ${best ? `<p class="prev">Recordul la ${esc(BW_SCHEMES[this.scheme].name)}: ${best.data.rounds} runde + ${best.data.extra} repetări.</p>` : ''}
         ${up !== null ? `<div class="advice up">Ai făcut de două ori cel puțin ${BW_SCHEMES[this.scheme].up} runde. Treci la ${esc(BW_SCHEMES[up].name)}. <button class="link" style="color:inherit;padding:0" data-a="p:scheme" data-i="${up}">Alege</button></div>` : ''}
@@ -76,7 +94,7 @@ class AmrapPlayer implements Player {
       const left = prep ? PREP - t : this.min * 60 - (t - PREP);
       const paused = !this.clock.running;
       el.innerHTML = chrome(
-        'Bodyweight Workout',
+        this.title,
         `<p class="phase-lbl">${prep ? 'Pregătește-te' : 'Timp rămas'}</p>
         <div class="mid-time" id="t">${mmss(Math.ceil(left))}</div>
         ${moves(false)}
@@ -88,7 +106,7 @@ class AmrapPlayer implements Player {
       return;
     }
     el.innerHTML = chrome(
-      'Bodyweight Workout',
+      this.title,
       `<h1 class="pl-h">Timpul a expirat.</h1>
       <p class="lead">${this.rounds} runde complete.</p>
       <p>Câte repetări ai mai făcut în runda neterminată?</p>
@@ -102,8 +120,10 @@ class AmrapPlayer implements Player {
 
   start(): void {
     unlock();
-    ctx.S.set.bwScheme = this.scheme;
-    save();
+    if (!this.circuit) {
+      ctx.S.set.bwScheme = this.scheme;
+      save();
+    }
     this.st = 'run';
     this.clock.start();
     this.render();
@@ -148,9 +168,9 @@ class AmrapPlayer implements Player {
       makeEntry({
         kind: 'amrap',
         block: worked >= this.min * 60 - 1 ? this.block : undefined,
-        name: 'Bodyweight Workout',
+        name: this.title,
         dur: worked,
-        data: { rounds: this.rounds, extra: this.extra, scheme: this.scheme, reps: this.reps, min: this.min, ...(this.deload ? { deload: true } : {}) },
+        data: { rounds: this.rounds, extra: this.extra, scheme: this.circuit ? -1 : this.scheme, ...(this.circuit ? { circuit: this.circuit.name } : {}), reps: this.reps, min: this.min, ...(this.deload ? { deload: true } : {}) },
       }),
     );
     this.saved = true;
@@ -210,6 +230,6 @@ class AmrapPlayer implements Player {
   }
 }
 
-export function openAmrap(block?: string, min = 10): void {
-  mountPlayer(new AmrapPlayer(block, min));
+export function openAmrap(block?: string, min = 10, circuit?: Circuit): void {
+  mountPlayer(new AmrapPlayer(block, min, circuit));
 }

@@ -35,7 +35,7 @@ export async function posterBlob(d: PosterData): Promise<Blob | null> {
   const x = c.getContext('2d');
   if (!x) return null;
   try { await document.fonts.ready; } catch { /* the fallback font draws it */ }
-  const glow = css('--glow', '255, 41, 68'), glow2 = css('--glow-2', '229, 16, 44');
+  const glow = css('--glow', '255, 212, 59'), glow2 = css('--glow-2', '245, 194, 17');
   try { (x as unknown as { fontStretch: string }).fontStretch = 'extra-condensed'; } catch { /* not supported: normal width */ }
 
   // the arena: black, a pool of the emphasis' light at the top, a floor glow

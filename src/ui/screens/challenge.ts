@@ -38,7 +38,7 @@ export function challengeHtml(): string {
         : racesSeg();
   return `${top()}
     ${pageHead('Provocări', 'Curse simulate, provocări de 30 de zile și disciplină.')}
-    ${heroBand('run')}
+    ${heroBand('deadlift')}
     ${segBar('Secțiuni Provocări', CHALLENGE_SEGS, seg)}
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }

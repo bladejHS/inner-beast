@@ -403,7 +403,7 @@ class WorkoutPlayer implements Player {
       })}
       <ul class="hist">${lines || '<li><span>Nicio serie bifată.</span></li>'}</ul>
       ${this.saved ? this.rpeHtml() : ''}
-      ${this.w.id === 'legs' && this.saved ? this.kneeHtml() : ''}
+      ${this.w.id === 'lower' && this.saved ? this.kneeHtml() : ''}
       <div style="height:16px"></div>
       <button class="btn" data-a="p:close">Închide</button>`,
     );

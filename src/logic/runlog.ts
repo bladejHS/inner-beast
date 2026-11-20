@@ -76,6 +76,11 @@ export function zoneHard(hrMax: number): [number, number] {
   return [Math.round(hrMax * 0.85), Math.round(hrMax * 0.95)];
 }
 
+/** Threshold pace (Hybrid365's Tuesday): comfortably hard, about 80–88 % of the maximum heart rate. */
+export function zoneThr(hrMax: number): [number, number] {
+  return [Math.round(hrMax * 0.8), Math.round(hrMax * 0.88)];
+}
+
 export function runAdvice(log: Entry[], zone?: [number, number]): string {
   const runs = log.filter((e) => e.kind === 'run' && Number(e.data.pace) > 0);
   if (!runs.length) return '';

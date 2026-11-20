@@ -63,7 +63,7 @@ export function weekCard(full: boolean): string {
   return `<section class="card wc" aria-label="Combinațiile săptămânii">
     <p class="label">Săptămâna ${learnWeek() + 1}</p>
     <h3>Combinațiile săptămânii</h3>
-    <p class="small dim" style="margin:0 0 4px">Una nouă și una de recapitulat. Joi, în shadow kickboxing, prima rundă e doar cu cea nouă.</p>
+    <p class="small dim" style="margin:0 0 4px">Una nouă și una de recapitulat. În shadow kickboxing, prima rundă e doar cu cea nouă.</p>
     ${items}
     <button class="btn sm wide" data-a="qt" data-k="week">${ic('play')} Exersează-le: 3 × 3 min</button>
   </section>`;

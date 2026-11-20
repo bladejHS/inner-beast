@@ -12,6 +12,8 @@
      2.0  the rear high kick lands: flash, sparks, shock ring, the camera shakes, time slows for a moment, the eyes
           flare; the page stamps the name (onImpact)
      2.4  the fighters reset; the page leaves when it wants (about 3.3 s)
+   Since 2026-11-20 Inner Beast opens with THE SPLIT instead (BeastArena.hybrid, below: the Hybrid365 plan, a runner
+   breaking the finish beam between a bench press and a deadlift, in yellow); Beast Nutrition keeps the arena.
    API: BeastArena.create(opts) → { start(), still(T), burst(), destroy() }
    opts: canvas, stage (the wolf element; .sp-emb and .sp-eye inside), bg (the light layer), root (#splash),
          color [r,g,b], hot [r,g,b], onImpact(). */
@@ -302,6 +304,69 @@
   var BAG_TRACK = [[0, GA], [0.1, JAB], [0.24, GA], [0.38, CROSS], [0.54, GA], [0.68, HOOK], [0.84, GA], [1.5, GA]];
   var BAG_HITS = [0.1, 0.38, 0.68];
 
+  // ---- the gym (2026-11-20, Hybrid365 in Inner Beast: "run fast, build muscle") ---------------------------------
+  // Side views, the floor at y = 31.5 units as for the standing figures; the barbell seen end-on, as its plate.
+  var FLOOR = 31.5, PLATE = 8.2;
+
+  /** Bench press: lying on the bench, feet on the floor, the bar pressed from the chest to straight arms. */
+  function benchJ(T) {
+    var k = 0.5 - 0.5 * Math.cos((2 * Math.PI * Math.max(0, T)) / 1.7);
+    var H = [-10, 13], N = [14, 13], Hd = [N[0] + NECK + HEAD - 0.6, 12.2];
+    var K = [-25.5, 14.2], F = [-27, FLOOR - 1.6];
+    var P = [mix(14.5, 13, k), mix(13 - UP - FORE + 0.4, 5.2, ease(k))];
+    var low = function (e1, e2) { return e1[1] > e2[1]; };
+    var E = ik(N, P, UP, FORE, low);
+    return { H: [H, H], N: N, S: [N, N], Hd: Hd, E: [E, [E[0] - 0.7, E[1]]], P: [P, [P[0] - 0.7, P[1]]], K: [K, [K[0] + 0.8, K[1]]], F: [F, [F[0] + 0.8, F[1]]], T: [[F[0] + 4.2, FLOOR], [F[0] + 5, FLOOR]], X: [], bar: P, bench: true };
+  }
+
+  /** Romanian deadlift: the hips go back, the bar slides down the thighs to the shins, the back stays flat. */
+  function deadliftJ(T) {
+    var k = ease(0.5 - 0.5 * Math.cos((2 * Math.PI * Math.max(0, T)) / 2.1));
+    var hx = -7.5 * k, a = 16 * k, ar = a * R;
+    var Kx = hx + Math.sin(ar) * TH, b = Math.asin(clamp(-Kx / SH, -1, 1)) / R;
+    var y = FLOOR - Math.cos(ar) * TH - Math.cos(b * R) * SH;
+    var J = joints({ x: hx, y: y, t: mix(178, 102, k), a: [[0, 0], [0, 0]], l: [[a, b], [a + 1.5, b]] });
+    var P = J.P[0];
+    J.bar = [P[0], Math.min(P[1], FLOOR - PLATE)];
+    return J;
+  }
+
+  /** Push press: a short dip, the drive from the legs, the bar locked out overhead, lowered to the shoulders. */
+  function pressJ(T) {
+    var u = (Math.max(0, T) % 1.9) / 1.9;
+    var dip = u < 0.14 ? Math.sin((u / 0.14) * Math.PI) : 0;
+    var up = u < 0.1 ? 0 : u < 0.32 ? ease((u - 0.1) / 0.22) : u < 0.62 ? 1 : u < 0.92 ? 1 - ease((u - 0.62) / 0.3) : 0;
+    var kn = 9 * dip;
+    var J = joints({ x: 0, y: 0.9 * dip * 2.2, t: 179, a: [[0, 0], [0, 0]], l: [[kn, -kn * 0.6], [kn - 2, -kn * 0.6 + 2]] });
+    var N = J.N, P = [N[0] + mix(5.5, 2, up), N[1] + mix(1.5, -UP - FORE + 0.6, up)];
+    var E = ik(N, P, UP, FORE, function (e1, e2) { return e1[0] > e2[0]; });
+    J.E = [E, [E[0] - 0.7, E[1]]]; J.P = [P, [P[0] - 0.7, P[1]]];
+    J.bar = P; J.lock = up;
+    return J;
+  }
+
+  /** The barbell, end-on: its plate as a lit disc with a hub; `sleeve` adds the bar's stub for the side views. */
+  function plate(c, x, y, s, o, hot, pale) {
+    c.save(); c.globalAlpha = o.alpha;
+    c.shadowColor = o.glow; c.shadowBlur = o.blur;
+    c.fillStyle = o.rim; c.beginPath(); c.arc(x, y - 0.6 * s, (PLATE + 0.7) * s, 0, 2 * Math.PI); c.fill();
+    c.shadowBlur = 0; c.fillStyle = '#040508'; c.beginPath(); c.arc(x, y, PLATE * s, 0, 2 * Math.PI); c.fill();
+    c.strokeStyle = rgba(hot, 0.55 * o.alpha); c.lineWidth = Math.max(1, 0.55 * s);
+    c.beginPath(); c.arc(x, y, PLATE * 0.66 * s, 0, 2 * Math.PI); c.stroke();
+    c.fillStyle = rgba(pale, 0.95); c.shadowColor = rgba(hot, 1); c.shadowBlur = 6;
+    c.beginPath(); c.arc(x, y, 1.5 * s, 0, 2 * Math.PI); c.fill();
+    c.restore();
+  }
+
+  /** A whole lift: the bench under the presser, the figure, then the plate in front of it. */
+  function lifter(c, J, bx, by, s, dir, o, hot, pale) {
+    function P(p) { return [bx + dir * p[0] * s, by + p[1] * s]; }
+    if (J.bench) rimmed(c, [[P([-17, 20.2]), P([21, 20.2]), 3.6], [P([-12, 21]), P([-12, FLOOR]), 1.8], [P([16, 21]), P([16, FLOOR]), 1.8]], o, s);
+    figure(c, J, bx, by, s, dir, o);
+    var q = P(J.bar);
+    plate(c, q[0], q[1], s, o, hot, pale);
+  }
+
   // ---------------------------------------------------------------------------------------------------------------
 
   function create(o) {
@@ -562,6 +627,204 @@
     };
   }
 
+  /* THE SPLIT (2026-11-20), Inner Beast's opening since the Hybrid365 plan: "run fast, build muscle", in the
+     yellow of the plan. One spotlight on a running track; the wolf watches from the dark behind.
+       0    darkness, the wolf's eyes light up; the lane lines draw themselves in from the right
+       .35  the light rises: a bench presser on the left, a deadlift on the right, the finish beam standing in the middle
+       .45  the runner comes in from the left, the track sliding under him, speed lines behind
+       2.0  he breaks the finish beam: flash, sparks, shock ring, the camera shakes, time slows; the page stamps the name
+       2.4  he runs out on the right; the lifters keep working; the page leaves at about 3.3 s
+     Same API as create(): { start(), still(T), burst(), destroy() }. */
+  function createHybrid(o) {
+    var cv = o.canvas, c = cv.getContext('2d');
+    var col = o.color || [245, 194, 17], hot = o.hot || [255, 212, 59];
+    var pale = hot.map(function (v) { return Math.round(mix(v, 255, 0.72)); }), rimc = hot.map(function (v) { return Math.round(mix(v, 255, 0.3)); });
+    var emb = o.stage ? o.stage.querySelector('.sp-emb') : null, eyes = o.stage ? o.stage.querySelectorAll('.sp-eye') : [];
+    var Wd = 0, Ht = 0, dpr = 1, raf = 0, last = 0, T = 0, real = 0, slow = 0, shake = 0, hitAt = -1, live = true, impacted = false;
+    var sparks = [], rings = [], motes = [], trail = [], halves = [];
+    function size() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      Wd = cv.clientWidth || innerWidth; Ht = cv.clientHeight || innerHeight;
+      cv.width = Math.round(Wd * dpr); cv.height = Math.round(Ht * dpr);
+    }
+    function layout() {
+      var s = Math.min(Wd * 0.0079, Ht * 0.0036, 4.2);
+      return { s: s, cx: Wd / 2, gy: Ht * 0.72, sf: s * 0.6, gf: Ht * 0.5 };
+    }
+    for (var i = 0; i < 40; i++) motes.push({ x: Math.random(), y: Math.random(), v: 0.012 + Math.random() * 0.03, r: 0.6 + Math.random() * 1.5, f: Math.random() * 6 });
+    function burstAt(x, y, n, power, dirX) {
+      for (var i = 0; i < n; i++) {
+        var a = (dirX > 0 ? -60 : -120) * R + (Math.random() - 0.5) * 220 * R, v = power * (0.25 + Math.random());
+        sparks.push({ x: x, y: y, px: x, py: y, vx: Math.cos(a) * v + dirX * power * 0.45, vy: Math.sin(a) * v, t: 0, life: 0.35 + Math.random() * 0.6, w: 1 + Math.random() * 1.8 });
+      }
+    }
+    /** Where the runner is: in from the left, through the beam at IMPACT, out on the right. */
+    function runX(L) {
+      var a = (T - 0.45) / (IMPACT - 0.45);
+      if (a < 1) return mix(-0.12 * Wd, L.cx, clamp(a, 0, 1));
+      return mix(L.cx, 1.2 * Wd, clamp((T - IMPACT) / 1.3, 0, 1));
+    }
+    function lit() { return clamp((T - 0.35) / 0.6, 0, 1); }
+    function update(dt) {
+      real += dt;
+      var rate = slow > 0 ? 0.16 : 1;
+      if (slow > 0) slow -= dt;
+      T += dt * rate;
+      shake *= Math.pow(0.0025, dt);
+      var L = layout(), rx = runX(L), by = L.gy - HIPY * L.s, J = runner(T * 1.35);
+      if (!impacted && T >= IMPACT) {
+        impacted = true; hitAt = real; slow = 0.36; shake = 11;
+        var hx = L.cx, hy = by + 2 * L.s;
+        burstAt(hx, hy, 160, 760, 1);
+        rings.push({ x: hx, y: hy, t: 0 });
+        halves = [{ y: L.gy - 70 * L.s, vy: -260, vx: -60 }, { y: L.gy - 70 * L.s, vy: 200, vx: 80 }];
+        if (o.root) { o.root.style.setProperty('--ix', hx.toFixed(0) + 'px'); o.root.style.setProperty('--iy', hy.toFixed(0) + 'px'); }
+        if (o.onImpact) try { o.onImpact(); } catch (e) { /* the page's part */ }
+      }
+      [J.P[0], J.P[1], J.T[0], J.T[1]].forEach(function (p, k) { trail.push({ k: k, x: rx + p[0] * L.s, y: by + p[1] * L.s, t: real }); });
+      while (trail.length && real - trail[0].t > 0.12) trail.shift();
+      for (var i = sparks.length - 1; i >= 0; i--) {
+        var p = sparks[i], k2 = dt * (slow > 0 ? 0.3 : 1);
+        p.t += k2;
+        if (p.t > p.life) { sparks.splice(i, 1); continue; }
+        p.px = p.x; p.py = p.y;
+        p.vy += 900 * k2; p.vx *= Math.pow(0.18, k2); p.vy *= Math.pow(0.4, k2);
+        p.x += p.vx * k2; p.y += p.vy * k2;
+      }
+      for (var j = rings.length - 1; j >= 0; j--) { rings[j].t += dt; if (rings[j].t > 0.6) rings.splice(j, 1); }
+      for (var m = 0; m < motes.length; m++) { var q = motes[m]; q.y -= q.v * dt; if (q.y < -0.05) { q.y = 1.02; q.x = Math.random(); } }
+      halves.forEach(function (h) { h.y += h.vy * dt; h.vy *= Math.pow(0.05, dt); });
+      return { L: L, rx: rx, by: by, J: J };
+    }
+    function dom() {
+      var l = lit(), flare = hitAt >= 0 ? Math.max(0, 1 - (real - hitAt) / 0.7) : 0;
+      if (o.bg) o.bg.style.opacity = (l * (0.85 + 0.15 * flare)).toFixed(3);
+      if (emb) emb.style.opacity = (0.05 + 0.5 * l + 0.3 * flare).toFixed(3);
+      var e = clamp((T - 0.1) / 0.22, 0, 1), flick = T < 0.5 ? (Math.sin(T * 90) > -0.3 ? 1 : 0.35) : 1;
+      for (var i = 0; i < eyes.length; i++) {
+        eyes[i].style.opacity = (e * flick * (0.75 + 0.25 * Math.sin(real * 5)) + flare * 0.8).toFixed(3);
+        eyes[i].style.transform = 'rotate(var(--r)) scale(' + (1 + flare * 0.9).toFixed(3) + ')';
+      }
+      if (o.stage && live) {
+        var sx = (Math.random() - 0.5) * shake * 0.5, sy = (Math.random() - 0.5) * shake * 0.5;
+        o.stage.style.transform = 'translate(' + sx.toFixed(1) + 'px,' + sy.toFixed(1) + 'px) scale(' + (1 + 0.035 * Math.min(T, 3) / 3).toFixed(4) + ')';
+      }
+    }
+    function draw(S) {
+      var L = S.L, l = lit();
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      c.clearRect(0, 0, Wd, Ht);
+      if (shake > 0.3) c.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+      var fl = c.createLinearGradient(0, L.gy - 4, 0, Ht);
+      fl.addColorStop(0, 'rgba(4,5,8,0)'); fl.addColorStop(0.12, 'rgba(4,5,8,.84)'); fl.addColorStop(1, 'rgba(4,5,8,.97)');
+      c.fillStyle = fl; c.fillRect(-20, L.gy - 4, Wd + 40, Ht - L.gy + 30);
+      c.globalCompositeOperation = 'lighter';
+      var cone = c.createLinearGradient(0, 0, 0, L.gy);
+      cone.addColorStop(0, rgba(hot, 0)); cone.addColorStop(0.35, rgba(col, 0.05 * l)); cone.addColorStop(1, rgba(col, 0.13 * l));
+      c.fillStyle = cone;
+      c.beginPath(); c.moveTo(L.cx - Wd * 0.05, -10); c.lineTo(L.cx + Wd * 0.05, -10); c.lineTo(L.cx + Wd * 0.48, L.gy); c.lineTo(L.cx - Wd * 0.48, L.gy); c.closePath(); c.fill();
+      function pool(y, rx, a) {
+        c.save(); c.translate(L.cx, y); c.scale(1, 0.13);
+        var g = c.createRadialGradient(0, 0, 0, 0, 0, rx);
+        g.addColorStop(0, rgba(pale, a * 0.5)); g.addColorStop(0.25, rgba(hot, a * 0.55)); g.addColorStop(1, rgba(col, 0));
+        c.fillStyle = g; c.beginPath(); c.arc(0, 0, rx, 0, 2 * Math.PI); c.fill(); c.restore();
+      }
+      pool(L.gf, Wd * 0.62, 0.3 * l);
+      pool(L.gy, Wd * 0.6, 0.7 * l);
+      // the track: lane lines drawn in from the right, their dashes sliding left under the runner
+      var draw0 = clamp(T / 0.5, 0, 1), slide = (T * 1.35 * 300) % 60;
+      for (var ln = 0; ln < 4; ln++) {
+        var ly = L.gy + 6 + ln * ln * 7 + ln * 6, x0 = Wd - Wd * 1.1 * ease(draw0);
+        c.strokeStyle = rgba(hot, (0.5 - ln * 0.09) * Math.max(l, 0.35)); c.lineWidth = 1.2 + ln * 0.5;
+        c.beginPath(); c.moveTo(Math.max(-10, x0), ly); c.lineTo(Wd + 10, ly); c.stroke();
+        if (ln === 1) {
+          c.strokeStyle = rgba(pale, 0.4 * l); c.lineWidth = 2.2;
+          for (var d = -60 - slide; d < Wd + 60; d += 60) { c.beginPath(); c.moveTo(d, ly + 12); c.lineTo(d + 26, ly + 12); c.stroke(); }
+        }
+      }
+      // the finish beam, until the runner breaks it
+      if (!impacted) {
+        var bh = (L.gy - Ht * 0.22) * ease(clamp((T - 0.3) / 0.6, 0, 1)), pulse = 0.75 + 0.25 * Math.sin(real * 12);
+        var bg = c.createLinearGradient(0, L.gy, 0, L.gy - bh);
+        bg.addColorStop(0, rgba(pale, 0.9 * pulse)); bg.addColorStop(0.6, rgba(hot, 0.5 * pulse)); bg.addColorStop(1, rgba(col, 0));
+        c.fillStyle = bg; c.fillRect(L.cx - 2, L.gy - bh, 4, bh);
+        c.fillStyle = rgba(hot, 0.12 * pulse); c.fillRect(L.cx - 14, L.gy - bh, 28, bh);
+      } else {
+        halves.forEach(function (h, k) {
+          var a = Math.max(0, 1 - (real - hitAt) / 0.5);
+          c.fillStyle = rgba(pale, 0.8 * a); c.fillRect(L.cx - 2 + h.vx * (real - hitAt) * 0.3 * (k ? 1 : -1), h.y, 4, 40 * L.s * a);
+        });
+      }
+      c.globalCompositeOperation = 'source-over';
+      var fa = clamp((T - 0.42) / 0.5, 0, 1);
+      var far = { alpha: 0.85 * fa, body: 1, rim: rgba(hot, 0.85), glow: rgba(hot, 0.9), blur: 7 * Math.min(dpr, 1.5) };
+      var near = { alpha: clamp((T - 0.4) / 0.3, 0, 1), body: 1, rim: rgba(rimc, 1), glow: rgba(hot, 1), blur: 12 * Math.min(dpr, 1.5) };
+      var byF = L.gf - HIPY * L.sf;
+      lifter(c, benchJ(T), L.cx - Wd * 0.3, byF, L.sf, 1, far, hot, pale);
+      lifter(c, deadliftJ(T), L.cx + Wd * 0.33, byF, L.sf, -1, far, hot, pale);
+      // speed lines behind the runner, then the runner
+      c.save(); c.globalCompositeOperation = 'lighter';
+      for (var sl = 0; sl < 6; sl++) {
+        var yy = S.by + (-30 + sl * 11) * L.s, len = (30 + 18 * ((sl * 37) % 5)) * L.s * near.alpha;
+        var g2 = c.createLinearGradient(S.rx - len - 8 * L.s, 0, S.rx - 8 * L.s, 0);
+        g2.addColorStop(0, rgba(col, 0)); g2.addColorStop(1, rgba(hot, 0.35));
+        c.strokeStyle = g2; c.lineWidth = 1.4; c.beginPath(); c.moveTo(S.rx - len - 8 * L.s, yy); c.lineTo(S.rx - 8 * L.s, yy); c.stroke();
+      }
+      c.restore();
+      c.save(); c.globalAlpha = near.alpha * 0.8; c.fillStyle = '#000';
+      c.beginPath(); c.ellipse(S.rx, L.gy + 1, 15 * L.s, 2.4 * L.s, 0, 0, 2 * Math.PI); c.fill(); c.restore();
+      figure(c, S.J, S.rx, S.by, L.s, 1, near);
+      c.globalCompositeOperation = 'lighter';
+      for (var i2 = 4; i2 < trail.length; i2++) {
+        var a2 = trail[i2 - 4], b2 = trail[i2];
+        if (a2.k !== b2.k) continue;
+        var age = (real - b2.t) / 0.12;
+        c.strokeStyle = rgba(b2.k > 1 ? pale : hot, (1 - age) * 0.6); c.lineWidth = 3 * L.s * 0.45 * (1 - age);
+        c.beginPath(); c.moveTo(a2.x, a2.y); c.lineTo(b2.x, b2.y); c.stroke();
+      }
+      c.lineCap = 'round';
+      for (var i3 = 0; i3 < sparks.length; i3++) {
+        var p = sparks[i3], u = p.t / p.life;
+        c.strokeStyle = u < 0.25 ? 'rgba(255,250,230,' + (1 - u).toFixed(2) + ')' : rgba(hot, 1 - u);
+        c.lineWidth = p.w; c.beginPath(); c.moveTo(p.px, p.py); c.lineTo(p.x + (p.x - p.px) * 0.8, p.y + (p.y - p.py) * 0.8); c.stroke();
+      }
+      for (var r = 0; r < rings.length; r++) {
+        var gr = rings[r], v = gr.t / 0.6;
+        c.strokeStyle = rgba(pale, (1 - v) * 0.9); c.lineWidth = 3 * (1 - v) + 0.5;
+        c.beginPath(); c.ellipse(gr.x, gr.y, 10 + v * 160, (10 + v * 160) * 0.8, 0, 0, 2 * Math.PI); c.stroke();
+      }
+      for (var m = 0; m < motes.length; m++) {
+        var q = motes[m], a3 = l * 0.32 * (0.5 + 0.5 * Math.sin(real * 2 + q.f));
+        c.fillStyle = rgba(pale, a3); c.beginPath(); c.arc(q.x * Wd, q.y * Ht * 0.75, q.r, 0, 2 * Math.PI); c.fill();
+      }
+      c.globalCompositeOperation = 'source-over';
+    }
+    function frame(now) {
+      if (!live) return;
+      var dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
+      last = now;
+      draw(update(dt)); dom();
+      raf = requestAnimationFrame(frame);
+    }
+    function onResize() { size(); }
+    size();
+    addEventListener('resize', onResize);
+    return {
+      start: function () { live = true; last = 0; raf = requestAnimationFrame(frame); },
+      still: function (at) {
+        live = false;
+        var cb = o.onImpact; o.onImpact = null;
+        var S = null;
+        while (T < at) S = update(1 / 60);
+        o.onImpact = cb; shake = 0; slow = 0;
+        if (S) draw(S);
+        dom();
+      },
+      burst: function () { /* the exit is the page's */ },
+      destroy: function () { live = false; cancelAnimationFrame(raf); removeEventListener('resize', onResize); }
+    };
+  }
+
   /** Seated, legs crossed, hands on the knees, seen from the front; the chest rises with the breath. */
   function calm(T) {
     var b = Math.sin((2 * Math.PI * T) / 5.5), ny = 2.5 - 1.1 * b;
@@ -777,6 +1040,15 @@
         c.restore();
         by = ty - HIPY * s;
         figure(c, runner(t), xq - 2 * s, by, s, 1, o2);
+      } else if (kind === 'bench') {
+        s = Math.min(Ht / 56, Wd / 66); by = gy - FLOOR * s;
+        lifter(c, benchJ(t), cx + 2 * s, by, s, 1, o2, hot, pale);
+      } else if (kind === 'deadlift') {
+        s = Ht / 80; by = gy - FLOOR * s;
+        lifter(c, deadliftJ(t), cx + 3 * s, by, s, 1, o2, hot, pale);
+      } else if (kind === 'press') {
+        s = Ht / 112; by = gy - FLOOR * s;
+        lifter(c, pressJ(t), cx - 2 * s, by, s, 1, o2, hot, pale);
       } else if (kind === 'push') {
         s = Math.min(Wd / 100, Ht / 42); by = gy - HIPY * s;
         figure(c, pushup(t), cx + 4 * s, by, s, -1, o2);
@@ -846,5 +1118,5 @@
     return { stop: function () { live = false; cancelAnimationFrame(raf); if (ro) ro.disconnect(); } };
   }
 
-  window.BeastArena = { create: create, hero: hero };
+  window.BeastArena = { create: create, hero: hero, hybrid: createHybrid };
 })();

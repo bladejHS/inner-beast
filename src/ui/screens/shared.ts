@@ -3,10 +3,9 @@
 import { wolfArt } from '../rankart.ts';
 import { focusCombos, usesLegs } from '../../data/combos.ts';
 import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks, type RestKey } from '../../data/plan.ts';
-import { ROW_CHALLENGES, rowChallenge } from '../../data/row.ts';
 import { activeStreak, cycleAt, deloadOn, growMinutes, weekSince } from '../../logic/progress.ts';
 import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
-import { zone2, zoneHard } from '../../logic/runlog.ts';
+import { zone2, zoneHard, zoneThr } from '../../logic/runlog.ts';
 import { kickPower, kickWeek, kneeNotes, kneeSore, type KneeNote } from '../../logic/knee.ts';
 import { parseSteps } from '../../logic/pedometer.ts';
 import { dayKey, esc, inWeek, num, pad2, RO_DAYS, weekStart, weekdayIdx } from '../../logic/util.ts';
@@ -46,7 +45,7 @@ export function soreKnee(): KneeNote | null {
 }
 
 /** A living picture under a tab's title (2026-11-15): the arena engine (public/splash/arena.js) draws `kind` on a loop. */
-export function heroBand(kind: 'fight' | 'bag' | 'push' | 'pull' | 'run' | 'calm'): string {
+export function heroBand(kind: 'fight' | 'bag' | 'push' | 'pull' | 'run' | 'calm' | 'bench' | 'deadlift' | 'press'): string {
   return `<div class="hero-stage band" aria-hidden="true"><img class="hero-wolf" src="${wolfArt()}" alt="" width="680" height="801" decoding="async"><canvas class="hero-cv" data-kind="${kind}"></canvas></div>`;
 }
 
@@ -115,15 +114,15 @@ export function startBlock(raw: Block): void {
   const b = liveBlock(raw);
   switch (b.kind) {
     case 'rounds':
-      return openRounds({ name: b.name, rounds: b.rounds ?? 1, work: b.work ?? 180, rest: blockRest(b), focus: b.focus, block: b.id, tip: b.tip, cues: b.cues, legSwap: b.legSwap, warmup: b.warmup, burstFrom: b.burstFrom, hiit: b.hiit, react: b.react });
+      return openRounds({ name: b.name, rounds: b.rounds ?? 1, work: b.work ?? 180, rest: blockRest(b), focus: b.focus, block: b.id, tip: b.tip, cues: b.cues, legSwap: b.legSwap, warmup: b.warmup, burstFrom: b.burstFrom, hiit: b.hiit, thr: b.thr, react: b.react });
     case 'cardio':
       return openRounds({ name: b.name, rounds: 1, work: (b.min ?? 20) * 60, rest: 0, block: b.id, tip: b.tip, cues: b.cues, cardio: true });
     case 'row':
-      return openRow(b.id);
+      return openRow(b.id, b.rowCh);
     case 'amrap':
-      return openAmrap(b.id, b.min ?? 10);
+      return openAmrap(b.id, b.min ?? 10, b.circuit ? { name: b.name, ...b.circuit } : undefined);
     case 'workout':
-      return openWorkout(b.workout ?? 'push', b.id);
+      return openWorkout(b.workout ?? 'upper', b.id);
     case 'routine':
       return openRoutine(b.routine ?? 'mobility', b.id);
     case 'run':
@@ -169,16 +168,16 @@ export function toggleMark(raw: Block): void {
 }
 
 const ICON_BY_ID: Record<string, string> = {
-  'mon-shadow': 'shadow', 'thu-shadow': 'shadow', 'tue-easy': 'shadow', 'fri-easy': 'shadow',
-  'mon-bag': 'bag', 'thu-bag': 'bag', 'thu-power': 'bolt', 'thu-rope': 'rope', 'sun-legs': 'stretch', 'mon-bw': 'bolt',
-  'tue-cal': 'fight', 'mon-lower': 'fight', 'fri-cal': 'fight', 'sun-lunges': 'fight', 'tue-stretch': 'stretch', 'fri-stretch': 'stretch', 'tue-cool': 'stretch',
-  'sat-mob': 'stretch', 'wed-walk': 'walk', 'wed-shower': 'drop', 'wed-med': 'wind', 'sat-med': 'wind',
-  'sat-breath': 'mind', 'sun-jog': 'run', 'tue-row': 'row', 'knee-tue': 'wall', 'knee-sat': 'wall', 'kick-fri': 'stretch',
+  'mon-run': 'run', 'thu-run': 'run', 'sat-long': 'run', 'tue-wu': 'run', 'tue-cd': 'run', 'tue-thr': 'timer',
+  'mon-upper': 'lift', 'wed-upper': 'lift', 'thu-lower': 'lift', 'fri-upper': 'lift', 'fri-emom': 'bolt', 'wed-cond': 'pulse',
+  'sun-walk': 'walk', 'sun-flow': 'stretch', 'sun-stretch': 'stretch', 'sun-foam': 'stretch', 'sun-breath': 'wind',
 };
 
 export function blockIcon(raw: Block): string {
   const b = liveBlock(raw);
   if (b.focus === 'ladder' || b.focus === 'plate') return 'ladder';
+  if (b.thr) return 'timer';
+  if (b.kind === 'amrap') return 'bolt';
   if (b.kind === 'row' || b.hiit || (b.kind === 'cardio' && b.alt === 'aero')) return 'row';
   return ICON_BY_ID[b.id] ?? 'timer';
 }
@@ -201,20 +200,12 @@ export function blockMinutes(raw: Block): number {
 function altPicker(b: Block): string {
   const s = ctx.S.set;
   const opts: Array<[string, string, boolean]> =
-    b.alt === 'feet'
-      ? [['rope', 'Jumping Rope', s.thuFeet === 'rope'], ['ladder', 'Agility Ladder', s.thuFeet === 'ladder'], ['plate', 'Plate Footwork', s.thuFeet === 'plate']]
-      : b.alt === 'partner'
-        ? [['shadow', 'Singur', s.thuPartner !== 'spar'], ['spar', 'Cu partener', s.thuPartner === 'spar']]
-        : b.alt === 'aero'
-          ? [['row', 'Vâslitor', s.sunAero !== 'run'], ['run', 'Alergare', s.sunAero === 'run']]
-          : [['bag', 'Heavy Bag', s.thuMain === 'bag'], ['row', 'Machine Row', s.thuMain === 'row']];
+    b.alt === 'cond'
+      ? [['a', 'A · Engine Builder', s.wedCond !== 'b'], ['b', 'B · Hybrid Circuit', s.wedCond === 'b']]
+      : [['run', 'Alergare', s.aero !== 'row'], ['row', 'Vâslitor', s.aero === 'row']];
   const chips = (act: string, list: Array<[string, string, boolean]>, label: string) =>
     `<div class="chips rd-alt" role="group" aria-label="${esc(label)}">${list.map(([v, l, on]) => `<button class="chip" aria-pressed="${on}" data-a="${act}" data-b="${b.id}" data-v="${v}">${esc(l)}</button>`).join('')}</div>`;
   let html = chips('alt', opts, 'Alege activitatea');
-  if (b.alt === 'main' && s.thuMain === 'row') {
-    const cur = rowChallenge(s.rowCh);
-    html += chips('row-ch', ROW_CHALLENGES.map((c) => [c.id, `${c.id.toUpperCase()}: ${c.label}`, c.id === cur.id]), 'Alege provocarea');
-  }
   return html;
 }
 
@@ -234,8 +225,8 @@ export function blockCard(raw: Block, n: number, today: string, next = false): s
     extra += `<p class="rd-hr">${ic('pulse')}<span>Zona 2: <b>${lo}–${hi}</b> bpm</span></p>`;
   }
   if (b.hiit) {
-    const [lo, hi] = zoneHard(ctx.S.set.hrMax);
-    extra += `<p class="rd-hr">${ic('pulse')}<span>Intervale: <b>${lo}–${hi}</b> bpm</span></p>`;
+    const [lo, hi] = b.thr ? zoneThr(ctx.S.set.hrMax) : zoneHard(ctx.S.set.hrMax);
+    extra += `<p class="rd-hr">${ic('pulse')}<span>${b.thr ? 'Prag' : 'Intervale'}: <b>${lo}–${hi}</b> bpm</span></p>`;
   }
   if (b.kind === 'run') extra += `<button class="link" data-a="polar" data-b="${b.id}">Adaugă din Polar Flow</button>`;
   if (b.kind === 'rounds' && b.focus && b.burstFrom !== 1 && b.focus !== 'legs' && b.focus !== 'rope' && b.focus !== 'ladder' && b.focus !== 'plate') {

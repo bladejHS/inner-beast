@@ -182,7 +182,7 @@ export function progressHtml(): string {
   const body = seg === 'train' ? trainSeg() : seg === 'tests' ? testsHtml() : seg === 'log' ? logSeg() : weekSeg();
   return `${top()}
     ${pageHead('Progres', 'Ce ai construit, săptămână de săptămână.')}
-    ${heroBand('pull')}
+    ${heroBand('press')}
     ${segBar('Secțiuni Progres', PROGRESS_SEGS, seg)}
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }

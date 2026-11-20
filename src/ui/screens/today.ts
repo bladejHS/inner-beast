@@ -26,7 +26,7 @@ export function weekStrip(today: string, active: number): string {
 }
 
 /** The living picture on the day's card (public/splash/arena.js): the discipline of the day, in the arena's light. */
-const HERO_KIND = ['fight', 'push', 'run', 'fight', 'pull', 'run', 'calm'];
+const HERO_KIND = ['bench', 'run', 'pull', 'deadlift', 'press', 'run', 'calm'];
 
 /** The stage as a fight-night broadcast (2026-11-15): the LIVE bug, the corner brackets, a light sweep, and the lower
  *  third with the day's main event: its longest block. Decoration only; the same facts are in the rows below. */
@@ -39,7 +39,7 @@ function broadcast(day: Day, n: number, total: number, tag: string): string {
     <i class="bc-c tl"></i><i class="bc-c tr"></i><i class="bc-c bl"></i><i class="bc-c br"></i><i class="bc-sweep"></i>
     ${wolfMood(day.idx)}
     <p class="bc-bug"><span class="bc-live${cleared ? ' off' : ''}">${cleared ? 'Final' : 'Live'}</span><b>${esc(tag)}</b></p>
-    <div class="bc-l3"><span class="bc-tag">${cleared ? 'Câștigat' : 'Main event'}</span><span class="bc-name"><b>${esc(m.name)}</b><small>${esc(m.dose)}</small></span></div>
+    <div class="bc-l3"><span class="bc-tag">${cleared ? 'Gata' : 'Key session'}</span><span class="bc-name"><b>${esc(m.name)}</b><small>${esc(m.dose)}</small></span></div>
   </div>`;
 }
 
@@ -61,7 +61,7 @@ export function dayBody(day: Day, today: string, kicker: string): string {
       <h1 class="ms-t"><span>${esc(day.title)}</span></h1>
       <div class="hero-stage" aria-hidden="true">
         <img class="hero-wolf" src="${wolfArt()}" alt="" width="680" height="801" decoding="async">
-        <canvas class="hero-cv" data-kind="${HERO_KIND[day.idx] ?? 'fight'}"></canvas>
+        <canvas class="hero-cv" data-kind="${HERO_KIND[day.idx] ?? 'run'}"></canvas>
         ${broadcast(day, n, total, c ? `Ciclul ${c.id} · ${c.week}/4` : RO_DAYS[day.idx])}
       </div>
       <div class="ms-row">
@@ -77,7 +77,7 @@ export function dayBody(day: Day, today: string, kicker: string): string {
     ${weekdayIdx(today) === day.idx ? rankPlate() : ''}
     ${weekHead(today)}
     ${weekStrip(today, day.idx)}
-    <h2 class="sec">Rundele zilei<small>Atinge numărul unei runde ca s-o bifezi fără timer.</small></h2>
+    <h2 class="sec">Sesiunile zilei<small>Atinge numărul unei sesiuni ca s-o bifezi fără timer.</small></h2>
     <ol class="rds">${day.blocks.map((b, i) => blockCard(b, i + 1, today, b === next)).join('')}</ol>`;
 }
 
@@ -244,7 +244,7 @@ function introCard(): string {
     seen = false;
   }
   if (ctx.S.log.length || seen) return '';
-  return `<section class="card lime"><p class="label">Bine ai venit</p><h3>Cum merge</h3><p>Planul din carte e împărțit pe zile. Apeși Start la fiecare rundă: timerul, combinațiile și seriile se salvează singure în Progres.</p><p class="dim small">Dacă ai făcut un bloc fără aplicație, apeși pe numărul lui și îl bifezi.</p><button class="link" data-a="intro-ok">Am înțeles</button></section>`;
+  return `<section class="card lime"><p class="label">Bine ai venit</p><h3>Cum merge</h3><p>Planul Hybrid365 e împărțit pe zile: 3 alergări, 3 zile de upper, 1 de lower și o condiționare. Apeși Start la fiecare sesiune: timerul și seriile se salvează singure în Progres.</p><p class="dim small">Dacă ai făcut un bloc fără aplicație, apeși pe numărul lui și îl bifezi.</p><button class="link" data-a="intro-ok">Am înțeles</button></section>`;
 }
 
 export function todayHtml(): string {

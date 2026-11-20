@@ -229,9 +229,9 @@ export const lightWord = (s: { easy?: string }, today: string): string => (s.eas
 export const CYCLE_WEEKS = 4;
 
 export const CYCLES: Array<{ id: CycleId; name: string; what: string }> = [
-  { id: 'A', name: 'Forță și bază aerobă', what: 'Greutatea crește la split squat și dips, EMOM-ul urcă, alergarea și canotajul se lungesc.' },
-  { id: 'B', name: 'Putere și viteză', what: 'Sprinturi și aruncări explozive (sărituri, când genunchii le permit), punch-out și luni, forța se menține cu aceeași greutate.' },
-  { id: 'C', name: 'Capacitate', what: 'Punch-out luni și joi, 8 runde la sac joi, AMRAP-ul și EMOM-ul urcă.' },
+  { id: 'A', name: 'Bază', what: 'Threshold Run 4 × 6 min, cu 90 s de jogging. Alergările ușoare și cea lungă cresc cu 5 minute pe sesiune; la forță, întâi repetări, apoi greutate.' },
+  { id: 'B', name: 'Volum', what: 'Threshold Run 5 × 6 min: o repetare în plus. Greutatea urcă la exercițiile principale, condiționarea mai densă.' },
+  { id: 'C', name: 'Ritm', what: 'Threshold Run 5 × 7 min, cu doar 60 s de jogging. Încerci să bați seria de top de vineri și timpii de miercuri.' },
 ];
 
 export interface CycleNow {

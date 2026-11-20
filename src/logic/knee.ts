@@ -41,7 +41,7 @@ export function legDays(log: Entry[], knee: Record<string, KneeDay>): LegDay[] {
   const out: LegDay[] = [];
   for (let i = log.length - 1; i >= 0; i--) {
     const e = log[i];
-    if (e.kind !== 'workout' || e.data.wid !== 'legs' || e.data.deload || seen.has(e.date)) continue;
+    if (e.kind !== 'workout' || (e.data.wid !== 'legs' && e.data.wid !== 'lower') || e.data.deload || seen.has(e.date)) continue;
     seen.add(e.date);
     const ex = (e.data.ex as Array<{ id: string; lvl: number }> | undefined) ?? [];
     const k = knee[e.date] ?? {};

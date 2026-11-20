@@ -174,6 +174,12 @@ export function advise(ex: Exercise, last: LastEx | undefined, lvl: number, prev
     const next = last.log.kg + kgStep(last.log.kg);
     return { kind: 'top', kg: next, text: `Hybrid365: greutate în plus în fiecare săptămână. Ai făcut toate seriile cu ${kgStr(last.log.kg)} kg: azi ${kgStr(next)} kg și bate seria de top de data trecută.` };
   }
+  if (ex.steps && lvl === ex.vars.length - 1 && atTop(last)) return { kind: 'top', text: `Ești la ținta circuitului: ${ex.vars[lvl]}. O ții de fiecare dată.` };
+  if (ex.steps && lvl < ex.steps.length) {
+    // the step's own target, as the player sets it
+    const st = ex.steps[lvl]!;
+    ex = { ...ex, sets: st.sets, lo: st.lo, hi: st.hi };
+  }
   if (atTop(last)) {
     const lkg = last.log.kg;
     if (ex.load && lkg) {

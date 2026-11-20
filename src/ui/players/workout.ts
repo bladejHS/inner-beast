@@ -186,6 +186,11 @@ class WorkoutPlayer implements Player {
   }
 
   initX(ex: Exercise, lvl: number): XS {
+    // a ladder exercise takes its sets and reps from the step it is on
+    if (ex.steps) {
+      const st = ex.steps[Math.min(Math.max(0, lvl), ex.steps.length - 1)]!;
+      ex = { ...ex, sets: this.deload ? lighter(st.sets) : st.sets, lo: st.lo, hi: st.hi };
+    }
     const last = lastExercise(ctx.S.log, ex.id);
     const prev = last ? lastExercise(ctx.S.log, ex.id, last.ts) : undefined;
     const nextKg = advise(ex, last, lvl, prev).kg;

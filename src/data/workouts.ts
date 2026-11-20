@@ -35,6 +35,8 @@ export interface Exercise {
   /** The same movement on another day (2026-11-20, the user: what I lifted on Monday shows the next day, with the
    *  weight to use): the newest session of any exercise in the group sets today's weight. */
   same?: string;
+  /** A ladder of fixed targets, one per variation (Sit-ups): the sets and reps of each step. */
+  steps?: Array<{ sets: number; lo: number; hi: number }>;
   /** Friday's main lifts (Hybrid365: "Add load to main lifts weekly"): more weight every week once all the sets were
    *  done inside the range, not only at its top. */
   weekly?: boolean;
@@ -241,19 +243,23 @@ export const WORKOUTS: Workout[] = [
     min: 9,
     ex: [
       {
-        id: 'situps', name: 'Sit-ups', vars: ['Sit-ups'], start: 0,
-        type: 'max', sets: 2, hi: 60, rest: 60, muscles: 'abdomen, flexorii șoldului',
-        cue: 'Două serii la maxim, în ritmul din circuit. Ținta: 60 la rând. Bate data trecută cu cel puțin o repetare.',
+        // no max sets (the user, 2026-11-20): a ladder of fixed targets towards the circuit's 60 in a row; each step is
+        // met twice before the next one
+        id: 'situps', name: 'Sit-ups', start: 0,
+        vars: ['Sit-ups 3 × 15', 'Sit-ups 3 × 20', 'Sit-ups 3 × 25', 'Sit-ups 2 × 35', 'Sit-ups 2 × 45', 'Sit-ups 2 × 55', 'Sit-ups 1 × 60'],
+        steps: [{ sets: 3, lo: 15, hi: 15 }, { sets: 3, lo: 20, hi: 20 }, { sets: 3, lo: 25, hi: 25 }, { sets: 2, lo: 35, hi: 35 }, { sets: 2, lo: 45, hi: 45 }, { sets: 2, lo: 55, hi: 55 }, { sets: 1, lo: 60, hi: 60 }],
+        type: 'reps', sets: 3, lo: 15, hi: 15, rest: 60, muscles: 'abdomen, flexorii șoldului',
+        cue: 'Toate repetările, curat, în ritmul din circuit. Când faci treapta de două ori la rând, urci la următoarea; ultima e 60 la rând, ca în Circuitul 1.',
       },
       {
         id: 'hkr', name: 'Hanging Knee Raises', vars: ['Lying Leg Raises', 'Hanging Knee Raises', 'Hanging Leg Raises'], start: 1,
         type: 'reps', sets: 3, lo: 8, hi: 15, rest: 60, muscles: 'abdomenul de jos, priza',
-        cue: 'Atârnat cu umerii activi, ridici genunchii spre piept fără balans și cobori controlat. Atârnatul construiește și priza pentru cele 90 de secunde.',
+        cue: 'Atârnat cu umerii activi, ridici genunchii spre piept fără balans și cobori controlat. Progresia: repetări până la 3 × 15, apoi varianta următoare. Atârnatul construiește și priza pentru cele 90 de secunde.',
       },
       {
-        id: 'plank', name: 'Plank', vars: ['Forearm Plank', 'Long-lever Plank'], start: 0,
+        id: 'plank', name: 'Plank', vars: ['Forearm Plank', 'Long-lever Plank', 'Plank with Leg Lift'], start: 0,
         type: 'time', sets: 2, lo: 30, hi: 60, rest: 45, muscles: 'tot trunchiul',
-        cue: 'Pe antebrațe, corpul drept din cap până în călcâie, fesierii și abdomenul strânși. La 2 × 60 s treci la varianta lungă (coatele în fața umerilor).',
+        cue: 'Pe antebrațe, corpul drept din cap până în călcâie, fesierii și abdomenul strânși. Progresia: câte 5 secunde în plus până la 2 × 60 s, apoi varianta următoare (coatele în fața umerilor, apoi un picior ridicat pe rând).',
       },
     ],
   },

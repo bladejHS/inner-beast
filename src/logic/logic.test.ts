@@ -740,9 +740,17 @@ test('run advice: no pace target, pulse at the same pace, a check every 4th run'
 test('Hybrid365 fitted to the user: Hack Squat for the Back Squat, machines with no dumbbell ceiling, kg carried over', () => {
   assert.deepEqual(WORKOUTS.map((w) => [w.id, w.min]), [['upper', 55], ['upper2', 60], ['lower', 55], ['power', 65], ['core', 9]]);
   // the core for the circuits: sit-ups to a max, knee raises up their variations, the plank to 60 s
-  assert.deepEqual(workoutById('core').ex.map((e) => [e.id, e.type, e.sets]), [['situps', 'max', 2], ['hkr', 'reps', 3], ['plank', 'time', 2]]);
-  const sit = advise(exerciseById('situps')!, { log: { id: 'situps', name: 's', sets: [42, 35], unit: 'reps' }, lvl: 0, date: 'x' }, 0);
-  assert.match(sit.text, /42/);
+  assert.deepEqual(workoutById('core').ex.map((e) => [e.id, e.type]), [['situps', 'reps'], ['hkr', 'reps'], ['plank', 'time']]);
+  assert.ok(!workoutById('core').ex.some((e) => e.type === 'max'), 'no max sets');
+  // sit-ups climb a ladder of fixed targets, each met twice: 3 × 15 ... 1 × 60
+  const sit = exerciseById('situps')!;
+  assert.equal(sit.steps!.length, sit.vars.length);
+  assert.equal(advise(sit, lastOf('situps', [15, 15, 15], 0), 0, lastOf('situps', [15, 14, 15], 0)).kind, 'stay');
+  assert.deepEqual([advise(sit, lastOf('situps', [15, 15, 15], 0), 0, lastOf('situps', [15, 15, 15], 0)).kind, advise(sit, lastOf('situps', [15, 15, 15], 0), 0, lastOf('situps', [15, 15, 15], 0)).lvl], ['up', 1]);
+  assert.equal(advise(sit, lastOf('situps', [35, 35], 3), 3, lastOf('situps', [35, 35], 3)).lvl, 4);
+  assert.equal(advise(sit, lastOf('situps', [60], 6), 6).kind, 'top');
+  const pl = advise(exerciseById('plank')!, { log: { id: 'plank', name: 'p', sets: [60, 60], unit: 'sec' }, lvl: 0, date: 'x' }, 0);
+  assert.deepEqual([pl.kind, pl.lvl], ['up', 1]);
   const hk = advise(exerciseById('hkr')!, lastOf('hkr', [15, 15, 15], 1), 1);
   assert.deepEqual([hk.kind, hk.lvl], ['up', 2]);
   assert.equal(workoutById('lower').ex[0]!.id, 'hacksq');

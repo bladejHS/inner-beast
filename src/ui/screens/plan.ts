@@ -1,10 +1,10 @@
 // "Plan": the week as seven day cards and the 12-week Hybrid365 loop as a campaign map.
 
-import { ENGINE_STEPS, POWER_STEPS, THR_STEPS, WEEK, blockLine, resolveBlock, type Block, type Picks } from '../../data/plan.ts';
+import { ENGINE_STEPS, POWER_STEPS, THR_STEPS, WEEK, blockLine, resolveBlock, type Block, type Day, type Picks } from '../../data/plan.ts';
+import { workoutById } from '../../data/workouts.ts';
 import { CYCLE_WEEKS, CYCLES, cycleAt, dayComplete, dayProgress, daysOff, loopWeek, repeatMonday, weekDone, weekSince } from '../../logic/progress.ts';
 import { addDays, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
-import { dayPoster } from '../art.ts';
 import { ic } from '../icons.ts';
 import { campaignSvg } from '../campaign.ts';
 import { blockIcon, blockMinutes, pageHead, planPicks, top, heroBand } from './shared.ts';
@@ -80,6 +80,53 @@ function cycleCard(today: string): string {
     ${repeatHtml(today)}</section>`;
 }
 
+/** The day's banner (2026-11-21, the user: "ceva mai specific și motivațional"): the day's own coaching line from
+ *  the Hybrid365 slide, the day's targets as they stand this week (minutes, sets × reps, the progression step), and the
+ *  day's discipline drawn in gold on the right by the arena engine (animated on today, still on the others). */
+const DAY_LINE: Array<[string, string]> = [
+  ['Build momentum,', 'not fatigue.'],
+  ['Your key', 'performance session.'],
+  ['Lift heavy', 'with intent.'],
+  ['Move well. Lift strong.', 'Recover smart.'],
+  ['Beat last week’s', 'top set.'],
+  ['Finish stronger', 'than you started.'],
+  ['This is where', 'you get better.'],
+];
+const DAY_KIND = ['bench', 'run', 'pull', 'deadlift', 'press', 'run', 'calm'];
+
+/** A session as a short target: "30′ Z2", "4×6′ prag", "DB Bench 4×6–8", "Engine 8×250". */
+function target(raw: Block, picks: Picks): string {
+  const b = resolveBlock(raw, picks);
+  if (b.id === 'tue-wu' || b.id === 'tue-cd' || b.id === 'sun-foam') return '';
+  if (b.kind === 'run' || b.kind === 'cardio') return b.id === 'sat-long' ? `Long ${b.min}′` : b.id === 'sun-walk' ? `Walk ${b.min}′` : `${b.min}′ Z2`;
+  if (b.thr) return `${b.rounds}×${Math.round((b.work ?? 0) / 60)}′ prag`;
+  if (b.kind === 'row') return `Engine ${b.dose.replace(' m', '')}`;
+  if (b.kind === 'amrap') return 'AMRAP 10′';
+  if (b.kind === 'rounds' && b.hiit) return b.name;
+  if (b.workout === 'core') return 'Core';
+  if (b.kind === 'workout') {
+    const ex = workoutById(b.workout ?? 'upper').ex[0];
+    if (!ex) return b.name;
+    const st = ex.steps?.[0];
+    return `${ex.name.replace('Weighted ', '').replace('Dumbbell ', 'DB ')} ${st ? st.sets : ex.sets}×${ex.lo === ex.hi ? ex.lo : `${ex.lo}–${ex.hi}`}`;
+  }
+  if (b.routine === 'emom-power') return b.dose.replace('EMOM × ', 'EMOM ');
+  if (b.kind === 'routine') return 'Mobility';
+  if (b.kind === 'breath') return 'Breath';
+  return '';
+}
+
+function dayBanner(d: Day, picks: Picks, today: boolean): string {
+  const [a, b] = DAY_LINE[d.idx] ?? DAY_LINE[0]!;
+  const tags = [...new Set(d.blocks.map((x) => target(x, picks)).filter(Boolean))].slice(0, 4);
+  return `<div class="dban${today ? ' today' : ''}" aria-hidden="true">
+    <canvas class="hero-cv" data-kind="${DAY_KIND[d.idx] ?? 'run'}"${today ? '' : ' data-still="1"'}></canvas>
+    <i class="po-sheen"></i>
+    <p class="db-l">${esc(a)} <b>${esc(b)}</b></p>
+    <p class="db-t">${tags.map((t) => `<span>${esc(t)}</span>`).join('')}</p>
+  </div>`;
+}
+
 /** One progression as a ladder of steps rising left to right: done in gold, the current one lit, the rest outlined. */
 function ladder(name: string, labels: string[], cur: number, note: string): string {
   const n = labels.length, at = Math.min(cur, n - 1);
@@ -129,7 +176,7 @@ export function planHtml(): string {
     const state = d.idx === tIdx ? 'Azi' : complete ? 'Gata' : d.idx < tIdx && n < d.blocks.length ? 'Rămas' : '';
     return `<li>
       <button class="dc ${d.idx === tIdx ? 'now' : ''} ${complete ? 'full' : ''}" style="--f:${(n / d.blocks.length).toFixed(3)}" data-a="${d.idx === tIdx ? 'tab' : 'day'}" data-k="today" data-i="${d.idx}">
-        <span class="dc-ph">${dayPoster(d.idx, 'sm', [...new Set(d.blocks.map((b) => blockIcon(b)))].slice(0, 4).map((n) => ic(n)).join(''))}</span>
+        <span class="dc-ph dc-ban">${dayBanner(d, picks, d.idx === tIdx)}</span>
         <span class="dc-head">
           <span class="dc-day">${esc(RO_DAYS[d.idx])}</span>
           ${state ? `<span class="dc-tag">${state}</span>` : ''}

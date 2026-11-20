@@ -206,7 +206,7 @@ function mountHero(root: ParentNode): void {
   const color = rgb('--glow-2', [245, 194, 17]), hot = rgb('--glow', [255, 212, 59]);
   for (const cv of root.querySelectorAll<HTMLCanvasElement>('canvas.hero-cv')) {
     try {
-      arena.hero(cv, { kind: cv.dataset.kind, color, hot, still });
+      arena.hero(cv, { kind: cv.dataset.kind, color, hot, still: still || cv.dataset.still === '1' });
     } catch {
       /* the card stands without its picture */
     }

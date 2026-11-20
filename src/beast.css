@@ -2051,3 +2051,21 @@ html:not([data-motion='lite']) #app.enter-seg .cc-b, html:not([data-motion='lite
 .cc-key i.last { background: #5a5852; margin-left: 8px; }
 .faster { font-style: normal; color: var(--red-hot); font-weight: 800; }
 .slower { font-style: normal; color: var(--faint); }
+
+/* ---------- 8.5 (2026-11-21): the day banners in Plan, specific and motivational ----------
+   The day's coaching line from its Hybrid365 slide in heavy caps (the last words in gold), the week's real targets as
+   small plates, the day's discipline drawn in gold on the right (moving on today, still on the other days). */
+.dc-ph.dc-ban { height: 112px; margin: 0 -16px 12px; }
+.dc-ph.dc-ban::after { display: none; }
+.dban { position: absolute; inset: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 9px; padding: 0 16px;
+  background: radial-gradient(70% 130% at 88% 60%, rgba(var(--glow-2), .2), transparent 60%), linear-gradient(100deg, #101010, #0a0a0a 55%, #121110);
+  border-bottom: 1px solid rgba(var(--glow-2), .35); }
+.dban::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(-62deg, rgba(240, 239, 234, .02) 0 1px, transparent 1px 7px); pointer-events: none; }
+.dban .hero-cv { position: absolute; right: 0; top: 0; bottom: 0; left: auto; width: 46%; height: 100%; -webkit-mask-image: linear-gradient(90deg, transparent, #000 35%); mask-image: linear-gradient(90deg, transparent, #000 35%); }
+.db-l { position: relative; z-index: 1; max-width: 66%; margin: 0; font: 900 extra-condensed 27px/.92 var(--font); letter-spacing: .01em; text-transform: uppercase; color: var(--ink); text-wrap: balance; text-shadow: 0 2px 12px rgba(0, 0, 0, .8); }
+.db-l b { color: var(--red-hot); }
+.db-t { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 5px; max-width: 72%; margin: 0; }
+.db-t span { padding: 4px 7px 3px; border: 1px solid rgba(var(--glow-2), .45); border-radius: 4px; background: rgba(7, 7, 7, .72); font: 800 semi-condensed 10.5px/1 var(--font); letter-spacing: .06em; color: var(--ink-2); white-space: nowrap; }
+.dban.today { border-bottom-color: var(--red-hot); background: radial-gradient(70% 130% at 88% 60%, rgba(var(--glow), .3), transparent 62%), linear-gradient(100deg, #141310, #0a0a0a 55%, #15130e); }
+.dban.today .db-t span:first-child { border-color: var(--red-hot); color: var(--red-hot); }
+html:not([data-motion='lite']) #app.enter-tab .dban .po-sheen { animation: po-sheen 1.6s var(--e-out) .35s both; }

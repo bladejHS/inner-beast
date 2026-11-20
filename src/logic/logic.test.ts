@@ -646,6 +646,21 @@ test('the same movement on another day: Monday at 50 kg gives Friday its weight'
   assert.equal(lastSame([mon], exerciseById('hacksq')!, undefined), undefined);
 });
 
+test('Power Finisher: its own ladder, one step per session; the two test circuits on the race clock', async () => {
+  const { POWER_STEPS } = await import('../data/plan.ts');
+  const { powerRoutine } = await import('../data/routines.ts');
+  const { CIRCUITS, raceById } = await import('../data/races.ts');
+  const fri = WEEK[4].blocks.find((b) => b.id === 'fri-emom')!;
+  const P: Picks = { legMode: 'wall', thuFeet: 'rope', thuMain: 'bag', rowCh: 'a' };
+  assert.equal(resolveBlock(fri, { ...P, powStep: 0 }).dose, 'EMOM × 10 min');
+  assert.match(resolveBlock(fri, { ...P, powStep: 9 }).line!, /EMOM × 12 min \(8 Med Ball Chest Throws \/ 10 Plyo Push Ups\)/);
+  const r = powerRoutine(POWER_STEPS[5]!);
+  assert.deepEqual([r.moves.length, r.moves[0]!.name, r.moves[1]!.name], [12, 'Min 1: 8 Med Ball Chest Throws', 'Min 2: 10 Plyo Push Ups']);
+  assert.deepEqual(CIRCUITS.map((c) => c.levels[0]!.segs.length), [8, 8]);
+  assert.equal(raceById('circ2')!.levels[0]!.segs[5]!.name, 'Bench Press 50 kg × 20');
+  assert.deepEqual(raceById('circ1')!.levels[0]!.segs.filter((x) => x.sec).map((x) => x.sec), [90, 180]);
+});
+
 test('stalling: three sessions that do not beat the one before them', () => {
   const log = [session('pushups', [10, 10], 1, '2026-10-01'), session('pushups', [10, 9], 1, '2026-10-08'), session('pushups', [10, 10], 1, '2026-10-15')];
   assert.equal(stalled(log, 'pushups', 1), false);

@@ -34,11 +34,14 @@ export const DAY_MOTTO: Array<[string, string]> = [
   ['This is where you', 'get better.'],
 ];
 
-/** The day's poster (2026-11-11, in place of the stock photos): the motto set in Saira over a steel plate, the wolf's
- *  mark faint at the right, the day's number stencilled, the red slash. `sm` is the small cut on the plan's day cards. */
-export function dayPoster(idx: number, cls = ''): string {
+/** The day's banner in Plan (2026-11-20, the user asked for a new one): set like the Hybrid365 slides, the number in
+ *  gold and the weekday in heavy white caps ("1. MONDAY"), the day's motto under them, the session icons on the right,
+ *  a gold hairline at the foot and the forge crest faint behind. `ics` are the icons of the day's sessions. */
+const DAY_EN = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+export function dayPoster(idx: number, cls = '', ics = ''): string {
   const [a, b] = DAY_MOTTO[idx] ?? DAY_MOTTO[0]!;
-  return `<div class="poster ${cls}" aria-hidden="true"><i class="po-mark" style="--m:url(${import.meta.env.BASE_URL}ui/mark.svg)"></i><i class="po-n">0${idx + 1}</i><i class="po-slash"></i><p class="po-t"><span>${a}</span> <b>${b}</b></p></div>`;
+  return `<div class="poster hy ${cls}" aria-hidden="true"><i class="po-mark" style="--m:url(${import.meta.env.BASE_URL}ui/mark.svg)"></i><i class="po-sheen"></i>
+    <span class="po-day"><b>${idx + 1}.</b>${DAY_EN[idx] ?? ''}</span><span class="po-m">${a} <em>${b}</em></span>${ics ? `<span class="po-ics">${ics}</span>` : ''}<i class="po-line"></i></div>`;
 }
 
 /** The finish mark on every "Gata." screen: three claw gashes torn in, with a shock ring. */

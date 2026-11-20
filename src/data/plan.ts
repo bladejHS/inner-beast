@@ -99,6 +99,7 @@ export interface Picks {
   /** Where the Hybrid365 progressions stand: the threshold step (THR_STEPS) and the Engine Builder step (ENGINE_STEPS). */
   thrStep?: number;
   engStep?: number;
+  powStep?: number;
   /** Wednesday's conditioning: A Engine Builder (row), B Hybrid Circuit, C Norwegian 4x4, D Hill Repeats, E 30/30s. */
   wedCond?: 'a' | 'b' | 'c' | 'd' | 'e';
   /** Today's minutes for the blocks that grow (see Block.grow). */
@@ -141,6 +142,15 @@ export const THR_STEPS: Array<{ reps: number; min: number; rest: number }> = [
  *  rest comes down 5 s a session to 30 s, then a round more, up to 10. */
 export const ENGINE_STEPS: Array<{ rounds: number; rest: number }> = [
   { rounds: 8, rest: 45 }, { rounds: 8, rest: 40 }, { rounds: 8, rest: 35 }, { rounds: 8, rest: 30 }, { rounds: 9, rest: 30 }, { rounds: 10, rest: 30 },
+];
+
+/** Friday's Power Finisher (EMOM, odd minutes Med Ball Chest Throws, even minutes Plyo Push Ups). The Hybrid365 slide
+ *  gives no numbers for it ("improve bar speed and efficiency on power movements"), so this ladder is the app's own, at
+ *  the user's request (2026-11-20): one step per full session, a rep more on one move at a time, then two more minutes.
+ *  The reps stay low on purpose: power is speed, and a set ends when the speed drops. */
+export const POWER_STEPS: Array<{ min: number; throws: number; plyo: number }> = [
+  { min: 10, throws: 6, plyo: 8 }, { min: 10, throws: 7, plyo: 8 }, { min: 10, throws: 7, plyo: 9 },
+  { min: 10, throws: 8, plyo: 9 }, { min: 10, throws: 8, plyo: 10 }, { min: 12, throws: 8, plyo: 10 },
 ];
 
 /** Threshold pace, the key session. Its reps, their length and the jog between them follow THR_STEPS. */
@@ -253,6 +263,11 @@ export function resolveBlock(b: Block, p: Picks): Block {
     const s = ENGINE_STEPS[Math.min(ENGINE_STEPS.length - 1, Math.max(0, p.engStep ?? 0))]!;
     r = { ...r, rowDose: { reps: s.rounds, rest: s.rest }, dose: `${s.rounds} × 250 m`, line: `Conditioning: Engine Builder ${s.rounds} × 250 m Row, ${s.rest} s rest`,
       tip: `Session 2, Option A: ${s.rounds} runde pe timp de 250 m pe vâslitor (sau SkiErg), cu ${s.rest} s pauză. Provocator, nu maximal. Progresia Hybrid365: densitate mai mare (pauza scade cu 5 s până la 30 s, apoi o rundă în plus), notezi timpul și încerci să-l bați.` };
+  }
+  if (b.id === 'fri-emom') {
+    const s = POWER_STEPS[Math.min(POWER_STEPS.length - 1, Math.max(0, p.powStep ?? 0))]!;
+    r = { ...r, min: s.min, dose: `EMOM × ${s.min} min`, line: `Power Finisher: EMOM × ${s.min} min (${s.throws} Med Ball Chest Throws / ${s.plyo} Plyo Push Ups)`,
+      tip: `Session 2: EMOM ${s.min} minute, alternant. Minutele impare: ${s.throws} Med Ball Chest Throws. Minutele pare: ${s.plyo} Plyo Push Ups. Ce rămâne din minut e pauză. Viteza contează, nu oboseala: dacă repetările încetinesc, te oprești.` };
   }
   const grown = b.grow ? p.grown?.[b.id] : undefined;
   if (grown && grown !== b.min) r = { ...r, min: grown, dose: `${grown} min` };

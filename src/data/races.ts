@@ -164,6 +164,39 @@ export const RACES: Race[] = [
   },
 ];
 
+/** The user's two test circuits (2026-11-20), done for time in Progres → Teste, on the race clock: the timed parts
+ *  run by themselves, the others end with a tap. One level each; the splits show where the time went. */
+export const CIRCUITS: Race[] = [
+  {
+    id: 'circ1', name: 'Circuitul 1', sub: '1000 m, 50 m, 70 flotări, săritură, 60 abdomene, 60 genuflexiuni, atârnat, sac', icon: 'bolt',
+    note: 'Pe timp, fără pauze plănuite. Când termini un pas, apeși Gata; atârnatul și runda de sac merg singure.',
+    levels: [{ name: 'Test', est: 22, segs: [
+      { name: 'Run 1000 m', detail: '1000 m alergare' },
+      { name: 'Sprint 50 m', detail: '50 m, tot ce ai' },
+      { name: '70 Push-ups', detail: '70 de flotări, împărțite cum vrei' },
+      { name: 'Standing Long Jump', detail: 'Săritura în lungime de pe loc, aterizare moale' },
+      { name: '60 Sit-ups', detail: '60 de abdomene' },
+      { name: '60 Squats', detail: '60 de genuflexiuni' },
+      { name: 'Dead Hang 90 s', detail: 'Atârnat la bară, 90 de secunde', sec: 90 },
+      { name: 'Heavy Bag 1 Round', detail: 'O rundă de 3 minute la sac', sec: 180 },
+    ] }],
+  },
+  {
+    id: 'circ2', name: 'Circuitul 2', sub: '1500 m row, 50 flotări, curl 20 kg, dips, 40 abdomene, piept 50 kg, sărituri, assault bike', icon: 'bolt',
+    note: 'Pe timp, fără pauze plănuite. Apeși Gata la finalul fiecărui pas.',
+    levels: [{ name: 'Test', est: 26, segs: [
+      { name: 'Row 1500 m', detail: '1500 m pe vâslitor' },
+      { name: '50 Push-ups', detail: '50 de flotări' },
+      { name: '10 Biceps Curls 20 kg', detail: '10 flexii la biceps cu 20 kg' },
+      { name: '10 Dips', detail: '10 dips-uri' },
+      { name: '40 Sit-ups', detail: '40 de abdomene' },
+      { name: 'Bench Press 50 kg × 20', detail: 'Împins la piept cu 50 kg, 20 de repetări' },
+      { name: '40 Bench Jumps', detail: '40 de sărituri peste bancă' },
+      { name: 'Assault Bike 1000 m', detail: '1000 m pe assault bike' },
+    ] }],
+  },
+];
+
 export function raceById(id: string): Race | undefined {
-  return RACES.find((r) => r.id === id);
+  return RACES.find((r) => r.id === id) ?? CIRCUITS.find((r) => r.id === id);
 }

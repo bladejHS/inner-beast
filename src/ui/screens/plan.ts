@@ -1,6 +1,6 @@
 // "Plan": the week as seven day cards and the 12-week Hybrid365 loop as a campaign map.
 
-import { WEEK, blockLine, resolveBlock } from '../../data/plan.ts';
+import { ENGINE_STEPS, POWER_STEPS, THR_STEPS, WEEK, blockLine, resolveBlock, type Block, type Picks } from '../../data/plan.ts';
 import { CYCLE_WEEKS, CYCLES, cycleAt, dayComplete, dayProgress, daysOff, loopWeek, repeatMonday, weekDone, weekSince } from '../../logic/progress.ts';
 import { addDays, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
@@ -80,6 +80,39 @@ function cycleCard(today: string): string {
     ${repeatHtml(today)}</section>`;
 }
 
+/** One progression as a ladder of steps rising left to right: done in gold, the current one lit, the rest outlined. */
+function ladder(name: string, labels: string[], cur: number, note: string): string {
+  const n = labels.length, at = Math.min(cur, n - 1);
+  return `<div class="lad"><div class="lad-h"><b>${esc(name)}</b><span>${esc(labels[at]!)}</span></div>
+    <div class="lad-s">${labels.map((l, i) => `<i class="${i < at ? 'ok' : i === at ? 'now' : ''}" style="--i:${i};--h:${(0.3 + (0.7 * (i + 1)) / n).toFixed(3)}"><span>${esc(l)}</span></i>`).join('')}</div>
+    <p class="small dim">${esc(note)}</p></div>`;
+}
+
+/** A run that grows by minutes: where it is between its start and its cap. */
+function runBar(name: string, b: Block | undefined, picks: Picks): string {
+  if (!b?.grow) return '';
+  const m = resolveBlock(b, picks).min ?? b.grow.base;
+  const f = (m - b.grow.base) / (b.grow.cap - b.grow.base || 1);
+  return `<div class="lad-run"><span>${esc(name)}</span><div class="lad-bar"><i style="--f:${Math.max(0.04, f).toFixed(3)}"></i></div><b>${m}′<small>/${b.grow.cap}′</small></b></div>`;
+}
+
+/** The Hybrid365 progressions as they stand, under the map (2026-11-20, the user: "animație pentru progresie"). */
+function progressionHtml(): string {
+  const p = planPicks();
+  const blk = (id: string) => WEEK.flatMap((d) => d.blocks).find((x) => x.id === id);
+  return `<h2 class="sec">Progresia<small>Fiecare scară urcă o treaptă după o sesiune completă. Auriu: făcut; luminat: acum.</small></h2>
+    <section class="card lads">
+      ${ladder('Threshold Run', THR_STEPS.map((s) => `${s.reps}×${s.min}′${s.rest < 90 ? ' 60″' : ''}`), p.thrStep ?? 0, 'Hybrid365: o repetare în plus până la 6, apoi repetări de 7–8 minute, apoi pauză de 60 s.')}
+      ${ladder('Engine Builder', ENGINE_STEPS.map((s) => `${s.rounds}·${s.rest}″`), p.engStep ?? 0, 'Hybrid365: densitate mai mare, mai puțină pauză sau mai multe runde.')}
+      ${ladder('Power Finisher', POWER_STEPS.map((s) => `${s.min}′ ${s.throws}/${s.plyo}`), p.powStep ?? 0, 'Scara aplicației (Hybrid365 cere doar viteză mai mare): câte o repetare în plus, apoi 12 minute.')}
+      <div class="lad-runs">
+        ${runBar('Easy Run luni', blk('mon-run'), p)}
+        ${runBar('Easy Run joi', blk('thu-run'), p)}
+        ${runBar('Long Run', blk('sat-long'), p)}
+      </div>
+    </section>`;
+}
+
 export function planHtml(): string {
   const today = dayKey();
   const mon = weekStart(today);
@@ -96,7 +129,7 @@ export function planHtml(): string {
     const state = d.idx === tIdx ? 'Azi' : complete ? 'Gata' : d.idx < tIdx && n < d.blocks.length ? 'Rămas' : '';
     return `<li>
       <button class="dc ${d.idx === tIdx ? 'now' : ''} ${complete ? 'full' : ''}" style="--f:${(n / d.blocks.length).toFixed(3)}" data-a="${d.idx === tIdx ? 'tab' : 'day'}" data-k="today" data-i="${d.idx}">
-        <span class="dc-ph">${dayPoster(d.idx, 'sm')}</span>
+        <span class="dc-ph">${dayPoster(d.idx, 'sm', [...new Set(d.blocks.map((b) => blockIcon(b)))].slice(0, 4).map((n) => ic(n)).join(''))}</span>
         <span class="dc-head">
           <span class="dc-day">${esc(RO_DAYS[d.idx])}</span>
           ${state ? `<span class="dc-tag">${state}</span>` : ''}
@@ -121,5 +154,7 @@ export function planHtml(): string {
       }).join('')}</div>
     </section>
     ${cycleCard(today)}
+    ${progressionHtml()}
+    <h2 class="sec">Săptămâna</h2>
     <ol class="dcs">${days}</ol>`;
 }

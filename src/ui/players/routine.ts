@@ -24,8 +24,8 @@ class RoutinePlayer implements Player {
   sideSwitched = false;
   saved = false;
 
-  constructor(rid: string, block?: string) {
-    this.r = routineById(rid);
+  constructor(rid: string, block?: string, routine?: Routine) {
+    this.r = routine ?? routineById(rid);
     this.block = block;
     this.render();
   }
@@ -187,6 +187,6 @@ class RoutinePlayer implements Player {
   }
 }
 
-export function openRoutine(rid: string, block?: string): void {
-  mountPlayer(new RoutinePlayer(rid, block));
+export function openRoutine(rid: string, block?: string, routine?: Routine): void {
+  mountPlayer(new RoutinePlayer(rid, block, routine));
 }

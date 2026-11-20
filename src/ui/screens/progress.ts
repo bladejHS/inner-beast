@@ -4,6 +4,7 @@
 
 import { fireCalendar } from '../fire.ts';
 import { WEEK } from '../../data/plan.ts';
+import { CIRCUITS, type Race } from '../../data/races.ts';
 import { BW_SCHEMES, WORKOUTS } from '../../data/workouts.ts';
 import { activeStreak, allRecords, dayProgress, exerciseTrend, stalled, totals, weekDone, weekSince } from '../../logic/progress.ts';
 import { runAdvice, zone2 } from '../../logic/runlog.ts';
@@ -24,6 +25,34 @@ export function testValue(t: FitTest, v: number): string {
   return t.unit === 'time' ? mmss(v) : `${String(v).replace('.', ',')} ${UNIT_LABEL[t.unit]}`;
 }
 
+/** A circuit's card: the start, the best and the last time, the times drawing themselves, and each part of the last
+ *  run against the best run as bars that grow in. */
+function circuitCard(r: Race): string {
+  const runs = ctx.S.log.filter((e) => e.kind === 'race' && e.data.ev === r.id);
+  const best = runs.length ? runs.reduce((b, e) => (e.dur < b.dur ? e : b)) : undefined;
+  const last = runs[runs.length - 1];
+  const first = runs[0];
+  const gain = first && best && runs.length > 1 ? first.dur - best.dur : 0;
+  const segs = r.levels[0]!.segs;
+  const ls = (last?.data.splits as number[] | undefined) ?? [];
+  const bs = (best?.data.splits as number[] | undefined) ?? [];
+  const max = Math.max(1, ...ls, ...bs);
+  const parts = last ? `<div class="cc-parts">${segs.map((s, i) => {
+    const l = ls[i] ?? 0, b = bs[i] ?? 0;
+    return `<div class="cc-p" style="--i:${i}"><span>${esc(s.name)}</span><div class="cc-bars"><i class="cc-b best" style="--w:${(b / max).toFixed(3)}"></i><i class="cc-b last${l <= b ? ' pb' : ''}" style="--w:${(l / max).toFixed(3)}"></i></div><b>${raceTime(l)}</b></div>`;
+  }).join('')}<p class="small dim cc-key"><i class="best"></i>cel mai bun · <i class="last"></i>ultima încercare</p></div>` : '';
+  return `<section class="card cc">
+    <div class="cc-h"><div><b>${esc(r.name)}</b><span>${esc(r.sub)}</span></div><button class="btn sm" data-a="ch:go" data-k="${r.id}" data-i="0">Start</button></div>
+    ${runs.length ? `<div class="cc-stats">
+      <div><b class="num">${raceTime(best!.dur)}</b><span>cel mai bun</span></div>
+      <div><b class="num">${raceTime(last!.dur)}</b><span>ultima, ${shortDay(last!.date)}</span></div>
+      <div class="${gain > 0 ? 'up' : ''}"><b class="num">${gain > 0 ? `−${raceTime(gain)}` : runs.length}</b><span>${gain > 0 ? 'față de prima' : runs.length === 1 ? 'încercare' : 'încercări'}</span></div>
+    </div>
+    ${runs.length > 1 ? `<div class="cc-spark">${spark(runs.slice(-12).map((e) => Math.round(e.dur)), true)}</div>` : ''}
+    ${parts}` : `<ul class="cc-list">${segs.map((s) => `<li>${esc(s.name)}</li>`).join('')}</ul><p class="small dim">${esc(r.note)}</p>`}
+  </section>`;
+}
+
 function testsHtml(): string {
   const rows = TESTS.map((t) => {
     const r = ctx.S.tests[t.id] ?? [];
@@ -34,7 +63,9 @@ function testsHtml(): string {
       : `${t.what}. ${t.every}`;
     return `<li class="test-row"><div><b>${esc(t.name)}</b><span>${esc(info)}</span></div><button class="btn ghost sm" data-a="test" data-k="${t.id}" aria-label="Notează ${esc(t.name)}">Notează</button></li>`;
   });
-  return `${goalHtml(dayKey())}<h2 class="sec" id="tests">Teste<small>În săptămâna ușoară, odihnit: puterea întâi, alergarea la final</small></h2><ul class="hist tests">${rows.join('')}</ul>`;
+  return `<h2 class="sec first">Circuite<small>Pe timp. Bate-ți timpul; barele arată unde l-ai câștigat sau pierdut.</small></h2>
+    ${CIRCUITS.map(circuitCard).join('')}
+    ${goalHtml(dayKey())}<h2 class="sec" id="tests">Teste<small>În săptămâna ușoară, odihnit: puterea întâi, alergarea la final</small></h2><ul class="hist tests">${rows.join('')}</ul>`;
 }
 
 function entryLine(e: Entry, del = false): string {

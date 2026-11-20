@@ -10,9 +10,6 @@ import { pageHead, top } from './shared.ts';
 const sw = (k: string, on: boolean, label: string): string =>
   `<label class="switch"><input type="checkbox" data-a="set-bool" data-k="${k}" ${on ? 'checked' : ''} aria-label="${esc(label)}"><span></span></label>`;
 
-const step = (k: string, value: string, label: string): string =>
-  `<div class="stepper" role="group" aria-label="${esc(label)}"><button data-a="set-step" data-k="${k}" data-d="-1" aria-label="Scade">−</button><output>${esc(value)}</output><button data-a="set-step" data-k="${k}" data-d="1" aria-label="Crește">+</button></div>`;
-
 const row = (label: string, hint: string, ctl: string): string =>
   `<div class="field"><div class="field-l">${esc(label)}${hint ? `<small>${esc(hint)}</small>` : ''}</div>${ctl}</div>`;
 
@@ -37,22 +34,17 @@ export function settingsHtml(): string {
   const s = ctx.S.set;
   const op = openingMode();
   const mo = motionMode();
-  const mm = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
   return `${top(true)}
-    ${pageHead('Setări', 'Sunet, runde, memento-uri și datele tale.')}
+    ${pageHead('Setări', 'Sunet, puls, memento-uri și datele tale.')}
     <h2 class="sec first">Sunet și ecran</h2>
     ${row('Sunete', 'Gong, bipuri, semnale', sw('sound', s.sound, 'Sunete'))}
-    ${row('Voce', 'Combinațiile strigate în engleză, indicațiile în română', sw('voice', s.voice, 'Voce'))}
+    ${row('Voce', 'Indicațiile din timpul timerelor', sw('voice', s.voice, 'Voce'))}
     ${row('Vibrații', 'La schimbarea rundelor; pe iPhone browserul nu le permite', sw('vibrate', s.vibrate, 'Vibrații'))}
     ${row('Gongul trece de modul silențios', 'iPhone: sună și cu butonul de silențios pornit, dar poate opri muzica din alte aplicații', sw('bellThroughMute', s.bellThroughMute, 'Gongul trece de modul silențios'))}
     ${row('Ecranul rămâne aprins', 'Cât timp rulează un timer', sw('wake', s.wake, 'Ecran aprins'))}
-    ${row('Animații', mo === 'lite' ? 'Reduse: fără zgârieturi între ecrane, fără explozii la runde' : 'Complete: zgârieturi între ecrane, runde care lovesc, scântei la final', `<div class="chips">${[['full', 'Complete'], ['lite', 'Reduse']].map(([v, l]) => `<button class="chip" aria-pressed="${mo === v}" data-a="set-motion" data-v="${v}">${l}</button>`).join('')}</div>`)}
-    ${row('Intro la pornire', 'Automat: complet la prima pornire și după o versiune nouă, altfel doar lupul, o clipă', `<div class="chips">${[['auto', 'Automat'], ['full', 'Mereu'], ['short', 'Scurt'], ['off', 'Oprit']].map(([v, l]) => `<button class="chip" aria-pressed="${op === v}" data-a="set-opening" data-v="${v}">${l}</button>`).join('')}</div>`)}
-    <h2 class="sec">Runde</h2>
-    ${row('Combinații strigate', 'În rundele de shadow, sac și coardă', `<div class="chips">${[0, 10, 15, 20, 30].map((v) => `<button class="chip" aria-pressed="${s.callEvery === v}" data-a="set-call" data-v="${v}">${v ? `${v} s` : 'Oprit'}</button>`).join('')}</div>`)}
-    ${row('Pauză la rundele de 3 minute', 'Cartea nu o precizează; standardul în box e 1 minut', step('rest3', mm(s.rest3), 'Pauză 3 minute'))}
-    ${row('Pauză la intervalele de 1 minut', 'Timerul rapid de Wall Sit / Jumping Squats', step('rest1', mm(s.rest1), 'Pauză 1 minut'))}
-    <h2 class="sec">Puls<small>Pentru vâslitul de marți și alergarea de duminică, cu centura de puls.</small></h2>
+    ${row('Animații', mo === 'lite' ? 'Reduse: fără dungi între ecrane și fără scântei' : 'Complete: dungi de viteză între ecrane, scântei la final', `<div class="chips">${[['full', 'Complete'], ['lite', 'Reduse']].map(([v, l]) => `<button class="chip" aria-pressed="${mo === v}" data-a="set-motion" data-v="${v}">${l}</button>`).join('')}</div>`)}
+    ${row('Intro la pornire', 'Automat: complet la prima pornire și după o versiune nouă, altfel doar blazonul, o clipă', `<div class="chips">${[['auto', 'Automat'], ['full', 'Mereu'], ['short', 'Scurt'], ['off', 'Oprit']].map(([v, l]) => `<button class="chip" aria-pressed="${op === v}" data-a="set-opening" data-v="${v}">${l}</button>`).join('')}</div>`)}
+    <h2 class="sec">Puls<small>Pentru alergările în zona 2, pragul de marți și intervalele de miercuri, cu centura de puls.</small></h2>
     ${row('Pulsul maxim', `Zona 2, ușor: ${zone2(s.hrMax)[0]}–${zone2(s.hrMax)[1]} bpm. Estimat pentru 23 de ani (208 − 0,7 × vârsta); dacă centura ți-a arătat un maxim mai mare, pune-l pe acela.`, `<div class="stepper" role="group" aria-label="Pulsul maxim"><button data-a="set-hr" data-d="-1" aria-label="Scade">−</button><output>${s.hrMax}</output><button data-a="set-hr" data-d="1" aria-label="Crește">+</button></div>`)}
     <h2 class="sec">Memento-uri în calendar<small>O aplicație web nu poate trimite notificări programate, mai ales pe iPhone. Pune următoarele 4 săptămâni din plan și zilele pozelor de progres în calendarul telefonului, cu alarmă.</small></h2>
     <div class="ics">

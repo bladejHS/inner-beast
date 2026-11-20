@@ -15,6 +15,8 @@ class RacePlayer implements Player {
   title: string;
   timer = 0;
   result: { dur: number; pb?: number; splits: number[] } | null = null;
+  /** The splits of the best time before this one, to compare part by part. */
+  bestSplits?: number[];
 
   constructor(run: RaceRun) {
     this.run = run;
@@ -42,7 +44,13 @@ class RacePlayer implements Player {
     const el = ovEl();
     if (this.result) {
       const { dur, pb, splits } = this.result;
-      const rows = splits.map((s, i) => `<li><div><b>${esc(this.level.segs[i].name)}</b><span>${raceTime(s)}</span></div></li>`).join('');
+      const prev = this.bestSplits;
+      const rows = splits.map((s, i) => {
+        const p = prev?.[i];
+        const d = p ? s - p : 0;
+        const delta = p ? ` <em class="${d <= 0 ? 'faster' : 'slower'}">${d <= 0 ? '−' : '+'}${raceTime(Math.abs(d))}</em>` : '';
+        return `<li><div><b>${esc(this.level.segs[i].name)}</b><span>${raceTime(s)}${delta}</span></div></li>`;
+      }).join('');
       el.innerHTML = chrome(this.title, `<h1 class="pl-h done-h">Finish.</h1>
         <p class="lead">${raceTime(dur)}${pb === undefined ? ', primul tău timp la acest nivel.' : dur < pb ? `, record nou. Înainte: ${raceTime(pb)}.` : `. Recordul rămâne ${raceTime(pb)}.`}</p>
         <ul class="hist">${rows}</ul><div style="height:16px"></div><button class="btn" data-a="p:close">Închide</button>`);
@@ -95,6 +103,8 @@ class RacePlayer implements Player {
     window.clearInterval(this.timer);
     const dur = run.splits.reduce((s, x) => s + x, 0);
     const pb = bestTime(ctx.S.log, run.ev, run.lvl);
+    const bestRun = ctx.S.log.filter((e) => e.kind === 'race' && e.data.ev === run.ev && e.data.lvl === run.lvl).sort((a, b) => a.dur - b.dur)[0];
+    this.bestSplits = Array.isArray(bestRun?.data.splits) ? (bestRun!.data.splits as number[]) : undefined;
     addEntry(makeEntry({ kind: 'race', name: `${raceById(run.ev)?.name}: ${level.name}`, dur, data: { ev: run.ev, lvl: run.lvl, level: LEVEL_NAMES[run.lvl], splits: run.splits } }));
     ctx.S.race = null;
     save();

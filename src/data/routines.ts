@@ -297,6 +297,18 @@ export const ROUTINES: Routine[] = [
   },
 ];
 
+/** The Power Finisher at a step of its ladder (POWER_STEPS in plan.ts): `min` minutes, alternating the two moves. */
+export function powerRoutine(s: { min: number; throws: number; plyo: number }): Routine {
+  const base = ROUTINES.find((r) => r.id === 'emom-power')!;
+  return {
+    ...base,
+    intro: `EMOM ${s.min} minute, alternant: în minutele impare ${s.throws} Med Ball Chest Throws, în cele pare ${s.plyo} Plyo Push Ups. La începutul fiecărui minut faci repetările, restul minutului e pauză. Viteză și explozie, nu oboseală.`,
+    moves: Array.from({ length: s.min }, (_, i) => (i % 2 === 0
+      ? { name: `Min ${i + 1}: ${s.throws} Med Ball Chest Throws`, sec: 60, cue: `Minut impar: ${s.throws} aruncări de la piept, cât de exploziv poți. Ce rămâne din minut e pauză.` }
+      : { name: `Min ${i + 1}: ${s.plyo} Plyo Push Ups`, sec: 60, cue: `Minut par: ${s.plyo} flotări pliometrice, mâinile se desprind de sol. Ce rămâne din minut e pauză.` })),
+  };
+}
+
 export function routineById(id: string): Routine {
   return ROUTINES.find((r) => r.id === id) ?? ROUTINES[0];
 }

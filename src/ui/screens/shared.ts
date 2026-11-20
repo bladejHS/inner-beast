@@ -1,8 +1,9 @@
 // Pieces shared by the screens: header, page title, section switcher, the day's rounds, starting and checking off a block.
 
+import { powerRoutine } from '../../data/routines.ts';
 import { wolfArt } from '../rankart.ts';
 import { focusCombos, usesLegs } from '../../data/combos.ts';
-import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks, type RestKey } from '../../data/plan.ts';
+import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks, type RestKey, POWER_STEPS } from '../../data/plan.ts';
 import { activeStreak, cycleAt, deloadOn, growMinutes, weekSince, fullSessions } from '../../logic/progress.ts';
 import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
 import { zone2, zoneHard, zoneThr } from '../../logic/runlog.ts';
@@ -103,7 +104,8 @@ export function planPicks(today = dayKey()): Settings & Picks {
   const c = cycleAt(S.cycle.start, today, S.cycle.repeats);
   // the Hybrid365 progressions move one step per full session; a lighter week holds them
   const thrStep = fullSessions(S.log, 'tue-thr'), engStep = S.log.filter((e) => e.block === 'wed-cond' && e.kind === 'row').length;
-  picksVal = { ...S.set, cycle: c?.id, cycleWeek: c?.week, grown, thrStep, engStep };
+  const powStep = S.log.filter((e) => e.block === 'fri-emom' && !e.data.deload).length;
+  picksVal = { ...S.set, cycle: c?.id, cycleWeek: c?.week, grown, thrStep, engStep, powStep };
   return picksVal;
 }
 
@@ -126,7 +128,7 @@ export function startBlock(raw: Block): void {
     case 'workout':
       return openWorkout(b.workout ?? 'upper', b.id);
     case 'routine':
-      return openRoutine(b.routine ?? 'mobility', b.id);
+      return openRoutine(b.routine ?? 'mobility', b.id, b.routine === 'emom-power' ? powerRoutine(POWER_STEPS[Math.min(POWER_STEPS.length - 1, planPicks().powStep ?? 0)]!) : undefined);
     case 'run':
       return openRun({ mode: 'run', block: b.id, target: (b.min ?? 20) * 60 });
     case 'walk':

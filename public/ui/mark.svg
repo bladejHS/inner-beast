@@ -1,30 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 240 240"><g><g transform="translate(120 120) scale(0.98) translate(-120 -121)"><defs>
-    <linearGradient id="m13rim" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#f3f1ea"/><stop offset=".45" stop-color="#9b9890"/><stop offset="1" stop-color="#3c3a36"/></linearGradient>
-    <linearGradient id="m13au" x1="0" y1="0" x2=".2" y2="1"><stop offset="0" stop-color="#d4e1f2"/><stop offset=".26" stop-color="#99b5d9"/><stop offset=".6" stop-color="#7897c0"/><stop offset=".85" stop-color="#446896"/><stop offset="1" stop-color="#26374c"/></linearGradient>
-    <linearGradient id="m13aul" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#bed1ea"/><stop offset="1" stop-color="#7897c0"/></linearGradient>
-    <linearGradient id="m13aud" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#446896"/><stop offset="1" stop-color="#26374c"/></linearGradient>
-    <linearGradient id="m13bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#c9c8c2"/><stop offset="1" stop-color="#55534e"/></linearGradient>
-    <linearGradient id="m13fo" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#5587c8"/><stop offset=".55" stop-color="#86abdb"/><stop offset="1" stop-color="#b9cfeb" stop-opacity=".9"/></linearGradient>
-    <linearGradient id="m13fi" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#dbe6f4"/><stop offset="1" stop-color="#aac2e2"/></linearGradient>
-    <radialGradient id="m13hot" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff"/><stop offset=".25" stop-color="#c8d9f0"/><stop offset=".55" stop-color="#6591ca" stop-opacity=".6"/><stop offset="1" stop-color="#446896" stop-opacity="0"/></radialGradient>
-    <radialGradient id="m13fire" cx=".5" cy=".6" r=".55"><stop offset=".55" stop-color="#b7d2f6"/><stop offset=".78" stop-color="#639eec"/><stop offset="1" stop-color="#1964c6" stop-opacity="0"/></radialGradient>
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 240 240"><g><g transform="translate(120 120) scale(0.98) translate(-120 -120)"><defs>
+    <linearGradient id="m13rim" x1="0" y1="0" x2=".6" y2="1"><stop offset="0" stop-color="#e6eef8"/><stop offset=".4" stop-color="#7f9cc4"/><stop offset=".75" stop-color="#34506f"/><stop offset="1" stop-color="#9db8dc"/></linearGradient>
+    <radialGradient id="m13disc" cx=".5" cy=".35" r=".7"><stop offset="0" stop-color="#1a2a40"/><stop offset=".55" stop-color="#0c1320"/><stop offset="1" stop-color="#05070c"/></radialGradient>
+    <linearGradient id="m13la" x1="0" y1="0" x2=".3" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".35" stop-color="#cfe0f6"/><stop offset="1" stop-color="#86a9d6"/></linearGradient>
+    <linearGradient id="m13lb" x1="0" y1="0" x2=".2" y2="1"><stop offset="0" stop-color="#a9c4e8"/><stop offset="1" stop-color="#557bb0"/></linearGradient>
+    <linearGradient id="m13ra" x1="1" y1="0" x2=".7" y2="1"><stop offset="0" stop-color="#7c9ccb"/><stop offset="1" stop-color="#2f4b72"/></linearGradient>
+    <linearGradient id="m13rb" x1="1" y1="0" x2=".8" y2="1"><stop offset="0" stop-color="#4b6b98"/><stop offset="1" stop-color="#1b2c45"/></linearGradient>
+    <linearGradient id="m13in" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9fbde6"/></linearGradient>
+    <linearGradient id="m13hz" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9fc0ec" stop-opacity="0"/><stop offset=".5" stop-color="#ffffff"/><stop offset="1" stop-color="#9fc0ec" stop-opacity="0"/></linearGradient>
+    <linearGradient id="m13ray" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#bcd3f2" stop-opacity="0"/></linearGradient>
+    <radialGradient id="m13glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff"/><stop offset=".2" stop-color="#d7e6fa"/><stop offset=".5" stop-color="#7fa6dc" stop-opacity=".55"/><stop offset="1" stop-color="#3f6aa8" stop-opacity="0"/></radialGradient>
+    <radialGradient id="m13aura" cx=".5" cy=".5" r=".5"><stop offset=".6" stop-color="#9cc0f2" stop-opacity=".7"/><stop offset=".82" stop-color="#4f86d6" stop-opacity=".45"/><stop offset="1" stop-color="#1f4f96" stop-opacity="0"/></radialGradient>
+    <clipPath id="m13cl"><circle cx="120" cy="120" r="104"/></clipPath>
     <filter id="m13gl" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2"/></filter>
-    <filter id="m13big" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="10"/></filter>
+    <filter id="m13big" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="12"/></filter>
   </defs>
   
-  <polygon points="120,9.88 201.6,38.44 213.84,124.12 120,232.24 26.16,124.12 38.4,38.44" fill="#000" opacity=".55" filter="url(#m13gl)" transform="translate(0 6)"/>
-  <polygon points="120,12 200,40 212,124 120,230 28,124 40,40" fill="#1b1b1b"/>
-  <polygon points="120,12 200,40 212,124 120,230 28,124 40,40" fill="none" stroke="url(#m13rim)" stroke-width="14" stroke-linejoin="miter"/>
+  <circle cx="120" cy="126" r="108" fill="#000" opacity=".5" filter="url(#m13gl)"/>
+  <circle cx="120" cy="120" r="112" fill="url(#m13disc)"/>
+  <circle cx="120" cy="120" r="108" fill="none" stroke="url(#m13rim)" stroke-width="10"/>
   
   
-  <g filter="url(#m13gl)" opacity="0.5"><circle cx="120" cy="114" r="26" fill="url(#m13hot)"/></g>
-  <path d="M120 26C129 44 141 55 140 76C146 70 148 62 147 52C159 65 161 84 153 99C147 109 135 113 120 113C105 113 93 109 87 99C79 84 81 65 93 52C92 62 94 70 100 76C99 55 111 44 120 26Z" fill="url(#m13fo)"/>
+  <g clip-path="url(#m13cl)">
+    
+    <polygon points="120,50 34,190 80,190 120,122 160,190 206,190" fill="#bcd3f2"/>
+    <polygon points="120,132 92,182 104,182 120,160 136,182 148,182" fill="#ffffff" opacity="1"/>
+    
+  </g>
   
-  <rect x="90" y="111" width="60" height="16" rx="2" fill="url(#m13bar)"/>
+  <g filter="url(#m13gl)" opacity="0.6"><circle cx="120" cy="50" r="16" fill="url(#m13glow)"/></g>
+  <path d="M120 30L124.4 45.6L140 50L124.4 54.4L120 70L115.6 54.4L100 50L115.6 45.6Z" fill="#ffffff"/>
   
-  <rect x="56" y="58" width="42" height="124" rx="4" fill="#7897c0"/><rect x="142" y="58" width="42" height="124" rx="4" fill="#7897c0"/>
-  
-  <g filter="url(#m13gl)" opacity=".9"><circle cx="120" cy="117" r="7" fill="#ecf3fc"/></g>
-  <path d="M92 190L120 212L148 190" fill="none" stroke="#7897c0" stroke-width="12" stroke-linecap="square" stroke-linejoin="miter"/>
   
   </g></g></svg>

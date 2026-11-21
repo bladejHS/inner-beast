@@ -35,7 +35,7 @@ export function top(back: boolean | Tab = false): string {
       ? `<button class="back" data-a="tab" data-k="${back}" aria-label="Înapoi la ${esc(TAB_NAME[back] ?? back)}">${ic('back')}<span>${esc(TAB_NAME[back] ?? 'Înapoi')}</span></button>`
       : back
         ? `<button class="back" data-a="back" aria-label="Înapoi">${ic('back')}<span>Înapoi</span></button>`
-        : `<div class="brand"><img class="brand-mark" src="${BASE}ui/mark.svg" alt="" width="30" height="30"><span>Hybrid <b>Forge</b></span></div>`;
+        : `<div class="brand"><img class="brand-mark" src="${BASE}ui/mark.svg" alt="" width="30" height="30"><span>Zen<b>ith</b></span></div>`;
   const run = streak > 1 ? `<button class="streak${streak >= 7 ? ' hot' : ''}" data-a="tab" data-k="progress" aria-label="${streak} zile active la rând">${ic('claw')}<b class="num">${streak}</b><span>zile</span></button>` : '';
   return `<header class="top">${left}<div class="top-r">${run}<button class="icon-btn" data-a="settings" aria-label="Setări">${ic('gear')}</button></div></header>`;
 }
@@ -294,7 +294,7 @@ export function importHealthSteps(): void {
 /** How to set up the Shortcut once. */
 export function healthHow(): void {
   openSheet(`<h2>Pașii din Sănătate</h2>
-    <p class="small">iPhone-ul numără pașii toată ziua, cu cipul de mișcare, și îi pune în aplicația Sănătate. E cel mai precis număr pe care îl poți avea, mai precis decât orice aplicație web. O aplicație web nu poate citi Sănătate direct, așa că o scurtătură îl copiază, iar Hybrid Forge îl lipește.</p>
+    <p class="small">iPhone-ul numără pașii toată ziua, cu cipul de mișcare, și îi pune în aplicația Sănătate. E cel mai precis număr pe care îl poți avea, mai precis decât orice aplicație web. O aplicație web nu poate citi Sănătate direct, așa că o scurtătură îl copiază, iar Zenith îl lipește.</p>
     <h3>O singură dată: scurtătura</h3>
     <ol class="how-list">
       <li>Deschide aplicația <b>Scurtături</b> și apasă <b>+</b>. Numește-o „Pași azi”.</li>
@@ -306,7 +306,7 @@ export function healthHow(): void {
     <h3>Zilnic</h3>
     <ol class="how-list">
       <li>Rulezi „Pași azi”: din widget, din Siri sau cu <b>Atingere pe spate</b> (Configurări → Accesibilitate → Atingere → Atingere pe spate → dublu → „Pași azi”).</li>
-      <li>Deschizi Hybrid Forge și apeși <b>Din Sănătate</b>, apoi <b>Lipește</b>.</li>
+      <li>Deschizi Zenith și apeși <b>Din Sănătate</b>, apoi <b>Lipește</b>.</li>
     </ol>
     <p class="small dim">Numărul înlocuiește pașii de azi; peste 10.000 bifează plimbarea de miercuri.</p>
     <button class="btn" data-a="m:close">Am înțeles</button>`, { 'm:close': () => closeSheet() });

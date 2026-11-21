@@ -68,5 +68,5 @@ export function settingsHtml(): string {
     </ul>
     <h2 class="sec">Versiunea<small>Aplicația se actualizează singură când o deschizi cu internet. Dacă vezi totuși ceva vechi, apasă butonul: datele tale rămân.</small></h2>
     <button class="btn ghost sm" style="width:100%" data-a="force-update">${ic('refresh')}Actualizează acum</button>
-    <p class="small dim" style="text-align:center;margin-top:28px">HYBRID FORGE 4.0 · versiunea ${__BUILD__}</p>`;
+    <p class="small dim" style="text-align:center;margin-top:28px">ZENITH 5.0 · versiunea ${__BUILD__}</p>`;
 }

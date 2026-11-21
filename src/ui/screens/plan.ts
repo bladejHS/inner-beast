@@ -123,7 +123,7 @@ function target(raw: Block, picks: Picks): string {
  * The day's title card (2026-11-21, the user: "ceva mai spectaculos"): the day's number huge in gold outline behind
  * the athlete, the discipline and its intensity, the Hybrid365 coaching line with its last words in molten gold, the
  * week's real targets as metal tags. Today burns (live badge, moving light, a gold edge running round the card);
- * a finished day gets the FORGED stamp.
+ * a finished day gets the SUMMIT stamp.
  */
 function dayBanner(d: Day, picks: Picks, today: boolean, full: boolean): string {
   const [a, b] = DAY_LINE[d.idx] ?? DAY_LINE[0]!;
@@ -137,7 +137,7 @@ function dayBanner(d: Day, picks: Picks, today: boolean, full: boolean): string 
     <canvas class="hero-cv" data-kind="${DAY_KIND[d.idx] ?? 'run'}"${today ? '' : ' data-still="1"'}></canvas>
     <i class="po-sheen"></i>
     <p class="db-k"><b>Day ${n}</b><span>${esc(DAY_TAG[d.idx] ?? '')}</span>${today ? '<em>Azi</em>' : ''}</p>
-    ${full ? '<i class="db-stamp">Forged</i>' : ''}
+    ${full ? '<i class="db-stamp">Summit</i>' : ''}
     <p class="db-l"><span>${esc(a)}</span><b>${esc(b)}</b></p>
     <p class="db-h"><span>Intensitate</span>${bars}</p>
     <p class="db-t">${tags.map((t) => `<span>${esc(t)}</span>`).join('')}</p>

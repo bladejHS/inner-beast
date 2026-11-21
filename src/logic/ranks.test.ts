@@ -9,7 +9,7 @@ test('the rank climbs at each threshold', () => {
   assert.equal(rankOf(10).rank.name, 'Athlete');
   assert.equal(rankOf(39).next?.name, 'Hybrid');
   assert.equal(rankOf(39).into, 29);
-  assert.equal(rankOf(500).rank.name, 'Forged');
+  assert.equal(rankOf(500).rank.name, 'Zenith');
   assert.equal(rankOf(500).next, null);
   assert.equal(RANKS.length, 5);
 });

@@ -1,4 +1,4 @@
-// Ranks (2026-11-15, renamed 2026-11-20 with HYBRID FORGE): the sessions add up to a rank, from Rookie to Forged. Only training counts: walks, showers and
+// Ranks (2026-11-15, renamed 2026-11-20 with HYBRID FORGE): the sessions add up to a rank, from Rookie to Zenith. Only training counts: walks, showers and
 // the breathing sessions are kept in the log but do not raise the rank.
 
 import type { Entry, Kind } from './store.ts';
@@ -10,7 +10,7 @@ export const RANKS: Rank[] = [
   { name: 'Athlete', min: 10, motto: 'Zece sesiuni: nu mai e o încercare, e un obicei.' },
   { name: 'Hybrid', min: 40, motto: 'Patruzeci de sesiuni. Alergi și ridici la fel de bine.' },
   { name: 'Elite', min: 100, motto: 'O sută. Puțini ajung aici.' },
-  { name: 'Forged', min: 200, motto: 'Două sute. Nu te mai antrenezi pentru formă: ești forjat.' },
+  { name: 'Zenith', min: 200, motto: 'Două sute. Ai ajuns pe vârf: ăsta e zenitul tău.' },
 ];
 
 const TRAINING: ReadonlySet<Kind> = new Set<Kind>(['rounds', 'amrap', 'workout', 'routine', 'run', 'row', 'coach', 'race', 'cardio']);

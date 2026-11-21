@@ -50,6 +50,17 @@ export function heroBand(kind: 'fight' | 'bag' | 'push' | 'pull' | 'run' | 'calm
   return `<div class="hero-stage band" aria-hidden="true"><img class="hero-wolf" src="${wolfArt()}" alt="" width="680" height="801" decoding="async"><canvas class="hero-cv" data-kind="${kind}"></canvas></div>`;
 }
 
+/**
+ * A tab's masthead (2026-11-21, ZENITH layout): the living picture runs full-bleed under the header, the title, its
+ * star line and its one line of text sit over the picture's foot. Replaces pageHead + heroBand on the five tabs.
+ */
+export function masthead(title: string, sub: string, kind: Parameters<typeof heroBand>[0], kicker = 'Zenith'): string {
+  return `<header class="mast">
+    <div class="mast-stage" aria-hidden="true"><img class="hero-wolf" src="${wolfArt()}" alt="" width="680" height="801" decoding="async"><canvas class="hero-cv" data-kind="${kind}"></canvas><i class="mast-hz"></i></div>
+    ${pageHead(title, sub, kicker)}
+  </header>`;
+}
+
 /** The big slanted title of a tab, with one line under it. The title rises out of its own box on entry. */
 export function pageHead(title: string, sub = '', kicker = '', size: '' | 'sm' = ''): string {
   return `<div class="ph${size ? ` ph-${size}` : ''}">${kicker ? `<p class="ph-k">${kicker}</p>` : ''}<h1 class="ph-t"><span>${esc(title)}</span></h1><i class="ph-blade" aria-hidden="true"></i>${sub ? `<p class="ph-s">${sub}</p>` : ''}</div>`;

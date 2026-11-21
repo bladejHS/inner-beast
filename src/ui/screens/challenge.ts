@@ -6,7 +6,7 @@ import { bestTime } from '../../logic/race.ts';
 import { dayKey, esc, raceTime, shortDay } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
-import { pageHead, segBar, segOf, top, heroBand } from './shared.ts';
+import { segBar, segOf, top, masthead } from './shared.ts';
 import { challengesHtml, dopaCard, nofapCard } from './discipline.ts';
 
 const hm = (min: number): string => (min < 60 ? `${min} min` : `${Math.floor(min / 60)} h${min % 60 ? ` ${min % 60} min` : ''}`);
@@ -37,8 +37,7 @@ export function challengeHtml(): string {
         ? `<p class="lead dim">Disciplina e un mușchi. Îl antrenezi zilnic, ca pe restul.</p>${nofapCard(today)}${dopaCard(today)}`
         : racesSeg();
   return `${top()}
-    ${pageHead('Provocări', 'Curse simulate, provocări de 30 de zile și disciplină.')}
-    ${heroBand('deadlift')}
+    ${masthead('Provocări', 'Curse simulate, provocări de 30 de zile și disciplină.', 'deadlift')}
     ${segBar('Secțiuni Provocări', CHALLENGE_SEGS, seg)}
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }

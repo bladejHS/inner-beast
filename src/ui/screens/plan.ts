@@ -7,7 +7,7 @@ import { addDays, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { campaignSvg } from '../campaign.ts';
-import { blockIcon, blockMinutes, pageHead, planPicks, top, heroBand } from './shared.ts';
+import { blockIcon, blockMinutes, planPicks, top, masthead } from './shared.ts';
 
 function weekRange(mon: string): string {
   const end = addDays(mon, 6);
@@ -206,9 +206,10 @@ export function planHtml(): string {
     </li>`;
   }).join('');
   return `${top()}
-    ${pageHead('Planul', `Săptămâna ${weekRange(mon)}`)}
-    ${heroBand('bench')}
+    ${masthead('Planul', `Săptămâna ${weekRange(mon)}`, 'bench')}
     <p class="obj-plate"><b>Obiectiv</b><span>SRI · Brigada Antiteroristă</span></p>
+    <h2 class="sec first">Săptămâna<small>Glisează prin zile; azi e în centru.</small></h2>
+    <ol class="dcs" aria-label="Zilele săptămânii">${days}</ol>
     <section class="plan-sum">
       <div class="ps-n"><b class="num" data-count="${full}">${full}</b><span>din 7 zile</span></div>
       <div class="ps-n"><b class="num" data-count="${blocksDone}">${blocksDone}</b><span>din ${totalBlocks} blocuri</span></div>
@@ -218,7 +219,5 @@ export function planHtml(): string {
       }).join('')}</div>
     </section>
     ${cycleCard(today)}
-    ${progressionHtml()}
-    <h2 class="sec">Săptămâna</h2>
-    <ol class="dcs">${days}</ol>`;
+    ${progressionHtml()}`;
 }

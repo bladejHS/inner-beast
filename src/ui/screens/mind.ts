@@ -8,7 +8,7 @@ import { ctx } from '../ctx.ts';
 import { art } from '../art.ts';
 import { ic } from '../icons.ts';
 import { habitCard } from './today.ts';
-import { pageHead, segBar, segOf, top, heroBand } from './shared.ts';
+import { pageHead, segBar, segOf, top, masthead } from './shared.ts';
 
 const TOOLS = [
   { k: 'lab', icon: 'wind', name: 'Breathwork Lab', sub: 'Reset, Tactical, Recovery, Advanced' },
@@ -86,8 +86,7 @@ export function mindHtml(): string {
   const seg = segOf('mind', MIND_SEGS.map(([k]) => k));
   const body = seg === 'mental' ? mentalSeg() : seg === 'book' ? bookSeg() : toolsSeg();
   return `${top()}
-    ${pageHead('Minte', 'Respirație, frig, disciplină și de ce-ul tău.')}
-    ${heroBand('calm')}
+    ${masthead('Minte', 'Respirație, frig, disciplină și de ce-ul tău.', 'calm')}
     ${segBar('Secțiuni Minte', MIND_SEGS, seg)}
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }

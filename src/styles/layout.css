@@ -1,0 +1,111 @@
+/* ZENITH · layout (2026-11-21; the user: "vreau și lucrurile cum sunt așezate în aplicație să fie modificate,
+   ceva special și spectaculos"). How the screens are put together:
+   - every tab opens on a masthead: its living picture full-bleed under the header, the title set over the foot of the
+     picture on a horizon of light (shared.ts masthead);
+   - Azi opens on the day itself: the picture full-bleed, the mission's name over it, a floating glass HUD with the day's
+     numbers, then the start capsule; the week is a row of orbit dials; the sessions climb a lit route;
+   - Plan opens on the week as a carousel of day cards that you swipe, today in the centre, the side cards turned away;
+   - Progres and Minte lay their numbers and tools out as a bento: one big piece, the rest around it. */
+
+/* ---------- the masthead ---------- */
+.mast { position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: clamp(330px, 50svh, 450px); margin: calc(-1 * var(--top-h)) calc(-1 * var(--gutter)) 22px; padding: 0 var(--gutter) 8px; isolation: isolate; }
+.mast-stage { position: absolute; inset: 0 0 -10px; z-index: -1; overflow: hidden; border-radius: 0 0 44px 44px;
+  background: radial-gradient(60% 55% at 70% 45%, rgba(var(--glow-2), .3), transparent 70%), radial-gradient(90% 50% at 50% 0, rgba(130, 170, 235, .16), transparent 70%), linear-gradient(180deg, #0c1628, #070b14 70%, #05070c);
+  -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent); mask-image: linear-gradient(180deg, #000 72%, transparent); }
+/* a canvas has no stretch: its width and height are given, or it grows with its own pixels */
+.mast-stage .hero-cv { left: 34%; right: auto; top: calc(var(--top-h) - 6px); bottom: auto; width: 70%; height: calc(74% - var(--top-h) + 6px); }
+.mast-stage .hero-wolf { left: auto; right: -14%; top: 4%; width: 74%; transform: none; opacity: .12; }
+.mast-hz { position: absolute; left: 0; right: 0; bottom: 30%; height: 1px; background: linear-gradient(90deg, transparent, rgba(var(--glow), .5) 30%, #fff 62%, rgba(var(--glow), .5) 85%, transparent); box-shadow: 0 0 18px 2px rgba(var(--glow), .45); }
+.mast .ph { margin: 0; }
+.mast .ph-t { font-size: clamp(40px, 12.5vw, 72px); text-shadow: none; }
+.mast .ph-s { color: var(--ink-2); text-shadow: 0 1px 10px rgba(0, 0, 0, .9); }
+
+/* ---------- Azi: the day full-bleed ---------- */
+.mission.az { margin-top: calc(-1 * var(--top-h)); padding-bottom: 4px; }
+.mission.az::after { display: none; }
+.az-stage { height: clamp(380px, 60svh, 540px); margin: 0 calc(-1 * var(--gutter)); border: 0; border-radius: 0 0 44px 44px; box-shadow: 0 40px 70px -40px rgba(var(--glow-2), .7);
+  background: radial-gradient(60% 55% at 50% 38%, rgba(var(--glow-2), .32), transparent 70%), radial-gradient(90% 40% at 50% 0, rgba(130, 170, 235, .16), transparent 70%), linear-gradient(180deg, #0c1628, #070b14 75%, #05070c); }
+.az-stage .hero-cv { top: calc(var(--top-h) + 6px); bottom: auto; height: calc(66% - var(--top-h) - 6px); }
+.az-stage .hero-wolf { top: 6%; width: 78%; opacity: .12; }
+.az-stage .mast-hz { bottom: 34%; }
+.az-stage::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 46%; z-index: 1; background: linear-gradient(180deg, transparent, rgba(5, 7, 12, .7) 55%, rgba(5, 7, 12, .92)); pointer-events: none; }
+.az .bc-c.tl, .az .bc-c.tr { top: calc(var(--top-h) + 4px); }
+.az .bc-c.bl, .az .bc-c.br { display: none; }
+.az .bc-bug { top: calc(var(--top-h) + 12px); }
+.az .wm { top: calc(var(--top-h) + 8px); }
+.az-head { position: relative; z-index: 3; margin: -138px 0 0; }
+.az-head .ms-k { margin-bottom: 10px; }
+.az-head .ms-t { font-size: clamp(38px, min(12.5vw, 7.4svh), 74px); }
+/* the HUD: the day's numbers on one floating glass capsule */
+.az-hud { position: relative; z-index: 3; justify-content: space-between; gap: 10px; margin: 18px 0 14px; padding: 10px 18px 10px 10px; border: 1px solid transparent; border-radius: 30px;
+  background: var(--glass) padding-box, linear-gradient(180deg, rgba(20, 30, 48, .86), rgba(9, 14, 23, .9)) padding-box, var(--glass-edge) border-box; box-shadow: var(--shadow); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.az-hud .gauge { width: 60px; }
+.az-hud .ms-m { align-items: center; text-align: center; }
+.az-hud .ms-m + .ms-m { padding-left: 16px; box-shadow: inset 1px 0 0 var(--hair-2); }
+.az .segs { margin-bottom: 16px; }
+
+/* the week as orbit dials: each day a ring that fills with what is done */
+.wk { gap: 4px; }
+.wk-d { min-height: 0; aspect-ratio: 1; padding: 0; gap: 0; border: 0; border-radius: 50%; background: none !important; box-shadow: none !important; overflow: visible; font-size: 10.5px; }
+.wk-d::before { content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(var(--acc-hi) calc(var(--f, 0) * 360deg), rgba(255, 255, 255, .09) 0);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px)); mask: radial-gradient(closest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px)); }
+.wk-d::after { content: ''; position: absolute; inset: 5px; z-index: -1; border-radius: 50%; background: rgba(255, 255, 255, .03); }
+.wk-d i { display: none; }
+.wk-d.full::before { background: #fff; box-shadow: 0 0 12px rgba(255, 255, 255, .6); }
+.wk-d.full::after { background: radial-gradient(circle, rgba(var(--glow), .25), transparent 70%); }
+.wk-d.now { color: #fff; }
+.wk-d.now::after { background: radial-gradient(circle, rgba(var(--glow), .35), rgba(var(--glow), .06) 70%); box-shadow: 0 0 20px -4px rgba(var(--glow), .9); }
+.wk-d.on { color: var(--on-lit); }
+.wk-d.on::after { inset: 4px; background: var(--lit); box-shadow: 0 0 18px -4px rgba(var(--glow), .9); }
+.wk-d.on span { color: var(--on-lit); }
+
+/* the sessions climb a route: a line of light joins the discs, lit up to where you are */
+.rds { --rail: 34px; }
+.rd { overflow: visible; }
+.rd::after { content: ''; position: absolute; left: calc(var(--rail) - 1px); top: 58px; bottom: -14px; width: 2px; z-index: 0; border-radius: 1px; background: linear-gradient(180deg, rgba(var(--glow), .35), rgba(var(--glow), .08)); }
+.rd:last-child::after { display: none; }
+.rd.done::after { background: linear-gradient(180deg, #fff, rgba(var(--glow), .5)); box-shadow: 0 0 8px rgba(255, 255, 255, .5); }
+.rd-node { z-index: 1; }
+
+/* ---------- Plan: the week as a carousel ---------- */
+.dcs { display: grid; grid-auto-flow: column; grid-auto-columns: min(86%, 420px); gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
+  margin: 0 calc(-1 * var(--gutter)) 10px; padding: 6px var(--gutter) 22px; scroll-padding: 0 var(--gutter); }
+.dcs::-webkit-scrollbar { display: none; }
+.dcs { align-items: start; }
+.dcs > li { scroll-snap-align: center; display: flex; }
+/* a button centres its content: the cards stack theirs from the top, the bar sits at the foot */
+.dcs .dc { display: flex; flex-direction: column; justify-content: flex-start; content-visibility: visible; }
+.dcs .dc > * { flex: none; }
+.dcs .dc-bar { margin-top: auto; }
+.dcs .dc-list { margin-bottom: 16px; }
+/* the side cards turn away, the one in the centre comes forward */
+@supports (animation-timeline: view(inline)) {
+  @media (prefers-reduced-motion: no-preference) {
+    html:not([data-motion='lite']) .dcs > li { animation: card-focus linear both; animation-timeline: view(inline); }
+    html:not([data-motion='lite']) .dcs .dc, html:not([data-motion='lite']) .dcs .dc.now { animation-timeline: auto; }
+    html:not([data-motion='lite']) .dcs .dc:not(.now) { animation: none; }
+  }
+}
+@keyframes card-focus { 0% { opacity: .45; transform: perspective(900px) rotateY(18deg) scale(.88); } 50% { opacity: 1; transform: none; } 100% { opacity: .45; transform: perspective(900px) rotateY(-18deg) scale(.88); } }
+@media (min-width: 980px) { .dcs { grid-auto-columns: 380px; } }
+
+/* ---------- Progres: the numbers as a bento ---------- */
+.stats { grid-auto-flow: dense; }
+.stats > .stat:first-child { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr; align-items: end; column-gap: 16px; padding: 18px 20px;
+  background: radial-gradient(120% 140% at 0 0, rgba(var(--glow-2), .3), transparent 60%) padding-box, var(--glass-fill) padding-box, linear-gradient(160deg, rgba(220, 234, 252, .7), rgba(111, 151, 208, .2)) border-box; }
+.stats > .stat:first-child b { font-size: 76px; }
+.stats > .stat:first-child span { margin: 0 0 8px; font-size: 14px; }
+
+/* ---------- Minte: the tools as a bento ---------- */
+.tiles > .tile:first-child { grid-column: 1 / -1; min-height: 170px; justify-content: flex-end;
+  background: radial-gradient(90% 120% at 100% 0, rgba(var(--glow-2), .4), transparent 60%) padding-box, var(--glass-fill) padding-box, linear-gradient(160deg, rgba(220, 234, 252, .7), rgba(111, 151, 208, .2)) border-box; }
+.tiles > .tile:first-child svg { position: absolute; right: 18px; top: 18px; width: 64px; height: 64px; opacity: .9; }
+.tiles > .tile:first-child b { font-size: 20px; }
+.tiles > .tile:first-child span { margin-top: 0; font-size: 14px; }
+
+/* ---------- Provocări: the races as big plates with their number ---------- */
+.more { counter-reset: race; }
+.more > .more-r, .more > :not(.more-r) > .more-r { counter-increment: race; }
+.more .more-r { position: relative; min-height: 92px; overflow: hidden; }
+.more .more-r::before { content: counter(race, decimal-leading-zero); position: absolute; right: 44px; top: 50%; transform: translateY(-50%); font: 800 expanded 64px/1 var(--font); color: transparent; -webkit-text-stroke: 1px rgba(var(--glow), .22); pointer-events: none; }

@@ -30,7 +30,7 @@ const HERO_KIND = ['bench', 'run', 'pull', 'deadlift', 'press', 'run', 'calm'];
 
 /** The stage as a fight-night broadcast (2026-11-15): the LIVE bug, the corner brackets, a light sweep, and the lower
  *  third with the day's main event: its longest block. Decoration only; the same facts are in the rows below. */
-function broadcast(day: Day, n: number, total: number, tag: string): string {
+function broadcast(day: Day, n: number, total: number, tag: string, third = true): string {
   const main = [...day.blocks].sort((a, b) => blockMinutes(b) - blockMinutes(a))[0];
   if (!main) return '';
   const m = liveBlock(main);
@@ -39,11 +39,11 @@ function broadcast(day: Day, n: number, total: number, tag: string): string {
     <i class="bc-c tl"></i><i class="bc-c tr"></i><i class="bc-c bl"></i><i class="bc-c br"></i><i class="bc-sweep"></i>
     ${wolfMood(day.idx)}
     <p class="bc-bug"><span class="bc-live${cleared ? ' off' : ''}">${cleared ? 'Final' : 'Live'}</span><b>${esc(tag)}</b></p>
-    <div class="bc-l3"><span class="bc-tag">${cleared ? 'Gata' : 'Key session'}</span><span class="bc-name"><b>${esc(m.name)}</b><small>${esc(m.dose)}</small></span></div>
+    ${third ? `<div class="bc-l3"><span class="bc-tag">${cleared ? 'Gata' : 'Key session'}</span><span class="bc-name"><b>${esc(m.name)}</b><small>${esc(m.dose)}</small></span></div>` : ''}
   </div>`;
 }
 
-export function dayBody(day: Day, today: string, kicker: string): string {
+export function dayBody(day: Day, today: string, kicker: string, notes = ''): string {
   const done = weekDone(ctx.S.log, weekStart(today), weekSince(ctx.S.cycle, weekStart(today)));
   const n = dayProgress(day, done);
   const total = day.blocks.length;
@@ -56,15 +56,18 @@ export function dayBody(day: Day, today: string, kicker: string): string {
   const starts = until > 6 ? shortDay(ctx.S.cycle.start) : until > 0 ? RO_DAYS[weekdayIdx(ctx.S.cycle.start)] : '';
   const cyc = light ? ['Ușoară', ctx.S.easy === today ? 'ziua' : 'săptămâna'] : c ? [`${c.id} · ${c.week}/4`, 'ciclul'] : starts ? [starts, 'începe ciclul'] : ['—', 'ciclul'];
   return `
-    <section class="mission hero${n === total ? ' cleared' : ''}" aria-label="Misiunea zilei">
-      <p class="ms-k"><span>Today's Mission</span><b>${esc(kicker)}</b></p>
-      <h1 class="ms-t"><span>${esc(day.title)}</span></h1>
-      <div class="hero-stage" aria-hidden="true">
+    <section class="mission hero az${n === total ? ' cleared' : ''}" aria-label="Misiunea zilei">
+      <div class="hero-stage az-stage" aria-hidden="true">
         <img class="hero-wolf" src="${wolfArt()}" alt="" width="680" height="801" decoding="async">
         <canvas class="hero-cv" data-kind="${HERO_KIND[day.idx] ?? 'run'}"></canvas>
-        ${broadcast(day, n, total, c ? `Ciclul ${c.id} · ${c.week}/4` : RO_DAYS[day.idx])}
+        ${broadcast(day, n, total, c ? `Ciclul ${c.id} · ${c.week}/4` : RO_DAYS[day.idx], false)}
+        <i class="mast-hz"></i>
       </div>
-      <div class="ms-row">
+      <div class="az-head">
+        <p class="ms-k"><span>Today's Mission</span><b>${esc(kicker)}</b></p>
+        <h1 class="ms-t"><span>${esc(day.title)}</span></h1>
+      </div>
+      <div class="ms-row az-hud">
         ${gauge(total ? n / total : 0, `<b class="num">${n}</b><small>/${total}</small>`, `day-${day.idx}`, 'ms-g')}
         <div class="ms-m"><b class="num">~${mins}</b><span>minute</span></div>
         <div class="ms-m"><b>${cyc[0]}</b><span>${cyc[1]}</span></div>
@@ -74,6 +77,7 @@ export function dayBody(day: Day, today: string, kicker: string): string {
         ? `<button class="cta" data-a="start" data-b="${next.id}"><span class="cta-ic">${ic('play')}</span><span class="cta-l"><small>Începe</small><b>${esc(liveBlock(next).name)}</b></span><i class="cta-sheen" aria-hidden="true"></i></button>`
         : `<p class="ms-done">${ic('claw')}<span>Misiune încheiată</span></p>`}
     </section>
+    ${notes}
     ${weekdayIdx(today) === day.idx ? rankPlate() : ''}
     ${weekHead(today)}
     ${weekStrip(today, day.idx)}
@@ -252,12 +256,7 @@ export function todayHtml(): string {
   const idx = weekdayIdx(today);
   const day = WEEK[idx];
   return `${top()}
-    ${draftCard()}
-    ${kneeCard(today)}
-    ${introCard()}
-    ${deloadCard(today)}
-    ${repeatCard(today)}
-    ${dayBody(day, today, prettyDay(today))}
+    ${dayBody(day, today, prettyDay(today), `${draftCard()}${kneeCard(today)}${introCard()}${deloadCard(today)}${repeatCard(today)}`)}
     ${habitCard() || fuelRow(today) ? `<h2 class="sec">Zilnic</h2>${habitCard()}${fuelRow(today)}` : ''}
     ${whyCard()}
     ${readyCard(today, idx)}`;

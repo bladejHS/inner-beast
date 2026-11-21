@@ -4,6 +4,7 @@ import './styles/components.css';
 import './styles/screens.css';
 import './styles/players.css';
 import './styles/shows.css';
+import './styles/layout.css';
 import { publishPlan } from './logic/bridge.ts';
 import { blockById, WEEK, type Block } from './data/plan.ts';
 import { rowChallenge } from './data/row.ts';
@@ -191,6 +192,10 @@ function render(enter: Enter = ''): void {
   moveRings(app, !!enter);
   fitTitles(app);
   mountHero(app);
+  // Plan's week carousel opens on today, in the centre (2026-11-21, ZENITH layout)
+  const week = app.querySelector<HTMLElement>('.dcs');
+  const now = week?.querySelector<HTMLElement>('.dc.now')?.parentElement;
+  if (week && now) week.scrollLeft = now.offsetLeft - (week.clientWidth - now.offsetWidth) / 2;
   if (ctx.tab === 'today' && !views.length) chapterCheck();
   if (enter) for (const el of app.querySelectorAll<HTMLElement>('[data-count]')) countUp(el, 0, Number(el.dataset.count) || 0, 800);
   if (keepId) {

@@ -52,7 +52,8 @@ function habitsBlock(): string {
   const today = dayKey();
   const active = ctx.S.habits.find((h) => !h.archived);
   const streak = active ? habitStreak(active, today) : 0;
-  const old = ctx.S.habits.filter((h) => h.archived);
+  const old = ctx.S.habits.filter((h) => h.archived && !h.dropped);
+  if (!active) return `<p class="small dim">Nicio rutină zilnică. Adaugi una dacă vrei: un singur lucru mic, făcut în fiecare zi.</p><div class="btn-row"><button class="btn sm" data-a="hab-new">Adaugă o rutină zilnică</button></div>${old.length ? `<p class="small dim" style="margin-top:12px">Obiceiuri construite: ${old.map((h) => esc(h.name)).join(', ')}.</p>` : ''}`;
   return `${habitCard()}
     <ol class="ticks" style="margin-top:10px">${HABIT_STEPS.map(([d, t]) => `<li style="${streak >= d ? 'color:var(--white)' : 'color:var(--dim)'}"><b>${d} zile.</b> ${esc(t)}</li>`).join('')}</ol>
     <div class="btn-row"><button class="btn ghost sm" data-a="hab-edit">Schimbă rutina</button>${streak >= 28 ? '<button class="btn sm" data-a="hab-new">Adaugă un obicei nou</button>' : ''}</div>

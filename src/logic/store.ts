@@ -41,6 +41,8 @@ export interface Habit {
   start: string;
   days: Record<string, number>;
   archived?: boolean;
+  /** Taken off the daily list at the user's request (2026-11-21: push-ups); kept only as history, not as a built habit. */
+  dropped?: boolean;
   /** A number that grows: `start` in the first 7 days from `from`, then `step` more every 7 days (user, 2026-11-07:
    *  push-ups from 10, 3 more each week). */
   prog?: { start: number; step: number; from: string };
@@ -226,8 +228,9 @@ export const DEFAULT_SETTINGS: Settings = {
   wedCond: 'a',
 };
 
-export function defaultHabit(today: string): Habit {
-  return { id: 'pushups50', name: 'Push-ups', type: 'count', goal: 10, start: today, days: {}, prog: { start: 10, step: 3, from: today } };
+/** No daily routine by default since 2026-11-21 (the user: "pe zilnic scoate push ups"); the user adds one if they want. */
+export function defaultHabits(): Habit[] {
+  return [];
 }
 
 export function freshState(today: string = dayKey()): State {
@@ -237,7 +240,7 @@ export function freshState(today: string = dayKey()): State {
     log: [],
     lvl: {},
     emom: { ...EMOM_START },
-    habits: [defaultHabit(today)],
+    habits: defaultHabits(),
     wins: [],
     why: { victim: '', winner: '', drive: '' },
     sleep: {},

@@ -434,13 +434,12 @@ export function habitDone(h: Habit, day: string): boolean {
 
 /** The push-up routine grows from 10, 3 more each week (asked on 2026-11-07). Turns the active push-up habit into
  *  that once; true when it changed something, so the caller saves. Another routine is left as it is. */
-export function growPushups(habits: Habit[], today: string): boolean {
-  const h = habits.find((x) => !x.archived);
-  if (!h || h.prog || h.type !== 'count' || !/push|flot/i.test(h.name)) return false;
-  h.prog = { start: 10, step: 3, from: today };
-  h.goal = 10;
-  h.name = 'Push-ups';
-  return true;
+/** 2026-11-21, the user: "pe zilnic scoate push ups". The active push-ups routine leaves the daily list once;
+ *  its days stay saved. True when something changed. */
+export function dropPushups(habits: Habit[]): boolean {
+  let changed = false;
+  for (const h of habits) if (!h.archived && /push|flot/i.test(h.name)) { h.archived = true; h.dropped = true; changed = true; }
+  return changed;
 }
 
 export function habitStreak(h: Habit, today: string): number {

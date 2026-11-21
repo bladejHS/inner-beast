@@ -2,8 +2,8 @@ import './beast.css';
 import { publishPlan } from './logic/bridge.ts';
 import { blockById, WEEK, type Block } from './data/plan.ts';
 import { rowChallenge } from './data/row.ts';
-import { defaultHabit, freshState, normalize, type Habit } from './logic/store.ts';
-import { growPushups, habitGoal } from './logic/progress.ts';
+import { defaultHabits, freshState, normalize, type Habit } from './logic/store.ts';
+import { dropPushups, habitGoal } from './logic/progress.ts';
 import { chapterCheck, ranksSheet } from './ui/show.ts';
 import { forceUpdate } from './ui/update.ts';
 import { wolfBadge } from './ui/rankart.ts';
@@ -340,9 +340,9 @@ function habitSheet(fresh: boolean): void {
   const step = fresh ? 0 : h?.prog?.step ?? 0;
   openSheet(
     `<h2>${fresh ? 'Obicei nou' : 'Rutina zilei'}</h2>
-    <p class="dim">Un singur lucru bun pentru tine, atât de simplu încât îl faci zilnic. Flotările pornesc de la 10 și cresc cu 3 în fiecare săptămână.</p>
+    <p class="dim">Un singur lucru bun pentru tine, atât de simplu încât îl faci zilnic.</p>
     <label class="small" for="hb-name" style="font-weight:700">Ce faci zilnic</label>
-    <input type="text" id="hb-name" value="${esc(name)}" placeholder="ex. 50 Push-ups, 10 minute de citit" maxlength="60">
+    <input type="text" id="hb-name" value="${esc(name)}" placeholder="ex. 10 minute de citit, 2 L de apă" maxlength="60">
     <div class="field"><div class="field-l">Număr de atins<small>Gol = doar bifezi. Cu creștere: numărul din prima săptămână.</small></div><input type="number" id="hb-goal" inputmode="numeric" value="${type === 'count' ? goal : ''}" style="width:100px" min="1" max="1000"></div>
     <div class="field"><div class="field-l">Crește în fiecare săptămână cu<small>0 = numărul rămâne fix</small></div><input type="number" id="hb-step" inputmode="numeric" value="${step || ''}" placeholder="0" style="width:100px" min="0" max="100"></div>
     <div style="height:12px"></div>
@@ -749,7 +749,7 @@ function act(a: string, el: HTMLElement): void {
     case 'reset':
       ask('Ștergi tot?', 'Istoricul, rutina, victoriile și setările dispar de pe telefon. Nu se poate anula.', 'Șterge tot', () => {
         ctx.S = freshState();
-        ctx.S.habits = [defaultHabit(dayKey())];
+        ctx.S.habits = defaultHabits();
         save();
         views.length = 0;
         ctx.tab = 'today';
@@ -891,7 +891,7 @@ window.addEventListener('popstate', () => {
 });
 
 // the push-up routine grows from 10, 3 more each week (asked on 2026-11-07): kept from the first day it is seen
-if (growPushups(ctx.S.habits, dayKey())) save();
+if (dropPushups(ctx.S.habits)) save();
 
 render();
 

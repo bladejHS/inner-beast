@@ -12,8 +12,8 @@ import { CHALLENGES, challengeDays } from '../data/challenges.ts';
 import { addDays, dayKey, inWeek, mmss, num, paceStr, weekStart, weekdayIdx } from './util.ts';
 import { Clock, breath478Seq, burstAt, doneSec, locate, phaseStart, roundsSeq, showerSeq, totalSec } from './seq.ts';
 import { Track, haversine, routePath, simplify } from './geo.ts';
-import { activeStreak, advise, allRecords, bestSet, amrapBest, amrapUp, cycleAt, cycleStartFor, daysOff, repeatMonday, weekSince, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, growMinutes, growPushups, setKgAdvice, lastSame, crossKg, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
-import { defaultHabit, freshState, makeEntry, normalize, type Habit } from './store.ts';
+import { activeStreak, advise, allRecords, bestSet, amrapBest, amrapUp, cycleAt, cycleStartFor, daysOff, repeatMonday, weekSince, dayComplete, deloadDue, deloadOn, emomAdvice, emomNext, growMinutes, dropPushups, setKgAdvice, lastSame, crossKg, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, lastExercise, lighter, loadable, stalled, totals, variationPath, weekDone } from './progress.ts';
+import { defaultHabits, freshState, makeEntry, normalize, type Habit } from './store.ts';
 import { LAB, labSeq } from './breathlab.ts';
 import { roundThemes } from '../data/combos.ts';
 import { WARMUP_SEC } from '../data/plan.ts';
@@ -253,9 +253,9 @@ test('weekly completion, streaks and habit milestones', () => {
   assert.equal(activeStreak(s.log, '2026-10-27'), 3);
   assert.equal(activeStreak(s.log, '2026-10-28'), 3);
   assert.equal(activeStreak(s.log, '2026-10-30'), 0);
-  const h = s.habits[0];
+  const h: Habit = { id: 'h', name: 'Citit', type: 'count', goal: 10, start: '2026-10-20', days: {} };
   for (let i = 0; i < 8; i++) h.days[addDays('2026-10-20', i)] = 50;
-  h.days['2026-10-28'] = 5; // under the default target of 10 push-ups
+  h.days['2026-10-28'] = 5; // under the target of 10
   assert.equal(habitStreak(h, '2026-10-28'), 8);
   assert.equal(habitMilestone(8), 7);
   assert.equal(habitMilestone(30), 28);
@@ -284,7 +284,7 @@ test('normalize repairs partial or broken state', () => {
   assert.equal(n.set.sound, false);
   assert.equal(n.set.callEvery, 15);
   assert.equal(n.log.length, 1);
-  assert.equal(n.habits[0].goal, 10);
+  assert.deepEqual(n.habits, []);
   assert.equal(normalize(null).v, 1);
 });
 
@@ -828,11 +828,14 @@ test('the runs: on foot by default, the rower when picked; the threshold pulse; 
   assert.deepEqual([c('d').name, c('d').rounds, c('d').work, c('d').restSec], ['Hill Repeats', 8, 60, 90]);
   assert.deepEqual([c('e').name, c('e').rounds, c('e').work, c('e').restSec], ['30/30s', 16, 30, 30]);
 });
-test('daily routine: push-ups from 10, three more every week, and the old routine turns into it once', () => {
-  const h: Habit = { id: 'p', name: '50 Push-ups', type: 'count', goal: 50, start: '2026-10-20', days: { '2026-11-06': 50 } };
-  assert.equal(growPushups([h], '2026-11-07'), true);
-  assert.deepEqual([h.name, h.goal, h.prog], ['Push-ups', 10, { start: 10, step: 3, from: '2026-11-07' }]);
-  assert.equal(growPushups([h], '2026-11-08'), false); // once only
+test('daily routine: push-ups leave the daily list once, a growing count still climbs every week', () => {
+  const p: Habit = { id: 'p', name: 'Push-ups', type: 'count', goal: 10, start: '2026-10-20', days: { '2026-11-06': 50 }, prog: { start: 10, step: 3, from: '2026-11-07' } };
+  assert.equal(dropPushups([p]), true);
+  assert.deepEqual([p.archived, p.dropped, p.days['2026-11-06']], [true, true, 50]);
+  assert.equal(dropPushups([p]), false); // once only
+  assert.deepEqual(defaultHabits(), []);
+  assert.deepEqual(freshState('2026-11-07').habits, []);
+  const h: Habit = { id: 'w', name: 'Apă', type: 'count', goal: 10, start: '2026-10-20', days: { '2026-11-06': 50 }, prog: { start: 10, step: 3, from: '2026-11-07' } };
   assert.deepEqual(['2026-11-07', '2026-11-13', '2026-11-14', '2026-11-21', '2026-12-05'].map((d) => habitGoal(h, d)), [10, 10, 13, 16, 22]);
   assert.deepEqual([habitWeek(h, '2026-11-07'), habitWeek(h, '2026-11-14')], [1, 2]);
   h.days['2026-11-14'] = 12;
@@ -841,9 +844,8 @@ test('daily routine: push-ups from 10, three more every week, and the old routin
   assert.equal(habitDone(h, '2026-11-14'), true);
   assert.equal(habitDone(h, '2026-11-06'), true); // the day before: 50 done, more than the new target
   const read: Habit = { id: 'r', name: 'Citit', type: 'count', goal: 10, start: '2026-11-01', days: {} };
-  assert.equal(growPushups([read], '2026-11-07'), false);
+  assert.equal(dropPushups([read]), false);
   assert.equal(habitGoal(read, '2026-12-01'), 10);
-  assert.deepEqual(defaultHabit('2026-11-07').prog, { start: 10, step: 3, from: '2026-11-07' });
 });
 
 test('a missed week repeats in the loop instead of moving on, and only from its Monday', () => {

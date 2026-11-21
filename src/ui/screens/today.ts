@@ -109,7 +109,7 @@ function fuelRow(today: string): string {
 
 export function habitCard(compact = false): string {
   const today = dayKey();
-  const h = ctx.S.habits.find((x) => !x.archived) ?? ctx.S.habits[0];
+  const h = ctx.S.habits.find((x) => !x.archived);
   if (!h) return '';
   const val = h.days[today] ?? 0;
   const ok = habitDone(h, today);
@@ -258,9 +258,7 @@ export function todayHtml(): string {
     ${deloadCard(today)}
     ${repeatCard(today)}
     ${dayBody(day, today, prettyDay(today))}
-    <h2 class="sec">Zilnic</h2>
-    ${habitCard()}
-    ${fuelRow(today)}
+    ${habitCard() || fuelRow(today) ? `<h2 class="sec">Zilnic</h2>${habitCard()}${fuelRow(today)}` : ''}
     ${whyCard()}
     ${readyCard(today, idx)}`;
 }

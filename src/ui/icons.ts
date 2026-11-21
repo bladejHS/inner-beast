@@ -1,6 +1,6 @@
 // Line icons, 24 × 24, drawn with currentColor.
 
-// Shapes with class "f" fill in when their tab is the current one (see .nav in beast.css).
+// Shapes with class "f" fill in when their tab is the current one (see .nav in src/styles/base.css).
 const P: Record<string, string> = {
   today: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
   plan: '<path class="f" d="M3.5 6.5h17v14h-17z"/><path d="M3.5 10.5h17M8 3.5v5M16 3.5v5"/><path d="M8 15.4l2.6 2.4 5.3-5.2"/>',

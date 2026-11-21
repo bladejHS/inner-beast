@@ -108,7 +108,7 @@ function sparks(c: HTMLCanvasElement, host: HTMLElement): void {
   const H = (c.height = Math.round(innerHeight * dpr));
   const cx = W / 2;
   const cy = H * 0.36;
-  const COLORS = ['#ff4433', '#99bdec', '#c3daf8', '#d10f1d', '#e4eefa'];
+  const COLORS = ['#ffffff', '#99bdec', '#c3daf8', '#6f97d0', '#e4eefa'];
   const ps = Array.from({ length: 120 }, () => {
     const a = Math.random() * Math.PI * 2;
     const v = (220 + Math.random() * 760) * dpr;

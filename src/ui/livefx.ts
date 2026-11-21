@@ -186,7 +186,7 @@ function frame(now: number): void {
     p.vy += 500 * dpr * dt;
     p.x += p.vx * dt;
     p.y += p.vy * dt;
-    c.fillStyle = hot ? `rgba(20,4,8,${(1 - p.age / p.life).toFixed(3)})` : `rgba(255,${200 - Math.round(p.age / p.life * 120)},120,${(1 - p.age / p.life).toFixed(3)})`;
+    c.fillStyle = hot ? `rgba(20,4,8,${(1 - p.age / p.life).toFixed(3)})` : `rgba(${200 - Math.round(p.age / p.life * 80)},${220 - Math.round(p.age / p.life * 60)},255,${(1 - p.age / p.life).toFixed(3)})`;
     c.fillRect(p.x, p.y, 1.6 * dpr, 1.6 * dpr);
   }
   c.globalCompositeOperation = 'source-over';

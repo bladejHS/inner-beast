@@ -1,0 +1,104 @@
+/* ZENITH, the design system (2026-11-21). Written from scratch; it replaces the old beast.css and its eight layers of
+   themes (Broadcast, Arena, Fight Night, Hybrid, Forge...). The user: "schimbă absolut tot ce ține de design / temă,
+   de la 0", in a warm blue that does not tire the eyes.
+
+   The idea: a night ascent. The app is a clear night sky over a horizon: deep blue-black, a few stars, a soft aurora
+   at the top. Everything you read floats on it as glass lit from above. One light, ice blue, marks what you can press
+   and what is live; white light marks what is done or won. Titles are set wide like a mission display (Saira
+   expanded), numbers tall and narrow like an instrument readout (Saira condensed), labels small and spaced. Shapes are
+   soft: panels of 24 px, pills for everything you press. The bullet, the section mark and the records carry the star
+   of the mark. Motion rises and settles; nothing flashes red, nothing is slanted.
+
+   Files: tokens (this), base (page, sky, type, frame, bars), components (controls and surfaces), screens (the five
+   tabs), players (the full-screen timers), shows (celebrations, entries, motion settings, desktop).
+   The @font-face rules live in index.html so the opening uses the same font. */
+
+:root {
+  color-scheme: dark;
+
+  /* the sky, from the top of the page down; surfaces are glass over it */
+  --bg: #05070c;
+  --sky-1: #0b1322;
+  --sky-2: #070b14;
+  --n1: #0a0f18;
+  --n2: #0f1622;
+  --n3: #162031;
+  --n4: #203048;
+  --n5: #2e405e;
+  --edge: #6d7f9c;
+
+  /* text: white with the faintest warmth, then three greys of the night; all pass 4.5:1 on --n3 */
+  --ink: #f2f4f8;
+  --ink-2: #d3dae6;
+  --label: #a3b1c6;
+  --mute: #9aa8bd;
+  --faint: #7a889e;
+  --disabled: #4a5770;
+
+  /* the light: ice blue, warm enough to be soft; lit = the fill of what you press (dark letters on it) */
+  --acc: #8fb3e6;
+  --acc-hi: #b9d3f5;
+  --acc-lo: #5a82bd;
+  --acc-deep: #1b2c46;
+  --acc-text: #acc8f0;
+  --lit: linear-gradient(135deg, #cfe1f8 0%, #9dbfec 38%, #6f97d0 100%);
+  --on-lit: #06101f;
+  --star: #ffffff;
+
+  /* states */
+  --warn: #f3b1a8;
+  --warn-bg: rgba(243, 177, 168, .1);
+  --ok: #bfe3d4;
+
+  /* glass */
+  --glass: linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, 0) 42%);
+  --glass-fill: linear-gradient(180deg, rgba(16, 24, 38, .78), rgba(9, 14, 23, .84));
+  --glass-edge: linear-gradient(180deg, rgba(196, 218, 248, .36), rgba(120, 152, 204, .1) 38%, rgba(120, 152, 204, .05));
+  --hair: rgba(169, 199, 240, .2);
+  --hair-2: rgba(169, 199, 240, .1);
+  --shadow: 0 26px 52px -32px rgba(0, 0, 0, .95);
+
+  /* the RGB of the light, for glows; main.ts reads --glow and --glow-2 for the living pictures */
+  --glow: 185, 211, 245;
+  --glow-2: 111, 151, 208;
+  --glow-d: 27, 44, 70;
+
+  /* the timer's phases */
+  --ph-rest: radial-gradient(120% 70% at 50% -10%, #12213a, #070b14 60%, #04060a);
+  --ph-work: radial-gradient(130% 80% at 50% -10%, #3a68a8, #1b3762 45%, #0a1428);
+  --ph-cold: radial-gradient(130% 80% at 50% -10%, #2b7d93, #12384a 50%, #061820);
+  --ph-easy: radial-gradient(130% 80% at 50% -10%, #1b2c46, #0b1220 60%);
+  --ph-last: linear-gradient(180deg, #e4eefb, #b9d3f5);
+  --ph-final: #ffffff;
+
+  /* the 12-week loop's chapters on the campaign map */
+  --ch-A: #8fb3e6;
+  --ch-B: #b9d3f5;
+  --ch-C: #d7e6fa;
+
+  /* shape */
+  --r: 24px;
+  --r-md: 18px;
+  --r-sm: 14px;
+  --pill: 999px;
+
+  /* type: one family, four widths */
+  --font: 'Saira', 'Arial Narrow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* frame */
+  --gutter: 16px;
+  --top-h: calc(58px + env(safe-area-inset-top));
+
+  /* motion */
+  --e-out: cubic-bezier(.16, 1, .3, 1);
+  --e-in: cubic-bezier(.7, 0, .84, 0);
+  --e-snap: cubic-bezier(.7, 0, .2, 1);
+  --spring: cubic-bezier(.34, 1.36, .64, 1);
+  --spring-hard: cubic-bezier(.3, 1.8, .5, 1);
+}
+@supports (animation-timing-function: linear(0, 1)) {
+  :root {
+    --spring: linear(0, 0.032, 0.115, 0.228, 0.356, 0.487, 0.612, 0.726, 0.824, 0.905, 0.969, 1.017, 1.05, 1.07, 1.081, 1.083, 1.08, 1.073, 1.063, 1.053, 1.042, 1.031, 1.022, 1.014, 1.007, 1.002, 0.998, 0.996, 0.994, 0.993, 0.993, 0.993, 1);
+    --spring-hard: linear(0, 0.061, 0.217, 0.425, 0.65, 0.861, 1.037, 1.165, 1.243, 1.274, 1.265, 1.228, 1.173, 1.111, 1.051, 1, 0.962, 0.937, 0.926, 0.926, 0.934, 0.949, 0.965, 0.982, 0.997, 1.008, 1.016, 1.02, 1.021, 1.019, 1.015, 1.011, 1);
+  }
+}

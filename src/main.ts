@@ -1,4 +1,9 @@
-import './beast.css';
+import './styles/tokens.css';
+import './styles/base.css';
+import './styles/components.css';
+import './styles/screens.css';
+import './styles/players.css';
+import './styles/shows.css';
 import { publishPlan } from './logic/bridge.ts';
 import { blockById, WEEK, type Block } from './data/plan.ts';
 import { rowChallenge } from './data/row.ts';
@@ -142,7 +147,7 @@ function syncNav(): void {
   }
   if (cur !== navOn) {
     nav.dataset.on = cur;
-    // Minte is the cool zone: its action colour is ice, not red (beast.css)
+    // Minte is the cool zone: its action colour is ice, not red (src/styles)
     if (cur === 'mind') document.documentElement.dataset.zone = 'cool';
     else delete document.documentElement.dataset.zone;
     // the wolf roars when Azi is picked again
@@ -171,8 +176,8 @@ function render(enter: Enter = ''): void {
     clearTimeout(enterTimer);
     enterTimer = window.setTimeout(() => app.classList.remove('enter-tab', 'enter-seg'), 1100);
   }
-  // each emphasis of the 12-week loop has its colour (beast.css, html[data-cycle]); before the loop, A
-  // the light of the hour on Azi's stage: cold in the morning, embers in the evening, darker at night (beast.css)
+  // each emphasis of the 12-week loop has its colour (html[data-cycle]; the styles no longer recolour by it); before the loop, A
+  // the light of the hour on Azi's stage: cold in the morning, embers in the evening, darker at night (src/styles)
   const hr = new Date().getHours();
   document.documentElement.dataset.tod = hr >= 5 && hr < 10 ? 'morning' : hr < 17 && hr >= 10 ? 'day' : hr >= 17 && hr < 22 ? 'evening' : 'night';
   // since the Hybrid365 plan (2026-11-20) one colour, the yellow: the loop no longer recolours the app

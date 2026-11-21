@@ -2052,20 +2052,154 @@ html:not([data-motion='lite']) #app.enter-seg .cc-b, html:not([data-motion='lite
 .faster { font-style: normal; color: var(--red-hot); font-weight: 800; }
 .slower { font-style: normal; color: var(--faint); }
 
-/* ---------- 8.5 (2026-11-21): the day banners in Plan, specific and motivational ----------
-   The day's coaching line from its Hybrid365 slide in heavy caps (the last words in gold), the week's real targets as
-   small plates, the day's discipline drawn in gold on the right (moving on today, still on the other days). */
-.dc-ph.dc-ban { height: 112px; margin: 0 -16px 12px; }
+/* ---------- 8.5 (2026-11-21, v2): the day banners in Plan as title cards ----------
+   The user: "ceva mai spectaculos". The day's number huge in a gold outline behind the athlete, the discipline and how
+   hard the day hits, the Hybrid365 coaching line with its last words in molten gold, the week's targets as metal tags.
+   Today burns: a live badge, a swaying light, the molten words flowing and a gold edge running round the card. */
+.dc-ph.dc-ban { height: 206px; margin: 0 -16px 14px; }
 .dc-ph.dc-ban::after { display: none; }
-.dban { position: absolute; inset: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 9px; padding: 0 16px;
-  background: radial-gradient(70% 130% at 88% 60%, rgba(var(--glow-2), .2), transparent 60%), linear-gradient(100deg, #101010, #0a0a0a 55%, #121110);
-  border-bottom: 1px solid rgba(var(--glow-2), .35); }
-.dban::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(-62deg, rgba(240, 239, 234, .02) 0 1px, transparent 1px 7px); pointer-events: none; }
-.dban .hero-cv { position: absolute; right: 0; top: 0; bottom: 0; left: auto; width: 46%; height: 100%; -webkit-mask-image: linear-gradient(90deg, transparent, #000 35%); mask-image: linear-gradient(90deg, transparent, #000 35%); }
-.db-l { position: relative; z-index: 1; max-width: 66%; margin: 0; font: 900 extra-condensed 27px/.92 var(--font); letter-spacing: .01em; text-transform: uppercase; color: var(--ink); text-wrap: balance; text-shadow: 0 2px 12px rgba(0, 0, 0, .8); }
-.db-l b { color: var(--red-hot); }
-.db-t { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 5px; max-width: 72%; margin: 0; }
-.db-t span { padding: 4px 7px 3px; border: 1px solid rgba(var(--glow-2), .45); border-radius: 4px; background: rgba(7, 7, 7, .72); font: 800 semi-condensed 10.5px/1 var(--font); letter-spacing: .06em; color: var(--ink-2); white-space: nowrap; }
-.dban.today { border-bottom-color: var(--red-hot); background: radial-gradient(70% 130% at 88% 60%, rgba(var(--glow), .3), transparent 62%), linear-gradient(100deg, #141310, #0a0a0a 55%, #15130e); }
-.dban.today .db-t span:first-child { border-color: var(--red-hot); color: var(--red-hot); }
-html:not([data-motion='lite']) #app.enter-tab .dban .po-sheen { animation: po-sheen 1.6s var(--e-out) .35s both; }
+.dban { position: absolute; inset: 0; overflow: hidden; isolation: isolate; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; padding: 0 16px 16px;
+  background:
+    radial-gradient(60% 90% at 78% 82%, rgba(var(--glow-2), .2), transparent 62%),
+    radial-gradient(45% 60% at 100% 0, rgba(240, 239, 234, .06), transparent 70%),
+    linear-gradient(180deg, #101010, #070707 70%, #0b0a08); }
+.dban::before { content: ''; position: absolute; inset: 0; z-index: -1; background: repeating-linear-gradient(-62deg, rgba(240, 239, 234, .022) 0 1px, transparent 1px 8px); pointer-events: none; }
+.dban::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: linear-gradient(90deg, #44351b, #b89443 18%, #f3dc95 42%, #b89443 68%, rgba(184, 148, 67, 0)); box-shadow: 0 0 16px rgba(213, 180, 93, .5); }
+.db-num { position: absolute; right: -12px; top: 50%; z-index: -2; transform: translateY(-56%); font: 900 extra-condensed 236px/.8 var(--font); font-style: normal; letter-spacing: -.04em;
+  color: transparent; -webkit-text-fill-color: transparent; -webkit-text-stroke: 1.2px rgba(213, 180, 93, .32);
+  background: linear-gradient(180deg, rgba(213, 180, 93, .2), rgba(213, 180, 93, 0) 70%); -webkit-background-clip: text; background-clip: text; pointer-events: none; }
+.db-beam { position: absolute; top: -40%; right: 20%; z-index: -1; width: 110px; height: 180%; background: linear-gradient(180deg, rgba(240, 239, 234, .12), rgba(213, 180, 93, .05) 50%, transparent 80%); transform: rotate(20deg); filter: blur(9px); pointer-events: none; }
+.dban .hero-cv { position: absolute; right: -2%; top: 0; bottom: 0; left: auto; z-index: -1; width: 54%; height: 100%; -webkit-mask-image: linear-gradient(90deg, transparent, #000 32%); mask-image: linear-gradient(90deg, transparent, #000 32%); }
+.dban .po-sheen { z-index: 1; }
+.db-k { position: absolute; left: 16px; right: 16px; top: 14px; display: flex; align-items: center; gap: 9px; margin: 0; }
+.db-k b { padding: 4px 7px 3px; border: 1px solid rgba(213, 180, 93, .6); border-radius: 3px; background: rgba(7, 7, 7, .72); font: 900 semi-condensed 10.5px/1 var(--font); letter-spacing: .18em; text-transform: uppercase; color: var(--red-hot); }
+.db-k span { font: 800 semi-condensed 10.5px/1 var(--font); letter-spacing: .22em; text-transform: uppercase; color: var(--label); text-shadow: 0 1px 6px #000; }
+.db-k em { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px 4px; border-radius: 999px; background: linear-gradient(180deg, #e3c675, #927535); color: #0d0d0d; font: 900 semi-condensed 10.5px/1 var(--font); font-style: normal; letter-spacing: .2em; text-transform: uppercase; box-shadow: 0 0 20px -2px rgba(213, 180, 93, .75); }
+.db-k em::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #0d0d0d; animation: db-live 1.2s ease-in-out infinite; }
+@keyframes db-live { 50% { opacity: .2; } }
+.db-l { position: relative; max-width: 70%; margin: 0; font: 900 extra-condensed 31px/.9 var(--font); letter-spacing: .005em; text-transform: uppercase; text-wrap: balance; }
+.db-l span, .db-l b { display: block; width: fit-content; }
+.db-l span { color: var(--ink); text-shadow: 0 2px 14px rgba(0, 0, 0, .85); }
+.db-l b { background: linear-gradient(100deg, #927535 0%, #d5b45d 18%, #fff3c9 30%, #d5b45d 44%, #b89443 64%, #f0d58a 82%, #927535 100%); background-size: 240% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 10px rgba(0, 0, 0, .8)); }
+.db-h { display: flex; align-items: center; gap: 4px; margin: 0; }
+.db-h span { margin-right: 6px; font: 800 semi-condensed 9.5px/1 var(--font); letter-spacing: .2em; text-transform: uppercase; color: var(--faint); }
+.db-h i { width: 15px; height: 6px; border-radius: 1px; background: #292929; transform: skewX(-24deg); }
+.db-h i.on { background: linear-gradient(90deg, #927535, #d5b45d); box-shadow: 0 0 8px rgba(213, 180, 93, .45); }
+.db-h i.max { background: linear-gradient(90deg, #d5b45d, #fff3c9); box-shadow: 0 0 12px rgba(255, 236, 170, .75); }
+.db-t { display: flex; flex-wrap: wrap; gap: 5px; max-width: 88%; margin: 0; }
+.db-t span { padding: 5px 8px 4px; border: 1px solid rgba(184, 148, 67, .42); border-radius: 3px; background: linear-gradient(180deg, rgba(27, 27, 27, .94), rgba(7, 7, 7, .94)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06); font: 800 semi-condensed 10.5px/1 var(--font); letter-spacing: .06em; color: var(--ink-2); white-space: nowrap; }
+.db-stamp { position: absolute; right: 18px; top: 44px; z-index: 1; padding: 6px 11px 5px; border: 2px solid #d5b45d; border-radius: 3px; outline: 1px solid rgba(213, 180, 93, .4); outline-offset: 2px; transform: rotate(-9deg); background: rgba(7, 7, 7, .6);
+  font: 900 semi-condensed 13px/1 var(--font); font-style: normal; letter-spacing: .28em; text-transform: uppercase; color: #f3dc95; box-shadow: 0 0 24px -4px rgba(213, 180, 93, .6); }
+
+/* today */
+.dban.today { background:
+    radial-gradient(62% 95% at 78% 82%, rgba(var(--glow), .34), transparent 62%),
+    radial-gradient(45% 60% at 100% 0, rgba(240, 239, 234, .08), transparent 70%),
+    linear-gradient(180deg, #14110b, #070707 70%, #100c05); }
+.dban.today .db-num { -webkit-text-stroke-color: rgba(243, 220, 149, .55); background-image: linear-gradient(180deg, rgba(213, 180, 93, .34), rgba(213, 180, 93, 0) 72%); }
+.dban.today .db-t span:first-child { border-color: #d5b45d; color: #f3dc95; box-shadow: 0 0 12px -3px rgba(213, 180, 93, .6); }
+html:not([data-motion='lite']) .dban.today .db-l b { animation: molten 4.5s linear infinite; }
+html:not([data-motion='lite']) .dban.today .db-beam { animation: beam 6s ease-in-out infinite alternate; }
+@keyframes molten { to { background-position: -171.43% 0; } }
+@keyframes beam { from { transform: rotate(13deg); opacity: .65; } to { transform: rotate(27deg); opacity: 1; } }
+
+/* the card round the banner: a gold-edged plate; today a gold light runs round its edge */
+@property --ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.dc { border: 1px solid transparent; contain-intrinsic-size: auto 300px auto 430px;
+  background: linear-gradient(var(--n1), var(--n1)) padding-box, linear-gradient(160deg, rgba(213, 180, 93, .45), #292929 28%, #1b1b1b 70%, rgba(184, 148, 67, .3)) border-box; }
+.dc.now { border-width: 1.5px; box-shadow: 0 26px 56px -30px rgba(213, 180, 93, .6);
+  background: linear-gradient(var(--n1), var(--n1)) padding-box, conic-gradient(from var(--ang), rgba(184, 148, 67, .3) 0 52%, #d5b45d 68%, #fff3c9 74%, #b89443 80%, rgba(184, 148, 67, .3) 94%) border-box; }
+.dc.now::before { display: none; }
+html:not([data-motion='lite']) .dc.now { animation: ang 4s linear infinite; }
+@keyframes ang { to { --ang: 360deg; } }
+
+/* entering Plan: the numbers rise, the lines wipe in, the intensity fills */
+html:not([data-motion='lite']) #app.enter-tab .db-num { animation: db-num .8s var(--e-out) calc(.05s + var(--n) * .04s) both; }
+html:not([data-motion='lite']) #app.enter-tab .db-l span, html:not([data-motion='lite']) #app.enter-tab .db-l b { animation: db-wipe .55s var(--e-out) calc(.15s + var(--n) * .04s) both; }
+html:not([data-motion='lite']) #app.enter-tab .db-l b { animation-delay: calc(.28s + var(--n) * .04s); }
+html:not([data-motion='lite']) #app.enter-tab .dban.today .db-l b { animation: db-wipe .55s var(--e-out) .28s both, molten 4.5s linear infinite; }
+html:not([data-motion='lite']) #app.enter-tab .db-h i { animation: db-bar .4s var(--e-out) calc(.35s + var(--i) * .07s) both; }
+html:not([data-motion='lite']) #app.enter-tab .db-stamp { animation: db-stamp .5s var(--spring-hard, cubic-bezier(.3, 1.6, .5, 1)) .45s both; }
+@keyframes db-num { from { opacity: 0; transform: translateY(-50%) scale(1.25); } }
+@keyframes db-wipe { from { clip-path: inset(0 100% 0 0); transform: translateX(-14px); } to { clip-path: inset(0 0 0 0); transform: none; } }
+@keyframes db-bar { from { transform: skewX(-24deg) scaleX(0); opacity: 0; } }
+@keyframes db-stamp { from { transform: rotate(-9deg) scale(2.2); opacity: 0; } }
+
+/* scrolling down the week: each card rises into place */
+@supports (animation-timeline: view()) {
+  html:not([data-motion='lite']) .dcs .dc { animation: dc-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 65%; }
+  html:not([data-motion='lite']) .dcs .dc.now { animation: dc-rise linear both, ang 4s linear infinite; animation-timeline: view(), auto; animation-range: entry 0% entry 65%, normal; }
+}
+@keyframes dc-rise { from { opacity: 0; translate: 0 44px; scale: .94; } }
+
+/* ---------- 8.6 (2026-11-21): FORGE, the whole app more spectacular ----------
+   Embers drifting up through the black, a forge glow breathing under the content, titles in polished metal with a
+   light passing over them, molten gold blades, gold-edged plates, a gold light circling the crest, a sheen across the
+   buttons. All of it stops in "Mișcare redusă" and with the system's reduced motion. */
+
+/* embers: one tile of sparks a screen tall, drifting up and repeating */
+html::after { content: ''; position: fixed; left: 0; right: 0; top: 0; z-index: -1; height: 200vh; pointer-events: none; opacity: .7;
+  background-image:
+    radial-gradient(circle at 8% 12%, rgba(243, 220, 149, .7) 0 1px, transparent 2px),
+    radial-gradient(circle at 23% 64%, rgba(213, 180, 93, .55) 0 1.4px, transparent 2.6px),
+    radial-gradient(circle at 37% 28%, rgba(213, 180, 93, .35) 0 1px, transparent 2px),
+    radial-gradient(circle at 52% 86%, rgba(243, 220, 149, .6) 0 1.2px, transparent 2.4px),
+    radial-gradient(circle at 66% 44%, rgba(184, 148, 67, .5) 0 1.6px, transparent 3px),
+    radial-gradient(circle at 79% 8%, rgba(213, 180, 93, .45) 0 1px, transparent 2px),
+    radial-gradient(circle at 91% 70%, rgba(243, 220, 149, .55) 0 1.3px, transparent 2.5px),
+    radial-gradient(circle at 15% 92%, rgba(184, 148, 67, .4) 0 1px, transparent 2px),
+    radial-gradient(circle at 46% 54%, rgba(255, 243, 201, .5) 0 .8px, transparent 1.8px),
+    radial-gradient(circle at 72% 96%, rgba(213, 180, 93, .4) 0 1px, transparent 2px),
+    radial-gradient(circle at 86% 32%, rgba(255, 243, 201, .45) 0 .9px, transparent 1.9px),
+    radial-gradient(circle at 4% 46%, rgba(213, 180, 93, .35) 0 1.1px, transparent 2.2px);
+  background-size: 100% 50%; }
+html:not([data-motion='lite'])::after { animation: embers 46s linear infinite; }
+@keyframes embers { to { transform: translateY(-50%); } }
+/* the forge under the content, breathing */
+html::before { content: ''; position: fixed; left: -10%; right: -10%; bottom: -12vh; z-index: -1; height: 46vh; pointer-events: none;
+  background: radial-gradient(50% 60% at 50% 100%, rgba(184, 148, 67, .16), rgba(68, 53, 27, .08) 55%, transparent 75%); }
+html:not([data-motion='lite'])::before { animation: forge 7s ease-in-out infinite alternate; }
+@keyframes forge { from { opacity: .55; transform: scaleY(.9); } to { opacity: 1; transform: none; } }
+
+/* titles: polished metal, a light passing over on every tab */
+.ph-t span, .ms-t span {
+  background: linear-gradient(100deg, transparent 38%, rgba(255, 241, 200, .95) 49%, transparent 60%) no-repeat, linear-gradient(180deg, #ffffff 0%, #f0efea 38%, #b7b2a6 53%, #e9e5da 68%, #f7f5ef 100%);
+  background-size: 260% 100%, 100% 100%; background-position: 170% 0, 0 0;
+  -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+html:not([data-motion='lite']) #app.enter-tab .ph-t span { animation: ttl-sheen .95s var(--e-out) .12s both; }
+@keyframes ttl-sheen { from { background-position: 170% 0, 0 0; } to { background-position: -70% 0, 0 0; } }
+
+/* the blades under the titles and before the sections: molten gold with a spark running along */
+.ph-blade { position: relative; width: 96px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, #44351b, #b89443 28%, #f3dc95 58%, #d5b45d 78%, rgba(184, 148, 67, 0)); box-shadow: 0 0 14px rgba(213, 180, 93, .5); }
+.ph-blade::after { content: ''; position: absolute; left: 0; top: -4px; width: 20px; height: 11px; border-radius: 50%; background: radial-gradient(closest-side, #fff8e0, rgba(213, 180, 93, .7) 45%, transparent); opacity: 0; }
+html:not([data-motion='lite']) .ph-blade::after { animation: blade-spark 4s var(--e-out) 1.2s infinite; }
+@keyframes blade-spark { 0% { transform: translateX(-10px); opacity: 0; } 12% { opacity: 1; } 55%, 100% { transform: translateX(92px); opacity: 0; } }
+.sec::before { width: 30px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, #b89443, #f3dc95); box-shadow: 0 0 12px rgba(213, 180, 93, .55); }
+
+/* big numbers: polished metal */
+.ps-n b, .stat b, .ms-m b { background: linear-gradient(180deg, #ffffff 0%, #f0efea 40%, #a9a49a 56%, #ece8dd 74%, #f7f5ef 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+
+/* plates: a gold edge catching the light at the top-left corner, fading round the plate */
+.card:not(.lime, .white) { border: 1px solid transparent;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .035), rgba(255, 255, 255, 0) 38%) padding-box, linear-gradient(var(--n2), var(--n2)) padding-box,
+    linear-gradient(155deg, rgba(213, 180, 93, .5), rgba(41, 41, 41, .9) 26%, #202020 62%, rgba(184, 148, 67, .26)) border-box;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 24px 48px -30px rgba(0, 0, 0, .95); }
+.card.lime { border-color: rgba(213, 180, 93, .6); box-shadow: 0 0 0 1px rgba(0, 0, 0, .3), 0 22px 50px -28px rgba(213, 180, 93, .55), inset 0 1px 0 rgba(255, 243, 201, .12); }
+
+/* the crest in the tab bar: a gold light circling it */
+.nw::before { content: ''; position: absolute; inset: -4px; z-index: 0; border-radius: 50%; pointer-events: none; opacity: .45;
+  background: conic-gradient(transparent 0 10%, #d5b45d 22%, #fff3c9 25%, transparent 38% 60%, #927535 72%, transparent 86%);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px)); mask: radial-gradient(closest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px)); }
+.nav-wolf[aria-current] .nw::before { opacity: 1; }
+html:not([data-motion='lite']) .nw::before { animation: crest-spin 6s linear infinite; }
+@keyframes crest-spin { to { transform: rotate(360deg); } }
+
+/* buttons: a sheen crossing now and then */
+.btn:not(.ghost, .danger) { overflow: hidden; isolation: isolate; }
+.btn:not(.ghost, .danger)::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(105deg, transparent 35%, rgba(255, 241, 200, .16) 50%, transparent 65%); transform: translateX(-120%); }
+html:not([data-motion='lite']) .btn:not(.ghost, .danger)::after { animation: btn-sheen 5.5s ease-in-out 1.5s infinite; }
+@keyframes btn-sheen { 0% { transform: translateX(-120%); } 22%, 100% { transform: translateX(120%); } }
+
+/* the top bar: a gold hairline under it */
+.top::after { background: linear-gradient(90deg, transparent, rgba(184, 148, 67, .5) 30%, rgba(243, 220, 149, .6) 50%, rgba(184, 148, 67, .5) 70%, transparent); }

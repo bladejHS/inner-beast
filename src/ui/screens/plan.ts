@@ -93,6 +93,9 @@ const DAY_LINE: Array<[string, string]> = [
   ['This is where', 'you get better.'],
 ];
 const DAY_KIND = ['bench', 'run', 'pull', 'deadlift', 'press', 'run', 'calm'];
+/** The day's discipline, as on its slide, and how hard it hits (of 5). */
+const DAY_TAG = ['Run · Upper', 'Threshold', 'Upper · Engine', 'Run · Lower', 'Strength · Power', 'Long Run', 'Recovery'];
+const DAY_HEAT = [2, 4, 4, 2, 5, 3, 1];
 
 /** A session as a short target: "30′ Z2", "4×6′ prag", "DB Bench 4×6–8", "Engine 8×250". */
 function target(raw: Block, picks: Picks): string {
@@ -116,13 +119,27 @@ function target(raw: Block, picks: Picks): string {
   return '';
 }
 
-function dayBanner(d: Day, picks: Picks, today: boolean): string {
+/**
+ * The day's title card (2026-11-21, the user: "ceva mai spectaculos"): the day's number huge in gold outline behind
+ * the athlete, the discipline and its intensity, the Hybrid365 coaching line with its last words in molten gold, the
+ * week's real targets as metal tags. Today burns (live badge, moving light, a gold edge running round the card);
+ * a finished day gets the FORGED stamp.
+ */
+function dayBanner(d: Day, picks: Picks, today: boolean, full: boolean): string {
   const [a, b] = DAY_LINE[d.idx] ?? DAY_LINE[0]!;
   const tags = [...new Set(d.blocks.map((x) => target(x, picks)).filter(Boolean))].slice(0, 4);
-  return `<div class="dban${today ? ' today' : ''}" aria-hidden="true">
+  const heat = DAY_HEAT[d.idx] ?? 3;
+  const n = String(d.idx + 1).padStart(2, '0');
+  const bars = [1, 2, 3, 4, 5].map((i) => `<i class="${i <= heat ? `on${i === 5 ? ' max' : ''}` : ''}" style="--i:${i}"></i>`).join('');
+  return `<div class="dban${today ? ' today' : ''}${full ? ' full' : ''}" style="--n:${d.idx}" aria-hidden="true">
+    <i class="db-num">${n}</i>
+    <i class="db-beam"></i>
     <canvas class="hero-cv" data-kind="${DAY_KIND[d.idx] ?? 'run'}"${today ? '' : ' data-still="1"'}></canvas>
     <i class="po-sheen"></i>
-    <p class="db-l">${esc(a)} <b>${esc(b)}</b></p>
+    <p class="db-k"><b>Day ${n}</b><span>${esc(DAY_TAG[d.idx] ?? '')}</span>${today ? '<em>Azi</em>' : ''}</p>
+    ${full ? '<i class="db-stamp">Forged</i>' : ''}
+    <p class="db-l"><span>${esc(a)}</span><b>${esc(b)}</b></p>
+    <p class="db-h"><span>Intensitate</span>${bars}</p>
     <p class="db-t">${tags.map((t) => `<span>${esc(t)}</span>`).join('')}</p>
   </div>`;
 }
@@ -176,7 +193,7 @@ export function planHtml(): string {
     const state = d.idx === tIdx ? 'Azi' : complete ? 'Gata' : d.idx < tIdx && n < d.blocks.length ? 'Rămas' : '';
     return `<li>
       <button class="dc ${d.idx === tIdx ? 'now' : ''} ${complete ? 'full' : ''}" style="--f:${(n / d.blocks.length).toFixed(3)}" data-a="${d.idx === tIdx ? 'tab' : 'day'}" data-k="today" data-i="${d.idx}">
-        <span class="dc-ph dc-ban">${dayBanner(d, picks, d.idx === tIdx)}</span>
+        <span class="dc-ph dc-ban">${dayBanner(d, picks, d.idx === tIdx, complete)}</span>
         <span class="dc-head">
           <span class="dc-day">${esc(RO_DAYS[d.idx])}</span>
           ${state ? `<span class="dc-tag">${state}</span>` : ''}

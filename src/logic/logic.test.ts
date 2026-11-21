@@ -657,8 +657,10 @@ test('Power Finisher: its own ladder, one step per session; the two test circuit
   assert.match(resolveBlock(fri, { ...P, powStep: 9 }).line!, /EMOM × 12 min \(8 Med Ball Chest Throws \/ 10 Plyo Push Ups\)/);
   const r = powerRoutine(POWER_STEPS[5]!);
   assert.deepEqual([r.moves.length, r.moves[0]!.name, r.moves[1]!.name], [12, 'Min 1: 8 Med Ball Chest Throws', 'Min 2: 10 Plyo Push Ups']);
-  assert.deepEqual(CIRCUITS.map((c) => c.levels[0]!.segs.length), [8, 8]);
-  assert.equal(raceById('circ2')!.levels[0]!.segs[5]!.name, 'Bench Press 50 kg × 20');
+  assert.deepEqual(CIRCUITS.map((c) => c.levels[0]!.segs.length), [8, 9]);
+  assert.equal(raceById('circ2')!.levels[0]!.segs[5]!.name, '40 Sit-ups');
+  assert.deepEqual(raceById('circ2')!.levels[0]!.segs.slice(3, 5).map((x) => x.name), ['10 Dips', '20 Squats']);
+  assert.equal(raceById('circ2')!.levels[0]!.segs[6]!.name, 'Bench Press 50 kg × 20');
   assert.deepEqual(raceById('circ1')!.levels[0]!.segs.filter((x) => x.sec).map((x) => x.sec), [90, 180]);
 });
 

@@ -182,13 +182,15 @@ export const CIRCUITS: Race[] = [
     ] }],
   },
   {
-    id: 'circ2', name: 'Circuitul 2', sub: '1500 m row, 50 flotări, curl 20 kg, dips, 40 abdomene, piept 50 kg, sărituri, assault bike', icon: 'bolt',
+    id: 'circ2', name: 'Circuitul 2', sub: '1500 m row, 50 flotări, curl 20 kg, dips, 20 genuflexiuni, 40 abdomene, piept 50 kg, sărituri, assault bike', icon: 'bolt',
     note: 'Pe timp, fără pauze plănuite. Apeși Gata la finalul fiecărui pas.',
-    levels: [{ name: 'Test', est: 26, segs: [
+    levels: [{ name: 'Test', est: 27, segs: [
       { name: 'Row 1500 m', detail: '1500 m pe vâslitor' },
       { name: '50 Push-ups', detail: '50 de flotări' },
       { name: '10 Biceps Curls 20 kg', detail: '10 flexii la biceps cu 20 kg' },
       { name: '10 Dips', detail: '10 dips-uri' },
+      // the user, 2026-11-21: "după 10 dips adaugă 20 de genuflexiuni"
+      { name: '20 Squats', detail: '20 de genuflexiuni' },
       { name: '40 Sit-ups', detail: '40 de abdomene' },
       { name: 'Bench Press 50 kg × 20', detail: 'Împins la piept cu 50 kg, 20 de repetări' },
       { name: '40 Bench Jumps', detail: '40 de sărituri peste bancă' },

@@ -60,34 +60,34 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 .sp-half{position:absolute;inset:-3px;background:#070707}
 .sp-a{clip-path:polygon(0 0,100% 0,100% 48%,0 48%)}
 .sp-b{clip-path:polygon(0 48%,100% 48%,100% 100%,0 100%)}
-.sp-bg{position:absolute;inset:0;opacity:0;pointer-events:none;background:radial-gradient(60% 30% at 50% 30%,rgba(255,140,40,.16),transparent 70%),radial-gradient(120% 40% at 50% 100%,rgba(184,148,67,.08),transparent 70%),linear-gradient(180deg,#0d0d0d,#070707 60%,#000)}
+.sp-bg{position:absolute;inset:0;opacity:0;pointer-events:none;background:radial-gradient(60% 30% at 50% 30%,rgba(115,168,238,.16),transparent 70%),radial-gradient(120% 40% at 50% 100%,rgba(120,151,192,.08),transparent 70%),linear-gradient(180deg,#0d0d0d,#070707 60%,#000)}
 .sp-go .sp-bg{animation:sp-bgin .9s ease-out .2s forwards}@keyframes sp-bgin{to{opacity:1}}
 .sp-stage{position:absolute;left:50%;top:max(4vh,env(safe-area-inset-top));width:var(--w);margin-left:calc(var(--w) / -2);aspect-ratio:680/801;transform-origin:50% 50%;pointer-events:none}
 .sp-emb{position:absolute;inset:0;opacity:0}
-.sp-emb img{display:block;width:100%;height:100%;filter:drop-shadow(0 0 24px rgba(184,148,67,.3))}
+.sp-emb img{display:block;width:100%;height:100%;filter:drop-shadow(0 0 24px rgba(120,151,192,.3))}
 .sp-emb::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.75) 50%,transparent 62%);background-size:300% 100%;background-position:120% 0;-webkit-mask:url(splash/umbra.webp) center/contain no-repeat;mask:url(splash/umbra.webp) center/contain no-repeat;opacity:0}
 .sp-hit .sp-emb{animation:sp-cool 1.3s ease-out forwards}
 .sp-hit .sp-emb::after{animation:sp-glint .9s ease-in-out .85s forwards}
 @keyframes sp-cool{0%{opacity:1;filter:brightness(3.4) saturate(0)}18%{filter:brightness(2.1) sepia(1) saturate(3) hue-rotate(-12deg)}55%{filter:brightness(1.3) sepia(.4) saturate(1.6)}100%{opacity:1;filter:none}}
 @keyframes sp-glint{0%{opacity:1;background-position:120% 0}100%{opacity:1;background-position:-20% 0}}
-.sp-eye{position:absolute;width:19%;aspect-ratio:2.4;margin:-3.96% 0 0 -9.5%;border-radius:50%;transform:rotate(var(--r));opacity:0;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(closest-side,#fff 0,#fff2c4 9%,#d5b45d 22%,rgba(213,180,93,.32) 42%,transparent 70%)}
+.sp-eye{position:absolute;width:19%;aspect-ratio:2.4;margin:-3.96% 0 0 -9.5%;border-radius:50%;transform:rotate(var(--r));opacity:0;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(closest-side,#fff 0,#e2edfa 9%,#99b5d9 22%,rgba(153,181,217,.32) 42%,transparent 70%)}
 .sp-eye{display:none}
 #sp-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .sp-flash,.sp-vig{position:absolute;inset:0;pointer-events:none}
 .sp-vig{background:radial-gradient(130% 95% at 50% 42%,transparent 45%,rgba(0,0,0,.8) 100%)}
-.sp-flash{background:radial-gradient(circle at var(--ix,50%) var(--iy,55%),#fff 0,#fff 3%,rgba(255,244,200,.85) 10%,rgba(213,180,93,.38) 26%,rgba(5,6,10,0) 50%);opacity:0}
+.sp-flash{background:radial-gradient(circle at var(--ix,50%) var(--iy,55%),#fff 0,#fff 3%,rgba(229,238,250,.85) 10%,rgba(153,181,217,.38) 26%,rgba(5,6,10,0) 50%);opacity:0}
 .sp-id{position:absolute;left:0;right:0;bottom:max(7vh,calc(env(safe-area-inset-bottom) + 34px));display:grid;justify-items:center;gap:clamp(8px,1.4vh,13px);pointer-events:none}
 .sp-name{margin:0;font:900 extra-condensed clamp(46px,13.5vw,84px)/.9 'Saira','Arial Narrow',sans-serif;letter-spacing:.06em;margin-right:-.06em;text-transform:uppercase;white-space:nowrap}
 .sp-name i{display:inline-block;font-style:normal;opacity:0;color:#f3f5fa;text-shadow:0 0 0 transparent}
-.sp-name .b{color:#d5b45d}
+.sp-name .b{color:#99b5d9}
 .sp-name .sp-gap{width:.28em}
-.sp-rule{display:block;width:min(58vw,300px);height:4px;background:linear-gradient(90deg,transparent,#b89443 18%,#d5b45d 50%,#b89443 82%,transparent);transform:skewX(-30deg) scaleX(0);opacity:0}
-.sp-tag{margin:0;font:700 semi-expanded clamp(10.5px,2.9vw,13.5px)/1.2 'Saira',system-ui,sans-serif;letter-spacing:.3em;margin-right:-.3em;color:#c9c4b0;white-space:nowrap;opacity:0}
-.sp-skip{position:absolute;right:max(14px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));padding:12px 14px;border:0;background:none;color:#c9c4b0;font:700 semi-expanded 11.5px/1 'Saira',system-ui,sans-serif;letter-spacing:.2em;cursor:pointer;opacity:0;transition:opacity .3s}
-.sp-skip:focus-visible{outline:2px solid #d5b45d;opacity:1}
+.sp-rule{display:block;width:min(58vw,300px);height:4px;background:linear-gradient(90deg,transparent,#7897c0 18%,#99b5d9 50%,#7897c0 82%,transparent);transform:skewX(-30deg) scaleX(0);opacity:0}
+.sp-tag{margin:0;font:700 semi-expanded clamp(10.5px,2.9vw,13.5px)/1.2 'Saira',system-ui,sans-serif;letter-spacing:.3em;margin-right:-.3em;color:#b7bfca;white-space:nowrap;opacity:0}
+.sp-skip{position:absolute;right:max(14px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));padding:12px 14px;border:0;background:none;color:#b7bfca;font:700 semi-expanded 11.5px/1 'Saira',system-ui,sans-serif;letter-spacing:.2em;cursor:pointer;opacity:0;transition:opacity .3s}
+.sp-skip:focus-visible{outline:2px solid #99b5d9;opacity:1}
 #sp-tear{position:fixed;inset:0;z-index:101;width:100%;height:100%;pointer-events:none;opacity:0}
-#sp-tear polyline{fill:none;stroke:#ff9a2e;stroke-width:4;stroke-linejoin:bevel}
-#sp-tear .core{stroke:#fffbe6;stroke-width:1.2}
+#sp-tear polyline{fill:none;stroke:#80b0ef;stroke-width:4;stroke-linejoin:bevel}
+#sp-tear .core{stroke:#eef4fc;stroke-width:1.2}
 
 /* the impact, keyed off .sp-hit (the engine calls the page when the kick lands) */
 .sp-go .sp-skip,.sp-calm .sp-skip{opacity:.85}
@@ -96,7 +96,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 .sp-hit .sp-rule{animation:sp-rule .34s cubic-bezier(.7,0,.2,1) .66s forwards}
 .sp-hit .sp-tag{animation:sp-flicker .5s steps(1) .78s forwards}
 @keyframes sp-flash{0%{opacity:0}8%{opacity:1}100%{opacity:0}}
-@keyframes sp-stamp{0%{opacity:0;transform:translateY(-.35em) scale(1.5);color:#fff;text-shadow:0 0 24px #ff9a2e,0 0 6px #fff}35%{opacity:1}70%{text-shadow:0 0 14px rgba(255,154,46,.6)}100%{opacity:1;transform:none;text-shadow:0 0 0 transparent}}
+@keyframes sp-stamp{0%{opacity:0;transform:translateY(-.35em) scale(1.5);color:#fff;text-shadow:0 0 24px #80b0ef,0 0 6px #fff}35%{opacity:1}70%{text-shadow:0 0 14px rgba(128,176,239,.6)}100%{opacity:1;transform:none;text-shadow:0 0 0 transparent}}
 @keyframes sp-rule{to{opacity:1;transform:skewX(-30deg)}}
 @keyframes sp-flicker{0%{opacity:.8}12%{opacity:.1}24%{opacity:.9}36%{opacity:.25}52%,100%{opacity:1}}
 
@@ -119,7 +119,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 @keyframes sp-out{to{opacity:0}}
 @keyframes sp-tear{0%{opacity:0}12%{opacity:1}60%{opacity:.8}100%{opacity:0}}
 .sp-fail{min-height:100dvh;display:grid;place-content:center;justify-items:center;gap:12px;padding:24px;text-align:center;font:600 15px/1.4 'Saira',system-ui,sans-serif;color:#f3f5fa}
-.sp-fail a{color:#d5b45d;font-weight:700}
+.sp-fail a{color:#99b5d9;font-weight:700}
 </style>
 </head>
 <body>
@@ -155,7 +155,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 (function () {
   var sp = document.getElementById('splash'), tear = document.getElementById('sp-tear');
   if (!sp) return;
-  var VERSION = '2026-11-20c', mode = 'auto', seen = false, known = '', boot = performance.now();
+  var VERSION = '2026-11-21b', mode = 'auto', seen = false, known = '', boot = performance.now();
   try { mode = localStorage.getItem('beast:opening') || 'auto'; known = localStorage.getItem('beast:opened-v') || ''; } catch (e) { /* storage blocked */ }
   try { seen = sessionStorage.getItem('beast:opened') === '1'; sessionStorage.setItem('beast:opened', '1'); } catch (e) { /* storage blocked */ }
   var forge = null;
@@ -212,7 +212,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
     setTimeout(leave, HOLD);
   }
   function arena(hit) {
-    return window.BeastIgnite.create({ canvas: document.getElementById('sp-cv'), stage: sp.querySelector('.sp-stage'), root: sp, color: [184, 148, 67], hot: [222, 156, 78], onImpact: hit });
+    return window.BeastIgnite.create({ canvas: document.getElementById('sp-cv'), stage: sp.querySelector('.sp-stage'), root: sp, color: [120, 151, 192], hot: [129, 167, 217], onImpact: hit });
   }
   // the calm poster is the same scene, frozen just after the finish beam breaks
   function poster() { if (!window.BeastIgnite) return; try { forge = arena(null); forge.still(2.4); } catch (e) { /* the wolf and the name are enough */ } }

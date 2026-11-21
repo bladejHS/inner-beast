@@ -87,7 +87,7 @@ export async function posterBlob(d: PosterData): Promise<Blob | null> {
   x.textAlign = 'center';
   x.textBaseline = 'alphabetic';
   // the kicker
-  x.fillStyle = css('--gold', '#dcb35e');
+  x.fillStyle = css('--gold', '#98b6dd');
   x.font = "800 34px Saira, sans-serif";
   x.letterSpacing = '12px';
   x.fillText('REZULTAT OFICIAL', W / 2, 920);
@@ -96,9 +96,9 @@ export async function posterBlob(d: PosterData): Promise<Blob | null> {
   fit(x, d.title.toUpperCase(), 250, 900, W - 120);
   const tg = x.createLinearGradient(0, 960, 0, 1180);
   tg.addColorStop(0, '#ffffff');
-  tg.addColorStop(0.45, '#fff3d6');
-  tg.addColorStop(0.7, css('--gold-2', '#f5d690'));
-  tg.addColorStop(1, css('--gold', '#dcb35e'));
+  tg.addColorStop(0.45, '#e5eefa');
+  tg.addColorStop(0.7, css('--gold-2', '#c0d5f2'));
+  tg.addColorStop(1, css('--gold', '#98b6dd'));
   x.save();
   x.shadowColor = `rgba(${glow}, .8)`;
   x.shadowBlur = 50;
@@ -144,7 +144,7 @@ export async function posterBlob(d: PosterData): Promise<Blob | null> {
   });
 
   if (d.recs.length) {
-    x.fillStyle = css('--gold-2', '#f5d690');
+    x.fillStyle = css('--gold-2', '#c0d5f2');
     fit(x, `RECORD: ${d.recs[0]!}`, 38, 800, W - 140);
     x.fillText(`RECORD: ${d.recs[0]!}`, W / 2, 1680);
   }

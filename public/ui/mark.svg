@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 240 240"><g><g transform="translate(120 120) scale(0.98) translate(-120 -121)"><defs>
     <linearGradient id="m13rim" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#f3f1ea"/><stop offset=".45" stop-color="#9b9890"/><stop offset="1" stop-color="#3c3a36"/></linearGradient>
-    <linearGradient id="m13au" x1="0" y1="0" x2=".2" y2="1"><stop offset="0" stop-color="#f3e6bd"/><stop offset=".26" stop-color="#d5b45d"/><stop offset=".6" stop-color="#b89443"/><stop offset=".85" stop-color="#80652d"/><stop offset="1" stop-color="#44351b"/></linearGradient>
-    <linearGradient id="m13aul" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ead39a"/><stop offset="1" stop-color="#b89443"/></linearGradient>
-    <linearGradient id="m13aud" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#80652d"/><stop offset="1" stop-color="#44351b"/></linearGradient>
+    <linearGradient id="m13au" x1="0" y1="0" x2=".2" y2="1"><stop offset="0" stop-color="#d4e1f2"/><stop offset=".26" stop-color="#99b5d9"/><stop offset=".6" stop-color="#7897c0"/><stop offset=".85" stop-color="#446896"/><stop offset="1" stop-color="#26374c"/></linearGradient>
+    <linearGradient id="m13aul" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#bed1ea"/><stop offset="1" stop-color="#7897c0"/></linearGradient>
+    <linearGradient id="m13aud" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#446896"/><stop offset="1" stop-color="#26374c"/></linearGradient>
     <linearGradient id="m13bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#c9c8c2"/><stop offset="1" stop-color="#55534e"/></linearGradient>
-    <linearGradient id="m13fo" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c8742a"/><stop offset=".55" stop-color="#dfa14a"/><stop offset="1" stop-color="#ecd08a" stop-opacity=".9"/></linearGradient>
-    <linearGradient id="m13fi" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#f6ead0"/><stop offset="1" stop-color="#e2c27c"/></linearGradient>
-    <radialGradient id="m13hot" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff"/><stop offset=".25" stop-color="#f1dca6"/><stop offset=".55" stop-color="#c8842e" stop-opacity=".6"/><stop offset="1" stop-color="#80652d" stop-opacity="0"/></radialGradient>
-    <radialGradient id="m13fire" cx=".5" cy=".6" r=".55"><stop offset=".55" stop-color="#ffcf6a"/><stop offset=".78" stop-color="#ff7a1a"/><stop offset="1" stop-color="#c03a00" stop-opacity="0"/></radialGradient>
+    <linearGradient id="m13fo" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#5587c8"/><stop offset=".55" stop-color="#86abdb"/><stop offset="1" stop-color="#b9cfeb" stop-opacity=".9"/></linearGradient>
+    <linearGradient id="m13fi" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#dbe6f4"/><stop offset="1" stop-color="#aac2e2"/></linearGradient>
+    <radialGradient id="m13hot" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff"/><stop offset=".25" stop-color="#c8d9f0"/><stop offset=".55" stop-color="#6591ca" stop-opacity=".6"/><stop offset="1" stop-color="#446896" stop-opacity="0"/></radialGradient>
+    <radialGradient id="m13fire" cx=".5" cy=".6" r=".55"><stop offset=".55" stop-color="#b7d2f6"/><stop offset=".78" stop-color="#639eec"/><stop offset="1" stop-color="#1964c6" stop-opacity="0"/></radialGradient>
     <filter id="m13gl" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2"/></filter>
     <filter id="m13big" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="10"/></filter>
   </defs>
@@ -22,9 +22,9 @@
   
   <rect x="90" y="111" width="60" height="16" rx="2" fill="url(#m13bar)"/>
   
-  <rect x="56" y="58" width="42" height="124" rx="4" fill="#b89443"/><rect x="142" y="58" width="42" height="124" rx="4" fill="#b89443"/>
+  <rect x="56" y="58" width="42" height="124" rx="4" fill="#7897c0"/><rect x="142" y="58" width="42" height="124" rx="4" fill="#7897c0"/>
   
-  <g filter="url(#m13gl)" opacity=".9"><circle cx="120" cy="117" r="7" fill="#fff8e8"/></g>
-  <path d="M92 190L120 212L148 190" fill="none" stroke="#b89443" stroke-width="12" stroke-linecap="square" stroke-linejoin="miter"/>
+  <g filter="url(#m13gl)" opacity=".9"><circle cx="120" cy="117" r="7" fill="#ecf3fc"/></g>
+  <path d="M92 190L120 212L148 190" fill="none" stroke="#7897c0" stroke-width="12" stroke-linecap="square" stroke-linejoin="miter"/>
   
   </g></g></svg>

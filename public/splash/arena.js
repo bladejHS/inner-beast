@@ -582,7 +582,7 @@
       c.lineCap = 'round';
       for (var i = 0; i < sparks.length; i++) {
         var p = sparks[i], u = p.t / p.life;
-        c.strokeStyle = u < 0.25 ? 'rgba(255,245,235,' + (1 - u).toFixed(2) + ')' : rgba(hot, 1 - u);
+        c.strokeStyle = u < 0.25 ? 'rgba(233,241,251,' + (1 - u).toFixed(2) + ')' : rgba(hot, 1 - u);
         c.lineWidth = p.w;
         c.beginPath(); c.moveTo(p.px, p.py); c.lineTo(p.x + (p.x - p.px) * 0.8, p.y + (p.y - p.py) * 0.8); c.stroke();
       }
@@ -639,7 +639,7 @@
      Same API as create(): { start(), still(T), burst(), destroy() }. */
   function createHybrid(o) {
     var cv = o.canvas, c = cv.getContext('2d');
-    var col = o.color || [245, 194, 17], hot = o.hot || [255, 212, 59];
+    var col = o.color || [165, 198, 240], hot = o.hot || [187, 213, 247];
     var pale = hot.map(function (v) { return Math.round(mix(v, 255, 0.72)); }), rimc = hot.map(function (v) { return Math.round(mix(v, 255, 0.3)); });
     var emb = o.stage ? o.stage.querySelector('.sp-emb') : null, eyes = o.stage ? o.stage.querySelectorAll('.sp-eye') : [];
     var Wd = 0, Ht = 0, dpr = 1, raf = 0, last = 0, T = 0, real = 0, slow = 0, shake = 0, hitAt = -1, live = true, impacted = false;
@@ -787,7 +787,7 @@
       c.lineCap = 'round';
       for (var i3 = 0; i3 < sparks.length; i3++) {
         var p = sparks[i3], u = p.t / p.life;
-        c.strokeStyle = u < 0.25 ? 'rgba(255,250,230,' + (1 - u).toFixed(2) + ')' : rgba(hot, 1 - u);
+        c.strokeStyle = u < 0.25 ? 'rgba(237,244,252,' + (1 - u).toFixed(2) + ')' : rgba(hot, 1 - u);
         c.lineWidth = p.w; c.beginPath(); c.moveTo(p.px, p.py); c.lineTo(p.x + (p.x - p.px) * 0.8, p.y + (p.y - p.py) * 0.8); c.stroke();
       }
       for (var r = 0; r < rings.length; r++) {
@@ -1094,7 +1094,7 @@
         if (p.t > p.life) { sparks.splice(j, 1); continue; }
         p.px = p.x; p.py = p.y; p.vy += 900 * dt; p.vx *= Math.pow(0.18, dt); p.vy *= Math.pow(0.4, dt); p.x += p.vx * dt; p.y += p.vy * dt;
         var u = p.t / p.life;
-        c.strokeStyle = u < 0.25 ? 'rgba(255,245,235,' + (1 - u).toFixed(2) + ')' : rgba(hot, 1 - u);
+        c.strokeStyle = u < 0.25 ? 'rgba(233,241,251,' + (1 - u).toFixed(2) + ')' : rgba(hot, 1 - u);
         c.lineWidth = p.w; c.beginPath(); c.moveTo(p.px, p.py); c.lineTo(p.x, p.y); c.stroke();
       }
       for (var q = 0; q < motes.length; q++) {

@@ -149,8 +149,8 @@ function frame(now: number): void {
     c.roundRect(inset, inset, W - inset * 2, H - inset * 2, rad);
     c.stroke();
     if (frac > 0.001) {
-      c.strokeStyle = calm && k !== 'easy' ? 'rgba(255, 212, 59, .95)' : `rgba(${ink}, ${hot ? 0.85 : 0.9})`;
-      c.shadowColor = hot ? 'rgba(0,0,0,0)' : calm ? 'rgba(255,200,40,.9)' : 'rgba(255,190,120,.95)';
+      c.strokeStyle = calm && k !== 'easy' ? 'rgba(187, 213, 247, .95)' : `rgba(${ink}, ${hot ? 0.85 : 0.9})`;
+      c.shadowColor = hot ? 'rgba(0,0,0,0)' : calm ? 'rgba(174,204,245,.9)' : 'rgba(166,200,244,.95)';
       c.shadowBlur = hot ? 0 : 14 * dpr;
       c.beginPath();
       const n = Math.max(2, Math.ceil(steps * frac));
@@ -171,7 +171,7 @@ function frame(now: number): void {
       c.globalCompositeOperation = hot ? 'source-over' : 'lighter';
       const g = c.createRadialGradient(hx, hy, 0, hx, hy, 16 * dpr);
       g.addColorStop(0, hot ? 'rgba(20,4,8,.9)' : 'rgba(255,255,255,1)');
-      g.addColorStop(0.35, hot ? 'rgba(20,4,8,.5)' : 'rgba(255,200,120,.8)');
+      g.addColorStop(0.35, hot ? 'rgba(20,4,8,.5)' : 'rgba(176,206,245,.8)');
       g.addColorStop(1, 'rgba(0,0,0,0)');
       c.fillStyle = g;
       c.beginPath();

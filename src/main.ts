@@ -203,7 +203,7 @@ function mountHero(root: ParentNode): void {
   // the zone's own light: red, or ice in Minte
   const css = getComputedStyle(document.documentElement);
   const rgb = (v: string, d: number[]) => { const p = css.getPropertyValue(v).split(',').map((x) => Number(x.trim())); return p.length === 3 && p.every((x) => x >= 0) ? p : d; };
-  const color = rgb('--glow-2', [245, 194, 17]), hot = rgb('--glow', [255, 212, 59]);
+  const color = rgb('--glow-2', [165, 198, 240]), hot = rgb('--glow', [187, 213, 247]);
   for (const cv of root.querySelectorAll<HTMLCanvasElement>('canvas.hero-cv')) {
     try {
       arena.hero(cv, { kind: cv.dataset.kind, color, hot, still: still || cv.dataset.still === '1' });

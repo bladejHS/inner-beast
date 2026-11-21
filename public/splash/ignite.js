@@ -22,7 +22,7 @@
 
   function create(o) {
     var cv = o.canvas, c = cv.getContext('2d');
-    var gold = o.color || [184, 148, 67], hot = o.hot || [222, 156, 78], white = [250, 246, 236];
+    var gold = o.color || [120, 151, 192], hot = o.hot || [129, 167, 217], white = [250, 246, 236];
     var W = 0, H = 0, dpr = 1, raf = 0, last = 0, T = 0, real = 0, slow = 0, shake = 0, hitAt = -1, live = true, impacted = false;
     var parts = [], sparks = [], embers = [], rings = [], ghosts = [], st = { x: 0, y: 0, w: 0, h: 0 }, core = [0, 0];
     var COUNT = o.count || 1400;

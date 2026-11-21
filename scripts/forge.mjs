@@ -39,17 +39,17 @@ export function forge(size = 'medium', id = `m${++n}`, rank = 0) {
   const flameI = `M120 ${fy(56)}C127 ${fy(68)} 135 77 133 92C131 102 126 107 120 107C114 107 109 102 107 92C105 77 113 ${fy(68)} 120 ${fy(56)}Z`;
   const rimTop = rank >= 3 ? '#ffffff' : '#f3f1ea', rimMid = rank >= 3 ? '#d9dde6' : '#9b9890', rimLow = rank >= 3 ? '#8f96a6' : '#3c3a36';
   const facets = CREST.map((p, i) => `<polygon points="${P([CEN, p, CREST[(i + 1) % CREST.length]])}" fill="${FACE[i % FACE.length]}"/>`).join('');
-  const sparks = rank >= 2 && !small ? [[86, 40, 5], [158, 50, 4], [100, 22, 3.5], [146, 28, 3]].map(([x, y, r]) => `<path d="M${x} ${y - r * 2}L${x + r * 0.5} ${y - r * 0.5}L${x + r * 2} ${y}L${x + r * 0.5} ${y + r * 0.5}L${x} ${y + r * 2}L${x - r * 0.5} ${y + r * 0.5}L${x - r * 2} ${y}L${x - r * 0.5} ${y - r * 0.5}Z" fill="#fff4d6" filter="url(#${id}gl)"/>`).join('') : '';
+  const sparks = rank >= 2 && !small ? [[17, 51, 95], [24, 83, 161], [100, 22, 3.5], [146, 28, 3]].map(([x, y, r]) => `<path d="M${x} ${y - r * 2}L${x + r * 0.5} ${y - r * 0.5}L${x + r * 2} ${y}L${x + r * 0.5} ${y + r * 0.5}L${x} ${y + r * 2}L${x - r * 0.5} ${y + r * 0.5}L${x - r * 2} ${y}L${x - r * 0.5} ${y - r * 0.5}Z" fill="#e6effb" filter="url(#${id}gl)"/>`).join('') : '';
   return `<defs>
     <linearGradient id="${id}rim" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="${rimTop}"/><stop offset=".45" stop-color="${rimMid}"/><stop offset="1" stop-color="${rimLow}"/></linearGradient>
-    <linearGradient id="${id}au" x1="0" y1="0" x2=".2" y2="1"><stop offset="0" stop-color="#f3e6bd"/><stop offset=".26" stop-color="#d5b45d"/><stop offset=".6" stop-color="#b89443"/><stop offset=".85" stop-color="#80652d"/><stop offset="1" stop-color="#44351b"/></linearGradient>
-    <linearGradient id="${id}aul" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ead39a"/><stop offset="1" stop-color="#b89443"/></linearGradient>
-    <linearGradient id="${id}aud" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#80652d"/><stop offset="1" stop-color="#44351b"/></linearGradient>
+    <linearGradient id="${id}au" x1="0" y1="0" x2=".2" y2="1"><stop offset="0" stop-color="#d4e1f2"/><stop offset=".26" stop-color="#99b5d9"/><stop offset=".6" stop-color="#7897c0"/><stop offset=".85" stop-color="#446896"/><stop offset="1" stop-color="#26374c"/></linearGradient>
+    <linearGradient id="${id}aul" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#bed1ea"/><stop offset="1" stop-color="#7897c0"/></linearGradient>
+    <linearGradient id="${id}aud" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#446896"/><stop offset="1" stop-color="#26374c"/></linearGradient>
     <linearGradient id="${id}bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#c9c8c2"/><stop offset="1" stop-color="#55534e"/></linearGradient>
-    <linearGradient id="${id}fo" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c8742a"/><stop offset=".55" stop-color="#dfa14a"/><stop offset="1" stop-color="#ecd08a" stop-opacity=".9"/></linearGradient>
-    <linearGradient id="${id}fi" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#f6ead0"/><stop offset="1" stop-color="#e2c27c"/></linearGradient>
-    <radialGradient id="${id}hot" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff"/><stop offset=".25" stop-color="#f1dca6"/><stop offset=".55" stop-color="#c8842e" stop-opacity=".6"/><stop offset="1" stop-color="#80652d" stop-opacity="0"/></radialGradient>
-    <radialGradient id="${id}fire" cx=".5" cy=".6" r=".55"><stop offset=".55" stop-color="#ffcf6a"/><stop offset=".78" stop-color="#ff7a1a"/><stop offset="1" stop-color="#c03a00" stop-opacity="0"/></radialGradient>
+    <linearGradient id="${id}fo" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#5587c8"/><stop offset=".55" stop-color="#86abdb"/><stop offset="1" stop-color="#b9cfeb" stop-opacity=".9"/></linearGradient>
+    <linearGradient id="${id}fi" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#dbe6f4"/><stop offset="1" stop-color="#aac2e2"/></linearGradient>
+    <radialGradient id="${id}hot" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff"/><stop offset=".25" stop-color="#c8d9f0"/><stop offset=".55" stop-color="#6591ca" stop-opacity=".6"/><stop offset="1" stop-color="#446896" stop-opacity="0"/></radialGradient>
+    <radialGradient id="${id}fire" cx=".5" cy=".6" r=".55"><stop offset=".55" stop-color="#b7d2f6"/><stop offset=".78" stop-color="#639eec"/><stop offset="1" stop-color="#1964c6" stop-opacity="0"/></radialGradient>
     <filter id="${id}gl" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="${small ? 2 : 5}"/></filter>
     <filter id="${id}big" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="10"/></filter>
   </defs>
@@ -57,7 +57,7 @@ export function forge(size = 'medium', id = `m${++n}`, rank = 0) {
   <polygon points="${P(scale(CREST, 1.02))}" fill="#000" opacity=".55" filter="url(#${id}gl)" transform="translate(0 6)"/>
   ${small ? `<polygon points="${P(CREST)}" fill="#1b1b1b"/>` : facets}
   <polygon points="${P(CREST)}" fill="none" stroke="url(#${id}rim)" stroke-width="${small ? 14 : 7}" stroke-linejoin="miter"/>
-  ${!small ? `<polygon points="${P(scale(CREST, 0.885))}" fill="none" stroke="${rank >= 1 ? '#b89443' : '#000'}" stroke-opacity="${rank >= 1 ? 0.85 : 0.5}" stroke-width="${rank >= 1 ? 2.4 : 2}" stroke-linejoin="miter"/>` : ''}
+  ${!small ? `<polygon points="${P(scale(CREST, 0.885))}" fill="none" stroke="${rank >= 1 ? '#7897c0' : '#000'}" stroke-opacity="${rank >= 1 ? 0.85 : 0.5}" stroke-width="${rank >= 1 ? 2.4 : 2}" stroke-linejoin="miter"/>` : ''}
   ${!small ? `<path d="M40 46L120 18L200 46" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="1.6"/>` : ''}
   <g filter="url(#${id}gl)" opacity="${small ? 0.5 : 0.85}"><circle cx="120" cy="114" r="${small ? 26 : 38}" fill="url(#${id}hot)"/></g>
   <path d="${flameO}" fill="url(#${id}fo)"/>
@@ -65,11 +65,11 @@ export function forge(size = 'medium', id = `m${++n}`, rank = 0) {
   <rect x="${small ? 90 : 96}" y="111" width="${small ? 60 : 48}" height="${small ? 16 : 12}" rx="2" fill="url(#${id}bar)"/>
   ${small ? '' : `<rect x="96" y="108" width="5" height="18" rx="1.5" fill="#d9d7d0"/><rect x="139" y="108" width="5" height="18" rx="1.5" fill="#d9d7d0"/>`}
   ${small
-    ? `<rect x="56" y="58" width="42" height="124" rx="4" fill="#b89443"/><rect x="142" y="58" width="42" height="124" rx="4" fill="#b89443"/>`
-    : [L, Rg].map((g, i) => `<polygon points="${P(g.outer)}" fill="url(#${id}${i ? 'aud' : 'aul'})"/><polygon points="${P(g.face)}" fill="url(#${id}au)"/><polygon points="${P(g.face)}" fill="none" stroke="#fff6dc" stroke-opacity=".35" stroke-width="1"/>`).join('')}
+    ? `<rect x="56" y="58" width="42" height="124" rx="4" fill="#7897c0"/><rect x="142" y="58" width="42" height="124" rx="4" fill="#7897c0"/>`
+    : [L, Rg].map((g, i) => `<polygon points="${P(g.outer)}" fill="url(#${id}${i ? 'aud' : 'aul'})"/><polygon points="${P(g.face)}" fill="url(#${id}au)"/><polygon points="${P(g.face)}" fill="none" stroke="#e8f0fb" stroke-opacity=".35" stroke-width="1"/>`).join('')}
   ${small ? '' : `<path d="M68 72L68 160" stroke="#fffaf0" stroke-opacity=".55" stroke-width="2.6" stroke-linecap="round"/><path d="M151 72L151 118" stroke="#fffaf0" stroke-opacity=".3" stroke-width="2" stroke-linecap="round"/>`}
-  <g filter="url(#${id}gl)" opacity=".9"><circle cx="120" cy="117" r="${small ? 7 : 9}" fill="#fff8e8"/></g>
-  <path d="M${small ? 92 : 96} 190L120 ${small ? 212 : 206}L${small ? 148 : 144} 190" fill="none" stroke="${small ? '#b89443' : `url(#${id}au)`}" stroke-width="${small ? 12 : 8}" stroke-linecap="square" stroke-linejoin="miter"/>
+  <g filter="url(#${id}gl)" opacity=".9"><circle cx="120" cy="117" r="${small ? 7 : 9}" fill="#ecf3fc"/></g>
+  <path d="M${small ? 92 : 96} 190L120 ${small ? 212 : 206}L${small ? 148 : 144} 190" fill="none" stroke="${small ? '#7897c0' : `url(#${id}au)`}" stroke-width="${small ? 12 : 8}" stroke-linecap="square" stroke-linejoin="miter"/>
   ${sparks}
   ${rank >= 3 ? `<path d="M120 ${small ? 20 : 24}l3.6 7.4 8.2 1.2-5.9 5.8 1.4 8.1-7.3-3.8-7.3 3.8 1.4-8.1-5.9-5.8 8.2-1.2Z" fill="#ffffff"/>` : ''}`;
 }
@@ -77,7 +77,7 @@ export function forge(size = 'medium', id = `m${++n}`, rank = 0) {
 /** The icon's field: charcoal, a warm glow rising from below the crest, a cool light from above. */
 export function field(id = `f${++n}`) {
   return `<defs><radialGradient id="${id}s" cx=".5" cy="0" r=".9"><stop offset="0" stop-color="#c9ccd4" stop-opacity=".22"/><stop offset=".6" stop-color="#16171b" stop-opacity=".3"/><stop offset="1" stop-color="#0a0a0b" stop-opacity="0"/></radialGradient>
-    <radialGradient id="${id}r" cx=".5" cy=".62" r=".55"><stop offset="0" stop-color="#b89443" stop-opacity=".26"/><stop offset=".55" stop-color="#44351b" stop-opacity=".22"/><stop offset="1" stop-color="#070707" stop-opacity="0"/></radialGradient></defs>
+    <radialGradient id="${id}r" cx=".5" cy=".62" r=".55"><stop offset="0" stop-color="#7897c0" stop-opacity=".26"/><stop offset=".55" stop-color="#26374c" stop-opacity=".22"/><stop offset="1" stop-color="#070707" stop-opacity="0"/></radialGradient></defs>
     <rect width="240" height="240" fill="#070707"/><rect width="240" height="240" fill="url(#${id}s)"/><rect width="240" height="240" fill="url(#${id}r)"/>`;
 }
 

@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#070707">
 <meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="HYBRID FORGE: planul Hybrid365 zi de zi (alergare, forță, condiționare), timere și tracking.">
+<meta name="description" content="ZENITH: planul Hybrid365 zi de zi (alergare, forță, condiționare), timere și tracking.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -29,8 +29,8 @@
 <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/start-750x1334.png">
 <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/start-1242x2208.png">
 <link rel="preload" href="splash/umbra.webp" as="image" type="image/webp">
-<script src="splash/arena.js"></script>
 <script src="splash/zenith.js"></script>
+<script src="splash/sky.js"></script>
 <link rel="preload" href="fonts/saira-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/saira-latin-ext-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script>
@@ -159,7 +159,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 (function () {
   var sp = document.getElementById('splash'), tear = document.getElementById('sp-tear');
   if (!sp) return;
-  var VERSION = '2026-11-21z', mode = 'auto', seen = false, known = '', boot = performance.now();
+  var VERSION = '2026-11-22s', mode = 'auto', seen = false, known = '', boot = performance.now();
   try { mode = localStorage.getItem('beast:opening') || 'auto'; known = localStorage.getItem('beast:opened-v') || ''; } catch (e) { /* storage blocked */ }
   try { seen = sessionStorage.getItem('beast:opened') === '1'; sessionStorage.setItem('beast:opened', '1'); } catch (e) { /* storage blocked */ }
   var forge = null;

@@ -37,7 +37,7 @@ export function challengeHtml(): string {
         ? `<p class="lead dim">Disciplina e un mușchi. Îl antrenezi zilnic, ca pe restul.</p>${nofapCard(today)}${dopaCard(today)}`
         : racesSeg();
   return `${top()}
-    ${masthead('Provocări', 'Curse simulate, provocări de 30 de zile și disciplină.', 'deadlift')}
+    ${masthead('Provocări', 'Curse simulate, provocări de 30 de zile și disciplină.', 'trail')}
     ${segBar('Secțiuni Provocări', CHALLENGE_SEGS, seg)}
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }

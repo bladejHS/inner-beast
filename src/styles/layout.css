@@ -13,8 +13,14 @@
   background: radial-gradient(60% 55% at 70% 45%, rgba(var(--glow-2), .3), transparent 70%), radial-gradient(90% 50% at 50% 0, rgba(130, 170, 235, .16), transparent 70%), linear-gradient(180deg, #0c1628, #070b14 70%, #05070c);
   -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent); mask-image: linear-gradient(180deg, #000 72%, transparent); }
 /* a canvas has no stretch: its width and height are given, or it grows with its own pixels */
-.mast-stage .hero-cv { left: 34%; right: auto; top: calc(var(--top-h) - 6px); bottom: auto; width: 70%; height: calc(74% - var(--top-h) + 6px); }
-.mast-stage .hero-wolf { left: auto; right: -14%; top: 4%; width: 74%; transform: none; opacity: .12; }
+.mast-stage .hero-cv { left: 0; top: 0; right: auto; bottom: auto; width: 100%; height: 100%; }
+/* the sky sinks and fades as you scroll away from it */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html:not([data-motion='lite']) .mast-stage .hero-cv, html:not([data-motion='lite']) .az-stage .hero-cv { animation: sky-sink linear both; animation-timeline: scroll(root); animation-range: 0 460px; }
+  }
+}
+@keyframes sky-sink { to { transform: translateY(110px) scale(1.12); opacity: .3; } }
 .mast-hz { position: absolute; left: 0; right: 0; bottom: 30%; height: 1px; background: linear-gradient(90deg, transparent, rgba(var(--glow), .5) 30%, #fff 62%, rgba(var(--glow), .5) 85%, transparent); box-shadow: 0 0 18px 2px rgba(var(--glow), .45); }
 .mast .ph { margin: 0; }
 .mast .ph-t { font-size: clamp(40px, 12.5vw, 72px); text-shadow: none; }
@@ -25,8 +31,7 @@
 .mission.az::after { display: none; }
 .az-stage { height: clamp(380px, 60svh, 540px); margin: 0 calc(-1 * var(--gutter)); border: 0; border-radius: 0 0 44px 44px; box-shadow: 0 40px 70px -40px rgba(var(--glow-2), .7);
   background: radial-gradient(60% 55% at 50% 38%, rgba(var(--glow-2), .32), transparent 70%), radial-gradient(90% 40% at 50% 0, rgba(130, 170, 235, .16), transparent 70%), linear-gradient(180deg, #0c1628, #070b14 75%, #05070c); }
-.az-stage .hero-cv { top: calc(var(--top-h) + 6px); bottom: auto; height: calc(66% - var(--top-h) - 6px); }
-.az-stage .hero-wolf { top: 6%; width: 78%; opacity: .12; }
+.az-stage .hero-cv { left: 0; top: 0; right: auto; bottom: auto; width: 100%; height: 100%; }
 .az-stage .mast-hz { bottom: 34%; }
 .az-stage::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 46%; z-index: 1; background: linear-gradient(180deg, transparent, rgba(5, 7, 12, .7) 55%, rgba(5, 7, 12, .92)); pointer-events: none; }
 .az .bc-c.tl, .az .bc-c.tr { top: calc(var(--top-h) + 4px); }

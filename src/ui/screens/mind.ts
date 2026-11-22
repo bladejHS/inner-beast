@@ -86,7 +86,7 @@ export function mindHtml(): string {
   const seg = segOf('mind', MIND_SEGS.map(([k]) => k));
   const body = seg === 'mental' ? mentalSeg() : seg === 'book' ? bookSeg() : toolsSeg();
   return `${top()}
-    ${masthead('Minte', 'Respirație, frig, disciplină și de ce-ul tău.', 'calm')}
+    ${masthead('Minte', 'Respirație, frig, disciplină și de ce-ul tău.', 'constellation')}
     ${segBar('Secțiuni Minte', MIND_SEGS, seg)}
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }

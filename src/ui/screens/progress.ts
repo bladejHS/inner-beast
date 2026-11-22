@@ -189,7 +189,7 @@ export function progressHtml(): string {
   const seg = segOf('progress', PROGRESS_SEGS.map(([k]) => k));
   const body = seg === 'train' ? trainSeg() : seg === 'tests' ? testsHtml() : seg === 'log' ? logSeg() : weekSeg();
   return `${top()}
-    ${masthead('Progres', 'Ce ai construit, săptămână de săptămână.', 'press')}
+    ${masthead('Progres', 'Ce ai construit, săptămână de săptămână.', 'orbit')}
     ${segBar('Secțiuni Progres', PROGRESS_SEGS, seg)}
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }

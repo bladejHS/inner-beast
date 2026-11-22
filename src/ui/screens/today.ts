@@ -1,13 +1,12 @@
 // "Azi": today's mission from the plan (the fight poster), the day's rounds, then the 28-day routine, sleep and your why.
 
-import { wolfArt } from '../rankart.ts';
 import { HABIT_STEPS } from '../../data/book.ts';
 import { WEEK, type Day } from '../../data/plan.ts';
 import { cycleAt, dayProgress, deloadDue, deloadOn, lightOn, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, weekDone, weekSince } from '../../logic/progress.ts';
 import { dayKey, esc, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
-import { blockCard, blockMinutes, gauge, liveBlock, top } from './shared.ts';
+import { blockCard, blockMinutes, gauge, liveBlock, top, skyCanvas, DAY_SCENE } from './shared.ts';
 import { rankPlate, wolfMood } from '../show.ts';
 import { repeatCard } from './plan.ts';
 import { draftSets, workoutDraft } from '../players/workout.ts';
@@ -25,8 +24,6 @@ export function weekStrip(today: string, active: number): string {
   }).join('')}</nav>`;
 }
 
-/** The living picture on the day's card (public/splash/arena.js): the discipline of the day, in the arena's light. */
-const HERO_KIND = ['bench', 'run', 'pull', 'deadlift', 'press', 'run', 'calm'];
 
 /** The stage as a fight-night broadcast (2026-11-15): the LIVE bug, the corner brackets, a light sweep, and the lower
  *  third with the day's main event: its longest block. Decoration only; the same facts are in the rows below. */
@@ -58,8 +55,7 @@ export function dayBody(day: Day, today: string, kicker: string, notes = ''): st
   return `
     <section class="mission hero az${n === total ? ' cleared' : ''}" aria-label="Misiunea zilei">
       <div class="hero-stage az-stage" aria-hidden="true">
-        <img class="hero-wolf" src="${wolfArt()}" alt="" width="680" height="801" decoding="async">
-        <canvas class="hero-cv" data-kind="${HERO_KIND[day.idx] ?? 'run'}"></canvas>
+        ${skyCanvas(DAY_SCENE[day.idx] ?? 'summit', day.idx + 1, { fx: 0.5, fy: 0.34, base: 0.66 })}
         ${broadcast(day, n, total, c ? `Ciclul ${c.id} · ${c.week}/4` : RO_DAYS[day.idx], false)}
         <i class="mast-hz"></i>
       </div>

@@ -205,18 +205,17 @@ function render(enter: Enter = ''): void {
 }
 ctx.render = () => render();
 
-/** The day's living picture (Azi): the arena engine from the opening draws the day's discipline on a loop. */
+/** The living skies (public/splash/sky.js): every canvas.hero-cv gets its scene; still in lite mode and reduced motion. */
 function mountHero(root: ParentNode): void {
-  const arena = (window as unknown as { BeastArena?: { hero: (c: HTMLCanvasElement, o: object) => unknown } }).BeastArena;
-  if (!arena) return;
+  const sky = (window as unknown as { ZenithSky?: { mount: (c: HTMLCanvasElement, o: object) => unknown } }).ZenithSky;
+  if (!sky) return;
   const still = lite() || matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // the zone's own light: red, or ice in Minte
   const css = getComputedStyle(document.documentElement);
   const rgb = (v: string, d: number[]) => { const p = css.getPropertyValue(v).split(',').map((x) => Number(x.trim())); return p.length === 3 && p.every((x) => x >= 0) ? p : d; };
-  const color = rgb('--glow-2', [165, 198, 240]), hot = rgb('--glow', [187, 213, 247]);
+  const color = rgb('--glow-2', [111, 151, 208]), hot = rgb('--glow', [185, 211, 245]);
   for (const cv of root.querySelectorAll<HTMLCanvasElement>('canvas.hero-cv')) {
     try {
-      arena.hero(cv, { kind: cv.dataset.kind, color, hot, still: still || cv.dataset.still === '1' });
+      sky.mount(cv, { color, hot, still: still || cv.dataset.still === '1' });
     } catch {
       /* the card stands without its picture */
     }

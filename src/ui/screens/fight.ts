@@ -124,7 +124,7 @@ export function fightHtml(): string {
   const body = seg === 'combos' ? combosSeg() : seg === 'alex' ? alexBody() : timersSeg();
   return `${top()}
     ${pageHead('Lupte', 'Runde de kickboxing, combinații și tot ce a arătat Alex.')}
-    ${heroBand('bag')}
+    ${heroBand('pulse')}
     ${segBar('Secțiuni Lupte', FIGHT_SEGS, seg)}
     <div class="seg-body" data-seg="${seg}">${body}</div>`;
 }

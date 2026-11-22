@@ -7,7 +7,7 @@ import { addDays, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { campaignSvg } from '../campaign.ts';
-import { blockIcon, blockMinutes, planPicks, top, masthead } from './shared.ts';
+import { blockIcon, blockMinutes, planPicks, top, masthead, skyCanvas, DAY_SCENE } from './shared.ts';
 
 function weekRange(mon: string): string {
   const end = addDays(mon, 6);
@@ -82,7 +82,7 @@ function cycleCard(today: string): string {
 
 /** The day's banner (2026-11-21, the user: "ceva mai specific și motivațional"): the day's own coaching line from
  *  the Hybrid365 slide, the day's targets as they stand this week (minutes, sets × reps, the progression step), and the
- *  day's discipline drawn in gold on the right by the arena engine (animated on today, still on the others). */
+ *  day.s scene drawn by the living skies, public/splash/sky.js (animated on today, still on the others). */
 const DAY_LINE: Array<[string, string]> = [
   ['Build momentum,', 'not fatigue.'],
   ['Your key', 'performance session.'],
@@ -92,7 +92,6 @@ const DAY_LINE: Array<[string, string]> = [
   ['Finish stronger', 'than you started.'],
   ['This is where', 'you get better.'],
 ];
-const DAY_KIND = ['bench', 'run', 'pull', 'deadlift', 'press', 'run', 'calm'];
 /** The day's discipline, as on its slide, and how hard it hits (of 5). */
 const DAY_TAG = ['Run · Upper', 'Threshold', 'Upper · Engine', 'Run · Lower', 'Strength · Power', 'Long Run', 'Recovery'];
 const DAY_HEAT = [2, 4, 4, 2, 5, 3, 1];
@@ -134,7 +133,7 @@ function dayBanner(d: Day, picks: Picks, today: boolean, full: boolean): string 
   return `<div class="dban${today ? ' today' : ''}${full ? ' full' : ''}" style="--n:${d.idx}" aria-hidden="true">
     <i class="db-num">${n}</i>
     <i class="db-beam"></i>
-    <canvas class="hero-cv" data-kind="${DAY_KIND[d.idx] ?? 'run'}"${today ? '' : ' data-still="1"'}></canvas>
+    ${skyCanvas(DAY_SCENE[d.idx] ?? 'summit', d.idx + 1, { fx: 0.62, fy: 0.4, base: 0.8, still: !today })}
     <i class="po-sheen"></i>
     <p class="db-k"><b>Day ${n}</b><span>${esc(DAY_TAG[d.idx] ?? '')}</span>${today ? '<em>Azi</em>' : ''}</p>
     ${full ? '<i class="db-stamp">Summit</i>' : ''}
@@ -206,7 +205,7 @@ export function planHtml(): string {
     </li>`;
   }).join('');
   return `${top()}
-    ${masthead('Planul', `Săptămâna ${weekRange(mon)}`, 'bench')}
+    ${masthead('Planul', `Săptămâna ${weekRange(mon)}`, 'summit')}
     <p class="obj-plate"><b>Obiectiv</b><span>SRI · Brigada Antiteroristă</span></p>
     <h2 class="sec first">Săptămâna<small>Glisează prin zile; azi e în centru.</small></h2>
     <ol class="dcs" aria-label="Zilele săptămânii">${days}</ol>

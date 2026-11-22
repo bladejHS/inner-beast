@@ -1,7 +1,6 @@
 // Pieces shared by the screens: header, page title, section switcher, the day's rounds, starting and checking off a block.
 
 import { powerRoutine } from '../../data/routines.ts';
-import { wolfArt } from '../rankart.ts';
 import { focusCombos, usesLegs } from '../../data/combos.ts';
 import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks, type RestKey, POWER_STEPS } from '../../data/plan.ts';
 import { activeStreak, cycleAt, deloadOn, growMinutes, weekSince, fullSessions } from '../../logic/progress.ts';
@@ -45,18 +44,35 @@ export function soreKnee(): KneeNote | null {
   return kneeSore(kneeNotes(ctx.S.log, ctx.S.knee), dayKey());
 }
 
-/** A living picture under a tab's title (2026-11-15): the arena engine (public/splash/arena.js) draws `kind` on a loop. */
-export function heroBand(kind: 'fight' | 'bag' | 'push' | 'pull' | 'run' | 'calm' | 'bench' | 'deadlift' | 'press'): string {
-  return `<div class="hero-stage band" aria-hidden="true"><img class="hero-wolf" src="${wolfArt()}" alt="" width="680" height="801" decoding="async"><canvas class="hero-cv" data-kind="${kind}"></canvas></div>`;
+/**
+ * The living skies (2026-11-22, public/splash/sky.js): no characters any more, only the night and one scene that
+ * carries the day or the tab. The user: "vreau să elimini animațiile cu personaje".
+ */
+export type Scene = 'summit' | 'orbit' | 'trail' | 'pulse' | 'constellation';
+/** The scene of each day of the week (Mon..Sun): strength orbits, the threshold beats, the climb, the long road, the calm. */
+export const DAY_SCENE: Scene[] = ['orbit', 'pulse', 'orbit', 'summit', 'summit', 'trail', 'constellation'];
+/** The canvas a scene is drawn on; fx/fy is its focus, base its horizon (fractions of the canvas). */
+export function skyCanvas(scene: Scene, seed: number, opts: { fx?: number; fy?: number; base?: number; still?: boolean } = {}): string {
+  const a = [`data-scene="${scene}"`, `data-seed="${seed}"`];
+  if (opts.fx != null) a.push(`data-fx="${opts.fx}"`);
+  if (opts.fy != null) a.push(`data-fy="${opts.fy}"`);
+  if (opts.base != null) a.push(`data-base="${opts.base}"`);
+  if (opts.still) a.push('data-still="1"');
+  return `<canvas class="hero-cv" ${a.join(' ')}></canvas>`;
+}
+
+/** A living picture under a tab's title (the boxing tab). */
+export function heroBand(scene: Scene): string {
+  return `<div class="hero-stage band" aria-hidden="true">${skyCanvas(scene, 3, { fy: 0.45, base: 0.86 })}</div>`;
 }
 
 /**
  * A tab's masthead (2026-11-21, ZENITH layout): the living picture runs full-bleed under the header, the title, its
  * star line and its one line of text sit over the picture's foot. Replaces pageHead + heroBand on the five tabs.
  */
-export function masthead(title: string, sub: string, kind: Parameters<typeof heroBand>[0], kicker = 'Zenith'): string {
+export function masthead(title: string, sub: string, scene: Scene, kicker = 'Zenith'): string {
   return `<header class="mast">
-    <div class="mast-stage" aria-hidden="true"><img class="hero-wolf" src="${wolfArt()}" alt="" width="680" height="801" decoding="async"><canvas class="hero-cv" data-kind="${kind}"></canvas><i class="mast-hz"></i></div>
+    <div class="mast-stage" aria-hidden="true">${skyCanvas(scene, title.length, { fx: 0.7, fy: 0.36, base: 0.7 })}<i class="mast-hz"></i></div>
     ${pageHead(title, sub, kicker)}
   </header>`;
 }

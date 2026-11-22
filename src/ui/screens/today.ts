@@ -2,8 +2,8 @@
 
 import { HABIT_STEPS } from '../../data/book.ts';
 import { WEEK, type Day } from '../../data/plan.ts';
-import { cycleAt, dayProgress, deloadDue, deloadOn, lightOn, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, weekDone, weekSince } from '../../logic/progress.ts';
-import { dayKey, esc, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
+import { activeStreak, cycleAt, dayProgress, deloadDue, deloadOn, lightOn, habitDone, habitGoal, habitMilestone, habitStreak, habitWeek, weekDone, weekSince } from '../../logic/progress.ts';
+import { addDays, dayKey, esc, prettyDay, RO_DAYS, shortDay, weekStart, weekdayIdx, daysBetween } from '../../logic/util.ts';
 import { ctx } from '../ctx.ts';
 import { ic } from '../icons.ts';
 import { blockCard, blockMinutes, gauge, liveBlock, top, skyCanvas, DAY_SCENE } from './shared.ts';
@@ -51,12 +51,14 @@ export function dayBody(day: Day, today: string, kicker: string, notes = ''): st
   // before the loop starts, the stat says when it starts instead of showing a dash
   const until = ctx.S.cycle.start ? daysBetween(today, ctx.S.cycle.start) : 0;
   const starts = until > 6 ? shortDay(ctx.S.cycle.start) : until > 0 ? RO_DAYS[weekdayIdx(ctx.S.cycle.start)] : '';
+  const isToday = weekdayIdx(today) === day.idx;
   const cyc = light ? ['Ușoară', ctx.S.easy === today ? 'ziua' : 'săptămâna'] : c ? [`${c.id} · ${c.week}/4`, 'ciclul'] : starts ? [starts, 'începe ciclul'] : ['—', 'ciclul'];
   return `
     <section class="mission hero az${n === total ? ' cleared' : ''}" aria-label="Misiunea zilei">
       <div class="hero-stage az-stage" aria-hidden="true">
         ${skyCanvas(DAY_SCENE[day.idx] ?? 'summit', day.idx + 1, { fx: 0.5, fy: 0.34, base: 0.66 })}
         ${broadcast(day, n, total, c ? `Ciclul ${c.id} · ${c.week}/4` : RO_DAYS[day.idx], false)}
+        ${isToday ? azClock() : ''}
         <i class="mast-hz"></i>
       </div>
       <div class="az-head">
@@ -70,15 +72,50 @@ export function dayBody(day: Day, today: string, kicker: string, notes = ''): st
       </div>
       <div class="segs" role="img" aria-label="${n} din ${total} blocuri făcute">${day.blocks.map((b, i) => `<i class="${done.has(b.id) ? 'on' : b === next ? 'next' : ''}" style="--i:${i}"></i>`).join('')}</div>
       ${next
-        ? `<button class="cta" data-a="start" data-b="${next.id}"><span class="cta-ic">${ic('play')}</span><span class="cta-l"><small>Începe</small><b>${esc(liveBlock(next).name)}</b></span><i class="cta-sheen" aria-hidden="true"></i></button>`
+        ? `<button class="cta" data-a="start" data-b="${next.id}"><span class="cta-ic"><i class="cta-halo" aria-hidden="true"></i>${ic('play')}</span><span class="cta-l"><small>Începe · ${day.blocks.indexOf(next) + 1}/${total}</small><b>${esc(liveBlock(next).name)}</b></span><em class="cta-t"><b class="num">${blockMinutes(next)}</b>min</em><i class="cta-sheen" aria-hidden="true"></i></button>`
         : `<p class="ms-done">${ic('claw')}<span>Misiune încheiată</span></p>`}
     </section>
     ${notes}
-    ${weekdayIdx(today) === day.idx ? rankPlate() : ''}
+    ${isToday ? briefHtml(today, done) : ''}
+    ${isToday ? rankPlate() : ''}
     ${weekHead(today)}
     ${weekStrip(today, day.idx)}
     <h2 class="sec">Sesiunile zilei<small>Atinge numărul unei sesiuni ca s-o bifezi fără timer.</small></h2>
     <ol class="rds">${day.blocks.map((b, i) => blockCard(b, i + 1, today, b === next)).join('')}</ol>`;
+}
+
+/** The time and a greeting over the day's sky (2026-11-22, Azi premium); main.ts keeps the clock running. */
+function azClock(): string {
+  const d = new Date();
+  const h = d.getHours();
+  const hi = h < 5 ? 'Noapte bună' : h < 12 ? 'Bună dimineața' : h < 18 ? 'Bună ziua' : 'Bună seara';
+  return `<div class="az-clock"><p class="az-greet"><i></i><span>${hi}</span></p><b class="az-time num" data-clock>${String(h).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}</b></div>`;
+}
+
+/**
+ * The day's briefing (2026-11-22, the user: "vreau să fie ceva foarte premium"): a bento of three instruments, the
+ * streak with the last seven days as lights, the week as a ring, and how ready you are (it opens the questions).
+ */
+function briefHtml(today: string, done: Set<string>): string {
+  const S = ctx.S;
+  const streak = activeStreak(S.log, today);
+  const days = new Set(S.log.map((e) => e.date));
+  const last7 = Array.from({ length: 7 }, (_, i) => addDays(today, i - 6));
+  const all = WEEK.reduce((t, d) => t + d.blocks.length, 0);
+  const pct = all ? Math.round((done.size / all) * 100) : 0;
+  const r = readiness(S.ready[today] ?? {}, S.sleep[today], sleepAvg3(S.sleep, today));
+  const ring = (f: number, inner: string, label: string, cls = '', attrs = '') =>
+    `<${attrs ? 'button' : 'div'} class="bf bf-ring ${cls}" style="--f:${f.toFixed(3)}"${attrs}><svg viewBox="0 0 48 48" aria-hidden="true"><circle class="t" cx="24" cy="24" r="20"/><circle class="v" cx="24" cy="24" r="20" pathLength="100" transform="rotate(-90 24 24)"/></svg><p>${inner}</p><span>${label}</span></${attrs ? 'button' : 'div'}>`;
+  return `<section class="brief" aria-label="Rezumatul zilei">
+    <div class="bf bf-streak">
+      <p class="bf-k">Seria</p>
+      <b class="num" data-count="${streak}">${streak}</b>
+      <span>${streak === 1 ? 'zi activă' : 'zile active'} la rând</span>
+      <div class="bf-dots" aria-label="Ultimele 7 zile">${last7.map((d, i) => `<i class="${days.has(d) ? 'on' : ''}${i === 6 ? ' now' : ''}" style="--i:${i}" title="${RO_DAYS[weekdayIdx(d)]}"></i>`).join('')}</div>
+    </div>
+    ${ring(pct / 100, `<b class="num" data-count="${pct}">${pct}</b><small>%</small>`, 'săptămâna')}
+    ${r ? ring(r.score / 100, `<b class="num" data-count="${r.score}">${r.score}</b>`, 'pregătire', `lv-${r.level}`, ' data-a="ready-edit" data-k="1" aria-label="Pregătirea de azi: schimbă răspunsurile"') : ring(0, '<b>?</b>', 'cum ești azi', 'ask', ' data-a="ready-edit" data-k="1" aria-label="Răspunde la cum ești azi"')}
+  </section>`;
 }
 
 /** Calories logged today in Beast Nutrition, which shares this origin. Null when that app holds nothing. */

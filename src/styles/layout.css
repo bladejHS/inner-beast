@@ -272,3 +272,97 @@
   .rx-sat, .rx-dial::before, .rc-aura, .rc-ring, .rc::after, .hof::after, .deck .stat::before, .deck .stats > .stat:first-child::after, .rc-live-dot { animation: none !important; }
 }
 html[data-motion='lite'] .rx-sat, html[data-motion='lite'] .rx-dial::before, html[data-motion='lite'] .rc-aura, html[data-motion='lite'] .rc-ring, html[data-motion='lite'] .rc::after, html[data-motion='lite'] .hof::after, html[data-motion='lite'] .deck .stat::before { animation: none !important; }
+
+/* ================= 2026-11-22 · Azi premium (the user: "vreau să fie ceva foarte premium") ================= */
+/* the clock over the sky */
+.az .bc-bug, .az .bc-c { display: none; }
+.az-clock { position: absolute; left: var(--gutter); top: calc(var(--top-h) + 10px); z-index: 3; display: grid; gap: 4px; pointer-events: none; }
+.az-greet { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 semi-expanded 10.5px/1 var(--font); letter-spacing: .26em; text-transform: uppercase; color: var(--ink-2); text-shadow: 0 1px 8px rgba(0, 0, 0, .8); }
+.az-greet i { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: live-ping 1.8s ease-out infinite; }
+.az-time { font: 260 expanded clamp(52px, 17vw, 84px)/.9 var(--font); letter-spacing: .02em; background: linear-gradient(180deg, #fff 30%, rgba(185, 211, 245, .55)); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 0 18px rgba(var(--glow), .35)); }
+#app.enter-tab .az-clock { animation: clock-in 1.1s var(--e-out) .1s both; }
+@keyframes clock-in { from { opacity: 0; letter-spacing: .4em; filter: blur(8px); } }
+
+/* the title: revealed like a light passing over it, then a sheen crossing every few seconds */
+#app.enter-tab .az-head .ms-t span { animation: title-in 1s var(--e-out) .15s both, title-sheen 7s ease-in-out 1.4s infinite; }
+.az-head .ms-t span { animation: title-sheen 7s ease-in-out 1.4s infinite; }
+@keyframes title-in { from { clip-path: inset(0 100% 0 0); letter-spacing: .25em; } to { clip-path: inset(0 0 0 0); } }
+@keyframes title-sheen { 0%, 55% { background-position: 170% 0, 0 0; } 85%, 100% { background-position: -70% 0, 0 0; } }
+.az-head .ms-k b { color: var(--ink-2); }
+
+/* the HUD capsule: a light running round its edge */
+.az-hud::after { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: conic-gradient(from var(--ang, 0deg), transparent 0 72%, rgba(255, 255, 255, .9) 84%, transparent 94%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); animation: deck-ang 6s linear infinite; }
+#app.enter-tab .az-hud { animation: hud-in .8s var(--spring) .35s both; }
+@keyframes hud-in { from { opacity: 0; transform: translateY(24px) scale(.94); } }
+
+/* the start capsule: ripples round the play, the session's minutes on the right */
+.cta { grid-template-columns: 80px 1fr auto; }
+.cta-ic { position: relative; }
+.cta-halo, .cta-halo::before { position: absolute; inset: -2px; border-radius: 50%; border: 2px solid rgba(6, 16, 31, .45); animation: cta-ripple 2.4s cubic-bezier(.2, .7, .3, 1) infinite; pointer-events: none; }
+.cta-halo::before { content: ''; inset: -2px; animation-delay: 1.2s; }
+@keyframes cta-ripple { from { transform: scale(1); opacity: .9; } to { transform: scale(1.55); opacity: 0; } }
+.cta-t { display: grid; justify-items: center; align-content: center; gap: 2px; margin: 12px 14px 12px 0; padding: 0 12px; border-radius: 18px; background: rgba(6, 16, 31, .1); box-shadow: inset 0 0 0 1px rgba(6, 16, 31, .18); font: 800 semi-expanded 9px/1 var(--font); font-style: normal; letter-spacing: .16em; text-transform: uppercase; color: rgba(6, 16, 31, .7); }
+.cta-t b { font: 800 condensed 26px/.9 var(--font); color: var(--on-lit); letter-spacing: 0; }
+.cta-sheen { animation: cta-sheen 4.5s ease-in-out 1s infinite; }
+@keyframes cta-sheen { 0%, 60% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
+
+/* the briefing: three instruments as a bento */
+.brief { display: grid; grid-template-columns: 1.25fr 1fr; grid-template-rows: auto auto; gap: 10px; margin: 18px 0 8px; }
+.bf { position: relative; overflow: hidden; min-width: 0; padding: 14px; border: 1px solid transparent; border-radius: 24px; color: var(--ink); text-align: left;
+  background: radial-gradient(120% 90% at 0 0, rgba(var(--glow-2), .22), transparent 60%) padding-box, var(--glass-fill) padding-box, var(--glass-edge) border-box; box-shadow: var(--shadow); }
+.bf::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .08) 50%, transparent 62%) no-repeat; background-size: 260% 100%; animation: deck-sheen 7s ease-in-out infinite; }
+.bf-k { margin: 0; font: 700 semi-expanded 10px/1 var(--font); letter-spacing: .24em; text-transform: uppercase; color: var(--label); }
+.bf-streak { grid-row: span 2; display: flex; flex-direction: column; padding: 16px 16px 18px;
+  background: radial-gradient(120% 80% at 100% 0, rgba(var(--glow), .3), transparent 60%) padding-box, radial-gradient(90% 60% at 0 100%, rgba(160, 140, 240, .16), transparent 70%) padding-box, var(--glass-fill) padding-box, linear-gradient(160deg, rgba(220, 234, 252, .75), rgba(111, 151, 208, .15)) border-box; }
+.bf-streak > b { margin-top: auto; font: 800 condensed 88px/.85 var(--font); background: linear-gradient(180deg, #fff 35%, var(--acc)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 22px rgba(var(--glow), .45)); }
+.bf-streak > span { margin-top: 6px; font: 600 normal 13px/1.25 var(--font); color: var(--mute); }
+.bf-dots { display: flex; gap: 6px; margin-top: 14px; }
+.bf-dots i { flex: 1; height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .08); }
+.bf-dots i.on { background: var(--lit); box-shadow: 0 0 10px -2px rgba(var(--glow), .9); }
+.bf-dots i.now { outline: 1.5px solid rgba(255, 255, 255, .7); outline-offset: 2px; }
+#app.enter-tab .bf-dots i { animation: pop .5s var(--spring) calc(.5s + var(--i) * .06s) both; }
+.bf-ring { display: grid; grid-template-columns: 58px 1fr; grid-template-rows: auto auto; column-gap: 12px; align-items: center; cursor: default; }
+button.bf-ring { cursor: pointer; font: inherit; }
+.bf-ring svg { grid-row: span 2; width: 58px; height: 58px; overflow: visible; }
+.bf-ring circle { fill: none; stroke-width: 4.5; }
+.bf-ring .t { stroke: rgba(255, 255, 255, .08); }
+.bf-ring .v { stroke: var(--acc-hi); stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: calc(100 - var(--f) * 100); filter: drop-shadow(0 0 5px rgba(var(--glow), .9)); }
+.bf-ring.lv-hold .v { stroke: #c9b8f5; filter: drop-shadow(0 0 5px #c9b8f5); }
+.bf-ring.lv-easy .v { stroke: #9fe3f0; filter: drop-shadow(0 0 5px #9fe3f0); }
+.bf-ring p { margin: 0; align-self: end; display: flex; align-items: flex-start; }
+.bf-ring p b { font: 800 condensed 34px/.9 var(--font); color: #fff; }
+.bf-ring p small { margin: 2px 0 0 1px; font: 800 condensed 14px/1 var(--font); color: var(--acc-hi); }
+.bf-ring > span { align-self: start; min-width: 0; margin-top: 4px; font: 700 normal 9px/1.2 var(--font); letter-spacing: .1em; text-transform: uppercase; color: var(--label); }
+.bf-ring.ask .t { stroke: rgba(var(--glow), .35); stroke-dasharray: 3 5; animation: rx-spin 12s linear infinite; transform-origin: 24px 24px; }
+.bf-ring.ask p b { color: var(--acc-hi); }
+.bf-ring[style*='--f:0.000'] .v { display: none; }
+#app.enter-tab .bf-ring .v { animation: rx-ring 1.4s var(--e-out) .45s both; }
+#app.enter-tab .bf { animation: pop .6s var(--spring) both; }
+#app.enter-tab .bf:nth-child(2) { animation-delay: .08s; } #app.enter-tab .bf:nth-child(3) { animation-delay: .16s; }
+
+/* the next session: a light running round its card */
+.rd.next { overflow: visible; }
+.rd.next::before { content: ''; position: absolute; inset: -1px; z-index: 2; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: conic-gradient(from var(--ang, 0deg), transparent 0 65%, rgba(255, 255, 255, .95) 80%, rgba(var(--glow), .8) 86%, transparent 95%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); animation: deck-ang 4s linear infinite; }
+.rd.next .rd-node::after { animation: node-pulse 2s ease-out infinite; }
+@keyframes node-pulse { from { transform: scale(1); opacity: 1; } to { transform: scale(1.7); opacity: 0; } }
+
+/* your why: a quote set large, with its mark */
+.card.why { position: relative; overflow: hidden; padding-top: 22px; }
+.card.why::before { content: '\201C'; position: absolute; right: 12px; top: -30px; font: 800 expanded 180px/1 var(--font); color: transparent; -webkit-text-stroke: 1px rgba(var(--glow), .28); pointer-events: none; }
+.why-quote { padding-left: 0; box-shadow: none; font: 650 italic 22px/1.35 var(--font); letter-spacing: .005em; background: linear-gradient(180deg, #fff, #b9d3f5); -webkit-background-clip: text; background-clip: text; color: transparent; text-wrap: balance; }
+
+/* Azi rises into place as it scrolls */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html:not([data-motion='lite']) #app:has(> .mission.az) > :is(.card, .brief, .wk, .wk-head, .sec, .row-link),
+    html:not([data-motion='lite']) #app:has(> .mission.az) .rds > li { animation: deck-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 80%; }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .az-greet i, .cta-halo, .cta-halo::before, .cta-sheen, .az-hud::after, .bf::before, .rd.next::before, .rd.next .rd-node::after, .az-head .ms-t span, .bf-ring.ask .t { animation: none !important; }
+}
+html[data-motion='lite'] .cta-halo, html[data-motion='lite'] .cta-halo::before, html[data-motion='lite'] .az-hud::after, html[data-motion='lite'] .bf::before, html[data-motion='lite'] .rd.next::before, html[data-motion='lite'] .az-head .ms-t span { animation: none !important; }

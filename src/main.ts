@@ -208,6 +208,11 @@ function render(enter: Enter = ''): void {
   }
 }
 ctx.render = () => render();
+// Azi's clock (2026-11-22): the minutes turn over without a redraw
+setInterval(() => {
+  const d = new Date();
+  for (const el of document.querySelectorAll<HTMLElement>('[data-clock]')) el.textContent = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}, 15000);
 
 /** The living skies (public/splash/sky.js): every canvas.hero-cv gets its scene; still in lite mode and reduced motion. */
 function mountHero(root: ParentNode): void {

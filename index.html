@@ -49,6 +49,8 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 /* THE ASCENT since 2026-11-21 (splash/zenith.js, the app renamed ZENITH): stars over a horizon, sparks rise and settle
    into the mark while a comet climbs to the peak; at 1.35 s the star at the tip ignites (flash, lens flare, shock
    rings, a light round the dial) and ZENITH is stamped; on the exit the stars streak upward and the mark flies home.
+   Since 2026-11-22: GENESIS (splash/zenith.js), about 5.6 s: a jump through hyperspace, the drop-out, mountain ranges
+   rising, sparks spiralling into the mark, the ignition at 3.0 s, the afterglow. Before it, THE ASCENT (below).
    Before that, THE IGNITION (splash/ignite.js, retired): a seam of molten light, a vortex of sparks spiralling onto the
    crest, the hammer strike at 1.45 s (flash, shock rings, sparks, slow-motion), the crest white-hot cooling to gold and
    steel while HYBRID FORGE is stamped; the black parts along the seam and the crest flies into the tab bar.
@@ -58,7 +60,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
    camera shakes, time slows) and INNER BEAST is stamped under the fight. Then the black rips open along the claw tear and
    the wolf flies home into the tab bar. Tap or Enter skips. Reduced motion, "Animații: Reduse" and Data Saver get the
    still poster: the same arena, frozen on the kick. */
-#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#05070c;color:#f0efea;animation:sp-guard 0s linear 10s forwards;--w:min(88vw,40vh,520px)}
+#splash{position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#05070c;color:#f0efea;animation:sp-guard 0s linear 13s forwards;--w:min(88vw,40vh,520px)}
 @keyframes sp-guard{to{visibility:hidden;pointer-events:none}}
 .sp-half{position:absolute;inset:-3px;background:#05070c}
 .sp-a{clip-path:polygon(0 0,100% 0,100% 48%,0 48%)}
@@ -159,7 +161,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
 (function () {
   var sp = document.getElementById('splash'), tear = document.getElementById('sp-tear');
   if (!sp) return;
-  var VERSION = '2026-11-22s', mode = 'auto', seen = false, known = '', boot = performance.now();
+  var VERSION = '2026-11-22g', mode = 'auto', seen = false, known = '', boot = performance.now();
   try { mode = localStorage.getItem('beast:opening') || 'auto'; known = localStorage.getItem('beast:opened-v') || ''; } catch (e) { /* storage blocked */ }
   try { seen = sessionStorage.getItem('beast:opened') === '1'; sessionStorage.setItem('beast:opened', '1'); } catch (e) { /* storage blocked */ }
   var forge = null;
@@ -174,7 +176,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
   try { localStorage.setItem('beast:opened-v', VERSION); } catch (e) { /* storage blocked */ }
   var conn = navigator.connection;
   var calm = mode === 'short' || matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'lite' || !!(conn && conn.saveData) || !window.BeastIgnite;
-  var HOLD = calm ? 1100 : 3500, LIMIT = 6500;
+  var HOLD = calm ? 1100 : 5600, LIMIT = 9000;
   var t0 = 0, started = false, leaving = false, broken = false;
   addEventListener('error', function (e) { if (e.error || (e.target && e.target.tagName === 'SCRIPT')) broken = true; }, true);
   function say(name) { try { dispatchEvent(new Event(name)); } catch (e) { /* old browser */ } }
@@ -219,7 +221,7 @@ html,body{margin:0;background:var(--sp-bg);color:var(--sp-fg)}
     return window.BeastIgnite.create({ canvas: document.getElementById('sp-cv'), stage: sp.querySelector('.sp-stage'), root: sp, color: [120, 151, 192], hot: [159, 192, 236], onImpact: hit });
   }
   // the calm poster is the same scene, frozen just after the finish beam breaks
-  function poster() { if (!window.BeastIgnite) return; try { forge = arena(null); forge.still(2.4); } catch (e) { /* the wolf and the name are enough */ } }
+  function poster() { if (!window.BeastIgnite) return; try { forge = arena(null); forge.still(4.6); } catch (e) { /* the wolf and the name are enough */ } }
   // Starts once main.ts has drawn the dashboard, so that work does not stutter the sparks; after half a second it runs anyway.
   function arm() {
     if (started) return;

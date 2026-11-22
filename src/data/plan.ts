@@ -95,7 +95,7 @@ export interface Picks {
   cycle?: CycleId;
   cycleWeek?: number;
   /** The easy and long runs: run (Hybrid365), or row on a day the knees ask for it. */
-  aero?: 'run' | 'row';
+  aero?: 'run' | 'row' | 'assault' | 'bike';
   /** The threshold session of the active loop plan (logic/nextblock.ts), when there is one: from loop 2 the ladder
       is held and the pace moves instead, so the session no longer comes from THR_STEPS. */
   thrOver?: { reps: number; min: number; rest: number };
@@ -139,6 +139,21 @@ const COND: Partial<Record<string, Partial<Block>>> = {
 
 /** Tuesday's progression, exactly as the slide gives it: "Add 1 rep (up to 5–6 total). Extend reps to 7–8 min. Or
  *  reduce recovery to 60 sec between reps." One step after each full threshold session (Picks.thrStep). */
+/** The low-impact machines (2026-11-23). The research is one-sided that at this body mass the swap is the single
+ *  best lever there is: impact per step disappears, the aerobic dose stays, and the endurance work stops competing
+ *  with the lifting as much (the interference the meta-analyses find is for running, not cycling). */
+/** The day's title when the running is on a machine: "Threshold Run" becomes "Threshold Bike". */
+export function dayTitleFor(title: string, aero?: 'run' | 'row' | 'assault' | 'bike'): string {
+  if (!aero || aero === 'run' || !/Run/.test(title)) return title;
+  return title.replace(/Run/g, MACHINES[aero].word);
+}
+
+export const MACHINES: Record<'row' | 'assault' | 'bike', { word: string; on: string; easy: string; cues: string[] }> = {
+  row: { word: 'Row', on: 'pe vâslitor', easy: 'vâslit ușor', cues: ['Împingi din picioare, apoi spatele, apoi brațele; revii în ordine inversă.'] },
+  assault: { word: 'Assault Bike', on: 'pe assault bike', easy: 'pedalat ușor', cues: ['Brațele și picioarele în același ritm; nu te lași pe ghidon.'] },
+  bike: { word: 'Bike', on: 'pe bicicletă', easy: 'pedalat ușor', cues: ['Cadență 85–95, șaua la înălțimea șoldului; nu te legeni.'] },
+};
+
 export const THR_STEPS: Array<{ reps: number; min: number; rest: number }> = [
   { reps: 4, min: 6, rest: 90 }, { reps: 5, min: 6, rest: 90 }, { reps: 6, min: 6, rest: 90 },
   { reps: 6, min: 7, rest: 90 }, { reps: 6, min: 8, rest: 90 }, { reps: 6, min: 8, rest: 60 },
@@ -282,11 +297,23 @@ export function resolveBlock(b: Block, p: Picks): Block {
   const grown = b.grow ? p.grown?.[b.id] : undefined;
   if (grown && grown !== b.min) r = { ...r, min: grown, dose: `${grown} min` };
   if (r.legSwap) return { ...r, name: p.legMode === 'jump' ? 'Jumping Squats' : 'Wall Sit' };
-  if (r.alt === 'aero' && p.aero === 'row') {
+  const machine = p.aero && p.aero !== 'run' ? MACHINES[p.aero] : null;
+  if (r.alt === 'aero' && machine) {
     return {
-      ...r, kind: 'cardio', name: r.name.replace('Run', 'Row'),
-      tip: `${r.tip} Azi pe vâslitor, aceeași durată și aceeași zonă 2: cruță genunchii.`,
-      cues: ['Ții pulsul în zona 2 de pe centură; dacă trece de ea, tragi mai ușor.', 'Împingi din picioare, apoi spatele, apoi brațele; revii în ordine inversă.'],
+      ...r, kind: 'cardio', name: r.name.replace('Run', machine.word),
+      tip: `${r.tip} Azi ${machine.on}, aceeași durată și aceeași zonă 2: minutele contează, nu kilometrii.`,
+      cues: ['Ții pulsul în zona 2 de pe centură; dacă trece de ea, tragi mai ușor.', ...machine.cues],
+    };
+  }
+  // the key session of the week moves to the machine as well: the structure stays, the impact goes
+  if (machine && (b.id === 'tue-thr' || b.id === 'tue-wu' || b.id === 'tue-cd')) {
+    const name = r.name.replace('Run', machine.word).replace('Threshold', 'Threshold');
+    const line = (r.line ?? '').replace(/Easy Run/g, `${machine.word} ușor`).replace(/easy jog/g, `${machine.easy}`).replace(/Threshold Pace/g, 'efort de prag');
+    return {
+      ...r, kind: b.id === 'tue-thr' ? r.kind : 'cardio', name, line,
+      tip: b.id === 'tue-thr'
+        ? `Pragul ${machine.on}: același efort și aceeași structură, fără impact. Reperul nu mai e ritmul, ci watt-ii sau ritmul de pe aparat — ține-i egali de la prima repetare la ultima.`
+        : `${r.tip ?? ''} ${machine.on}, ușor.`.trim(),
     };
   }
   if (r.alt === 'cond' && p.wedCond && COND[p.wedCond]) return { ...r, ...COND[p.wedCond], rowCh: undefined };

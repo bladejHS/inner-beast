@@ -139,7 +139,9 @@ export function planPicks(today = dayKey()): Settings & Picks {
   // the Hybrid365 progressions move one step per full session; a lighter week holds them
   const thrStep = fullSessions(S.log, 'tue-thr'), engStep = S.log.filter((e) => e.block === 'wed-cond' && e.kind === 'row').length;
   const powStep = S.log.filter((e) => e.block === 'fri-emom' && !e.data.deload).length;
-  picksVal = { ...S.set, cycle: c?.id, cycleWeek: c?.week, grown, thrStep, engStep, powStep,
+  // the machine period ends by itself: after the last day the plan is back on foot without anyone touching a switch
+  const onMachine = S.set.aero !== 'run' && (!S.set.aeroUntil || today <= S.set.aeroUntil);
+  picksVal = { ...S.set, aero: onMachine ? S.set.aero : 'run', cycle: c?.id, cycleWeek: c?.week, grown, thrStep, engStep, powStep,
     ...(plan ? { thrOver: plan.thr, pacePct: plan.pacePct } : {}) };
   return picksVal;
 }

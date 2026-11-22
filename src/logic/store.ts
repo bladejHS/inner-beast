@@ -80,8 +80,12 @@ export interface Settings {
   hrMax: number;
   /** Sunday's easy aerobic slot. Row by default: kinder to the knees while they hurt. */
   sunAero: 'run' | 'row';
-  /** Hybrid365 (2026-11-20): the easy and long runs, on foot by default; the rower on a day the knees ask for it. */
-  aero: 'run' | 'row';
+  /** Hybrid365 (2026-11-20): the easy and long runs, on foot by default; a machine when the knees ask for it.
+      2026-11-23, the user: "prima lună tot ce ține de alergare o să fie la aparat row, assault bike, bike" — so the
+      choice now covers every running block, the threshold session included, and it can be set to expire. */
+  aero: 'run' | 'row' | 'assault' | 'bike';
+  /** The last day the machine replaces running; after it the plan goes back on foot by itself. Empty = no end. */
+  aeroUntil: string;
   /** Wednesday's conditioning: Option A Engine Builder (row), Option B Hybrid Circuit. */
   wedCond: 'a' | 'b' | 'c' | 'd' | 'e';
 }
@@ -226,6 +230,7 @@ export const DEFAULT_SETTINGS: Settings = {
   hrMax: 192,
   sunAero: 'row',
   aero: 'run',
+  aeroUntil: '',
   wedCond: 'a',
 };
 

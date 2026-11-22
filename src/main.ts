@@ -14,7 +14,7 @@ import { dropPushups, habitGoal } from './logic/progress.ts';
 import { chapterCheck, ranksSheet } from './ui/show.ts';
 import { forceUpdate } from './ui/update.ts';
 import { wolfBadge } from './ui/rankart.ts';
-import { dayKey, esc, shortDay, uid, weekdayIdx, weekStart } from './logic/util.ts';
+import { addDays, dayKey, esc, shortDay, uid, weekdayIdx, weekStart } from './logic/util.ts';
 import { initAudio, unlock } from './ui/audio.ts';
 import { closePlayer, closeSheet, ctx, openSheet, ask, save, sheetAct, toast, type Tab, type View } from './ui/ctx.ts';
 import { ic } from './ui/icons.ts';
@@ -612,6 +612,21 @@ function act(a: string, el: HTMLElement): void {
       S.set.hrMax = Math.max(150, Math.min(220, S.set.hrMax + (Number(el.dataset.d) || 0)));
       save();
       return render();
+    case 'set-aero': {
+      const v = (el.dataset.v as 'run' | 'row' | 'assault' | 'bike') || 'run';
+      S.set.aero = v;
+      // a machine chosen without a term defaults to the month the user asked for; back on foot clears it
+      if (v === 'run') S.set.aeroUntil = '';
+      else if (!S.set.aeroUntil) S.set.aeroUntil = addDays(today, 28);
+      save();
+      return render();
+    }
+    case 'set-aero-until': {
+      const d = Number(el.dataset.v || 0);
+      S.set.aeroUntil = d > 0 ? addDays(today, d) : '';
+      save();
+      return render();
+    }
     case 'intro-ok':
       try {
         localStorage.setItem('beast:intro', '1');

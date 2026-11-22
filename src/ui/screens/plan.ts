@@ -1,6 +1,6 @@
 // "Plan": the week as seven day cards and the 12-week Hybrid365 loop as a campaign map.
 
-import { ENGINE_STEPS, POWER_STEPS, THR_STEPS, WEEK, blockLine, resolveBlock, type Block, type Day, type Picks } from '../../data/plan.ts';
+import { ENGINE_STEPS, POWER_STEPS, THR_STEPS, WEEK, blockLine, dayTitleFor, resolveBlock, type Block, type Day, type Picks } from '../../data/plan.ts';
 import { workoutById } from '../../data/workouts.ts';
 import { CYCLE_WEEKS, CYCLES, cycleAt, dayComplete, dayProgress, daysOff, loopWeek, repeatMonday, weekDone, weekSince } from '../../logic/progress.ts';
 import { addDays, dayKey, esc, RO_DAYS, shortDay, weekStart, weekdayIdx } from '../../logic/util.ts';
@@ -135,7 +135,7 @@ function dayBanner(d: Day, picks: Picks, today: boolean, full: boolean): string 
     <i class="db-beam"></i>
     ${skyCanvas(DAY_SCENE[d.idx] ?? 'summit', d.idx + 1, { fx: 0.62, fy: 0.4, base: 0.8, still: !today })}
     <i class="po-sheen"></i>
-    <p class="db-k"><b>Day ${n}</b><span>${esc(DAY_TAG[d.idx] ?? '')}</span>${today ? '<em>Azi</em>' : ''}</p>
+    <p class="db-k"><b>Day ${n}</b><span>${esc(dayTitleFor(DAY_TAG[d.idx] ?? '', planPicks().aero))}</span>${today ? '<em>Azi</em>' : ''}</p>
     ${full ? '<i class="db-stamp">Summit</i>' : ''}
     <p class="db-l"><span>${esc(a)}</span><b>${esc(b)}</b></p>
     <p class="db-h"><span>Intensitate</span>${bars}</p>
@@ -198,7 +198,7 @@ export function planHtml(): string {
           ${state ? `<span class="dc-tag">${state}</span>` : ''}
           <span class="dc-min">~${mins} min</span>
         </span>
-        <span class="dc-t">${esc(d.title)}</span>
+        <span class="dc-t">${esc(dayTitleFor(d.title, picks.aero))}</span>
         <span class="dc-list">${d.blocks.map((b) => `<span class="dc-li ${done.has(b.id) ? 'ok' : ''}">${ic(done.has(b.id) ? 'check' : blockIcon(b))}<span>${esc(blockLine(b, picks))}</span></span>`).join('')}</span>
         <span class="dc-bar" aria-hidden="true"><i></i></span>
       </button>

@@ -815,7 +815,14 @@ test('the runs: on foot by default, the rower when picked; the threshold pulse; 
   assert.deepEqual([resolveBlock(r('mon-run'), P).kind, resolveBlock(r('mon-run'), P).name], ['run', 'Easy Run (Zone 2)']);
   const row = resolveBlock(r('sat-long'), { ...P, aero: 'row' });
   assert.deepEqual([row.kind, row.name, row.id], ['cardio', 'Long Row (Endurance)', 'sat-long']);
-  assert.equal(resolveBlock(r('tue-wu'), { ...P, aero: 'row' }).kind, 'run'); // the threshold day stays on foot
+  // 2026-11-23, the user: "prima lună tot ce ține de alergare o să fie la aparat" — the threshold day moves too
+  assert.equal(resolveBlock(r('tue-wu'), { ...P, aero: 'row' }).kind, 'cardio');
+  const thr = resolveBlock(r('tue-thr'), { ...P, aero: 'bike' });
+  assert.equal(thr.kind, 'rounds', 'the structure of the key session is kept');
+  assert.match(thr.line ?? '', /efort de prag/);
+  assert.match(thr.tip ?? '', /pe bicicletă/);
+  const assault = resolveBlock(r('mon-run'), { ...P, aero: 'assault' });
+  assert.deepEqual([assault.kind, assault.name], ['cardio', 'Easy Assault Bike (Zone 2)']);
   assert.deepEqual(zoneHard(192), [163, 182]);
   assert.deepEqual(zoneThr(192), [154, 169]);
   const a = resolveBlock(r('wed-cond'), P);

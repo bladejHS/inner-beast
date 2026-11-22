@@ -77,8 +77,11 @@
 .dcs { display: grid; grid-auto-flow: column; grid-auto-columns: min(86%, 420px); gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
   margin: 0 calc(-1 * var(--gutter)) 10px; padding: 6px var(--gutter) 22px; scroll-padding: 0 var(--gutter); }
 .dcs::-webkit-scrollbar { display: none; }
-.dcs { align-items: start; }
+/* every day is the same card: they all take the height of the fullest day, and the bar sits at the foot of each
+   (2026-11-22, the user: "chenarul cu ziua 6 nu are dimensiunea ca restul" — Saturday has one block, so it was short) */
+.dcs { align-items: stretch; }
 .dcs > li { scroll-snap-align: center; display: flex; }
+.dcs > li > .dc { flex: 1; height: 100%; }
 /* a button centres its content: the cards stack theirs from the top, the bar sits at the foot */
 .dcs .dc { display: flex; flex-direction: column; justify-content: flex-start; content-visibility: visible; }
 .dcs .dc > * { flex: none; }

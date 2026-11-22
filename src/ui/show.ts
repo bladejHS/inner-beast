@@ -98,16 +98,19 @@ export function chapterCheck(): void {
   window.setTimeout(close, 7000);
 }
 
-/* ---------- the walk to the ring ---------- */
+/* ---------- the lift-off ---------- */
 
-/** Before the first round: the tunnel, the spotlights and the block's name, then `go`. A tap skips it. */
+/** Before the first round (2026-11-22, the user: "apare animatia cu ring-ul si scrie intra in ring"): the boxing
+ *  walk-out is gone. The night lifts instead — the stars streak down past you, the horizon sinks, the name of the
+ *  session settles over the summit, and an ice-light wipe hands over to the clock. A tap skips it. */
 export function walkIn(name: string, sub: string, go: () => void): void {
   if (lite()) { go(); return; }
   const el = document.createElement('div');
-  el.className = 'walk';
+  el.className = 'lift';
   el.setAttribute('aria-hidden', 'true');
-  el.innerHTML = `<i class="walk-tun"></i><i class="walk-sp l"></i><i class="walk-sp r"></i><i class="walk-floor"></i>
-    <div class="walk-core"><p class="walk-k">Intră în ring</p><b class="walk-t">${esc(name)}</b><p class="walk-s">${esc(sub)}</p></div><i class="walk-flash"></i>`;
+  const streaks = Array.from({ length: 16 }, (_, i) => `<i style="--x:${(((i * 37) % 100) + 1)}%;--d:${(i * 0.07).toFixed(2)}s;--h:${18 + ((i * 13) % 26)}vh"></i>`).join('');
+  el.innerHTML = `<span class="lift-sky">${streaks}</span><i class="lift-hz"></i><i class="lift-peak"></i>
+    <div class="lift-core"><p class="lift-k">Ascensiunea începe</p><b class="lift-t">${esc(name)}</b><p class="lift-s">${esc(sub)}</p></div><i class="lift-wipe"></i>`;
   document.body.appendChild(el);
   let done = false;
   const end = (): void => {

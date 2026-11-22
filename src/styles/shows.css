@@ -1,4 +1,4 @@
-/* ZENITH · shows: the round's banner, the day's celebration, the result card, the new chapter, the walk-out; the
+/* ZENITH · shows: the round's banner, the day's celebration, the result card, the new chapter, the lift-off; the
    entries when a screen opens; the slow loops of light; the motion settings; the desktop. */
 
 /* ---------- the round's banner: the phase's light floods in, a ring, the words land ---------- */
@@ -109,24 +109,23 @@
 .chap .cele-tap { position: absolute; left: 0; right: 0; bottom: calc(28px + env(safe-area-inset-bottom)); }
 .chap.calm * { animation: none !important; }
 
-/* ---------- the walk-out: rings of light rushing past, two beams, the name ---------- */
-.walk { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; overflow: hidden; background: #020307; color: #fff; text-align: center; }
-.walk.out { animation: chap-out .38s var(--e-in) both; }
-.walk-tun { position: absolute; left: 50%; top: 46%; width: 220vmax; height: 220vmax; margin: -110vmax 0 0 -110vmax; background: repeating-radial-gradient(circle, transparent 0 34px, rgba(var(--glow), .14) 34px 35px, transparent 35px 70px); animation: walk-tun 2.7s cubic-bezier(.5, 0, .8, .4) both; }
-@keyframes walk-tun { from { transform: scale(.25); opacity: 0; } 15% { opacity: 1; } to { transform: scale(1.6); opacity: .9; } }
-.walk-sp { position: absolute; top: -10%; width: 70vw; height: 130%; background: linear-gradient(180deg, rgba(220, 235, 255, .24), rgba(255, 255, 255, 0) 80%); clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%); mix-blend-mode: screen; filter: blur(6px); }
-.walk-sp.l { left: -18vw; transform-origin: 50% 0; animation: walk-sp-l 2.7s ease-in-out both; }
-.walk-sp.r { right: -18vw; transform-origin: 50% 0; animation: walk-sp-r 2.7s ease-in-out both; }
-@keyframes walk-sp-l { from { transform: rotate(-30deg); opacity: 0; } 30% { opacity: 1; } to { transform: rotate(14deg); } }
-@keyframes walk-sp-r { from { transform: rotate(30deg); opacity: 0; } 30% { opacity: 1; } to { transform: rotate(-14deg); } }
-.walk-floor { position: absolute; left: -20%; right: -20%; bottom: -10%; height: 40%; background: radial-gradient(50% 60% at 50% 30%, rgba(var(--glow-2), .45), transparent 70%); animation: fade 1s ease-out .6s both; }
-.walk-core { position: relative; padding: 0 24px; }
-.walk-k { margin: 0; font: 700 semi-expanded 12px/1 var(--font); letter-spacing: .4em; text-transform: uppercase; color: var(--acc-hi); animation: win-up .5s var(--e-out) .2s both; }
-.walk-t { display: block; margin: 14px 0 10px; font: 800 expanded clamp(40px, 13vw, 80px)/1 var(--font); letter-spacing: .05em; text-transform: uppercase; text-shadow: 0 0 40px rgba(var(--glow), .8); animation: walk-t 1s var(--spring-hard) .55s both; }
-@keyframes walk-t { from { opacity: 0; transform: scale(1.8); filter: blur(12px); letter-spacing: .3em; } }
-.walk-s { margin: 0; font: 750 semi-expanded 13px/1 var(--font); letter-spacing: .18em; text-transform: uppercase; color: var(--label); animation: win-up .5s var(--e-out) 1.1s both; }
-.walk-flash { position: absolute; inset: 0; background: #fff; opacity: 0; animation: walk-flash .5s ease-out 2.35s both; pointer-events: none; }
-@keyframes walk-flash { 0% { opacity: 0; } 30% { opacity: .85; } 100% { opacity: 0; } }
+/* ---------- the lift-off: the stars streak down past you, the horizon sinks, the name settles ---------- */
+.lift { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; overflow: hidden; background: radial-gradient(90% 60% at 50% 120%, rgba(var(--glow-2), .18), transparent 70%), #020305; color: #fff; text-align: center; }
+.lift.out { animation: chap-out .38s var(--e-in) both; }
+.lift-sky { position: absolute; inset: 0; overflow: hidden; }
+.lift-sky i { position: absolute; left: var(--x); top: -20vh; width: 1.5px; height: var(--h, 24vh); border-radius: 2px; background: linear-gradient(180deg, transparent, rgba(var(--glow), .75) 40%, #fff 70%, transparent); opacity: 0; animation: lift-streak 1.5s cubic-bezier(.3, 0, .7, 1) var(--d, 0s) infinite; }
+@keyframes lift-streak { 0% { opacity: 0; transform: translateY(-10vh) scaleY(.5); } 12% { opacity: .9; } 100% { opacity: 0; transform: translateY(130vh) scaleY(1.4); } }
+.lift-hz { position: absolute; left: -10%; right: -10%; bottom: 24%; height: 1px; background: linear-gradient(90deg, transparent, rgba(var(--glow), .9) 30%, #fff 50%, rgba(var(--glow), .9) 70%, transparent); box-shadow: 0 0 24px rgba(var(--glow), .6); animation: lift-hz 2.7s var(--e-out) both; }
+@keyframes lift-hz { 0% { opacity: 0; transform: translateY(16vh) scaleX(.4); } 22% { opacity: 1; transform: translateY(0) scaleX(1); } 100% { opacity: 0; transform: translateY(-26vh) scaleX(1.3); } }
+.lift-peak { position: absolute; left: 50%; bottom: 0; width: 150vw; height: 46vh; margin-left: -75vw; background: linear-gradient(180deg, rgba(var(--glow-2), .22), rgba(2, 3, 5, 0) 70%); clip-path: polygon(0 100%, 28% 46%, 42% 66%, 56% 18%, 72% 58%, 100% 100%); animation: lift-peak 2.7s var(--e-out) both; }
+@keyframes lift-peak { 0% { opacity: 0; transform: translateY(22vh); } 30% { opacity: 1; transform: translateY(0); } 100% { opacity: .5; transform: translateY(-8vh); } }
+.lift-core { position: relative; padding: 0 24px; }
+.lift-k { margin: 0; font: 650 14px/1.2 var(--font); letter-spacing: .02em; color: var(--acc-text); animation: win-up .5s var(--e-out) .2s both; }
+.lift-t { display: block; margin: 12px 0 10px; font: 800 expanded clamp(38px, 12vw, 76px)/1 var(--font); letter-spacing: .03em; text-transform: uppercase; text-shadow: 0 0 42px rgba(var(--glow), .6); animation: lift-t 1.1s var(--e-out) .5s both; }
+@keyframes lift-t { from { opacity: 0; transform: translateY(26px); filter: blur(14px); } }
+.lift-s { margin: 0; font: 650 13px/1.2 var(--font); letter-spacing: .04em; color: var(--label); animation: win-up .5s var(--e-out) 1.1s both; }
+.lift-wipe { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(var(--glow), .5) 55%, #fff 70%, rgba(var(--glow), .4) 85%, transparent); opacity: 0; pointer-events: none; animation: lift-wipe .6s ease-out 2.25s both; }
+@keyframes lift-wipe { 0% { opacity: 0; transform: translateY(60%); } 40% { opacity: .55; } 100% { opacity: 0; transform: translateY(-80%); } }
 
 /* ---------- entries: only when a screen or a section opens; things rise into focus ---------- */
 #app.enter-tab .ph-t span, #app.enter-tab .ms-t span { animation: rise .55s var(--e-out) both, title-sheen .95s var(--e-out) .12s both; }
@@ -225,10 +224,10 @@
 
 /* ---------- motion settings: "Animații: Reduse" and the phone's reduced motion ---------- */
 html[data-motion='lite'] *, html[data-motion='lite'] *::before, html[data-motion='lite'] *::after { animation: none !important; }
-html[data-motion='lite'] #swipe, html[data-motion='lite'] .rise, html[data-motion='lite'] .pl-fx { display: none; }
+html[data-motion='lite'] #swipe, html[data-motion='lite'] .rise, html[data-motion='lite'] .lift, html[data-motion='lite'] .pl-fx { display: none; }
 html[data-motion='lite'] .nw, html[data-motion='lite'] .nw-ring, html[data-motion='lite'] .g-v { transition-duration: .01s; }
 html[data-motion='lite'] .cele { animation: fade .2s ease-out both !important; }
-html[data-motion='lite'] .cele *, html[data-motion='lite'] .done-mark path { clip-path: none; opacity: 1; }
+html[data-motion='lite'] .cele *, html[data-motion='lite'] .done-mark path { clip-path: none; opacity: 1; stroke-dashoffset: 0; animation: none !important; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
   #swipe, .rise, .pl-fx { display: none; }

@@ -113,3 +113,21 @@ html[data-motion='lite'] .pl.setup .pl-wrap > * { animation: none !important; }
 @media (prefers-reduced-motion: reduce) {
   .pl.setup::before, .pl.setup .pl-glow, .pl.setup .pl-wrap > * { animation: none !important; }
 }
+
+/* The live timer keeps a light running round the edge of the screen, the same signal the HUD on Azi uses: the session
+   is open and the screen is awake. It is off in focus mode, under reduced motion and in the lite setting. */
+.pl:not(.setup)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 1px;
+  pointer-events: none;
+  background: conic-gradient(from var(--ang, 0deg), transparent 0 68%, rgba(var(--glow), .35) 80%, rgba(220, 236, 255, .95) 88%, transparent 96%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: deck-ang 7s linear infinite;
+}
+html[data-motion='lite'] .pl::after, .pl.focus::after { display: none; }
+@media (prefers-reduced-motion: reduce) { .pl::after { display: none; } }

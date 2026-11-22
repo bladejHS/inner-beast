@@ -1,5 +1,6 @@
-// The result after a session (2026-11-15): a broadcast stat card instead of a plain "Gata." The title lands like a
-// referee's call, the numbers count up, and below them the week and the run of days in a row.
+// The card at the end of a session (2026-11-15; ZENITH's words since 2026-11-22): the summit reached, the numbers
+// counting up, then the week and the run of days in a row. It used to be a boxing result card: "official result,
+// victory, by KO". The user asked for the app's own language.
 
 import { WEEK } from '../data/plan.ts';
 import { weekDone, weekSince } from '../logic/progress.ts';
@@ -32,14 +33,14 @@ export function winHtml(o: { name: string; full: boolean; by: string; stats: Win
   const done = weekDone(ctx.S.log, mon, weekSince(ctx.S.cycle, mon)).size;
   const total = WEEK.reduce((s, d) => s + d.blocks.length, 0);
   const streak = trainStreak(today);
-  last = { title: o.full ? 'Victorie' : 'Salvat', by: o.by, name: o.name, stats: o.stats, recs: o.recs ?? [], date: new Date(`${today}T12:00:00`).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' }) };
+  last = { title: o.full ? 'Vârf atins' : 'Salvat', by: o.by, name: o.name, stats: o.stats, recs: o.recs ?? [], date: new Date(`${today}T12:00:00`).toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' }) };
   const tile = (s: WinStat, i: number): string => {
     const num = typeof s.v === 'number';
     return `<div class="win-s" style="--i:${i}"><b class="num"${num ? ` data-win="${s.v}"` : ''}>${num && o.first && !lite() ? 0 : esc(String(s.v))}</b>${s.unit ? `<small>${esc(s.unit)}</small>` : ''}<span>${esc(s.label)}</span></div>`;
   };
   return `<div class="win${o.first ? ' play' : ''}${o.full ? '' : ' part'}">
-    <p class="win-k"><i></i>Rezultat oficial<i></i></p>
-    <h1 class="win-t"><span>${o.full ? 'Victorie' : 'Salvat'}</span></h1>
+    <p class="win-k"><i></i>Sesiune încheiată<i></i></p>
+    <h1 class="win-t"><span>${o.full ? 'Vârf atins' : 'Salvat'}</span></h1>
     <p class="win-by">${esc(o.by)}</p>
     <p class="win-n">${esc(o.name)}</p>
     ${o.recs?.length ? `<div class="win-rec"><b>${o.recs.length === 1 ? 'Record nou' : `${o.recs.length} recorduri noi`}</b><span>${o.recs.map(esc).join(' · ')}</span></div>` : ''}

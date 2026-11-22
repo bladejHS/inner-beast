@@ -9,6 +9,7 @@ import { makeEntry, type Entry, type SetLog } from '../../logic/store.ts';
 import { KNEE_STEPS, kneeAdvice, legDays } from '../../logic/knee.ts';
 import { dayKey, esc, mmss, shortDay } from '../../logic/util.ts';
 import { buzz, say, sfx, unlock } from '../audio.ts';
+import { walkIn } from '../show.ts';
 import { addEntry, ask, closePlayer, ctx, mountPlayer, ovEl, save, toast, type Player } from '../ctx.ts';
 import { lite, slam } from '../fx.ts';
 import { howHtml } from '../how.ts';
@@ -547,11 +548,14 @@ class WorkoutPlayer implements Player {
       case 'p:begin':
         unlock();
         dropWorkoutDraft();
-        this.st = 'ex';
-        this.t0 = Date.now();
-        this.startTs = this.t0;
-        this.timer = window.setInterval(() => this.tick(), 250);
-        return this.render();
+        // every session opens the same way: the night lifts, then the work starts (show.ts walkIn)
+        return walkIn(this.w.name, `${this.xs.filter((x) => !x.ex.opt).length} exerciții`, () => {
+          this.st = 'ex';
+          this.t0 = Date.now();
+          this.startTs = this.t0;
+          this.timer = window.setInterval(() => this.tick(), 250);
+          this.render();
+        });
       case 'p:resume': {
         const d = workoutDraft();
         if (!d || d.wid !== this.w.id) return;

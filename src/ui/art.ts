@@ -1,6 +1,5 @@
 // The ink drawings (public/art, made by scripts/art.mjs), painted with currentColor through a CSS mask.
 
-import { CLAWS } from './claws.ts';
 
 const RATIO = {
   wolf: 392 / 482,
@@ -45,9 +44,15 @@ export function dayPoster(idx: number, cls = '', ics = ''): string {
 }
 
 /** The finish mark on every "Gata." screen: three claw gashes torn in, with a shock ring. */
+/** The mark at the end of a session (2026-11-22): the summit reached and the star over it. The claws of the old
+ *  fight app are gone — the user asked for ZENITH's own. */
 function doneMark(): string {
-  const paths = CLAWS.map((c, i) => `<path d="${c.fill}" style="--d:${(0.06 + i * 0.07).toFixed(2)}s"/>`).join('');
-  return `<div class="done-mark" aria-hidden="true"><i class="dm-ring"></i><i class="dm-ring dm-r2"></i><svg viewBox="0 0 100 100">${paths}</svg></div>`;
+  return `<div class="done-mark" aria-hidden="true"><i class="dm-ring"></i><i class="dm-ring dm-r2"></i>
+    <svg viewBox="0 0 100 100">
+      <path class="dm-peak" d="M8 78 L38 34 L52 54 L64 38 L92 78 Z"/>
+      <path class="dm-lit" d="M38 34 L52 54 L44 60 Z"/>
+      <path class="dm-star" d="M66 16 L69.5 25.5 L79 29 L69.5 32.5 L66 42 L62.5 32.5 L53 29 L62.5 25.5 Z"/>
+    </svg></div>`;
 }
 
 export function art(name: ArtName, cls = ''): string {

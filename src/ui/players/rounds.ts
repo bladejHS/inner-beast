@@ -377,7 +377,7 @@ class RoundsPlayer implements Player {
   winBy(): string {
     if (!this.entry) return 'Prea scurt ca să se salveze';
     if (this.cfg.block && !this.entry.block) return 'Sesiune parțială, salvată în progres';
-    return this.cfg.cardio ? 'Prin consecvență' : this.cfg.hiit ? 'Prin rezistență' : this.isBurst(this.cfg.rounds) ? 'Prin KO' : 'Prin disciplină';
+    return this.cfg.cardio ? 'Prin consecvență' : this.cfg.hiit ? 'Prin rezistență' : this.isBurst(this.cfg.rounds) ? 'Prin explozii la maxim' : 'Prin disciplină';
   }
 
   winStats(r: number): WinStat[] {

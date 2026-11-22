@@ -5,6 +5,7 @@ import { focusCombos, usesLegs } from '../../data/combos.ts';
 import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks, type RestKey, POWER_STEPS } from '../../data/plan.ts';
 import { activeStreak, cycleAt, deloadOn, growMinutes, weekSince, fullSessions } from '../../logic/progress.ts';
 import { loopIndex } from '../../logic/loop.ts';
+import { currentKg, stillHeavy } from '../../logic/bodyweight.ts';
 import { activePlan as planFor } from '../../logic/nextblock.ts';
 import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
 import { zone2, zoneHard, zoneThr } from '../../logic/runlog.ts';
@@ -139,8 +140,11 @@ export function planPicks(today = dayKey()): Settings & Picks {
   // the Hybrid365 progressions move one step per full session; a lighter week holds them
   const thrStep = fullSessions(S.log, 'tue-thr'), engStep = S.log.filter((e) => e.block === 'wed-cond' && e.kind === 'row').length;
   const powStep = S.log.filter((e) => e.block === 'fri-emom' && !e.data.deload).length;
-  // the machine period ends by itself: after the last day the plan is back on foot without anyone touching a switch
-  const onMachine = S.set.aero !== 'run' && (!S.set.aeroUntil || today <= S.set.aeroUntil);
+  // the machine period ends by itself: by the scale when a weight was set, otherwise by the date
+  const kgNow = currentKg(S.weight, today)?.kg ?? null;
+  const onMachine = S.set.aero !== 'run' && (S.set.aeroKg > 0
+    ? stillHeavy(kgNow, S.set.aeroKg)
+    : !S.set.aeroUntil || today <= S.set.aeroUntil);
   picksVal = { ...S.set, aero: onMachine ? S.set.aero : 'run', cycle: c?.id, cycleWeek: c?.week, grown, thrStep, engStep, powStep,
     ...(plan ? { thrOver: plan.thr, pacePct: plan.pacePct } : {}) };
   return picksVal;

@@ -86,6 +86,9 @@ export interface Settings {
   aero: 'run' | 'row' | 'assault' | 'bike';
   /** The last day the machine replaces running; after it the plan goes back on foot by itself. Empty = no end. */
   aeroUntil: string;
+  /** The weight at which running may start again, kg. 0 = no weight condition. The user chose 125 (2026-11-23):
+      the machines last until the scale allows the first step, not until a date on the calendar. */
+  aeroKg: number;
   /** Wednesday's conditioning: Option A Engine Builder (row), Option B Hybrid Circuit. */
   wedCond: 'a' | 'b' | 'c' | 'd' | 'e';
 }
@@ -231,6 +234,7 @@ export const DEFAULT_SETTINGS: Settings = {
   sunAero: 'row',
   aero: 'run',
   aeroUntil: '',
+  aeroKg: 0,
   wedCond: 'a',
 };
 

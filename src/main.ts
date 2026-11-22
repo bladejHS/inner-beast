@@ -621,6 +621,20 @@ function act(a: string, el: HTMLElement): void {
       save();
       return render();
     }
+    case 'set-aero-kg': {
+      const v = Number(el.dataset.v || 0);
+      S.set.aeroKg = v;
+      // a weight condition replaces the date one: one rule at a time, so the plan has a single reason to change
+      if (v > 0) S.set.aeroUntil = '';
+      save();
+      return render();
+    }
+    case 'set-aero-kg-step': {
+      const d = Number(el.dataset.d) || 0;
+      S.set.aeroKg = Math.max(70, Math.min(200, (S.set.aeroKg || 125) + d));
+      save();
+      return render();
+    }
     case 'set-aero-until': {
       const d = Number(el.dataset.v || 0);
       S.set.aeroUntil = d > 0 ? addDays(today, d) : '';
@@ -795,6 +809,13 @@ function act(a: string, el: HTMLElement): void {
 }
 
 function onChange(el: HTMLElement): void {
+  if (el.dataset.a === 'set-bw') {
+    const v = Number((el as HTMLInputElement).value);
+    // one number, written on today: the plan reads the average of the last days from it (logic/bodyweight.ts)
+    if (v >= 60 && v <= 250) { ctx.S.weight[dayKey()] = Math.round(v * 10) / 10; save(); render(); }
+    return;
+  }
+
   const a = el.dataset.a || '';
   if (a.startsWith('p:')) return ctx.player?.act(a, el);
   const S = ctx.S;

@@ -17,15 +17,15 @@
   color-scheme: dark;
 
   /* the sky, from the top of the page down; surfaces are glass over it */
-  --bg: #030406;
-  --sky-1: #0a0d12;
-  --sky-2: #06080b;
-  --n1: #080a0e;
-  --n2: #0c0f14;
-  --n3: #13171e;
-  --n4: #1b2029;
-  --n5: #262c36;
-  --edge: #68707c;
+  --bg: #010203;
+  --sky-1: #070910;
+  --sky-2: #040507;
+  --n1: #050609;
+  --n2: #090b0f;
+  --n3: #0f1217;
+  --n4: #161a21;
+  --n5: #1f242c;
+  --edge: #5e6671;
 
   /* text: white with the faintest warmth, then three greys of the night; all pass 4.5:1 on --n3 */
   --ink: #f2f4f8;
@@ -39,7 +39,7 @@
   --acc: #8fb3e6;
   --acc-hi: #b9d3f5;
   --acc-lo: #5a82bd;
-  --acc-deep: #16202e;
+  --acc-deep: #111823;
   --acc-text: #acc8f0;
   --lit: linear-gradient(135deg, #cfe1f8 0%, #9dbfec 38%, #6f97d0 100%);
   --on-lit: #06101f;
@@ -51,23 +51,23 @@
   --ok: #bfe3d4;
 
   /* glass */
-  --glass: linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, 0) 42%);
-  --glass-fill: linear-gradient(180deg, rgba(14, 17, 23, .82), rgba(7, 9, 13, .88));
+  --glass: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, 0) 42%);
+  --glass-fill: linear-gradient(180deg, rgba(10, 12, 16, .86), rgba(4, 5, 8, .92));
   --glass-edge: linear-gradient(180deg, rgba(206, 220, 240, .26), rgba(130, 148, 176, .08) 38%, rgba(130, 148, 176, .04));
   --hair: rgba(192, 204, 222, .14);
   --hair-2: rgba(192, 204, 222, .07);
-  --shadow: 0 26px 52px -32px rgba(0, 0, 0, .95);
+  --shadow: 0 28px 56px -30px rgba(0, 0, 0, 1);
 
   /* the RGB of the light, for glows; main.ts reads --glow and --glow-2 for the living pictures */
   --glow: 185, 211, 245;
-  --glow-2: 96, 124, 164;
+  --glow-2: 84, 108, 144;
   --glow-d: 22, 32, 46;
 
   /* the timer's phases */
-  --ph-rest: radial-gradient(120% 70% at 50% -10%, #101620, #06080c 60%, #030406);
-  --ph-work: radial-gradient(130% 80% at 50% -10%, #2c4e76, #16283f 45%, #080d16);
+  --ph-rest: radial-gradient(120% 70% at 50% -10%, #0c1119, #040609 60%, #010203);
+  --ph-work: radial-gradient(130% 80% at 50% -10%, #264364, #122136 45%, #060a11);
   --ph-cold: radial-gradient(130% 80% at 50% -10%, #216172, #0e2b38 50%, #051217);
-  --ph-easy: radial-gradient(130% 80% at 50% -10%, #151b26, #080b10 60%);
+  --ph-easy: radial-gradient(130% 80% at 50% -10%, #11161f, #05070b 60%);
   --ph-last: linear-gradient(180deg, #e4eefb, #b9d3f5);
   --ph-final: #ffffff;
 

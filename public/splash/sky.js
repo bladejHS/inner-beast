@@ -36,7 +36,7 @@
     /* the sky every scene shares */
     var stars = [];
     for (var i = 0; i < 150; i++) stars.push({ x: R(), y: Math.pow(R(), 1.3) * base, r: 0.35 + Math.pow(R(), 3) * 1.4, f: R() * TAU, s: 0.6 + R() * 2.2 });
-    var bands = [0, 1, 2].map(function (k) { return { y: 0.12 + k * 0.09 + R() * 0.04, a: 0.03 + R() * 0.03, f: 1.6 + R() * 2.4, p: R() * TAU, v: 0.12 + R() * 0.18, h: 0.07 + R() * 0.05, hue: k === 1 ? [150, 130, 235] : k === 2 ? [120, 210, 230] : col }; });
+    var bands = [0, 1, 2].map(function (k) { return { y: 0.12 + k * 0.09 + R() * 0.04, a: 0.03 + R() * 0.03, f: 1.6 + R() * 2.4, p: R() * TAU, v: 0.12 + R() * 0.18, h: 0.07 + R() * 0.05, hue: k === 1 ? [118, 112, 152] : k === 2 ? [96, 132, 152] : col }; });
     var meteor = null, nextMeteor = 1.5 + R() * 4;
 
     /* summit: the ridge (normalized), its climbers */
@@ -115,7 +115,7 @@
       for (var b = 0; b < bands.length; b++) {
         var B = bands[b], y0 = B.y * H, amp = B.a * H, th = B.h * H;
         var g = c.createLinearGradient(0, y0 - amp - th, 0, y0 + amp + th);
-        g.addColorStop(0, rgba(B.hue, 0)); g.addColorStop(0.5, rgba(B.hue, 0.05 + 0.02 * Math.sin(t * 0.4 + b))); g.addColorStop(1, rgba(B.hue, 0));
+        g.addColorStop(0, rgba(B.hue, 0)); g.addColorStop(0.5, rgba(B.hue, 0.035 + 0.015 * Math.sin(t * 0.4 + b))); g.addColorStop(1, rgba(B.hue, 0));
         c.fillStyle = g; c.beginPath();
         var step = W / 24;
         for (var x = 0; x <= W + step; x += step) {
@@ -174,7 +174,7 @@
       c.restore();
       /* a far range for depth */
       c.globalCompositeOperation = 'source-over';
-      c.fillStyle = 'rgba(8,11,17,.62)'; c.beginPath(); c.moveTo(0, H);
+      c.fillStyle = 'rgba(5,7,11,.7)'; c.beginPath(); c.moveTo(0, H);
       for (var x = 0; x <= 24; x++) c.lineTo(x / 24 * W, (base - 0.1 - 0.06 * Math.abs(Math.sin(x * 1.37 + seed))) * H);
       c.lineTo(W, H); c.fill();
       /* the mountain: dark body, lit faces, edge of light */

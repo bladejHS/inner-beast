@@ -84,13 +84,13 @@ function cycleCard(today: string): string {
  *  the Hybrid365 slide, the day's targets as they stand this week (minutes, sets × reps, the progression step), and the
  *  day.s scene drawn by the living skies, public/splash/sky.js (animated on today, still on the others). */
 const DAY_LINE: Array<[string, string]> = [
-  ['Build momentum,', 'not fatigue.'],
-  ['Your key', 'performance session.'],
-  ['Lift heavy', 'with intent.'],
-  ['Move well. Lift strong.', 'Recover smart.'],
-  ['Beat last week’s', 'top set.'],
-  ['Finish stronger', 'than you started.'],
-  ['This is where', 'you get better.'],
+  ['Prinde avânt,', 'nu oboseală.'],
+  ['Sesiunea-cheie', 'a săptămânii.'],
+  ['Ridică greu,', 'cu intenție.'],
+  ['Mișcă-te bine. Ridică puternic.', 'Recuperează inteligent.'],
+  ['Bate seria de top', 'de săptămâna trecută.'],
+  ['Termină mai puternic', 'decât ai început.'],
+  ['Aici devii', 'mai bun.'],
 ];
 /** The day's discipline, as on its slide, and how hard it hits (of 5). */
 const DAY_TAG = ['Run · Upper', 'Threshold', 'Upper · Engine', 'Run · Lower', 'Strength · Power', 'Long Run', 'Recovery'];

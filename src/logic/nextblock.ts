@@ -143,10 +143,13 @@ export function nextLoopPlan(r: LoopReview, prev?: LoopPlan, lossPctWeek: number
   return { loop: r.loop + 1, thr, pacePct, thrCap, eng, long, easy, loadUp, order, retest, why };
 }
 
-/** The Engine Builder ladder of the next loop: more rounds at the rest it already holds. */
+/** The Engine Builder ladder of the next loop: one round more, at the rest it already holds.
+ *  Deliberately small. Nothing in the research covers rowing density, and the ladder's own floor is 30 s, so the
+ *  rest is not cut further and the rounds move by one a loop, not by three. */
 export function growEng(prev: Array<{ rounds: number; rest: number }>): Array<{ rounds: number; rest: number }> {
   const top = prev.at(-1)!;
-  return [top, { rounds: top.rounds + 1, rest: top.rest }, { rounds: top.rounds + 2, rest: top.rest }, { rounds: top.rounds + 2, rest: Math.max(20, top.rest - 5) }];
+  const rest = Math.max(30, top.rest);
+  return [{ rounds: top.rounds, rest }, { rounds: top.rounds + 1, rest }];
 }
 
 /** Weekly bodyweight change in %, from the weights of the loop; null when there are not enough. */
@@ -158,4 +161,12 @@ export function lossPerWeek(weights: Record<string, number>, from: string, to: s
   if (days < 14) return null;
   const pct = ((last[1] - first[1]) / first[1]) * 100;
   return Math.round((pct / (days / 7)) * 100) / 100;
+}
+
+/** The plan the loop at `today` runs on, or undefined while the first loop is still going. */
+export function activePlan(
+  s: { cycle: { start: string; repeats: string[]; plans?: LoopPlan[] } },
+  loopNow: number,
+): LoopPlan | undefined {
+  return s.cycle.plans?.find((p) => p.loop === loopNow);
 }

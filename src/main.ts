@@ -37,6 +37,7 @@ import { openCoach } from './ui/players/coach.ts';
 import { challengeHtml, toggleRace } from './ui/screens/challenge.ts';
 import { resumeRace, startRace } from './ui/players/race.ts';
 import { discAct, disciplineHtml } from './ui/screens/discipline.ts';
+import { nextLoopAct } from './ui/screens/nextloop.ts';
 import { labHtml } from './ui/screens/lab.ts';
 import { openLab } from './ui/players/lab.ts';
 import { icsExport } from './ui/ics.ts';
@@ -837,6 +838,7 @@ document.addEventListener('click', (ev) => {
   }
   if (a === 'ch:go') return startRace(el.dataset.k ?? '', Number(el.dataset.i));
   if (a === 'ch:resume') return resumeRace();
+  if (a.startsWith('nl:')) { if (nextLoopAct(a)) { render(); return; } }
   if (a.startsWith('dc:')) return discAct(a, el, render);
   const hadPlayer = !!ctx.player;
   act(a, el);

@@ -3,6 +3,7 @@
 // Teste (the test battery and the challenges) and Istoric (the latest entries; the full list opens on its own screen).
 
 import { fireCalendar } from '../fire.ts';
+import { nextLoopCard } from './nextloop.ts';
 import { WEEK } from '../../data/plan.ts';
 import { CIRCUITS, type Race } from '../../data/races.ts';
 import { BW_SCHEMES, WORKOUTS } from '../../data/workouts.ts';
@@ -148,7 +149,7 @@ function weekSeg(): string {
   const lr = loadReport(S.log, today);
   const dm = (d: string) => `${Number(d.slice(8))}.${Number(d.slice(5, 7))}`;
   const stat = (v: number, label: string, cls = '', shown = String(v)) => `<div class="stat ${cls}"><b class="num" data-count="${Math.round(v)}">${shown}</b><span>${label}</span></div>`;
-  return `<h2 class="sec first">Săptămâna asta<small>${full} din 7 zile complete</small></h2>
+  return `${nextLoopCard()}<h2 class="sec first">Săptămâna asta<small>${full} din 7 zile complete</small></h2>
     ${reactorHtml(done, today)}
     <div class="stats">
       ${stat(streak, streak === 1 ? 'zi activă la rând' : 'zile active la rând', streak > 0 ? 'hot' : '')}

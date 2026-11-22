@@ -4,6 +4,8 @@ import { powerRoutine } from '../../data/routines.ts';
 import { focusCombos, usesLegs } from '../../data/combos.ts';
 import { ALL_BLOCKS, BURST_SEC, resolveBlock, WARMUP_SEC, type Block, type Picks, type RestKey, POWER_STEPS } from '../../data/plan.ts';
 import { activeStreak, cycleAt, deloadOn, growMinutes, weekSince, fullSessions } from '../../logic/progress.ts';
+import { loopIndex } from '../../logic/loop.ts';
+import { activePlan as planFor } from '../../logic/nextblock.ts';
 import { makeEntry, type Kind, type Settings } from '../../logic/store.ts';
 import { zone2, zoneHard, zoneThr } from '../../logic/runlog.ts';
 import { kickPower, kickWeek, kneeNotes, kneeSore, type KneeNote } from '../../logic/knee.ts';
@@ -122,17 +124,23 @@ export function planPicks(today = dayKey()): Settings & Picks {
   // a check can be undone without touching the log's length, so the checked entries are counted too
   let marked = 0;
   for (const e of S.log) if (e.block) marked++;
-  const key = `${today}|${S.log.length}|${lastTs}|${marked}|${S.cycle.start}|${S.cycle.repeats.join(',')}|${S.deload.week}|${JSON.stringify(S.set)}`;
+  const key = `${today}|${S.log.length}|${lastTs}|${marked}|${S.cycle.start}|${S.cycle.repeats.join(',')}|${S.deload.week}|${JSON.stringify(S.set)}|${S.cycle.plans?.length ?? 0}`;
   if (picksVal && key === picksKey) return picksVal;
   const grown: Record<string, number> = {};
   const light = deloadOn(S.deload, today);
-  for (const b of ALL_BLOCKS) if (b.grow) grown[b.id] = light ? b.grow.base : growMinutes(S.log, b.id, S.cycle.start, b.grow);
+  // from loop 2 the runs follow the loop's plan (logic/nextblock.ts): the long run keeps its ceiling and starts where
+  // it got to, the easy runs are where the weekly volume grows
+  const plan = planFor(S, loopIndex(S.cycle.start, today, S.cycle.repeats));
+  const growOf = (b: { id: string; grow?: { base: number; step: number; cap: number } }) =>
+    (plan && b.id === 'sat-long' ? plan.long : plan && (b.id === 'mon-run' || b.id === 'thu-run') ? plan.easy : b.grow)!;
+  for (const b of ALL_BLOCKS) if (b.grow) { const g = growOf(b); grown[b.id] = light ? g.base : growMinutes(S.log, b.id, S.cycle.start, g); }
   picksKey = key;
   const c = cycleAt(S.cycle.start, today, S.cycle.repeats);
   // the Hybrid365 progressions move one step per full session; a lighter week holds them
   const thrStep = fullSessions(S.log, 'tue-thr'), engStep = S.log.filter((e) => e.block === 'wed-cond' && e.kind === 'row').length;
   const powStep = S.log.filter((e) => e.block === 'fri-emom' && !e.data.deload).length;
-  picksVal = { ...S.set, cycle: c?.id, cycleWeek: c?.week, grown, thrStep, engStep, powStep };
+  picksVal = { ...S.set, cycle: c?.id, cycleWeek: c?.week, grown, thrStep, engStep, powStep,
+    ...(plan ? { thrOver: plan.thr, pacePct: plan.pacePct } : {}) };
   return picksVal;
 }
 

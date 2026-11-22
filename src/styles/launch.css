@@ -131,3 +131,17 @@ html[data-motion='lite'] .pl.setup .pl-wrap > * { animation: none !important; }
 }
 html[data-motion='lite'] .pl::after, .pl.focus::after { display: none; }
 @media (prefers-reduced-motion: reduce) { .pl::after { display: none; } }
+
+/* The end-of-loop card on Progres (2026-11-23): what the twelve weeks did, and what the next ones ask for. */
+.nl { position: relative; overflow: hidden; }
+.nl-k { margin: 0; font: 650 13px/1.2 var(--font); letter-spacing: .02em; color: var(--acc-text); }
+.nl-t { margin: 6px 0 14px; font: 800 expanded clamp(26px, 8vw, 38px)/1 var(--font); text-transform: uppercase; letter-spacing: .02em; }
+.nl-g { display: grid; grid-template-columns: repeat(auto-fit, minmax(78px, 1fr)); gap: 8px; margin-bottom: 14px; }
+.nl-g div { display: grid; gap: 3px; justify-items: center; text-align: center; padding: 12px 6px; border: 1px solid var(--hair); border-radius: var(--r-sm); background: rgba(255, 255, 255, .02); }
+.nl-g b { font: 800 condensed 26px/1 var(--font); color: var(--acc-hi); font-variant-numeric: tabular-nums; }
+.nl-g span { font-size: 11px; color: var(--mute); text-wrap: balance; }
+.nl-w { margin: 0 0 14px; color: var(--ink-2); }
+.nl h3 { margin: 18px 0 8px; }
+.nl-why { margin: 0 0 18px; padding-left: 18px; display: grid; gap: 8px; }
+.nl-why li { color: var(--ink-2); line-height: 1.45; text-wrap: pretty; }
+.nl-why li::marker { color: var(--acc); }

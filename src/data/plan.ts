@@ -96,6 +96,11 @@ export interface Picks {
   cycleWeek?: number;
   /** The easy and long runs: run (Hybrid365), or row on a day the knees ask for it. */
   aero?: 'run' | 'row';
+  /** The threshold session of the active loop plan (logic/nextblock.ts), when there is one: from loop 2 the ladder
+      is held and the pace moves instead, so the session no longer comes from THR_STEPS. */
+  thrOver?: { reps: number; min: number; rest: number };
+  /** How much faster the threshold pace is than in the first loop, in %. */
+  pacePct?: number;
   /** Where the Hybrid365 progressions stand: the threshold step (THR_STEPS) and the Engine Builder step (ENGINE_STEPS). */
   thrStep?: number;
   engStep?: number;
@@ -260,8 +265,9 @@ export function resolveBlock(b: Block, p: Picks): Block {
   const ev = p.cycle && p.cycleWeek && p.cycleWeek % 2 === 0 ? b.cycleEven?.[p.cycle] : undefined;
   if (ev) r = { ...r, ...ev };
   if (b.id === 'tue-thr') {
-    const s = THR_STEPS[Math.min(THR_STEPS.length - 1, Math.max(0, p.thrStep ?? 0))]!;
-    r = { ...r, rounds: s.reps, work: s.min * 60, restSec: s.rest, dose: `${s.reps} × ${s.min} min`, line: `${s.reps} × ${s.min} min @ Threshold Pace, ${s.rest} s easy jog` };
+    const s = p.thrOver ?? THR_STEPS[Math.min(THR_STEPS.length - 1, Math.max(0, p.thrStep ?? 0))]!;
+    const faster = p.pacePct ? `, cu ${p.pacePct}% mai repede decât în ciclul trecut` : '';
+    r = { ...r, rounds: s.reps, work: s.min * 60, restSec: s.rest, dose: `${s.reps} × ${s.min} min`, line: `${s.reps} × ${s.min} min @ Threshold Pace, ${s.rest} s easy jog${faster}` };
   }
   if (b.id === 'wed-cond' && (!p.wedCond || p.wedCond === 'a')) {
     const s = ENGINE_STEPS[Math.min(ENGINE_STEPS.length - 1, Math.max(0, p.engStep ?? 0))]!;

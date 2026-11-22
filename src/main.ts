@@ -196,6 +196,10 @@ function render(enter: Enter = ''): void {
   const week = app.querySelector<HTMLElement>('.dcs');
   const now = week?.querySelector<HTMLElement>('.dc.now')?.parentElement;
   if (week && now) week.scrollLeft = now.offsetLeft - (week.clientWidth - now.offsetWidth) / 2;
+  // Provocări's race carousel keeps the open race in the centre
+  const rcs = app.querySelector<HTMLElement>('.rcs');
+  const rOn = rcs?.querySelector<HTMLElement>('.rc.on')?.parentElement;
+  if (rcs && rOn) rcs.scrollLeft = rOn.offsetLeft - (rcs.clientWidth - rOn.offsetWidth) / 2;
   if (ctx.tab === 'today' && !views.length) chapterCheck();
   if (enter) for (const el of app.querySelectorAll<HTMLElement>('[data-count]')) countUp(el, 0, Number(el.dataset.count) || 0, 800);
   if (keepId) {

@@ -114,3 +114,161 @@
 .more > .more-r, .more > :not(.more-r) > .more-r { counter-increment: race; }
 .more .more-r { position: relative; min-height: 92px; overflow: hidden; }
 .more .more-r::before { content: counter(race, decimal-leading-zero); position: absolute; right: 44px; top: 50%; transform: translateY(-50%); font: 800 expanded 64px/1 var(--font); color: transparent; -webkit-text-stroke: 1px rgba(var(--glow), .22); pointer-events: none; }
+
+/* ================= 2026-11-22 · Progres and Provocări, the user: "ceva mai spectaculos și o aranjare mult mai
+   animată și uimitoare" ================= */
+
+/* everything in these two tabs rises into place as it scrolls into view */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html:not([data-motion='lite']) .deck > *, html:not([data-motion='lite']) .deck .stats > *, html:not([data-motion='lite']) .deck .ex-line,
+    html:not([data-motion='lite']) .deck .hist > li, html:not([data-motion='lite']) .deck .lvs > li, html:not([data-motion='lite']) .deck .tl > li {
+      animation: deck-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 80%;
+    }
+  }
+}
+@keyframes deck-rise { from { opacity: 0; transform: translateY(48px) scale(.93) rotateX(14deg); } to { opacity: 1; transform: none; } }
+
+/* ---------- the week reactor ---------- */
+.rx { position: relative; margin: 4px 0 18px; }
+.rx-dial { position: relative; width: min(100%, 360px); margin: 0 auto; aspect-ratio: 1; }
+.rx-dial::before { content: ''; position: absolute; inset: 12%; z-index: -1; border-radius: 50%; background: radial-gradient(circle, rgba(var(--glow), .3), rgba(var(--glow-2), .1) 45%, transparent 70%); animation: rx-breathe 4s ease-in-out infinite; }
+.rx svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.rx-orbit { fill: none; stroke: rgba(var(--glow), .28); stroke-width: 1; stroke-dasharray: 2 7; }
+.rx-sat { transform-origin: 170px 170px; animation: rx-spin 14s linear infinite; }
+.rx-sat circle { fill: #fff; filter: drop-shadow(0 0 6px #fff) drop-shadow(0 0 12px rgba(185, 211, 245, .9)); }
+.rx-sat2 { animation-duration: 23s; animation-direction: reverse; }
+.rx-sat2 circle { fill: #c9b8f5; }
+.rx-tr { fill: none; stroke: rgba(255, 255, 255, .07); stroke-width: 12; stroke-linecap: round; }
+.rx-on { fill: none; stroke: url(#rxg); stroke-width: 12; stroke-linecap: round; stroke-dasharray: 1; filter: drop-shadow(0 0 6px rgba(185, 211, 245, .7)); }
+.rx-d.full .rx-on { stroke: #fff; filter: drop-shadow(0 0 8px #fff) drop-shadow(0 0 16px rgba(185, 211, 245, .8)); }
+.rx-d.now .rx-tr { stroke: rgba(185, 211, 245, .22); animation: rx-now 1.8s ease-in-out infinite; }
+.rx-d text { font: 800 semi-expanded 10px/1 var(--font); letter-spacing: .1em; text-anchor: middle; fill: var(--mute); text-transform: uppercase; }
+.rx-d.now text { fill: #fff; }
+.rx-d.full text { fill: var(--acc-hi); }
+.rx-bg { fill: none; stroke: var(--c); stroke-opacity: .09; stroke-width: 11; }
+.rx-r { fill: none; stroke: var(--c); stroke-width: 11; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: calc(100 - var(--f) * 100); filter: drop-shadow(0 0 5px var(--c)); }
+.rx-r.full { filter: drop-shadow(0 0 6px var(--c)) drop-shadow(0 0 14px var(--c)); }
+.rx-c { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; pointer-events: none; }
+.rx-c p { margin: 0; display: flex; align-items: flex-start; }
+.rx-c b { font: 800 condensed 46px/.9 var(--font); background: linear-gradient(180deg, #fff, var(--acc-hi)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.rx-c small { margin: 4px 0 0 2px; font: 800 condensed 16px/1 var(--font); color: var(--acc-hi); }
+.rx-c span { margin-top: 2px; font: 700 semi-expanded 8.5px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; color: var(--label); }
+.rx-k { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
+.rx-k span { position: relative; display: grid; justify-items: center; gap: 3px; padding: 10px 4px 11px; border-radius: 18px; background: rgba(255, 255, 255, .03); box-shadow: inset 0 0 0 1px var(--hair-2); }
+.rx-k i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); }
+.rx-k b { font: 800 condensed 24px/.95 var(--font); color: var(--ink); }
+.rx-k b small { font-size: 14px; color: var(--mute); }
+.rx-k em { font: 700 semi-expanded 8.5px/1 var(--font); font-style: normal; letter-spacing: .1em; text-transform: uppercase; color: var(--label); }
+.rx-k .full { box-shadow: inset 0 0 0 1px var(--c), 0 0 22px -8px var(--c); }
+.rx-k .full b { color: #fff; }
+#app.enter-tab .rx-on, #app.enter-seg .rx-on { animation: rx-draw 1.1s var(--e-out) calc(.15s + var(--i) * .07s) both; }
+#app.enter-tab .rx-r, #app.enter-seg .rx-r { animation: rx-ring 1.5s var(--e-out) calc(.35s + var(--i) * .12s) both; }
+#app.enter-tab .rx-dial, #app.enter-seg .rx-dial { animation: rx-in 1s var(--spring) both; }
+#app.enter-tab .rx-k span, #app.enter-seg .rx-k span { animation: pop .5s var(--spring) both; animation-delay: calc(.5s + var(--i, 0) * .06s); }
+.rx-k span:nth-child(2) { --i: 1; } .rx-k span:nth-child(3) { --i: 2; } .rx-k span:nth-child(4) { --i: 3; }
+@keyframes rx-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes rx-ring { from { stroke-dashoffset: 100; } }
+@keyframes rx-in { from { opacity: 0; transform: scale(.6) rotate(-40deg); } }
+@keyframes rx-spin { to { transform: rotate(360deg); } }
+@keyframes rx-breathe { 50% { transform: scale(1.1); opacity: .7; } }
+@keyframes rx-now { 50% { stroke: rgba(185, 211, 245, .45); } }
+
+/* Progres: the numbers as lit plates, the hero with a light running round its edge */
+.deck .stats > .stat:first-child { overflow: hidden; }
+.deck .stats > .stat:first-child::after { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: conic-gradient(from var(--ang, 0deg), transparent 0 70%, rgba(255, 255, 255, .95) 82%, transparent 92%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); animation: deck-ang 5s linear infinite; }
+.deck .stat::before { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .09) 50%, transparent 65%) no-repeat; background-size: 250% 100%; animation: deck-sheen 6s ease-in-out infinite; animation-delay: calc(var(--n, 0) * .4s); }
+.deck .stat:nth-child(2) { --n: 1; } .deck .stat:nth-child(3) { --n: 2; } .deck .stat:nth-child(4) { --n: 3; } .deck .stat:nth-child(5) { --n: 4; } .deck .stat:nth-child(6) { --n: 5; }
+@property --ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes deck-ang { to { --ang: 360deg; } }
+@keyframes deck-sheen { 0%, 60% { background-position: 150% 0; } 100% { background-position: -50% 0; } }
+/* Antrenament: every lift its own glass plate with a lit rail */
+.deck .ex-line { position: relative; margin: 0 0 8px; padding: 14px 14px 14px 18px; border: 0; border-radius: 20px; background: linear-gradient(180deg, rgba(20, 30, 48, .7), rgba(9, 14, 23, .7)); box-shadow: inset 0 0 0 1px var(--hair-2); }
+.deck .ex-line::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 0 3px 3px 0; background: var(--lit); box-shadow: 0 0 10px rgba(var(--glow), .8); }
+.deck .sub-h { display: flex; align-items: center; gap: 10px; }
+.deck .sub-h::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(var(--glow), .5), transparent); }
+
+/* ---------- Provocări: the hall of fame ---------- */
+.hof { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 0 0 6px; padding: 16px 6px; border: 1px solid transparent; border-radius: 26px; position: relative; overflow: hidden;
+  background: radial-gradient(80% 120% at 50% 0, rgba(var(--glow-2), .3), transparent 70%) padding-box, var(--glass-fill) padding-box, linear-gradient(160deg, rgba(220, 234, 252, .7), rgba(111, 151, 208, .15)) border-box; }
+.hof::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, .1) 50%, transparent 60%) no-repeat; background-size: 250% 100%; animation: deck-sheen 5s ease-in-out infinite; }
+.hof div { display: grid; justify-items: center; gap: 6px; text-align: center; }
+.hof div + div { box-shadow: inset 1px 0 0 var(--hair-2); }
+.hof b { font: 800 condensed 40px/.9 var(--font); background: linear-gradient(180deg, #fff, var(--acc-hi)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hof span { font: 700 semi-expanded 9px/1.2 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--label); }
+#app.enter-tab .hof div, #app.enter-seg .hof div { animation: pop .55s var(--spring) both; }
+#app.enter-tab .hof div:nth-child(2), #app.enter-seg .hof div:nth-child(2) { animation-delay: .08s; }
+#app.enter-tab .hof div:nth-child(3), #app.enter-seg .hof div:nth-child(3) { animation-delay: .16s; }
+
+.rc-live { display: flex; align-items: center; gap: 12px; margin: 12px 0 0; padding: 12px 12px 12px 16px; border-radius: 22px; background: radial-gradient(90% 140% at 0 50%, rgba(var(--glow), .3), transparent 70%), rgba(255, 255, 255, .03); box-shadow: inset 0 0 0 1px rgba(var(--glow), .6), 0 0 30px -10px rgba(var(--glow), .9); }
+.rc-live div { flex: 1; min-width: 0; }
+.rc-live b { display: block; font: 800 semi-expanded 14px/1.1 var(--font); text-transform: uppercase; letter-spacing: .04em; }
+.rc-live span { font-size: 12.5px; color: var(--mute); }
+.rc-live-dot { width: 10px; height: 10px; flex: none; border-radius: 50%; background: #fff; box-shadow: 0 0 0 0 rgba(255, 255, 255, .7); animation: live-ping 1.6s ease-out infinite; }
+@keyframes live-ping { to { box-shadow: 0 0 0 14px rgba(255, 255, 255, 0); } }
+
+/* ---------- the races as mission posters in a carousel ---------- */
+.rcs { display: grid; grid-auto-flow: column; grid-auto-columns: min(80%, 340px); gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; list-style: none;
+  margin: 0 calc(-1 * var(--gutter)) 6px; padding: 8px var(--gutter) 26px; scroll-padding: 0 var(--gutter); perspective: 1000px; }
+.rcs::-webkit-scrollbar { display: none; }
+.rcs > li { scroll-snap-align: center; display: flex; }
+.rc { --t: 185, 211, 245; position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; width: 100%; min-height: 430px; padding: 18px 18px 18px; border: 1px solid transparent; border-radius: 30px;
+  background: radial-gradient(90% 60% at 50% 22%, rgba(var(--t), .26), transparent 70%) padding-box, linear-gradient(180deg, #0f1a2e, #070b14 75%) padding-box, linear-gradient(170deg, rgba(var(--t), .75), rgba(var(--t), .08) 45%, rgba(var(--t), .35)) border-box;
+  box-shadow: 0 30px 60px -30px rgba(var(--t), .55); }
+.rc.on { box-shadow: 0 0 0 1.5px rgba(var(--t), .9), 0 30px 70px -24px rgba(var(--t), .9); }
+.rc::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .08) 50%, transparent 62%) no-repeat; background-size: 260% 100%; animation: deck-sheen 7s ease-in-out infinite; animation-delay: calc(var(--i) * .7s); }
+.rc-n { position: absolute; right: 14px; top: 16px; z-index: -1; font: 800 expanded 64px/.8 var(--font); font-style: normal; color: transparent; -webkit-text-stroke: 1px rgba(var(--t), .3); background: linear-gradient(180deg, rgba(var(--t), .14), transparent 75%); -webkit-background-clip: text; background-clip: text; pointer-events: none; }
+.rc-aura { position: absolute; left: 50%; top: 104px; z-index: -1; width: 240px; height: 240px; margin: -120px 0 0 -120px; border-radius: 50%; background: conic-gradient(from 0deg, transparent, rgba(var(--t), .35), transparent 40%, rgba(var(--t), .25), transparent 75%); filter: blur(18px); animation: rx-spin 9s linear infinite; }
+.rc-orb { position: relative; display: grid; place-items: center; width: 132px; height: 132px; margin: 8px auto 14px; }
+.rc-orb svg { width: 50px; height: 50px; color: #fff; filter: drop-shadow(0 0 10px rgba(var(--t), 1)) drop-shadow(0 0 24px rgba(var(--t), .7)); }
+.rc-orb::before { content: ''; position: absolute; inset: 24px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .25), rgba(var(--t), .18) 45%, rgba(5, 7, 12, .6) 75%); box-shadow: inset 0 0 0 1px rgba(var(--t), .5), 0 0 40px -6px rgba(var(--t), .8); }
+.rc-ring { position: absolute; inset: 0; border-radius: 50%; border: 1px dashed rgba(var(--t), .5); animation: rx-spin 16s linear infinite; }
+.rc-ring::after { content: ''; position: absolute; left: 50%; top: -4px; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px #fff, 0 0 18px rgba(var(--t), 1); }
+.rc-ring.two { inset: 12px; border: 1px solid rgba(var(--t), .22); animation-duration: 10s; animation-direction: reverse; }
+.rc-ring.two::after { width: 5px; height: 5px; margin-left: -2.5px; top: -3px; background: rgba(var(--t), 1); }
+.rc-k { margin: 0; text-align: center; font: 800 semi-expanded 9.5px/1 var(--font); letter-spacing: .3em; text-transform: uppercase; color: rgba(var(--t), 1); }
+.rc-t { margin: 8px 0 0; text-align: center; font: 800 expanded 30px/1 var(--font); letter-spacing: .02em; text-transform: uppercase; background: linear-gradient(180deg, #fff 40%, rgba(var(--t), 1)); -webkit-background-clip: text; background-clip: text; color: transparent; text-wrap: balance; }
+.rc-s { margin: 8px 0 0; text-align: center; font-size: 13px; line-height: 1.35; color: var(--mute); text-wrap: balance; }
+/* the five levels as a staircase */
+.rc-lad { display: flex; align-items: flex-end; justify-content: center; gap: 6px; height: 58px; margin: 16px 0 0; }
+.rc-lad i { position: relative; display: grid; place-items: end center; width: 30px; height: calc(18px + var(--j) * 10px); padding-bottom: 5px; border-radius: 8px 8px 4px 4px; background: rgba(255, 255, 255, .05); box-shadow: inset 0 0 0 1px rgba(var(--t), .25); transform-origin: 50% 100%; }
+.rc-lad i.on { background: linear-gradient(180deg, #fff, rgba(var(--t), 1)); box-shadow: 0 0 16px -2px rgba(var(--t), 1); }
+.rc-lad b { font: 800 condensed 10px/1 var(--font); color: var(--mute); }
+.rc-lad i.on b { color: var(--on-lit); }
+#app.enter-tab .rc-lad i, #app.enter-seg .rc-lad i { animation: lad-up .7s var(--spring) calc(.3s + var(--j) * .07s) both; }
+@keyframes lad-up { from { transform: scaleY(0); } }
+.rc-pb { display: flex; justify-content: center; align-items: baseline; gap: 8px; min-height: 18px; margin: 12px 0 14px; font-size: 12.5px; color: var(--mute); }
+.rc-pb b { font: 800 semi-expanded 10px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; color: rgba(var(--t), 1); }
+.rc-pb span { font-variant-numeric: tabular-nums; }
+.rc-go { width: 100%; margin-top: auto; }
+.rc.on .rc-go { background: rgba(255, 255, 255, .06); color: var(--ink); box-shadow: inset 0 0 0 1px rgba(var(--t), .6); }
+@supports (animation-timeline: view(inline)) {
+  @media (prefers-reduced-motion: no-preference) {
+    html:not([data-motion='lite']) .rcs > li { animation: card-focus linear both; animation-timeline: view(inline); }
+  }
+}
+/* the open race's levels: a staircase of plates */
+.rc-panel { animation: up .5s var(--e-out) both; }
+.lvs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lv { position: relative; display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 12px 12px 12px 12px; margin-left: calc(var(--i) * 6px); border-radius: 20px; background: linear-gradient(90deg, rgba(var(--glow-2), calc(.06 + var(--i) * .05)), rgba(255, 255, 255, .02)); box-shadow: inset 0 0 0 1px var(--hair-2); }
+.lv-n { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; font: 800 condensed 16px/1 var(--font); font-style: normal; color: var(--acc-hi); box-shadow: inset 0 0 0 1px rgba(var(--glow), .4); }
+.lv.done .lv-n { background: var(--lit); color: var(--on-lit); box-shadow: 0 0 18px -4px rgba(var(--glow), 1); }
+.lv b { display: block; font: 750 semi-expanded 12.5px/1.2 var(--font); letter-spacing: .03em; text-transform: uppercase; }
+.lv span { display: block; margin-top: 3px; font-size: 12.5px; color: var(--mute); }
+.lv .btn { padding: 0 16px; }
+#app .rc-panel .lv { animation: up .45s var(--e-out) calc(var(--i) * .06s) both; }
+/* the finished races on a lit timeline */
+.tl { list-style: none; margin: 0; padding: 0 0 0 4px; }
+.tl li { position: relative; display: grid; grid-template-columns: 22px 1fr; gap: 10px; padding: 0 0 16px; }
+.tl li::before { content: ''; position: absolute; left: 5px; top: 14px; bottom: -2px; width: 2px; background: linear-gradient(180deg, rgba(var(--glow), .6), rgba(var(--glow), .1)); }
+.tl li:last-child::before { display: none; }
+.tl i { width: 12px; height: 12px; margin-top: 3px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(var(--glow), .25), 0 0 12px rgba(var(--glow), .9); }
+.tl b { display: block; font-weight: 700; }
+.tl span { display: block; margin-top: 2px; font-size: 13px; color: var(--mute); }
+
+@media (prefers-reduced-motion: reduce) {
+  .rx-sat, .rx-dial::before, .rc-aura, .rc-ring, .rc::after, .hof::after, .deck .stat::before, .deck .stats > .stat:first-child::after, .rc-live-dot { animation: none !important; }
+}
+html[data-motion='lite'] .rx-sat, html[data-motion='lite'] .rx-dial::before, html[data-motion='lite'] .rc-aura, html[data-motion='lite'] .rc-ring, html[data-motion='lite'] .rc::after, html[data-motion='lite'] .hof::after, html[data-motion='lite'] .deck .stat::before { animation: none !important; }

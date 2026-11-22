@@ -139,12 +139,6 @@ function weekSeg(): string {
   const done = weekDone(S.log, weekStart(today), weekSince(S.cycle, weekStart(today)));
   const t = totals(S.log);
   const streak = activeStreak(S.log, today);
-  const week = WEEK.map((d) => {
-    const n = dayProgress(d, done);
-    // gold for a finished day, as on Azi and in Plan
-    const cls = [weekdayIdx(today) === d.idx ? 'today' : '', n === d.blocks.length ? 'full' : ''].filter(Boolean).join(' ');
-    return `<div class="${cls}"><i style="--f:${(n / d.blocks.length).toFixed(3)}"><b></b></i><span>${RO_DAYS[d.idx].slice(0, 2)}</span></div>`;
-  }).join('');
   const full = WEEK.filter((d) => dayProgress(d, done) === d.blocks.length).length;
   const last7 = Array.from({ length: 7 }, (_, i) => addDays(today, i - 6));
   const sleepVals = last7.map((d) => S.sleep[d] ?? 0);
@@ -155,8 +149,7 @@ function weekSeg(): string {
   const dm = (d: string) => `${Number(d.slice(8))}.${Number(d.slice(5, 7))}`;
   const stat = (v: number, label: string, cls = '', shown = String(v)) => `<div class="stat ${cls}"><b class="num" data-count="${Math.round(v)}">${shown}</b><span>${label}</span></div>`;
   return `<h2 class="sec first">Săptămâna asta<small>${full} din 7 zile complete</small></h2>
-    <div class="week7">${week}</div>
-    ${frameworkHtml(done)}
+    ${reactorHtml(done, today)}
     <div class="stats">
       ${stat(streak, streak === 1 ? 'zi activă la rând' : 'zile active la rând', streak > 0 ? 'hot' : '')}
       ${stat(t.sessions, 'sesiuni în total')}
@@ -189,9 +182,9 @@ export function progressHtml(): string {
   const seg = segOf('progress', PROGRESS_SEGS.map(([k]) => k));
   const body = seg === 'train' ? trainSeg() : seg === 'tests' ? testsHtml() : seg === 'log' ? logSeg() : weekSeg();
   return `${top()}
-    ${masthead('Progres', 'Ce ai construit, săptămână de săptămână.', 'orbit')}
+    ${masthead('Progres', 'Ce ai construit, săptămână de săptămână.', 'pulse')}
     ${segBar('Secțiuni Progres', PROGRESS_SEGS, seg)}
-    <div class="seg-body" data-seg="${seg}">${body}</div>`;
+    <div class="seg-body deck" data-seg="${seg}">${body}</div>`;
 }
 
 /** The best set on every variation, newest first: the RECORD the workout player shows, kept. */
@@ -211,12 +204,55 @@ const FRAMEWORK: Array<[string, string[]]> = [
 ];
 const FRAMEWORK_GOAL: Record<string, number> = { Runs: 3, Upper: 3, Lower: 1, Conditioning: 1 };
 
-function frameworkHtml(done: Set<string>): string {
-  return `<div class="fw">${FRAMEWORK.map(([name, ids]) => {
+/** The four framework rings' colours: runs ice-white, upper blue, lower lavender, conditioning cyan. */
+const RX_COL = ['#dbe9fb', '#8fb3e6', '#c9b8f5', '#9fe3f0'];
+/** An arc on the 340-wide reactor, angles in degrees clockwise from the top. */
+function arcD(r: number, a0: number, a1: number): string {
+  const p = (a: number) => {
+    const t = ((a - 90) * Math.PI) / 180;
+    return `${(170 + r * Math.cos(t)).toFixed(2)} ${(170 + r * Math.sin(t)).toFixed(2)}`;
+  };
+  return `M${p(a0)} A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${p(a1)}`;
+}
+
+/**
+ * The week reactor (2026-11-22, the user: "vreau ceva mai spectaculos și o aranjare mult mai animată"): the seven days as
+ * an outer crown of arcs that fill with what is done, the Hybrid365 framework (runs, upper, lower, conditioning) as four
+ * rings that draw themselves inside it, the week's share in the core, a satellite circling the whole.
+ */
+function reactorHtml(done: Set<string>, today: string): string {
+  const tIdx = weekdayIdx(today);
+  const span = 360 / 7, gap = 5;
+  let got = 0, all = 0;
+  const days = WEEK.map((d) => {
+    const n = dayProgress(d, done);
+    got += n;
+    all += d.blocks.length;
+    const f = n / d.blocks.length;
+    const a0 = d.idx * span + gap / 2, a1 = (d.idx + 1) * span - gap / 2, mid = ((a0 + a1) / 2 - 90) * (Math.PI / 180);
+    const cls = `${f === 1 ? ' full' : ''}${d.idx === tIdx ? ' now' : ''}`;
+    return `<g class="rx-d${cls}" style="--i:${d.idx}"><path class="rx-tr" d="${arcD(150, a0, a1)}"/>${f > 0 ? `<path class="rx-on" pathLength="1" d="${arcD(150, a0, a0 + (a1 - a0) * f)}"/>` : ''}<text x="${(170 + 127 * Math.cos(mid)).toFixed(1)}" y="${(170 + 127 * Math.sin(mid) + 3.5).toFixed(1)}">${RO_DAYS[d.idx].slice(0, 2)}</text></g>`;
+  }).join('');
+  const fw = FRAMEWORK.map(([name, ids], i) => {
     const goal = FRAMEWORK_GOAL[name] ?? 1;
     const n = Math.min(goal, ids.filter((id) => done.has(id)).length);
-    return `<div class="fw-i${n >= goal ? ' full' : ''}"><b class="num">${n}<small>/${goal}</small></b><span>${name}</span><i style="--f:${(n / goal).toFixed(3)}"></i></div>`;
-  }).join('')}</div>`;
+    return { name, goal, n, r: 104 - i * 16, c: RX_COL[i]! };
+  });
+  const rings = fw.map((x, i) => `<circle class="rx-bg" cx="170" cy="170" r="${x.r}" style="--c:${x.c}"/>${x.n ? `<circle class="rx-r${x.n >= x.goal ? ' full' : ''}" cx="170" cy="170" r="${x.r}" pathLength="100" transform="rotate(-90 170 170)" style="--f:${(x.n / x.goal).toFixed(3)};--c:${x.c};--i:${i}"/>` : ''}`).join('');
+  const pct = all ? Math.round((got / all) * 100) : 0;
+  return `<div class="rx">
+    <div class="rx-dial">
+      <svg viewBox="0 0 340 340" aria-hidden="true">
+        <defs><linearGradient id="rxg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#b9d3f5"/><stop offset="1" stop-color="#6f97d0"/></linearGradient></defs>
+        <circle class="rx-orbit" cx="170" cy="170" r="165"/>
+        <g class="rx-sat"><circle cx="170" cy="5" r="3.6"/></g>
+        <g class="rx-sat rx-sat2"><circle cx="170" cy="5" r="2.4"/></g>
+        ${days}${rings}
+      </svg>
+      <div class="rx-c"><p><b class="num" data-count="${pct}">${pct}</b><small>%</small></p><span>din săptămână</span></div>
+    </div>
+    <div class="rx-k">${fw.map((x) => `<span class="${x.n >= x.goal ? 'full' : ''}" style="--c:${x.c}"><i></i><b class="num">${x.n}<small>/${x.goal}</small></b><em>${x.name}</em></span>`).join('')}</div>
+  </div>`;
 }
 
 /** Estimated one-rep max (Epley): a common yardstick across rep ranges, for the strength trend. */

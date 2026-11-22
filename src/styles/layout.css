@@ -366,3 +366,8 @@ button.bf-ring { cursor: pointer; font: inherit; }
   .az-greet i, .cta-halo, .cta-halo::before, .cta-sheen, .az-hud::after, .bf::before, .rd.next::before, .rd.next .rd-node::after, .az-head .ms-t span, .bf-ring.ask .t { animation: none !important; }
 }
 html[data-motion='lite'] .cta-halo, html[data-motion='lite'] .cta-halo::before, html[data-motion='lite'] .az-hud::after, html[data-motion='lite'] .bf::before, html[data-motion='lite'] .rd.next::before, html[data-motion='lite'] .az-head .ms-t span { animation: none !important; }
+.bf-ask { display: grid; place-items: center; cursor: pointer; font: inherit; }
+.bf-ask b { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; font: 800 expanded 34px/1 var(--font); color: var(--acc-hi); box-shadow: inset 0 0 0 1.5px rgba(var(--glow), .5), 0 0 24px -6px rgba(var(--glow), .9); background: radial-gradient(circle at 40% 30%, rgba(var(--glow), .25), transparent 70%); animation: ask-pulse 2.6s ease-in-out infinite; }
+@keyframes ask-pulse { 50% { box-shadow: inset 0 0 0 1.5px rgba(var(--glow), .9), 0 0 34px -2px rgba(var(--glow), 1); } }
+html[data-motion='lite'] .bf-ask b { animation: none; }
+@media (prefers-reduced-motion: reduce) { .bf-ask b { animation: none; } }

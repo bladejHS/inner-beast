@@ -76,7 +76,7 @@ export function dayBody(day: Day, today: string, kicker: string, notes = ''): st
         : `<p class="ms-done">${ic('claw')}<span>Misiune încheiată</span></p>`}
     </section>
     ${notes}
-    ${isToday ? briefHtml(today, done) : ''}
+    ${isToday ? `${briefHtml(today, done)}${readyCard(today, day.idx)}` : ''}
     ${isToday ? rankPlate() : ''}
     ${weekHead(today)}
     ${weekStrip(today, day.idx)}
@@ -114,7 +114,7 @@ function briefHtml(today: string, done: Set<string>): string {
       <div class="bf-dots" aria-label="Ultimele 7 zile">${last7.map((d, i) => `<i class="${days.has(d) ? 'on' : ''}${i === 6 ? ' now' : ''}" style="--i:${i}" title="${RO_DAYS[weekdayIdx(d)]}"></i>`).join('')}</div>
     </div>
     ${ring(pct / 100, `<b class="num" data-count="${pct}">${pct}</b><small>%</small>`, 'săptămâna')}
-    ${r ? ring(r.score / 100, `<b class="num" data-count="${r.score}">${r.score}</b>`, 'pregătire', `lv-${r.level}`, ' data-a="ready-edit" data-k="1" aria-label="Pregătirea de azi: schimbă răspunsurile"') : ring(0, '<b>?</b>', 'cum ești azi', 'ask', ' data-a="ready-edit" data-k="1" aria-label="Răspunde la cum ești azi"')}
+    ${r ? ring(r.score / 100, `<b class="num" data-count="${r.score}">${r.score}</b>`, 'pregătire', `lv-${r.level}`, ' data-a="ready-edit" data-k="1" aria-label="Pregătirea de azi: schimbă răspunsurile"') : `<button class="bf bf-ask" data-a="ready-edit" data-k="1" aria-label="Cum ești azi? Răspunde la trei întrebări"><b aria-hidden="true">?</b></button>`}
   </section>`;
 }
 
@@ -193,7 +193,8 @@ export function readyCard(today: string, idx: number): string {
   const r = readiness(note, sleep, sleepAvg3(S.sleep, today));
   // 2026-11-12: optional. Unanswered it is one quiet line; the questions open only when asked for.
   if (!r && !editReady) {
-    return `<section class="card rdy-mini" aria-label="Pregătirea de azi"><div class="row"><div class="row-l"><p class="label">Opțional · 10 secunde</p><h3>Cum ești azi?</h3></div><button class="btn ghost sm" data-a="ready-edit" data-k="1">Răspunde</button></div></section>`;
+    // 2026-11-22: unanswered it is only the question mark in the briefing at the top
+    return '';
   }
   if (!r || editReady) {
     const five = (f: 'e' | 'f', cur: number | undefined, name: string): string =>
@@ -210,6 +211,8 @@ export function readyCard(today: string, idx: number): string {
   }
   const trainDay = idx !== 2 && idx !== 6;
   const easyOn = S.easy === today;
+  // a good day needs no card: the score is in the briefing ring
+  if (r.level === 'go' && !easyOn) return '';
   const why = r.why.length ? `${r.why.join(' și ')}. `.replace(/^./, (c) => c.toUpperCase()) : '';
   const text = r.level === 'go'
     ? ''
@@ -231,15 +234,6 @@ export function readyCard(today: string, idx: number): string {
     <button class="link" data-a="ready-edit" data-k="1">Schimbă răspunsurile</button></section>`;
 }
 
-function whyCard(): string {
-  const w = ctx.S.why;
-  const lines = [w.winner, w.victim, w.drive].filter((s) => s.trim());
-  if (!lines.length) {
-    return `<section class="card why"><p class="label">De ce-ul tău</p><p class="why-quote">„Găsește-ți de ce-ul și îți vei găsi succesul.”</p><p class="small dim">Scrie de ce faci asta; îl vezi aici în fiecare zi.</p><button class="btn ghost sm" data-a="tab" data-k="mind" data-to="why">Scrie-l</button></section>`;
-  }
-  const pick = lines[daysBetween('2026-01-01', dayKey()) % lines.length] ?? lines[0];
-  return `<section class="card why"><p class="label">De ce-ul tău</p><p class="why-quote">${esc(pick)}</p></section>`;
-}
 
 /** The 4th week of every emphasis: the lighter week with the tests, proposed; and the reminder while it is on. */
 function deloadCard(today: string): string {
@@ -291,8 +285,7 @@ export function todayHtml(): string {
   return `${top()}
     ${dayBody(day, today, prettyDay(today), `${draftCard()}${kneeCard(today)}${introCard()}${deloadCard(today)}${repeatCard(today)}`)}
     ${habitCard() || fuelRow(today) ? `<h2 class="sec">Zilnic</h2>${habitCard()}${fuelRow(today)}` : ''}
-    ${whyCard()}
-    ${readyCard(today, idx)}`;
+`;
 }
 
 export function dayViewHtml(idx: number): string {

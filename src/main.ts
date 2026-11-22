@@ -3,6 +3,7 @@ import './styles/base.css';
 import './styles/components.css';
 import './styles/screens.css';
 import './styles/players.css';
+import './styles/launch.css';
 import './styles/shows.css';
 import './styles/layout.css';
 import { publishPlan } from './logic/bridge.ts';

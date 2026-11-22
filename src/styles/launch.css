@@ -1,0 +1,115 @@
+/* The launch screen (2026-11-22): what you see in the seconds before every session, and the weakest page of ZENITH
+   until now — a flat dark sheet with the controls pushed to the top and a void underneath.
+
+   The idea is the same night as the rest of the app: you stand under the sky and look up before you climb. Stars, one
+   aurora band and the glow of the horizon, with the controls floating in the middle of it. It covers every player
+   (`chrome()` without live controls adds `.setup`), so the fifteen timers all open the same way. Nothing moves once
+   the screen has settled, and the live phases keep their own colours: the sky hides as soon as the clock runs. */
+
+.pl.setup {
+  background:
+    radial-gradient(130% 70% at 50% 108%, rgba(var(--glow-2), .20), transparent 62%),
+    radial-gradient(100% 60% at 50% -12%, rgba(var(--glow-2), .14), transparent 70%),
+    linear-gradient(180deg, #060a12, #040710 62%, #070c16);
+}
+
+/* the stars: three fields of different sizes, so the sky has depth without a single repeating pattern */
+.pl.setup::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .8;
+  background-image:
+    radial-gradient(1.8px 1.8px at 18% 22%, rgba(255, 255, 255, 0.95), transparent 62%),
+    radial-gradient(1.3px 1.3px at 72% 14%, rgba(255, 255, 255, 0.8), transparent 62%),
+    radial-gradient(1.6px 1.6px at 42% 36%, rgba(255, 255, 255, 0.85), transparent 62%),
+    radial-gradient(1.2px 1.2px at 88% 40%, rgba(255, 255, 255, 0.7), transparent 62%),
+    radial-gradient(2px 2px at 8% 54%, rgba(255, 255, 255, 0.9), transparent 62%),
+    radial-gradient(1.3px 1.3px at 60% 62%, rgba(255, 255, 255, 0.75), transparent 62%),
+    radial-gradient(1.5px 1.5px at 30% 76%, rgba(255, 255, 255, 0.7), transparent 62%),
+    radial-gradient(1.2px 1.2px at 82% 84%, rgba(255, 255, 255, 0.6), transparent 62%),
+    radial-gradient(1.4px 1.4px at 52% 8%, rgba(255, 255, 255, 0.8), transparent 62%),
+    radial-gradient(1.1px 1.1px at 24% 44%, rgba(255, 255, 255, 0.6), transparent 62%),
+    radial-gradient(1.7px 1.7px at 68% 32%, rgba(255, 255, 255, 0.85), transparent 62%),
+    radial-gradient(1.2px 1.2px at 12% 30%, rgba(255, 255, 255, 0.65), transparent 62%),
+    radial-gradient(1.4px 1.4px at 94% 68%, rgba(255, 255, 255, 0.7), transparent 62%),
+    radial-gradient(1.2px 1.2px at 38% 90%, rgba(255, 255, 255, 0.55), transparent 62%),
+    radial-gradient(1.1px 1.1px at 76% 56%, rgba(255, 255, 255, 0.6), transparent 62%),
+    radial-gradient(1.5px 1.5px at 6% 12%, rgba(255, 255, 255, 0.75), transparent 62%);
+  animation: lx-twinkle 7s ease-in-out infinite alternate;
+}
+
+/* the horizon: the ground the aurora sits on, low enough to leave the controls alone */
+.pl.setup::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 42%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 100% at 50% 100%, rgba(var(--glow-2), .26), transparent 68%),
+    linear-gradient(180deg, transparent, rgba(4, 7, 15, .9));
+  mask-image: linear-gradient(180deg, transparent, #000 38%);
+}
+
+@keyframes lx-twinkle { from { opacity: .62; } to { opacity: .92; } }
+
+/* the aurora band, the one thing that moves while you read the screen */
+.pl.setup .pl-glow {
+  background:
+    radial-gradient(60% 34% at 28% 24%, rgba(var(--glow-2), .30), transparent 70%),
+    radial-gradient(52% 28% at 74% 16%, rgba(var(--glow), .16), transparent 72%);
+  filter: blur(6px);
+  animation: lx-aurora 24s var(--ease, cubic-bezier(.2, 0, 0, 1)) infinite alternate;
+}
+
+@keyframes lx-aurora {
+  from { transform: translate3d(-4%, -2%, 0) scale(1); }
+  to { transform: translate3d(5%, 3%, 0) scale(1.12); }
+}
+
+/* the controls sit in the middle of the sky instead of hanging from the top bar */
+.pl.setup .pl-body { justify-content: center; padding-bottom: 28px; }
+.pl.setup .pl-wrap { max-width: 520px; }
+.pl.setup .pl-h { margin-block: 2px 14px; }
+
+/* the target of the session reads as one lit plate */
+.pl.setup .call-box {
+  position: relative;
+  padding: 16px 18px;
+  border: 1px solid rgba(var(--glow-2), .36);
+  border-radius: var(--r, 24px);
+  background: linear-gradient(180deg, rgba(var(--glow-2), .14), rgba(255, 255, 255, .02) 60%), rgba(8, 13, 22, .72);
+  box-shadow: 0 24px 46px -28px #000;
+  backdrop-filter: blur(10px);
+}
+.pl.setup .call-box .c-name { font-variant-numeric: tabular-nums; }
+
+/* one orchestrated entrance: the sky is already there, then the title, the plate and the controls arrive in order */
+@media (prefers-reduced-motion: no-preference) {
+  .pl.setup .pl-wrap > * { animation: lx-rise .55s cubic-bezier(.16, 1, .3, 1) both; }
+  .pl.setup .pl-wrap > *:nth-child(1) { animation-delay: .04s; }
+  .pl.setup .pl-wrap > *:nth-child(2) { animation-delay: .11s; }
+  .pl.setup .pl-wrap > *:nth-child(3) { animation-delay: .17s; }
+  .pl.setup .pl-wrap > *:nth-child(n+4) { animation-delay: .22s; }
+}
+@keyframes lx-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+/* the way out: the start button is the only lit thing on the screen, so it gets the weight */
+.pl.setup .btn {
+  box-shadow: 0 18px 40px -20px rgba(var(--glow), .75);
+  transition-property: transform, box-shadow, filter;
+  transition-duration: 160ms;
+  transition-timing-function: ease-out;
+}
+.pl.setup .btn:active { transform: scale(.985); box-shadow: 0 10px 24px -18px rgba(var(--glow), .7); }
+
+html[data-motion='lite'] .pl.setup::before,
+html[data-motion='lite'] .pl.setup .pl-glow,
+html[data-motion='lite'] .pl.setup .pl-wrap > * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .pl.setup::before, .pl.setup .pl-glow, .pl.setup .pl-wrap > * { animation: none !important; }
+}

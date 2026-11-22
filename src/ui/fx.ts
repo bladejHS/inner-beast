@@ -1,9 +1,9 @@
-// Show pieces: the claw swipe between tabs, the round-start slam, the "day done" celebration and the number count-ups.
+// Show pieces: the light sweep between tabs, the stage marker on the timers, the "day done" celebration and the
+// number count-ups.
 // All of it moves only transform and opacity (the sparks draw on one canvas), and all of it is skipped or cut short
 // when the phone asks for reduced motion or the user picked "Reduse" in Settings (html[data-motion=lite]).
 
 import { wolfArt } from './rankart.ts';
-import { CLAWS } from './claws.ts';
 
 
 export function lite(): boolean {
@@ -26,14 +26,16 @@ export function clawSwipe(dir: number): void {
   replay(el, 'rip');
 }
 
-/** "RUNDA 2": slams onto the timer with claws and a shock ring, and the screen shakes once. */
+/** The marker of a new stage on the timer (2026-11-22, the user: "la timere inca apare animatia si textul cu ring,
+ *  fa ceva specific pentru zenith"): the boxing slam is gone — no claws, no shock ring, no shake. Instead the night
+ *  opens: a hairline horizon draws out from the centre, the words rise through it, and three sparks climb away. */
 export function slam(text: string, sub = ''): void {
   if (lite()) return;
   // on body, not in the player: the player re-renders right after the phase change
   const el = document.createElement('div');
-  el.className = 'slam';
+  el.className = 'rise';
   el.setAttribute('aria-hidden', 'true');
-  el.innerHTML = `<i class="slam-bg"></i><span class="slam-claws"><i></i><i></i><i></i></span><i class="slam-ring"></i><b>${text}</b>${sub ? `<span class="slam-sub">${sub}</span>` : ''}`;
+  el.innerHTML = `<i class="rise-bg"></i><i class="rise-hz"></i><span class="rise-sp"><i></i><i></i><i></i></span><b>${text}</b>${sub ? `<span class="rise-sub">${sub}</span>` : ''}`;
   document.body.appendChild(el);
   window.setTimeout(() => {
     // take the colours of the phase that is starting
@@ -43,13 +45,8 @@ export function slam(text: string, sub = ''): void {
       el.style.color = cs.color;
       el.style.setProperty('--bg', cs.backgroundColor);
     }
-    const ov = document.getElementById('ov');
-    if (ov) {
-      replay(ov, 'shake');
-      window.setTimeout(() => ov.classList.remove('shake'), 500);
-    }
   }, 0);
-  window.setTimeout(() => el.remove(), 1250);
+  window.setTimeout(() => el.remove(), 1500);
 }
 
 /** A number climbs from `from` to `to` (integers only). */
@@ -69,19 +66,17 @@ export function countUp(el: HTMLElement, from: number, to: number, ms = 750): vo
   requestAnimationFrame(step);
 }
 
-/** Full-screen celebration when the last block of the day is done: the wolf lands, claws rip, sparks fly. */
+/** Full-screen celebration when the last block of the day is done: the mark of your rank rises, sparks fly. */
 export function celebrate(title: string, sub: string, o: { mark?: string; word?: string; cls?: string } = {}): void {
   const el = document.createElement('div');
   el.className = `cele${o.cls ? ` ${o.cls}` : ''}`;
   el.setAttribute('role', 'status');
-  const claws = CLAWS.map((c, i) => `<path d="${c.fill}" style="--d:${(0.92 + i * 0.07).toFixed(2)}s"/>`).join('');
   el.innerHTML = `
     <canvas class="cele-fx" aria-hidden="true"></canvas>
     <div class="cele-core">
       <div class="cele-mark" aria-hidden="true">
         <i class="cele-halo"></i>
-        ${o.mark ?? `<img src="${wolfArt()}" alt="" width="680" height="801" decoding="async">
-        <svg class="cele-claws" viewBox="0 0 100 100">${claws}</svg>`}
+        ${o.mark ?? `<img src="${wolfArt()}" alt="" width="680" height="801" decoding="async">`}
       </div>
       <p class="cele-k">${sub}</p>
       <h2 class="cele-t">${title}</h2>

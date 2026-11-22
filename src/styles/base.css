@@ -30,10 +30,10 @@ p, li, .sec small, .ph-s, .rd-tip, .cue, .tr-t span, .rl-t span, .more-t span, .
 body::before {
   content: ''; position: fixed; inset: 0; z-index: -3; pointer-events: none;
   background:
-    radial-gradient(90% 38% at 18% -6%, rgba(120, 160, 230, .2), transparent 70%),
-    radial-gradient(70% 30% at 96% 4%, rgba(150, 130, 235, .1), transparent 70%),
-    radial-gradient(80% 30% at 50% 108%, rgba(111, 151, 208, .12), transparent 70%),
-    linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 46%, #04060a 100%);
+    radial-gradient(90% 38% at 18% -6%, rgba(118, 150, 205, .11), transparent 72%),
+    radial-gradient(70% 30% at 96% 4%, rgba(140, 128, 190, .05), transparent 72%),
+    radial-gradient(80% 30% at 50% 108%, rgba(96, 124, 164, .07), transparent 72%),
+    linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 46%, #020304 100%);
 }
 /* a fine grain, so the dark is a surface */
 body::after {
@@ -43,7 +43,7 @@ body::after {
 /* the aurora, breathing at the top */
 html::before {
   content: ''; position: fixed; left: -10%; right: -10%; top: -12vh; z-index: -2; height: 58vh; pointer-events: none; filter: blur(12px);
-  background: radial-gradient(55% 45% at 28% 42%, rgba(110, 170, 240, .14), transparent 70%), radial-gradient(45% 38% at 76% 30%, rgba(160, 140, 240, .09), transparent 70%);
+  background: radial-gradient(55% 45% at 28% 42%, rgba(108, 150, 205, .08), transparent 72%), radial-gradient(45% 38% at 76% 30%, rgba(140, 128, 190, .045), transparent 72%);
 }
 /* the stars: one screen-tall tile of them, drifting up very slowly */
 html::after {
@@ -88,7 +88,7 @@ html::after {
 .ph-t { overflow: hidden; margin: 0; padding: .04em 0; font: 800 expanded clamp(36px, 11.2vw, 66px)/1 var(--font); letter-spacing: .02em; text-transform: uppercase; }
 .ph-t span, .ms-t span {
   display: block; word-spacing: .06em; text-wrap: balance; overflow-wrap: normal; hyphens: none;
-  background: linear-gradient(100deg, transparent 38%, rgba(255, 255, 255, .95) 49%, transparent 60%) no-repeat, linear-gradient(180deg, #ffffff 0%, #eef3fb 46%, #a6bddd 100%);
+  background: linear-gradient(100deg, transparent 38%, rgba(255, 255, 255, .95) 49%, transparent 60%) no-repeat, linear-gradient(180deg, #ffffff 0%, #eef1f6 46%, #b4bcc8 100%);
   background-size: 260% 100%, 100% 100%; background-position: 170% 0, 0 0;
   -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
 }
@@ -113,7 +113,7 @@ html::after {
   position: sticky; top: 0; z-index: 15; display: flex; align-items: center; justify-content: space-between; gap: 10px;
   min-height: var(--top-h); margin: 0 calc(-1 * var(--gutter)); padding: env(safe-area-inset-top) var(--gutter) 0;
 }
-.top::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: rgba(5, 7, 12, .74); -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%); }
+.top::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: rgba(3, 4, 6, .78); -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%); }
 .top::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(var(--glow), .3) 30%, rgba(255, 255, 255, .45) 50%, rgba(var(--glow), .3) 70%, transparent); }
 @supports (animation-timeline: scroll()) {
   .top::before, .top::after { opacity: 0; animation: top-dim linear both; animation-timeline: scroll(root); animation-range: 0 72px; }

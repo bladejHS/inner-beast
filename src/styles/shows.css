@@ -2,20 +2,22 @@
    entries when a screen opens; the slow loops of light; the motion settings; the desktop. */
 
 /* ---------- the round's banner: the phase's light floods in, a ring, the words land ---------- */
-.slam { position: fixed; inset: 0; z-index: 65; display: grid; place-items: center; align-content: center; gap: 8px; pointer-events: none; color: var(--ink); }
-.slam-bg { position: absolute; inset: 0; background: var(--bg, var(--acc-deep)); opacity: 0; animation: slam-bg 1.2s linear both; }
-.slam-claws { position: absolute; inset: 0; overflow: hidden; }
-.slam-claws i { position: absolute; top: -10%; left: 50%; width: 3px; height: 120%; margin-left: -1.5px; border-radius: 2px; background: linear-gradient(180deg, transparent, currentColor 30%, #fff 50%, currentColor 70%, transparent); opacity: 0; transform: translateX(-60vw) rotate(20deg) scaleY(.2); animation: slam-claw .5s var(--e-snap) both; }
-.slam-claws i:nth-child(2) { margin-left: 18px; animation-delay: .05s; }
-.slam-claws i:nth-child(3) { margin-left: 40px; animation-delay: .1s; }
-.slam-ring { position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border: 2px solid currentColor; border-radius: 50%; opacity: 0; animation: slam-ring .9s var(--e-out) .12s both; }
-.slam b { position: relative; padding: 0 16px; font: 800 expanded clamp(44px, 14vw, 90px)/.95 var(--font); letter-spacing: .04em; text-align: center; text-transform: uppercase; text-shadow: 0 0 40px rgba(var(--glow), .6); animation: slam-hit 1.2s var(--e-out) both; }
-.slam-sub { position: relative; font: 700 semi-expanded 11px/1 var(--font); letter-spacing: .32em; text-transform: uppercase; animation: slam-sub 1.2s ease both; }
-@keyframes slam-bg { 0% { opacity: 0; } 10%, 70% { opacity: .95; } 100% { opacity: 0; } }
-@keyframes slam-claw { 0% { opacity: 0; transform: translateX(-60vw) rotate(20deg) scaleY(.2); } 30% { opacity: .9; } 100% { opacity: 0; transform: translateX(60vw) rotate(20deg) scaleY(1); } }
-@keyframes slam-ring { 0% { opacity: .9; transform: scale(.3); } 100% { opacity: 0; transform: scale(5); } }
-@keyframes slam-hit { 0% { opacity: 0; transform: scale(1.8); filter: blur(10px); } 20% { opacity: 1; transform: scale(.97); filter: blur(0); } 32%, 76% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-12px); } }
-@keyframes slam-sub { 0%, 22% { opacity: 0; transform: translateY(8px); } 36%, 76% { opacity: .85; transform: none; } 100% { opacity: 0; } }
+/* The stage marker on the timers (2026-11-22). ZENITH's own: the night opens along a hairline, the words rise
+   through it and three sparks climb away. No claws, no shock ring, no shake — those belonged to the old fight app. */
+.rise { position: fixed; inset: 0; z-index: 65; display: grid; place-items: center; align-content: center; gap: 10px; pointer-events: none; color: var(--ink); }
+.rise-bg { position: absolute; inset: 0; background: var(--bg, var(--acc-deep)); opacity: 0; animation: rise-bg 1.45s linear both; }
+.rise-hz { position: absolute; left: 50%; top: 50%; width: 76vw; max-width: 520px; height: 1px; margin-left: -38vw; background: linear-gradient(90deg, transparent, rgba(var(--glow), .85) 22%, #fff 50%, rgba(var(--glow), .85) 78%, transparent); box-shadow: 0 0 18px rgba(var(--glow), .55); transform: scaleX(0); animation: rise-hz 1.45s var(--e-out) both; }
+.rise-sp { position: absolute; inset: 0; overflow: hidden; }
+.rise-sp i { position: absolute; left: 50%; top: 56%; width: 2px; height: 2px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px rgba(var(--glow), .9); opacity: 0; animation: rise-sp 1.3s var(--e-out) .18s both; }
+.rise-sp i:nth-child(2) { margin-left: -58px; animation-delay: .26s; animation-duration: 1.5s; }
+.rise-sp i:nth-child(3) { margin-left: 64px; animation-delay: .34s; animation-duration: 1.6s; }
+.rise b { position: relative; padding: 0 18px; font: 800 expanded clamp(40px, 12.5vw, 80px)/.98 var(--font); letter-spacing: .03em; text-align: center; text-transform: uppercase; text-shadow: 0 0 38px rgba(var(--glow), .5); animation: rise-t 1.45s var(--e-out) both; }
+.rise-sub { position: relative; font: 700 semi-expanded 11px/1 var(--font); letter-spacing: .3em; text-transform: uppercase; color: var(--acc-text); animation: rise-s 1.45s ease both; }
+@keyframes rise-bg { 0% { opacity: 0; } 12%, 66% { opacity: .92; } 100% { opacity: 0; } }
+@keyframes rise-hz { 0% { opacity: 0; transform: scaleX(0); } 18% { opacity: 1; } 46% { transform: scaleX(1); } 70% { opacity: .5; } 100% { opacity: 0; transform: scaleX(1); } }
+@keyframes rise-sp { 0% { opacity: 0; transform: translateY(0) scale(.6); } 20% { opacity: .9; } 100% { opacity: 0; transform: translateY(-46vh) scale(1); } }
+@keyframes rise-t { 0% { opacity: 0; transform: translateY(26px); filter: blur(12px); } 26% { opacity: 1; transform: translateY(0); filter: blur(0); } 70% { opacity: 1; } 100% { opacity: 0; transform: translateY(-14px); } }
+@keyframes rise-s { 0%, 20% { opacity: 0; transform: translateY(10px); } 36%, 70% { opacity: .9; transform: none; } 100% { opacity: 0; } }
 
 /* ---------- the whole day done: the mark rises into a burst of light, the words land under it ---------- */
 .cele { position: fixed; inset: 0; z-index: 200; overflow: hidden; display: grid; place-items: center; padding: 24px; cursor: pointer; color: var(--ink);
@@ -28,8 +30,6 @@
 .cele-mark { position: relative; width: min(56vw, 250px); aspect-ratio: 680 / 801; animation: cele-land .9s var(--spring-hard) .3s both; }
 .cele-mark img { position: relative; display: block; width: 100%; height: auto; }
 .cele-halo { position: absolute; inset: -30%; border-radius: 50%; background: radial-gradient(closest-side, rgba(var(--glow), .55), rgba(var(--glow-2), .15) 55%, transparent 72%); animation: fade .8s ease-out .5s both; }
-.cele-claws { position: absolute; left: 6%; top: 8%; width: 88%; height: auto; overflow: visible; }
-.cele-claws path { fill: var(--acc-hi); clip-path: inset(0 0 100% 0); animation: gash .24s var(--e-snap) forwards; animation-delay: var(--d, 1s); }
 @keyframes cele-land { 0% { opacity: 0; transform: translateY(60px) scale(.8); filter: blur(8px); } 60% { opacity: 1; filter: blur(0); } 100% { transform: none; } }
 .cele-k { margin: 22px 0 8px; font: 700 semi-expanded 11px/1 var(--font); letter-spacing: .34em; text-transform: uppercase; color: var(--acc-hi); animation: fade .5s ease-out 1.25s both; }
 .cele-t { margin: 0; font: 800 expanded clamp(40px, 12.5vw, 72px)/1 var(--font); letter-spacing: .04em; text-transform: uppercase; text-wrap: balance; background: linear-gradient(180deg, #ffffff 45%, #a6bddd); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; animation: done-in .6s var(--spring-hard) 1.35s both; }
@@ -225,13 +225,13 @@
 
 /* ---------- motion settings: "Animații: Reduse" and the phone's reduced motion ---------- */
 html[data-motion='lite'] *, html[data-motion='lite'] *::before, html[data-motion='lite'] *::after { animation: none !important; }
-html[data-motion='lite'] #swipe, html[data-motion='lite'] .slam, html[data-motion='lite'] .pl-fx { display: none; }
+html[data-motion='lite'] #swipe, html[data-motion='lite'] .rise, html[data-motion='lite'] .pl-fx { display: none; }
 html[data-motion='lite'] .nw, html[data-motion='lite'] .nw-ring, html[data-motion='lite'] .g-v { transition-duration: .01s; }
 html[data-motion='lite'] .cele { animation: fade .2s ease-out both !important; }
 html[data-motion='lite'] .cele *, html[data-motion='lite'] .done-mark path { clip-path: none; opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-  #swipe, .slam, .pl-fx { display: none; }
+  #swipe, .rise, .pl-fx { display: none; }
 }
 
 /* ---------- desktop ---------- */

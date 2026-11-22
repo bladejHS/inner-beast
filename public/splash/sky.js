@@ -115,7 +115,7 @@
       for (var b = 0; b < bands.length; b++) {
         var B = bands[b], y0 = B.y * H, amp = B.a * H, th = B.h * H;
         var g = c.createLinearGradient(0, y0 - amp - th, 0, y0 + amp + th);
-        g.addColorStop(0, rgba(B.hue, 0)); g.addColorStop(0.5, rgba(B.hue, 0.13 + 0.05 * Math.sin(t * 0.4 + b))); g.addColorStop(1, rgba(B.hue, 0));
+        g.addColorStop(0, rgba(B.hue, 0)); g.addColorStop(0.5, rgba(B.hue, 0.05 + 0.02 * Math.sin(t * 0.4 + b))); g.addColorStop(1, rgba(B.hue, 0));
         c.fillStyle = g; c.beginPath();
         var step = W / 24;
         for (var x = 0; x <= W + step; x += step) {
@@ -174,7 +174,7 @@
       c.restore();
       /* a far range for depth */
       c.globalCompositeOperation = 'source-over';
-      c.fillStyle = 'rgba(14,24,42,.55)'; c.beginPath(); c.moveTo(0, H);
+      c.fillStyle = 'rgba(8,11,17,.62)'; c.beginPath(); c.moveTo(0, H);
       for (var x = 0; x <= 24; x++) c.lineTo(x / 24 * W, (base - 0.1 - 0.06 * Math.abs(Math.sin(x * 1.37 + seed))) * H);
       c.lineTo(W, H); c.fill();
       /* the mountain: dark body, lit faces, edge of light */
